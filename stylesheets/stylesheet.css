@@ -1,6 +1,7 @@
 /*******************************************************************************
-Slate Theme for GitHub Pages
-by Jason Costello, @jsncostello
+Theme for YusDesign GitHub Page
+by Yuri Skorodelov, @yus
+reworked Slate Theme by Jason Costello, @jsncostello
 *******************************************************************************/
 
 /**
@@ -273,6 +274,8 @@ Full-Width Styles
   font-size: 42px;
   font-weight: 400;
   text-shadow: #111 0px 0px 10px;
+  content:'';
+  background:url(../images/yus143.png) 0 50% no-repeat;
 }
 
 #project_tagline {
