@@ -4,15 +4,12 @@
 * copyright: yusdesign (c) 2013
 */
 #kulerfeed{
-  background-color:#222222;
+  background:#222222 url(../images/ku18.png) 99% 99% no-repeat;
   padding:10px;
   min-height:480px;
   margin:0 auto;
   overflow-x: auto;
   overflow-y: visible;
-}
-#kuhead{
-  background:url(../images/ku18.png) 100% 50% no-repeat;
 }
 .fentry{
   margin: 2px 2px 0 0;
