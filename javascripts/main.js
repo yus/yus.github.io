@@ -2,7 +2,7 @@ console.log('This is main JS file.');
 
 google.load("feeds","1");
 google.load("webfont","1");
-WebFont.load({google:{families:["Roboto::cyrillic,latin"]}})
+WebFont.load({google:{families:["Roboto::cyrillic,latin"]}});
 function initialize(){var c=new google.feeds.Feed("http://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996");
 c.setNumEntries(50);
 c.load(function(d){
