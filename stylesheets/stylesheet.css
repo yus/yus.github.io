@@ -126,12 +126,12 @@ a {
 }
 
 #main_content a:hover {
-  color: #0069ba;
+  color: #fff;
   text-shadow: #0090ff 0px 0px 2px;
 }
 
 footer a:hover {
-  color: #43adff;
+  color: #fff;
   text-shadow: #0090ff 0px 0px 2px;
 }
 
