@@ -11,6 +11,9 @@
   overflow-x: auto;
   overflow-y: visible;
 }
+#kuhead{
+  background:url(../images/ku18.png) 100% 50% no-repeat;
+}
 .fentry{
   margin: 2px 2px 0 0;
   background-color: #555555;
