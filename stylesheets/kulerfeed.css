@@ -1,0 +1,18 @@
+/*
+* name: Yusdesign Kuler Feed
+* author: Yuri Skorodelov
+* copyright: yusdesign (c) 2013
+*/
+#kulerfeed{background-color:#222222;padding:10px;min-height:300px;margin:0 auto}
+.fentry{
+  margin: 2px 2px 0 0;
+  background-color: #555555;
+  padding:5px;
+  display:block;
+  float:left;
+}
+.flink{height: 16px;color:silver;text-decoration:none;}
+.flink:hover{color:white;}
+.penta, .thitle{display:block;}
+.thitle{font-size: 12px;vertical-align: top;height: 16px;padding: 5px 0 0;}
+h2{font-weight:normal;color:#333333;}
