@@ -64,7 +64,6 @@ body {
   background: #212121;
   font-size: 16px;
   font-family: 'Roboto', sans-serif;
-  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -72,7 +71,6 @@ h1, h2, h3, h4, h5, h6 {
   margin: 10px 0;
   font-weight: 400;
   font-family: 'Roboto', sans-serif;
-  letter-spacing: -1px;
 }
 
 h1 {
@@ -110,7 +108,7 @@ footer p {
 
 a {
   text-decoration: none;
-  color: #007edf;
+  color: #ccc;
   text-shadow: none;
 
   transition: color 0.5s ease;
@@ -127,12 +125,12 @@ a {
 
 #main_content a:hover {
   color: #fff;
-  text-shadow: #0090ff 0px 0px 2px;
+  text-shadow: #222 0px 0px 5px;
 }
 
 footer a:hover {
   color: #fff;
-  text-shadow: #0090ff 0px 0px 2px;
+  text-shadow: #222 0px 0px 5px;
 }
 
 em {
