@@ -3,7 +3,14 @@
 * author: Yuri Skorodelov
 * copyright: yusdesign (c) 2013
 */
-#kulerfeed{background-color:#222222;padding:10px;min-height:300px;margin:0 auto}
+#kulerfeed{
+  background-color:#222222;
+  padding:10px;
+  min-height:300px;
+  margin:0 auto;
+  overflow-x: auto;
+  overflow-y: visible;
+}
 .fentry{
   margin: 2px 2px 0 0;
   background-color: #555555;
