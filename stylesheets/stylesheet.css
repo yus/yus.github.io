@@ -143,7 +143,6 @@ strong {
 
 img {
   position: relative;
-  margin: 0 auto;
 }
 
 pre, code {
@@ -291,7 +290,7 @@ Full-Width Styles
 }
 
 #main_content {
-  padding-top: 40px;
+  padding: 40px;
 }
 
 #footer_wrap {
