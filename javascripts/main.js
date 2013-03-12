@@ -38,7 +38,7 @@ console.log('This is main JS file.');
         });
         WebFont.load({
           google: {
-            families: [ 'Roboto::cyrillic,latin' ]
+            families: [ 'Inder::latin' ]
           }
         });
       }
