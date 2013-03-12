@@ -36,3 +36,13 @@ h2{
   font-weight:normal;
   color:#333333;
 }
+div.copyright{
+  height: 20px;
+  background: url(../images/yus.png) no-repeat scroll 50% 50%;
+}
+div.regards{
+  height: 40px;
+  background:
+    url(../images/blacktocat18.png) no-repeat scroll 0 50%,
+    url(../images/ku18.png) 36px 50% no-repeat;
+}
