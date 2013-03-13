@@ -51,10 +51,17 @@
 .flink:hover{
   color:white;
 }
-.penta{
+.penta, .thitle{
   display:block;
   float: left;
   clear: both;
+}
+.thitle{
+  font-size:12px;
+  letter-spacing:-.4px;
+  vertical-align:top;
+  height:16px;
+  padding:5px 0 0;
 }
 h2{
   font-weight:normal;
