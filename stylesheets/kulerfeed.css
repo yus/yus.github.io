@@ -19,6 +19,7 @@
   display: inline-block;
 }
 .fentry{
+  width:94%;
   margin: 2px 2px 0 0;
   background-color: #555555;
   padding:5px;
@@ -29,6 +30,7 @@
   height:16px;
   color:silver;
   text-decoration:none;
+  text-align:left;
 }
 .flink:hover{color:white;}
 .penta, .thitle{display:block;}
