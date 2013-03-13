@@ -7,7 +7,9 @@
   padding:0;
   margin:0;
 }
-.gesso{height:600px}
+.gesso{
+  height:600px;
+}
 #kulerfeed{
   background-color:#222;
   padding:8px 12px 8px 10px;
@@ -46,14 +48,13 @@
   text-decoration:none;
   text-align:left;
 }
-.flink:hover{color:white;}
-.penta, .thitle{display:block;}
-.thitle{
-  font-size:12px;
-  letter-spacing:-.4px;
-  vertical-align:top;
-  height:16px;
-  padding:5px 0 0;
+.flink:hover{
+  color:white;
+}
+.penta{
+  display:block;
+  float: left;
+  clear: both;
 }
 h2{
   font-weight:normal;
