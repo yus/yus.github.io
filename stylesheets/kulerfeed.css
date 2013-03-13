@@ -3,13 +3,20 @@
 * author: Yuri Skorodelov
 * copyright: yusdesign (c) 2013
 */
+#gesso{
+  padding:0;
+  margin:0;
+}
 #kulerfeed{
   background-color:#222;
-  padding:10px;
-  min-height:480px;
-  margin:0 auto;
+  padding: 8px 12px 8px 10px;
+  margin: 0px auto;
   overflow-x: auto;
   overflow-y: visible;
+  height: 600px;
+  width: 150px;
+  direction: rtl;
+  display: inline-block;
 }
 .fentry{
   margin: 2px 2px 0 0;
