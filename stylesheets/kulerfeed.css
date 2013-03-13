@@ -12,31 +12,25 @@
   background-color:#222;
 }
 #kulerfeed{
-  padding:8px 10px;
-  margin:0px auto;
-  overflow-x:auto;
-  overflow-y:visible;
-  width:150px;
-  direction:rtl;
-  display:inline-block;
+  display: block;
+  margin: 0px auto 20px;
+  white-space: nowrap;
+  width: 85%;
+  overflow: hidden;
 }
 #palette{
-  display:inline-block;
-  min-width:300px;
-  padding:8px 12px 8px 10px;
+  display: block;
+  height: 200px;
 }
 #tagcloud{
-  margin: 0px;
-  padding: 8px 12px 8px 10px;
-  display: inline-block;
-  min-width: 200px;
+  display: block;
+  height: 200px;
 }
 .fentry{
-  width:94%;
-  background-color: #555555;
-  display:block;
-  float:left;
-  margin: 0px 0px 1px;
+  background-color: rgb(85, 85, 85);
+  display: inline-block;
+  margin: 0px 0px 1px 1px;
+  min-width: 10%;
   padding: 4px 4px 0px;
 }
 .flink{
@@ -58,7 +52,6 @@
 .thitle{
   font-size:12px;
   letter-spacing:-.4px;
-  vertical-align:top;
   height:16px;
   padding:5px 0 0;
 }
