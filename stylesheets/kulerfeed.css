@@ -12,10 +12,10 @@
   background-color:#222;
 }
 #kulerfeed{
-  display:block;
+  display:inline-block;
   margin:0px auto 20px;
   white-space:nowrap;
-  width:85%;
+  width:100%;
   overflow:hidden;
 }
 #palette{
