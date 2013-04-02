@@ -28,9 +28,8 @@
 }
 .fentry{
   background-color:rgb(85, 85, 85);
-  display:inline-block;
+  display:block;
   margin:0px 0px 1px 1px;
-  min-width:10%;
   padding:4px 4px 0px;
 }
 .flink{
