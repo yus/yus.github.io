@@ -62,14 +62,14 @@ body {
   color:#373737;
   background: #212121;
   font-size: 16px;
-  font-family: 'Lora', serif;
+  font-family: 'Podkova', serif;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 10px 0;
   font-weight: 400;
-  font-family: 'Lora', serif;
+  font-family: 'Podkova', serif;
 }
 
 h1 {
@@ -218,7 +218,7 @@ table {
  }
 
 th {
-  font-family: 'Lora', serif;
+  font-family: 'Podkova', serif;
   padding: 10px;
   background: #373737;
   color: #fff;
