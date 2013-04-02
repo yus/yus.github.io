@@ -6,9 +6,6 @@ google.load('feeds', '1');
 google.load('webfont', '1');
 
 function initialize() {
-  WebFontConfig = {
-    google: { families: [ 'Podkova::latin' ] }
-  };
 //title: 'Quickmaker Themes', title : 'Quickmaker Color Themes'
   var feed = new google.feeds.Feed('http://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996');
   feed.setNumEntries(50);
@@ -37,6 +34,9 @@ function initialize() {
         container.appendChild(div);
       }
     }
+  });
+  WebFontConfig.load({
+    google: { families: [ 'Podkova::latin' ] }
   });
 }
 google.setOnLoadCallback(initialize);
