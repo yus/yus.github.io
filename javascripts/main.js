@@ -35,7 +35,7 @@ function initialize() {
       }
     }
   });
-  WebFontConfig.load({
+  WebFont.load({
     google: { families: [ 'Podkova::latin' ] }
   });
 }
