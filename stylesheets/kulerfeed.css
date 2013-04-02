@@ -14,21 +14,11 @@
 #kulerfeed{
   display:inline-block;
   margin:0px auto 20px;
-  white-space:nowrap;
-  width:100%;
   overflow:hidden;
-}
-#palette{
-  display:block;
-  height:200px;
-}
-#tagcloud{
-  display:block;
-  height:200px;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
-  display:block;
+  display:inline-block;
   margin:0px 0px 1px 1px;
   padding:4px 4px 0px;
 }
