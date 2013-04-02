@@ -166,10 +166,10 @@ pre code {
 }
 
 blockquote {
-  color: #666;
+  color: #555;
   margin-bottom: 20px;
   padding: 0 0 0 20px;
-  border-left: 3px solid #bbb;
+  border-left: 3px solid #ccc;
 }
 
 ul, ol, dl {
@@ -241,7 +241,7 @@ Full-Width Styles
 
 .inner {
   position: relative;
-  max-width: 800px;
+  width: 720px;
   padding: 20px 10px;
   margin: 0 auto;
 }
