@@ -7,7 +7,7 @@ google.load('webfont', '1');
 
 function initialize() {
   WebFontConfig = {
-    google: { families: [ 'Lora::latin' ] }
+    google: { families: [ 'Podkova::latin' ] }
   };
 //title: 'Quickmaker Themes', title : 'Quickmaker Color Themes'
   var feed = new google.feeds.Feed('http://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996');
