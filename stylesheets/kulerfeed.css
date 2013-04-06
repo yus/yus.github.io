@@ -12,9 +12,10 @@
   background-color:#222;
 }
 #kulerfeed{
-  display:inline-block;
+  display:block;
   margin:0px auto 20px;
   overflow:hidden;
+  height:730px;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
