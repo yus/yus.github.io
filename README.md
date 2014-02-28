@@ -1,6 +1,6 @@
-yusdesign
-<<<<<<< HEAD
+
+<<<<<<< yusdesign
 =========
 =======
 =========
->>>>>>> origin/gh-pages
+>>>>>>>
