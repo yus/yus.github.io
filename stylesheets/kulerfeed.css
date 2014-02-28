@@ -3,34 +3,6 @@
 * author: Yuri Skorodelov
 * copyright: yusdesign (c) 2013
 */
-<<<<<<< HEAD
-#kulerfeed{
-  background-color:#222;
-  padding:10px;
-  min-height:480px;
-  margin:0 auto;
-  overflow-x: auto;
-  overflow-y: visible;
-}
-.fentry{
-  margin: 2px 2px 0 0;
-  background-color: #555;
-  padding:5px;
-  display:block;
-  float:left;
-  min-width:140px;
-}
-.flink{
-  height:16px;
-  color:silver;
-  text-decoration:none;
-}
-.flink:hover{color:white;}
-.penta, .thitle{display:block;}
-.thitle{
-  font-size:11px;
-  vertical-align:top;
-=======
 #gesso{
   padding:0;
   margin:0;
@@ -70,7 +42,6 @@
 .thitle{
   font-family: 'Podkova';
   font-size:12px;
->>>>>>> origin/gh-pages
   height:16px;
   padding:5px 0 0;
 }
@@ -78,8 +49,6 @@ h2{
   font-weight:normal;
   color:#333333;
 }
-<<<<<<< HEAD
-=======
 div.copyright{
   height:20px;
   background:url(../images/yus.png) no-repeat scroll 50% 50%;
@@ -90,4 +59,3 @@ div.regards{
     url(../images/blacktocat18.png) no-repeat scroll 0 50%,
     url(../images/ku18.png) 36px 50% no-repeat;
 }
->>>>>>> origin/gh-pages
