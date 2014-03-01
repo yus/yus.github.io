@@ -1,58 +1,76 @@
 <!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
+<html>
+  <head>
+    <title>StackMob - Master/Detail</title>
 
-  <title>My Parse App</title>
-  <meta name="description" content="My Parse App">
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/styles.css">
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.17.min.js"></script>
-</head>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 
-<body>
-  
-  <div id="main">
-    <h1>You're ready to use Parse!</h1>
+    <script type="text/javascript">
+      $(document).bind("mobileinit", function(){
+          $.mobile.page.prototype.options.addBackBtn= false;
+          $.mobile.ajaxEnabled = false;
+          $.mobile.linkBindingEnabled = false;
+          $.mobile.hashListeningEnabled = false;
+          $.mobile.pushStateEnabled = false;
 
-    <p>Read the documentation and start building your JavaScript app:</p>
+          $(document).on('pagehide', function (event, ui) {
+            $(".ui-page").not(".ui-page-active").remove()
+          });
+      });
+    </script>
 
-    <ul>
-      <li><a href="https://www.parse.com/docs/js_guide">Parse JavaScript Guide</a></li>
-      <li><a href="https://www.parse.com/docs/js">Parse JavaScript API Documentation</a></li>
-    </ul>
+    <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+    <script src="http://static.stackmob.com/js/stackmob-js-0.9.2-bundled-min.js"></script>
 
-    <div style="display:none" class="error">
-      Looks like there was a problem saving the test object. Make sure you've set your application ID and javascript key correctly in the call to <code>Parse.initialize</code> in this file.
-    </div>
+    <!-- App specific scripts -->
+    <script src="js/ts.js"></script>
 
-    <div style="display:none" class="success">
-      <p>We've also just created your first object using the following code:</p>
-      
-        <code>
-          var TestObject = Parse.Object.extend("TestObject");<br/>
-          var testObject = new TestObject();<br/>
-          testObject.save({foo: "bar"});
-        </code>
-    </div>
-  </div>
+    <!-- maximum scale added to stop zoom on select controls -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-  <script type="text/javascript">
-    Parse.initialize("7SHtJa3hoDV9OXpvyZUXk1TJpQ82IhGJ7ypRQOPo", "1J7hdHn2kQvNhQX2AYYzsxHTxY9j31mkObVLYpNO");
-    
-    var TestObject = Parse.Object.extend("TestObject");
-    var testObject = new TestObject();
-      testObject.save({foo: "bar"}, {
-      success: function(object) {
-        $(".success").show();
-      },
-      error: function(model, error) {
-        $(".error").show();
-      }
-    });
-  </script>
-</body>
+    <!-- templates -->
+    <script type="text/template" id="home">
+        <div data-role="header">
+            <h1>StackMob ToDo</h1>
+            <a href="#add" data-role="button" data-icon="add" class="ui-btn-right">Add</a>
+        </div>
+        <div data-role="content"></div>
+    </script>
 
+    <script type="text/template" id="listTemplate">
+        <li>
+          <a href="#update/<%= todo_id %>" data-id="<%= todo_id %>"><%= name %></a>
+        </li>
+    </script>
+
+    <script type="text/template" id="add">
+        <div data-role="header">
+            <a href="#" data-icon="back" class="back ui-btn-left">Back</a>
+            <h1>Add ToDo</h1>
+        </div>
+        <div data-role="content">
+            <form name="addForm" id="addForm">
+                <input type="text" name="name" id="name" placeholder="enter todo" value="">
+                <input type="submit" id="addBtn" value="Add" data-theme="b">
+            </form>
+        </div>
+    </script>
+
+    <script type="text/template" id="update">
+        <div data-role="header">
+            <a href="#" data-icon="back" class="back ui-btn-left">Back</a>
+            <h1>Update ToDo</h1>
+        </div>
+        <div data-role="content">
+            <form name="updateForm" id="updateForm">
+                <input type="text" name="name" id="name" value="<%=  name %>">
+                <input type="submit" id="updateBtn" value="Save" data-theme="b">
+                <input type="button" id="deleteBtn" value="Delete">
+            </form>
+        </div>
+    </script>
+
+  </head>
+  <body></body>
 </html>
-
