@@ -72,5 +72,55 @@
     </script>
 
   </head>
-  <body></body>
+  <body>
+    <script>
+    //What follows is standard Facebook JS initialization.  See Facebook for more details.
+    //Facebook JS SDK code here.  Use your own Facebook App ID
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '...', // FB App ID
+        status     : true, // check login status
+        cookie     : true, // enable cookies to allow the server to access the session
+        xfbml      : true  // parse XFBML
+      });
+    
+      // Additional initialization code here
+    };
+    
+    // Load the SDK Asynchronously
+    (function(d){
+       var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+       js = d.createElement('script'); js.id = id; js.async = true;
+       js.src = '//connect.facebook.net/en_US/all.js';
+       d.getElementsByTagName('head')[0].appendChild(js);
+     }(document));
+    </script>
+    
+    
+    <a href="javascript:void(0);" id="login">Log into Facebook</a>
+    
+    <div id="fb-root"></div>
+    
+    <script type="text/javascript">
+    function login() {
+    //Login with Facebook
+    FB.login(function(response) {
+      if (response.authResponse) {
+    
+        var accessToken = response.authResponse.accessToken;
+        var user = new StackMob.User();
+        user.loginWithFacebookToken(accessToken, false);
+    
+      } else {
+        console.log('User cancelled login or did not fully authorize.');
+      }
+    }, {scope: 'email'});
+    }
+    
+    $('#login').click(function() {
+      login();
+    });
+    
+    </script>
+  </body>
 </html>
