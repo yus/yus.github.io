@@ -40,13 +40,15 @@
   clear:both;
 }
 .thitle{
-  font-family: 'fira-sans-2';
+  font-family: 'Fira Sans';
+  font-weight: 500;
+  font-style:normal;
   font-size:12px;
   height:16px;
   padding:5px 0 0;
 }
 h2{
-  font-weight:normal;
+  font-style:normal;
   color:#333333;
 }
 div.copyright{
