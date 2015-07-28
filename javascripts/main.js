@@ -3,7 +3,7 @@
 *  License: CC-NC-ND 3.0 Unported
 */
 google.load('feeds', '1');
-google.load('webfont', '1');
+/*google.load('webfont', '1');*/
 
 function initialize() {
 //title: 'Quickmaker Themes', title : 'Quickmaker Color Themes'
@@ -35,8 +35,10 @@ function initialize() {
       }
     }
   });
+  /*
   WebFont.load({
     google: { families: [ 'Podkova::latin' ] }
   });
+  */
 }
 google.setOnLoadCallback(initialize);
