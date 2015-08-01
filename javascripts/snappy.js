@@ -4,6 +4,7 @@
 // If you want to create new surface just provide dimensions
 // like s = Snap(800, 600);
 var s = Snap("#svg");
+s = Snap(800, 600);
 // Lets create big circle in the middle:
 var bigCircle = s.circle(150, 150, 100);
 // By default its black, lets change its attributes
