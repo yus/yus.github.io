@@ -1,5 +1,5 @@
-var s = Snap("#svg");
-s = Snap(800, 600);
+var s = Snap("#snapper");
+//s = Snap(800, 600);
 
 var bigCircle = s.circle(150, 150, 100);
 
