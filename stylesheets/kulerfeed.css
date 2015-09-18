@@ -12,14 +12,17 @@
   background-color:#222;
 }
 #kulerfeed{
-  display:block;
-  margin:0px auto 20px;
-  overflow:hidden;
-  height:580px;
+  display: flex;
+  margin: 0px auto 20px;
+  overflow: hidden;
+  height: 580px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
-  display:inline-block;
+  display:flex;
   margin:0px 0px 1px 1px;
   padding:4px 4px 0px;
 }
