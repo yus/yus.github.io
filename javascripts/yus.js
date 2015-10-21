@@ -8,5 +8,10 @@ $(document).ready(function(){
       boxShadow: "none"
     };
     
-    $("div.yndx > iframe").contents().find("div.b-widget-donate").css( widgetDonateStyle );
+    $("div.yndx > iframe").load(function() {
+        var frame = $("div.yndx > iframe").contents();
+        /* other code */
+        frame.find("div.b-widget-donate").css( widgetDonateStyle );
+    });
+    
 }); 
