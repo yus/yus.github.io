@@ -7,5 +7,6 @@ $(document).ready(function(){
       borderRadius: "0px",
       boxShadow: "none"
     };
-    $("div[class|='b-widget-donate']").css( widgetDonateStyle );
+    
+    $("div.yndx > iframe").contents().find("div[class|='b-widget-donate']").css( widgetDonateStyle );
 }); 
