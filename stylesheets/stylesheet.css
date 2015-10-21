@@ -231,6 +231,16 @@ img {
   max-width: 100%;
 }
 
+/*****
+Custom
+*****/
+.b-widget-donate {
+    background: #242424 important!;
+}
+.b-widget-donate .b-input-text__input {
+    background: RGBA(72, 72, 72, 0.72) important!;
+}
+
 /*******************************************************************************
 Full-Width Styles
 *******************************************************************************/
