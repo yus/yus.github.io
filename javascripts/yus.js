@@ -1,8 +1,6 @@
 /**mod**/
 
-jQuery.noConflict();
-(function( $ ) {
-  $(function() {
+$(document).ready(function(){
     var widgetDonateStyle = {
       background: "none !important",
       backgroundSize: "0px 0%",
@@ -10,5 +8,4 @@ jQuery.noConflict();
       boxShadow: "none"
     };
     $("div[class|='b-widget-donate']").css( widgetDonateStyle );
-  });
-})(jQuery);
+}); 
