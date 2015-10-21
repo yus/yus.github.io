@@ -3,9 +3,12 @@
 jQuery.noConflict();
 (function( $ ) {
   $(function() {
-    $("div[class|='b-widget-donate']").css({
-      "background":"none !important",
-      "background-color":"#242424 !important"
-    });
+    var widgetDonateStyle = {
+      background: "none !important",
+      backgroundSize: "0px 0%",
+      borderRadius: "0px",
+      boxShadow: "none"
+    };
+    $("div[class|='b-widget-donate']").css( widgetDonateStyle );
   });
 })(jQuery);
