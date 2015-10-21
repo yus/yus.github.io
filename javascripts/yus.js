@@ -8,5 +8,5 @@ $(document).ready(function(){
       boxShadow: "none"
     };
     
-    $("div.yndx > iframe").contents().find("div[class|='b-widget-donate']").css( widgetDonateStyle );
+    $("div.yndx > iframe").contents().find("div.b-widget-donate").css( widgetDonateStyle );
 }); 
