@@ -16,7 +16,7 @@ function initialize() {
         var keystr = '&key=5F8FD294DC6015C63AEF97E329246996';
         var entry = result.feed.entries[i];
         var entryID = entry.link.slice(entry.link.lastIndexOf('/')+1);
-        var snipp = 'http://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+keystr;
+        var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+keystr;
         var div = document.createElement('div');
         var span = document.createElement('span');
         var img = document.createElement('img');
