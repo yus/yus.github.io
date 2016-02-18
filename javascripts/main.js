@@ -7,7 +7,7 @@ google.load('feeds', '1');
 
 function initialize() {
 //title: 'Quickmaker Themes', title : 'Quickmaker Color Themes'
-  var feed = new google.feeds.Feed('http://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996');
+  var feed = new google.feeds.Feed('https://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996');
   feed.setNumEntries(50);
   feed.load(function(result) {
     if (!result.error) {
