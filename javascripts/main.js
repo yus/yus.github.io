@@ -10,7 +10,8 @@ function OnLoad() {
     +'rss/search.cfm?searchQuery=userID:102986'
     +'&itemsPerPage=11'
     +'&key=5F8FD294DC6015C63AEF97E329246996';
-  google.feeds.findFeeds(query, fineone);
+  var food = new google.feeds.findFeeds(query, fineone);
+  food.setResultFormat(google.feeds.Feed.MIXED_FORMAT);
 }
 
 function fineone(result) {
