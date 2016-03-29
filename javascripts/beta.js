@@ -20,7 +20,7 @@ $j.ajax({
       console.log( typeof u );
       var entry = items[i];
       var qttl = $j( entry ).find( 'title' ), qrf = $j( entry ).find( 'link' );
-      console.log( i + ' > ' + typeof $j( entry ) + ' >> ' + $j(qrf).length + ' >> ' + $j(qttl).length + ' <' );
+      console.log( i + ' > ' + typeof $j( entry ) + ' >> ' + $j(qrf).text() + ' >> ' + $j(qttl).text() + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
