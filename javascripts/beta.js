@@ -22,7 +22,7 @@ $j.ajax({
       var entry = $j(value);
       var qcapt = $j(value).has("description");
       var entryID = entry.link.slice(entry.link.lastIndexOf('/')+1);
-      var qttl = entry.title.slice(entry.title.lastIndexOf(':')+2));
+      var qttl = entry.title.slice(entry.title.lastIndexOf(':')+2);
       var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+keystr;
       
       var qlink = cntnr.add('div').addClass('qi')
