@@ -19,7 +19,7 @@ $j.ajax({
 
     $j.each( items, function( i, u ) {
       
-      var entry = $j( u[i] );
+      var entry = $j( u )[ i ];
       var qrf = entry.find( 'link' );
       var qttl = entry.find( 'title' );
       console.log( i + ' ' + typeof entry + '> ' + entry.length + ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
