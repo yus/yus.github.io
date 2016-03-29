@@ -16,12 +16,12 @@ $j.ajax({
     cntnr.empty();
     var items = $j( response ).find( 'item' );
 
-    $j.each( items, function( i, val ) {
+    $j.each( items, function( i, obj ) {
       
-      var entry = $j( val );
-      var qrf = entry.find( 'link' ).text();
-      var qttl = entry.find( 'title' ).text();
-      console.log( i + '<<<' + val.length + '>>>' + '<<<' + qrf.length + '>>>' + '<<<' + qttl.length + '>>>' );
+      var entry = $j( obj );
+      var qrf = entry.find( 'link' );
+      var qttl = entry.find( 'title' );
+      console.log( i + '<<<' + typeof obj + obj.text().length + '>>>' + '<<<' + qrf.length + '>>>' + '<<<' + qttl.length + '>>>' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
