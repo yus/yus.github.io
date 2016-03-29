@@ -14,14 +14,15 @@ $j.ajax({
 }).done( function( response ) {
   if ( !response.error ) {
     cntnr.empty();
-    var items = $j( response ).find( 'item' );
+    var cls = $j( 'item' );
+    var items = $j( response ).find( cls );
 
-    $j.each( items, function( i, obj ) {
+    $j.each( items, function( i, u ) {
       
-      var entry = $j( obj );
+      var entry = $j( u[i] );
       var qrf = entry.find( 'link' );
       var qttl = entry.find( 'title' );
-      console.log( i + '>>>' + typeof entry + '>>>' + entry.length + '>>>' + '<<<' + qrf.length + '>>>' + '<<<' + qttl.length + '>>>' );
+      console.log( i + ' ' + typeof entry + '> ' + entry.length + ' >> ' qrf.length + ' >>> ' qttl.length + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
