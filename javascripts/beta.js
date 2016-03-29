@@ -17,11 +17,10 @@ $j.ajax({
       var themeLink = $j( $j(entry).find('link')[0] ).text();
       var themeImageLink = $j( $j(entry).find('link')[1] ).text();
       var entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-      //var generateTheme = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qk;
-      var gesso = $j('.gesso').append( '<div></div>' ).addClass( 'qi' );
-      var qlink = $j(gesso[i]).append( '<a></a>' ).addClass( 'ql' ).attr( 'href', themeLink );
-      qlink[i].append( '<img />' ).addClass( 'q' ).attr( 'src', themeImageLink );
-      qlink[i].append( '<span></span>' ).addClass('t').html( entryTitle );
+      $j('.gesso').append( '<div class="qi'+ i +'"></div>' );
+      $j('.gesso').has('qi'+i).append( '<a class="ql'+i+'"></a>' ).attr( 'href', themeLink );
+      $j('.gesso').has('ql'+i).append( '<img class="q'+i+'"/>' ).attr( 'src', themeImageLink )
+      $j('.gesso').has('ql'+i).append( '<span class="t'+i+'"></span>' ).html( entryTitle );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
     });
