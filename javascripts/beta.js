@@ -15,25 +15,20 @@ $j.ajax({
   if ( !response.error ) {
     cntnr.empty();
     var items = $j( response ).find( 'item' );
-
     $j.each( items, function( i, u ) {
-      //console.log( typeof u );
       var entry = items[i];
-      var qttl = $j( $j(entry).find('title')[1] ).text(), qrf = $j( $j(entry).find('link')[1] ).text();
-
-      console.log( i + ' > ' + typeof entry + ' >> ' + qrf + ' >> ' + qttl + ' <' );
-      //var qcapt = entry.has( 'description' ).text();
-      /*
-      var lslcr = qrf.lastIndexOf('/')+1;
-      var tslcr = qttl.lastIndexOf(':')+2;
-      var entryID = qrf.slice( lslcr );
-      var entryTitle = qttl.slice( tslcr );
-      var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
+      var entryTitle = $j( $j(entry).find('title')[1] ).text();
+      var themeLink = $j( $j(entry).find('link')[0] ).text();
+      var themeImageLink = $j( $j(entry).find('link')[1] ).text();
+      var entryID = qrf.slice( qrf.lastIndexOf('/')+1 );
+      
+      console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryTitle + ' <' );
+      
+      var generateTheme = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
       var gesso = cntnr.add( 'div' ).addClass( 'qi'+ i );
-      var qlink = gesso.add( 'a' ).addClass( 'ql' ).attr( 'href', qrf );
-      qlink.add( 'img' ).addClass( 'q' ).attr( 'src', snipp );
-      qlink.add( 'span' ).addClass('t').html( qttl );
-      */
+      var qlink = gesso.add( 'a' ).addClass( 'ql' ).attr( 'href', themeLink );
+      qlink.add( 'img' ).addClass( 'q' ).attr( 'src', generateTheme );
+      qlink.add( 'span' ).addClass('t').html( entryTitle );
     });
   }
 });
