@@ -4,32 +4,37 @@
 */
 
 $j = jQuery.noConflict();
-qu = 'https://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996';
+var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
+var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
+var cntnr = $j( '#kulerfeed' );
 
 $j.ajax({ 
   url:qu,
   dataType: 'xml'
 }).done( function( response ) {
   if ( !response.error ) {
-    var cntnr = $j( '#kulerfeed' );
     cntnr.empty();
     var items = $j( response ).find( 'item' );
-    
-    for (let value of items) {
-      console.log(value);
-    }
-/**
-    $j.each( items, function( index, value ) {
-      var entry = $j( value ), qeystr = '&key=5F8FD294DC6015C63AEF97E329246996'; 
-      var qrf = entry.has( 'link' ).text(), qttl = entry.has( 'title' ).text(), qcapt = $j( value ).has( 'description' );
-      var lslcr = qrf.lastIndexOf('/')+1, tslcr = qttl.lastIndexOf(':')+2;
-      var entryID = qrf.slice( lslcr ), entryTitle = qttl.slice( tslcr );
+
+    $j.each( items, function( i, val ) {
+      
+      var entry = $j( val );
+      var qrf = entry.has( 'link' ).text();
+      var qttl = entry.has( 'title' ).text();
+      console.log( i + '<<<' + val.length + '>>>' + '<<<' + qrf.length + '>>>' + '<<<' + qttl.length + '>>>' );
+      //var qcapt = entry.has( 'description' ).text();
+      /*
+      var lslcr = qrf.lastIndexOf('/')+1;
+      var tslcr = qttl.lastIndexOf(':')+2;
+      var entryID = qrf.slice( lslcr );
+      var entryTitle = qttl.slice( tslcr );
       var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
-      var qlink = cntnr.add( 'div' ).addClass( 'qi'+ index ).add( 'a' ).addClass( 'ql' ).attr( 'href', qrf );
+      
+      var gesso = cntnr.add( 'div' ).addClass( 'qi'+ i );
+      var qlink = gesso.add( 'a' ).addClass( 'ql' ).attr( 'href', qrf );
       qlink.add( 'img' ).addClass( 'q' ).attr( 'src', snipp );
       qlink.add( 'span' ).addClass('t').html( qttl );
-      console.log( index + '<<<' + value.length + '>>>' );
+      */
     });
-*/
   }
 });
