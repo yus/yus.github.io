@@ -19,7 +19,7 @@ $j.ajax({
       quler.appendTo('.gesso');
       entry = items[i];
       themeImageLink = $j( $j(entry).find('link')[1] ).text();
-      ilinks.push(themeImageLink);
+      $j( ilinks ).push(themeImageLink);
       entryTitle = $j( $j(entry).find('title')[1] ).text();
       themeLink = $j( $j(entry).find('link')[0] ).text();
       entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
@@ -30,9 +30,11 @@ $j.ajax({
   }
 });
 
+console.log( ilinks )
+
 function preload( ilinks ) {
-  for(var j = 0; j < ilinks.length; j++){
-    singleImages.push(loadImage(ilinks[j]));
+  for(var j = 0; j < $j( ilinks ).length; j++){
+    singleImages.push(loadImage($j( ilinks )[j]));
   }
 }
 
