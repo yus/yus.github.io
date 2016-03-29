@@ -3,6 +3,8 @@
 *  License: CC-NC-ND 3.0 Unported
 */
 
+var cntnr, mg, pg, wW, wH, qu, title, caption, $qlr, $j;
+
 $j = jQuery.noConflict();
 var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
 var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -39,6 +41,18 @@ function preload( ilinks ) {
 }
 
 function setup( singleImages ) {
+  mg = 5, pg = 20;
+  wW = windowWidth - 2*pg - 2*mg;
+  wH = windowHeight - 2*pg - 2*mg;
+  createCanvas(wW, wH);
+  cntnr = createDiv("thinking up the tints").id("bg").class("bg")
+          .style("background-color", "rgba(25, 25, 25, .29)")
+          .style("color", "rgba(255, 129, 29, .29)")
+          .style("overflow-x", "hidden")
+          .style("overflow-y", "auto")
+          .style("font-family", "'Fira', sans-serif")
+          .style("font-size", "11px");
+
   for(var r = 0; r < $j(singleImages).length; r++){
     $j(singleImages)[r].loadPixels();
     $j(halfImages).push(4 * width * height/2);
@@ -49,8 +63,15 @@ function setup( singleImages ) {
   }
 }
 
-function draw( singleImages ) {
+function draw( singleImages, wW, wH ) {
+  cntnr.size(wW, wH)
+        .style("padding", pg+"px")
+        .style("margin", mg+"px");
   for(var s = 0; s < $j(singleImages).length; s++){
     image($j(singleImages)[s], 0*s, 0*s);
   }
+}
+
+function windowResized(wW, wH) {
+  resizeCanvas(wW, wH);
 }
