@@ -19,11 +19,13 @@ $j.ajax({
       themeImageLink = $j( $j(entry).find('link')[1] ).text();
       entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
       $j('.gesso').html( '<div id="qi'+i+'"></div>' );
+    }).done( function( i, entry, entryTitle, themeLink, themeImageLink, entryID ) {
+      return entry, entryTitle, themeLink, themeImageLink, entryID;
       $j('div[id=^qi]'[i]).html( '<a class="ql'+i+'"></a>' );
-      $j('div[id=^qi]'[i]).has('a[class=^ql]').attr( 'href', themeLink )
+      $j('div[id=^qi]'[i]).find('a[class=^ql]').attr( 'href', themeLink )
                           .html( '<img class="q"/><span class="t"></span>' );
-      $j('div[id=^qi]'[i]).has('img.q').attr( 'src', themeImageLink );
-      $j('div[id=^qi]'[i]).has('span.t').html( entryTitle );
+      $j('div[id=^qi]'[i]).find('img.q').attr( 'src', themeImageLink );
+      $j('div[id=^qi]'[i]).find('span.t').html( entryTitle );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
     });
