@@ -18,11 +18,11 @@ $j.ajax({
     var items = $j( response ).find( cls );
 
     $j.each( items, function( i, u ) {
-      
-      var entry[i] = $j( u );
-      var qttl[i] = $j(entry[i]).find( 'title' ), qrf[i] = $j(entry[i]).find( 'link' );
-      console.log( i + ' > ' + typeof entry[i] + ' > ' + entry[i].length );
-      console.log( ' >> ' + qrf[i].length + ' >>> ' + qttl[i].length + ' <' );
+      console.log( typeof u );
+      var entry = items[i];
+      var qttl = $j(entry).find( 'title' ), qrf = $j(entry).find( 'link' );
+      console.log( i + ' > ' + typeof entry + ' > ' + entry.length );
+      console.log( ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
