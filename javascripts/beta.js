@@ -2,12 +2,10 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-
 $j = jQuery.noConflict();
 var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
 var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
 var cntnr = $j( '#kulerfeed' );
-
 $j.ajax({ 
   url:qu,
   dataType: 'xml'
@@ -20,10 +18,8 @@ $j.ajax({
       var entryTitle = $j( $j(entry).find('title')[1] ).text();
       var themeLink = $j( $j(entry).find('link')[0] ).text();
       var themeImageLink = $j( $j(entry).find('link')[1] ).text();
-      var entryID = qrf.slice( qrf.lastIndexOf('/')+1 );
-      
+      var entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryTitle + ' <' );
-      
       var generateTheme = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
       var gesso = cntnr.add( 'div' ).addClass( 'qi'+ i );
       var qlink = gesso.add( 'a' ).addClass( 'ql' ).attr( 'href', themeLink );
