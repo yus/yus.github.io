@@ -20,8 +20,8 @@ $j.ajax({
       console.log( typeof u );
       var entry = items[i];
       var qttl = $j(entry).find( 'title' ), qrf = $j(entry).find( 'link' );
-      console.log( i + ' > ' + typeof entry + ' > ' + entry.length );
-      console.log( ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
+      console.log( i + ' > ' + typeof entry + ' > ' + entry.text().length );
+      console.log( ' >> ' + qrf[1].text().length + ' >>> ' + qttl[1].text().length + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
