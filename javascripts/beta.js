@@ -5,6 +5,7 @@
 $j = jQuery.noConflict();
 var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
 var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
+var entry, entryTitle, themeLink, themeImageLink, entryID;
 $j.ajax({ 
   url:qu,
   dataType: 'xml'
@@ -12,15 +13,18 @@ $j.ajax({
   if ( !response.error ) {
     var items = $j( response ).find( 'item' );
     $j.each( items, function( i, u ) {
-      var entry = items[i];
-      var entryTitle = $j( $j(entry).find('title')[1] ).text();
-      var themeLink = $j( $j(entry).find('link')[0] ).text();
-      var themeImageLink = $j( $j(entry).find('link')[1] ).text();
-      var entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-      $j('.gesso').append( '<div class="qi'+ i +'"></div>' );
-      $j('.gesso').has('qi'+i).append( '<a class="ql'+i+'"></a>' ).attr( 'href', themeLink );
-      $j('.gesso').has('ql'+i).append( '<img class="q'+i+'"/>' ).attr( 'src', themeImageLink )
-      $j('.gesso').has('ql'+i).append( '<span class="t'+i+'"></span>' ).html( entryTitle );
+      entry = items[i];
+      entryTitle = $j( $j(entry).find('title')[1] ).text();
+      themeLink = $j( $j(entry).find('link')[0] ).text();
+      themeImageLink = $j( $j(entry).find('link')[1] ).text();
+      entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
+      $j('.gesso').html( '<div id="qi'+i+'"></div>' );
+      $j('id=^qi').addClass(i);
+      $j('id=^qi').html( '<a class="ql'+i+'"></a>' );
+      $j('a.=^ql').attr( 'href', themeLink )
+                  .html( '<img class="q"/><span class="t"></span>' );
+      $j('img.q').attr( 'src', themeImageLink );
+      $j('span.t').html( entryTitle );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
     });
