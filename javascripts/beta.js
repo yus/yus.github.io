@@ -4,32 +4,29 @@
 */
 
 $j = jQuery.noConflict();
-qu = "https://kuler-api.adobe.com/rss/search.cfm?"+
-  "searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996";
+qu = 'https://kuler-api.adobe.com/rss/search.cfm?'+
+  'searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996';
 
 $j.ajax({ 
   url:qu,
-  dataType: "xml"
+  dataType: 'xml'
 }).done( function( response ) {
   if (!response.error) {
-    $j( ".bg" ).empty();
-    var items = $j( response ).find("item");
     var cntnr = $j( 'kulerfeed' );
+    cntnr.empty();
+    var items = $j( response ).find( 'item' );
+    
     
     $j.each( items, function( index, value ) {
-      var keystr = '&key=5F8FD294DC6015C63AEF97E329246996';
-      //var entry = items[i];
-      var entry = $j(value);
-      //var qcapt = $j(value).has('description');
-      var entryID = entry.has('link').text();
-      entryID = entryID.slice(entry.link.lastIndexOf('/')+1);
-      var qttl = entry.has('title').text();
-      qttl.slice(entry.title.lastIndexOf(':')+2);
-      var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+keystr;
+      var entry = $j(value), qeystr = '&key=5F8FD294DC6015C63AEF97E329246996'; 
+      var qrf = entry.has('link').text(), qttl = entry.has('title').text(), qcapt = $j(value).has('description');
+      var lslcr = qrf.lastIndexOf('/')+1, tslcr = qttl.lastIndexOf(':')+2;
+      var entryID = qrf.slice(lslcr), entryTitle = qttl.slice(tslcr);
+      var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+qeystr;
       
-      var qlink = cntnr.add('div').addClass('qi')
+      var qlink = cntnr.add('div').addClass('qi'+index)
                         .add('a').addClass('ql')
-                        .attr('href', entry.link);
+                        .attr('href', );
       
       qlink.add('img').addClass('q')
             .attr('src', snipp)
