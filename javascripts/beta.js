@@ -20,9 +20,11 @@ $j.ajax({
       var keystr = '&key=5F8FD294DC6015C63AEF97E329246996';
       //var entry = items[i];
       var entry = $j(value);
-      var qcapt = $j(value).has("description");
-      var entryID = entry.link.slice(entry.link.lastIndexOf('/')+1);
-      var qttl = entry.title.slice(entry.title.lastIndexOf(':')+2);
+      //var qcapt = $j(value).has('description');
+      var entryID = entry.has('link').text();
+      entryID = entryID.slice(entry.link.lastIndexOf('/')+1);
+      var qttl = entry.has('title').text();
+      qttl.slice(entry.title.lastIndexOf(':')+2);
       var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid='+entryID+keystr;
       
       var qlink = cntnr.add('div').addClass('qi')
