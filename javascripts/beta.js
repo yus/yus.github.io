@@ -10,7 +10,6 @@ $j.ajax({
   dataType: 'xml'
 }).done( function( response ) {
   if ( !response.error ) {
-    cntnr.empty();
     var items = $j( response ).find( 'item' );
     $j.each( items, function( i, u ) {
       var entry = items[i];
@@ -25,7 +24,6 @@ $j.ajax({
       qlink[i].append( '<span></span>' ).addClass('t').html( entryTitle );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
       console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-      //console.log( generateTheme );
     });
   }
 });
