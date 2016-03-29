@@ -19,7 +19,7 @@ $j.ajax({
       quler.appendTo('.gesso');
       entry = items[i];
       themeImageLink = $j( $j(entry).find('link')[1] ).text();
-      images.push(themeImageLink);
+      singleImages.push(themeImageLink);
       entryTitle = $j( $j(entry).find('title')[1] ).text();
       themeLink = $j( $j(entry).find('link')[0] ).text();
       entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
