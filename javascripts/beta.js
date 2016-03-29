@@ -4,7 +4,7 @@
 */
 
 $j = jQuery.noConflict();
-qu = '//kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996';
+qu = 'https://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996';
 
 $j.ajax({ 
   url:qu,
@@ -20,7 +20,7 @@ $j.ajax({
       var qrf = entry.has( 'link' ).text(), qttl = entry.has( 'title' ).text(), qcapt = $j( value ).has( 'description' );
       var lslcr = qrf.lastIndexOf('/')+1, tslcr = qttl.lastIndexOf(':')+2;
       var entryID = qrf.slice( lslcr ), entryTitle = qttl.slice( tslcr );
-      var snipp = '//kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
+      var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
       
       var qlink = cntnr.add( 'div' ).addClass( 'qi'+ index ).add( 'a' ).addClass( 'ql' ).attr( 'href', qrf );
       qlink.add( 'img' ).addClass( 'q' ).attr( 'src', snipp );
