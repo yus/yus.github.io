@@ -19,8 +19,8 @@ $j.ajax({
 
     $j.each( items, function( i, u ) {
       
-      var entry = $j( u );
-      var qttl = entry[i].find( 'title' ), qrf = entry[i].find( 'link' );
+      var entry = $j( u )[i];
+      var qttl = $j(entry).find( 'title' ), qrf = $j(entry).find( 'link' );
       console.log( i + ' > ' + typeof entry + ' > ' + entry.length );
       console.log( ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
       //var qcapt = entry.has( 'description' ).text();
