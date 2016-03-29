@@ -17,10 +17,10 @@ $j.ajax({
     var items = $j( response ).find( 'item' );
 
     $j.each( items, function( i, u ) {
-      console.log( typeof u );
+      //console.log( typeof u );
       var entry = items[i];
       var qttl = $j( entry ).find( 'title' ), qrf = $j( entry ).find( 'link' );
-      console.log( i + ' > ' + typeof $j( entry ) + ' >> ' + $j(qrf).text() + ' >> ' + $j(qttl).text() + ' <' );
+      console.log( i + ' > ' + typeof $j( entry ) + ' >> ' + $j(qrf)[1].text() + ' >> ' + $j(qttl)[1].text() + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
@@ -28,7 +28,6 @@ $j.ajax({
       var entryID = qrf.slice( lslcr );
       var entryTitle = qttl.slice( tslcr );
       var snipp = 'https://kuler-api.adobe.com/rss/png/generateThemePng.cfm?themeid=' + entryID + qeystr;
-      
       var gesso = cntnr.add( 'div' ).addClass( 'qi'+ i );
       var qlink = gesso.add( 'a' ).addClass( 'ql' ).attr( 'href', qrf );
       qlink.add( 'img' ).addClass( 'q' ).attr( 'src', snipp );
