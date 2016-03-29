@@ -22,7 +22,8 @@ $j.ajax({
       var entry = $j( u )[ i ];
       var qrf = entry.find( 'link' );
       var qttl = entry.find( 'title' );
-      console.log( i + ' ' + typeof entry + '> ' + entry.length + ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
+      console.log( i + ' > ' + typeof entry + ' > ' + entry.length );
+      console.log( ' >> ' + qrf.length + ' >>> ' + qttl.length + ' <' );
       //var qcapt = entry.has( 'description' ).text();
       /*
       var lslcr = qrf.lastIndexOf('/')+1;
