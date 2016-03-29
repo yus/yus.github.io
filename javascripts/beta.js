@@ -34,23 +34,23 @@ console.log( ilinks )
 
 function preload( ilinks ) {
   for(var j = 0; j < $j( ilinks ).length; j++){
-    singleImages.push(loadImage($j( ilinks )[j]));
+    $j(singleImages).push(loadImage($j(ilinks)[j]));
   }
 }
 
 function setup( singleImages ) {
-  for(var r = 0; r < singleImages.length; r++){
-    singleImages[r].loadPixels();
-    halfImages.push(4 * width * height/2);
-    for(var f = 0; f < halfImages.length; f++){
-      singleImages[r].pixels[f+halfImages[f]] = singleImages[r].pixels[f];
+  for(var r = 0; r < $j(singleImages).length; r++){
+    $j(singleImages)[r].loadPixels();
+    $j(halfImages).push(4 * width * height/2);
+    for(var f = 0; f < $j(halfImages).length; f++){
+      $j(singleImages)[r].pixels[f+$j(halfImages)[f]] = $j(singleImages)[r].pixels[f];
     }
-    singleImages[r].updatePixels();
+    $j(singleImages)[r].updatePixels();
   }
 }
 
 function draw( singleImages ) {
-  for(var s = 0; s < singleImages.length; s++){
-    image(singleImages[s], 0*s, 0*s);
+  for(var s = 0; s < $j(singleImages).length; s++){
+    image($j(singleImages)[s], 0*s, 0*s);
   }
 }
