@@ -14,8 +14,7 @@ $j.ajax({
 }).done( function( response ) {
   if ( !response.error ) {
     cntnr.empty();
-    var cls = $j( 'item' );
-    var items = $j( response ).find( cls );
+    var items = $j( response ).find( 'item' );
 
     $j.each( items, function( i, u ) {
       console.log( typeof u );
