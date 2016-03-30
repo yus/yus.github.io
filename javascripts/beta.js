@@ -39,16 +39,16 @@ $.noConflict();
 
 var $j = jQuery.noConflict();
 
-function preload( ilinks ) {
+function preload() {
+  mg = 5, pg = 20;
+  wW = windowWidth - 2*pg - 2*mg;
+  wH = windowHeight - 2*pg - 2*mg;
   for(var j = 0; j < $j(ilinks).length; j++){
     $j(singulars).push(loadImage($j(ilinks)[j]));
   }
 }
 
-function setup( singulars ) {
-  mg = 5, pg = 20;
-  wW = windowWidth - 2*pg - 2*mg;
-  wH = windowHeight - 2*pg - 2*mg;
+function setup() {
   createCanvas( wW, wH );
   rendrr = createGraphics( wW, wH );
   cntnr = createDiv( "thinking up the tints" ).id("bg").class("bg")
@@ -68,7 +68,7 @@ function setup( singulars ) {
   }
 }
 
-function draw( singulars, wW, wH, mg, pg ) {
+function draw() {
   cntnr.size( wW, wH )
         .style("padding", pg+"px")
         .style("margin", mg+"px");
@@ -78,6 +78,6 @@ function draw( singulars, wW, wH, mg, pg ) {
   }
 }
 
-function windowResized( wW, wH ) {
+function windowResized() {
   resizeCanvas( wW, wH );
 }
