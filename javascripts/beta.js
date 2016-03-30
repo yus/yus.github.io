@@ -7,7 +7,7 @@ var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, ilinks;
 var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
 
 $.noConflict();
-(function( jQuery ) {
+(function( $ ) {
   $(function() {
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
