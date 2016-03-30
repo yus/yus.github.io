@@ -3,8 +3,8 @@
 *  License: CC-NC-ND 3.0 Unported
 */
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, ilinks;
-var $j = {};
-$j = jQuery.noConflict(), $d = jQuery(document), $q = jQuery.Deffered();
+var $j = {}, $d = jQuery(document), $q = jQuery.Deffered();
+$j = jQuery.noConflict(true);
 var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
 var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
 var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
