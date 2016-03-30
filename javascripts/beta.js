@@ -33,57 +33,51 @@ $.noConflict();
         });
       }
     });
-    
-    var $q = $.Deffered();
-    //$q.done( preload, setup, draw, windowResized, $j );
-    $q.done( preload, setup, draw, windowResized );
-    $q.resolve( ilinks );
     console.log( ilinks );
   });
 })(jQuery);
 
 var $j = jQuery.noConflict();
 
-function preload(ilinks) {
+function preload( ilinks ) {
   for(var j = 0; j < $j(ilinks).length; j++){
     $j(singulars).push(loadImage($j(ilinks)[j]));
   }
 }
 
-function setup(singulars) {
+function setup( singulars ) {
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-  createCanvas(wW, wH);
-  rendrr = createGraphics(wW, wH);
-  cntnr = createDiv("thinking up the tints").id("bg").class("bg")
+  createCanvas( wW, wH );
+  rendrr = createGraphics( wW, wH );
+  cntnr = createDiv( "thinking up the tints" ).id("bg").class("bg")
           .style("background-color", "rgba(25, 25, 25, .29)")
           .style("color", "rgba(255, 129, 29, .29)")
           .style("overflow-x", "hidden")
           .style("overflow-y", "auto")
           .style("font-family", "'Fira', sans-serif")
           .style("font-size", "11px");
-
-  for(var r = 0; r < $j(singulars).length; r++){
-    $j(singulars)[r].loadPixels();
-    $j(halves).push(4 * width * height/2);
-    for(var f = 0; f < $j(halves).length; f++){
-      $j(singulars)[r].pixels[f+$j(halves)[f]] = $j(singulars)[r].pixels[f];
+  for(var r = 0; r < $j( singulars ).length; r++){
+    $j( singulars )[r].loadPixels();
+    $j( halves ).push(4 * width * height/2);
+    for(var f = 0; f < $j( halves ).length; f++){
+      $j( singulars )[r].pixels[f+$j( halves )[f]] = $j( singulars )[r].pixels[f];
     }
     $j(singulars)[r].updatePixels();
   }
 }
 
 function draw( singulars, wW, wH, mg, pg ) {
-  cntnr.size(wW, wH)
+  cntnr.size( wW, wH )
         .style("padding", pg+"px")
         .style("margin", mg+"px");
   //rendrr.beginDraw();
-  for(var s = 0; s < $j(singulars).length; s++){
-    $j(rendrr).image($j(singulars)[s], 0*s, 0*s);
+  for(var s = 0; s < $j( singulars ).length; s++){
+    $j( rendrr ).image($j( singulars )[s], 0*s, 0*s);
   }
 }
 
-function windowResized(wW, wH) {
-  resizeCanvas(wW, wH);
+function windowResized( wW, wH ) {
+  resizeCanvas( wW, wH );
 }
