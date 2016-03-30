@@ -54,8 +54,8 @@ function windowResized(wW, wH) {
   resizeCanvas(wW, wH);
 }
 
-$q.done( preload, setup, draw, windowResized, $j );
-//$q.done( $j, preload, setup, draw, windowResized );
+//$q.done( preload, setup, draw, windowResized, $j );
+$q.done( $j, preload, setup, draw, windowResized );
 $d.ready( function($) {
   $j.ajax({ 
     url:qu,
