@@ -49,7 +49,8 @@ function windowResized(wW, wH) {
   resizeCanvas(wW, wH);
 }
 
-var $d = jQuery(document),$j = jQuery.noConflict(true), $q = jQuery.Deffered();
+var $j = jQuery.noConflict(true);
+var $d = $j(document), $q = $j.Deffered();
 var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
 var qc = '?searchQuery=userID:102986';
 var qn = '&itemsPerPage=50';
