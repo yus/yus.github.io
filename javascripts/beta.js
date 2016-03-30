@@ -20,7 +20,7 @@ $.noConflict();
         var items = $( response ).find( 'item' );
         $.each( items, function( i, u ) {
           quler = $('<div id="qi'+i+'"></div>');
-          quler.style("font-family", "'Fira Sans', sans-serif").appendTo('.gesso');
+          quler.css('font-family', '"Fira Sans", sans-serif').appendTo('.gesso');
           entry = items[i];
           themeImageLink = $( $(entry).find('link')[1] ).text();
           $( ilinks ).push(themeImageLink);
