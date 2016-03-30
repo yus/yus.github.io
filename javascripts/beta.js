@@ -10,13 +10,17 @@ function preload() {
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-  if( q ) {
-    ( !anchors ) ? anchors.append( q ) : print( q );
-  } else {
-    print( "there are " + anchors );
-  }
+
   for( var j = 0; j < anchors.length; j++ ) {
-    singulars.append( loadImage( anchors[j] ) );
+    loadImage( anchors[j], function( singulars ) {
+      image( singulars, 0, 0 );
+    }, function( !singulars ) {
+      if( q ) {
+        ( !anchors ) ? anchors.append( q ) : print( q );
+      } else {
+        print( "there are " + anchors );
+      }
+    });
   }
 }
 
