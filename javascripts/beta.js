@@ -4,13 +4,20 @@
 */
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, anchors, q;
 
+function quiz( q ) {
+  ( !anchors ) ? anchors.append( q ) : console.log( q );
+}
+
 function preload() {
-  if( !anchors ) ? anchors.append( q );
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-  for(var j = 0; j < anchors.length; j++){
-    singulars.append( loadImage( anchors[j] ) );
+  if( !q ) {
+    console.log( "this is " + q );
+  } else {
+    for( var j = 0; j < anchors.length; j++ ) {
+      singulars.append( loadImage( anchors[j] ) );
+    }
   }
 }
 
@@ -75,7 +82,7 @@ $.noConflict();
           return q;
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-        });
+        }).done( quiz( q ) );
       }
     });
     console.log( ilinks );
