@@ -47,7 +47,7 @@ function draw( singulars, wW, wH, mg, pg ) {
         .style("padding", pg+"px")
         .style("margin", mg+"px");
   //rendrr.beginDraw();
-  for(var s = 0; s < $j(singulars).length; s++){
+  for(var s = 0; s < $jq(singulars).length; s++){
     rendrr.image($jq(singulars)[s], 0*s, 0*s);
   }
 }
