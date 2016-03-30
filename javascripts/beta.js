@@ -23,7 +23,7 @@ $.noConflict();
           quler.appendTo('.gesso');
           entry = items[i];
           themeImageLink = $( $(entry).find('link')[1] ).text();
-          $.query( ilinks ).push(themeImageLink);
+          $( ilinks ).push(themeImageLink);
           entryTitle = $( $(entry).find('title')[1] ).text();
           themeLink = $( $(entry).find('link')[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
@@ -45,7 +45,7 @@ $.noConflict();
 var $j = jQuery.noConflict();
 
 function preload(ilinks) {
-  for(var j = 0, j < $j(ilinks).length, j++){
+  for(var j = 0; j < $j(ilinks).length; j++){
     $j(singulars).push(loadImage($j(ilinks)[j]));
   }
 }
@@ -64,10 +64,10 @@ function setup(singulars) {
           .style("font-family", "'Fira', sans-serif")
           .style("font-size", "11px");
 
-  for(var r = 0, r < $j(singulars).length, r++){
+  for(var r = 0; r < $j(singulars).length; r++){
     $j(singulars)[r].loadPixels();
     $j(halves).push(4 * width * height/2);
-    for(var f = 0, f < $j(halves).length, f++){
+    for(var f = 0; f < $j(halves).length; f++){
       $j(singulars)[r].pixels[f+$j(halves)[f]] = $j(singulars)[r].pixels[f];
     }
     $j(singulars)[r].updatePixels();
@@ -79,7 +79,7 @@ function draw( singulars, wW, wH, mg, pg ) {
         .style("padding", pg+"px")
         .style("margin", mg+"px");
   //rendrr.beginDraw();
-  for(var s = 0, s < $j(singulars).length, s++){
+  for(var s = 0; s < $j(singulars).length; s++){
     $j(rendrr).image($j(singulars)[s], 0*s, 0*s);
   }
 }
