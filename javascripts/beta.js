@@ -82,9 +82,8 @@ $.noConflict();
           return q;
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-        }).done( quiz( q ) );
+        }).done( console.log( anchors, q ) );
       }
     });
-    console.log( anchors, q );
   });
 })(jQuery);
