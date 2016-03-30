@@ -73,8 +73,8 @@ $jq.ajax({
       entry = items[i];
       themeImageLink = $jq( $jq(entry).find('link')[1] ).text();
       $jq( ilinks ).push(themeImageLink);
-      entryTitle = $jq( $j(entry).find('title')[1] ).text();
-      themeLink = $jq( $j(entry).find('link')[0] ).text();
+      entryTitle = $jq( $jq(entry).find('title')[1] ).text();
+      themeLink = $jq( $jq(entry).find('link')[0] ).text();
       entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
       quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
       console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
