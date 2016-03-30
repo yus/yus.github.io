@@ -20,6 +20,7 @@ $.noConflict();
         var items = $( response ).find( 'item' );
         $.each( items, function( i, u ) {
           quler = $('<div id="qi'+i+'"></div>');
+          quler.style("font-family", "'Fira Sans', sans-serif")
           quler.appendTo('.gesso');
           entry = items[i];
           themeImageLink = $( $(entry).find('link')[1] ).text();
@@ -56,7 +57,7 @@ function setup( singulars ) {
           .style("color", "rgba(255, 129, 29, .29)")
           .style("overflow-x", "hidden")
           .style("overflow-y", "auto")
-          .style("font-family", "'Fira', sans-serif")
+          .style("font-family", "'Fira Sans', sans-serif")
           .style("font-size", "11px");
   for(var r = 0; r < $j( singulars ).length; r++){
     $j( singulars )[r].loadPixels();
