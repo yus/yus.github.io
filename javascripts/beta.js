@@ -45,8 +45,8 @@ $.noConflict();
 var $j = jQuery.noConflict();
 
 function preload(ilinks) {
-  for(let j of ilinks){
-    $j(singulars).push(loadImage($(ilinks)[j]));
+  for(var j = 0, j < $j(ilinks).length, j++){
+    $j(singulars).push(loadImage($j(ilinks)[j]));
   }
 }
 
@@ -64,10 +64,10 @@ function setup(singulars) {
           .style("font-family", "'Fira', sans-serif")
           .style("font-size", "11px");
 
-  for(var r of singulars){
+  for(var r = 0, r < $j(singulars).length, r++){
     $j(singulars)[r].loadPixels();
     $j(halves).push(4 * width * height/2);
-    for(var f of halves){
+    for(var f = 0, f < $j(halves).length, f++){
       $j(singulars)[r].pixels[f+$j(halves)[f]] = $j(singulars)[r].pixels[f];
     }
     $j(singulars)[r].updatePixels();
@@ -79,7 +79,7 @@ function draw( singulars, wW, wH, mg, pg ) {
         .style("padding", pg+"px")
         .style("margin", mg+"px");
   //rendrr.beginDraw();
-  for(var s of singulars){
+  for(var s = 0, s < $j(singulars).length, s++){
     $j(rendrr).image($j(singulars)[s], 0*s, 0*s);
   }
 }
