@@ -2,8 +2,13 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, ilinks;
+var $j = {}, $q = $.Deffered();
+$j = jQuery.noConflict(true);
+var $d = $j(document);
+var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
+var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
+var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
 
 function preload( ilinks ) {
   for(var j = 0; j < $j( ilinks ).length; j++){
@@ -48,14 +53,6 @@ function draw( singulars, wW, wH, mg, pg ) {
 function windowResized(wW, wH) {
   resizeCanvas(wW, wH);
 }
-
-var $j = jQuery.noConflict(true);
-var $d = $j(document), $q = $j.Deffered();
-var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
-var qc = '?searchQuery=userID:102986';
-var qn = '&itemsPerPage=50';
-var qk = '&key=5F8FD294DC6015C63AEF97E329246996';
-var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
 
 $j.ajax({ 
   url:qu,
