@@ -4,35 +4,6 @@
 */
 
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, ilinks;
-var $j, entry, entryTitle, themeLink, themeImageLink, entryID, quler;
-
-$j = jQuery.noConflict();
-var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
-var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
-
-$j.ajax({ 
-  url:qu,
-  dataType: 'xml'
-}).done( function( response ) {
-  if ( !response.error ) {
-    var items = $j( response ).find( 'item' );
-    $j.each( items, function( i, u ) {
-      quler = $j('<div id="qi'+i+'"></div>');
-      quler.appendTo('.gesso');
-      entry = items[i];
-      themeImageLink = $j( $j(entry).find('link')[1] ).text();
-      $j( ilinks ).push(themeImageLink);
-      entryTitle = $j( $j(entry).find('title')[1] ).text();
-      themeLink = $j( $j(entry).find('link')[0] ).text();
-      entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-      quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
-      console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
-      console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-    });
-  }
-});
-
-console.log( ilinks )
 
 function preload( ilinks ) {
   for(var j = 0; j < $j( ilinks ).length; j++){
@@ -77,3 +48,39 @@ function draw( singulars, wW, wH, mg, pg ) {
 function windowResized(wW, wH) {
   resizeCanvas(wW, wH);
 }
+
+var $d = jQuery(document),$j = jQuery.noConflict(true), $q = jQuery.Deffered();
+var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
+var qc = '?searchQuery=userID:102986';
+var qn = '&itemsPerPage=50';
+var qk = '&key=5F8FD294DC6015C63AEF97E329246996';
+var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
+
+$j.ajax({ 
+  url:qu,
+  dataType: 'xml'
+}).done( function( response ) {
+  if ( !response.error ) {
+    var items = $j( response ).find( 'item' );
+    $j.each( items, function( i, u ) {
+      quler = $j('<div id="qi'+i+'"></div>');
+      quler.appendTo('.gesso');
+      entry = items[i];
+      themeImageLink = $j( $j(entry).find('link')[1] ).text();
+      $j( ilinks ).push(themeImageLink);
+      entryTitle = $j( $j(entry).find('title')[1] ).text();
+      themeLink = $j( $j(entry).find('link')[0] ).text();
+      entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
+      quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
+      console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
+      console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
+    });
+  }
+});
+
+$q.done( preload, setup, draw, windowResized, $j );
+//$q.done( $j, preload, setup, draw, windowResized );
+$d.ready(function( $j, ilinks ) {
+  $q.resolve( ilinks );
+  console.log( ilinks );
+});
