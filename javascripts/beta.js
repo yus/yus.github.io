@@ -14,7 +14,7 @@ function preload() {
   for( var j = 0; j < anchors.length; j++ ) {
     loadImage( anchors[j], function( singulars ) {
       image( singulars, 0, 0 );
-    }, function( !singulars ) {
+    }, function( singulars, q ) {
       if( q ) {
         ( !anchors ) ? anchors.append( q ) : print( q );
       } else {
