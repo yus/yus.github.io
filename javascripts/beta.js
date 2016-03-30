@@ -2,16 +2,19 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
+
+var $j = {}, $jq, $d, $q; 
+$jq = $j.query;
+$jq = jQuery.noConflict(true);
+$d = $jq(document);
+$q = $jq.Deffered();
+
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, ilinks;
-var $j = {}, $d = jQuery(document), $q = jQuery.Deffered();
-$j = jQuery.noConflict(true);
 var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
-var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
-var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
 
 function preload( ilinks ) {
-  for(var j = 0; j < $j( ilinks ).length; j++){
-    $j(singulars).push(loadImage($j(ilinks)[j]));
+  for(var j = 0; j < $jq( ilinks ).length; j++){
+    $jq(singulars).push(loadImage($jq(ilinks)[j]));
   }
 }
 
@@ -29,13 +32,13 @@ function setup( singulars ) {
           .style("font-family", "'Fira', sans-serif")
           .style("font-size", "11px");
 
-  for(var r = 0; r < $j(singulars).length; r++){
-    $j(singulars)[r].loadPixels();
-    $j(halves).push(4 * width * height/2);
+  for(var r = 0; r < $jq(singulars).length; r++){
+    $jq(singulars)[r].loadPixels();
+    $jq(halves).push(4 * width * height/2);
     for(var f = 0; f < $j(halves).length; f++){
-      $j(singulars)[r].pixels[f+$j(halves)[f]] = $j(singulars)[r].pixels[f];
+      $jq(singulars)[r].pixels[f+$j(halves)[f]] = $jq(singulars)[r].pixels[f];
     }
-    $j(singulars)[r].updatePixels();
+    $jq(singulars)[r].updatePixels();
   }
 }
 
@@ -45,7 +48,7 @@ function draw( singulars, wW, wH, mg, pg ) {
         .style("margin", mg+"px");
   //rendrr.beginDraw();
   for(var s = 0; s < $j(singulars).length; s++){
-    rendrr.image($j(singulars)[s], 0*s, 0*s);
+    rendrr.image($jq(singulars)[s], 0*s, 0*s);
   }
 }
 
@@ -55,28 +58,30 @@ function windowResized(wW, wH) {
 
 //$q.done( preload, setup, draw, windowResized, $j );
 $q.done( preload, setup, draw, windowResized );
-$d.ready( function($j) {
-  $j.ajax({ 
-    url:qu,
-    dataType: 'xml'
-  }).done( function( response ) {
-    if ( !response.error ) {
-      var items = $j( response ).find( 'item' );
-      $j.each( items, function( i, u ) {
-        quler = $j('<div id="qi'+i+'"></div>');
-        quler.appendTo('.gesso');
-        entry = items[i];
-        themeImageLink = $j( $j(entry).find('link')[1] ).text();
-        $j( ilinks ).push(themeImageLink);
-        entryTitle = $j( $j(entry).find('title')[1] ).text();
-        themeLink = $j( $j(entry).find('link')[0] ).text();
-        entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-        quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
-        console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
-        console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-      });
-    }
-  });
-  $q.resolve( ilinks );
+$d.ready( function( $jq ) {
+var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
+var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
+$jq.ajax({ 
+  url:qu,
+  dataType: 'xml'
+}).done( function( response ) {
+  if ( !response.error ) {
+    var items = $jq( response ).find( 'item' );
+    $jq.each( items, function( i, u ) {
+      quler = $jq('<div id="qi'+i+'"></div>');
+      quler.appendTo('.gesso');
+      entry = items[i];
+      themeImageLink = $jq( $jq(entry).find('link')[1] ).text();
+      $jq( ilinks ).push(themeImageLink);
+      entryTitle = $jq( $j(entry).find('title')[1] ).text();
+      themeLink = $jq( $j(entry).find('link')[0] ).text();
+      entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
+      quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
+      console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
+      console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
+    });
+  }
+});
+$q.resolve( ilinks );
   console.log( ilinks );
 });
