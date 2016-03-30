@@ -10,14 +10,13 @@ function preload() {
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-  if( !q ) {
-    console.log( "there are " + anchors );
-  } else {
+  if( q ) {
     ( !anchors ) ? anchors.append( q ) : console.log( q );
-    
-    for( var j = 0; j < anchors.length; j++ ) {
-      singulars.append( loadImage( anchors[j] ) );
-    }
+  } else {
+    console.log( "there are " + anchors );
+  }
+  for( var j = 0; j < anchors.length; j++ ) {
+    singulars.append( loadImage( anchors[j] ) );
   }
 }
 
@@ -75,16 +74,14 @@ $.noConflict();
           entry = items[i];
           themeImageLink = $( $( entry ).find( 'link' )[1] ).text();
           q = themeImageLink;
+          console.log( q );
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
           quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
-          return q;
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
         });
-      } else {
-        console.log( anchors, q );
       }
     });
   });
