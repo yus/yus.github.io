@@ -28,8 +28,9 @@ $.noConflict();
           themeLink = $( $(entry).find('link')[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
           quler.html('<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>');
-          console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
-          console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
+          return ilinks;
+          //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
+          //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
         });
       }
     });
@@ -37,14 +38,12 @@ $.noConflict();
   });
 })(jQuery);
 
-var $j = jQuery.noConflict();
-
 function preload() {
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-  for(var j = 0; j < $j(ilinks).length; j++){
-    $j(singulars).push(loadImage($j(ilinks)[j]));
+  for(var j = 0; j < ilinks.length; j++){
+    singulars.push(loadImage(ilinks[j]));
   }
 }
 
@@ -58,13 +57,13 @@ function setup() {
           .style("overflow-y", "auto")
           .style("font-family", "'Fira Sans', sans-serif")
           .style("font-size", "11px");
-  for(var r = 0; r < $j( singulars ).length; r++){
-    $j( singulars )[r].loadPixels();
-    $j( halves ).push(4 * width * height/2);
-    for(var f = 0; f < $j( halves ).length; f++){
-      $j( singulars )[r].pixels[f+$j( halves )[f]] = $j( singulars )[r].pixels[f];
+  for(var r = 0; r < singulars.length; r++){
+    singulars[r].loadPixels();
+    halves.push(4 * width * height/2);
+    for(var f = 0; f < $halves.length; f++){
+      singulars[r].pixels[f+halves[f]] = singulars[r].pixels[f];
     }
-    $j(singulars)[r].updatePixels();
+    singulars[r].updatePixels();
   }
 }
 
@@ -73,8 +72,8 @@ function draw() {
         .style("padding", pg+"px")
         .style("margin", mg+"px");
   //rendrr.beginDraw();
-  for(var s = 0; s < $j( singulars ).length; s++){
-    $j( rendrr ).image($j( singulars )[s], 0*s, 0*s);
+  for(var s = 0; s < singulars.length; s++){
+    rendrr.image(singulars)[s], 0*s, 0*s);
   }
 }
 
