@@ -85,6 +85,6 @@ $.noConflict();
         }).done( quiz( q ) );
       }
     });
-    console.log( ilinks );
+    console.log( anchors, q );
   });
 })(jQuery);
