@@ -4,17 +4,17 @@
 */
 var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, anchors, q;
 
-function quiz( q ) {
-  ( !anchors ) ? anchors.append( q ) : console.log( q );
-}
-
 function preload() {
+  anchors = new Array([]);
+
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
   if( !q ) {
-    console.log( "this is " + q );
+    console.log( "there are " + anchors );
   } else {
+    ( !anchors ) ? anchors.append( q ) : console.log( q );
+    
     for( var j = 0; j < anchors.length; j++ ) {
       singulars.append( loadImage( anchors[j] ) );
     }
