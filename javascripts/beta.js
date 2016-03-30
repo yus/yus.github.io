@@ -11,9 +11,9 @@ function preload() {
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
   if( q ) {
-    ( !anchors ) ? anchors.append( q ) : console.log( q );
+    ( !anchors ) ? anchors.append( q ) : print( q );
   } else {
-    console.log( "there are " + anchors );
+    print( "there are " + anchors );
   }
   for( var j = 0; j < anchors.length; j++ ) {
     singulars.append( loadImage( anchors[j] ) );
@@ -31,7 +31,7 @@ function setup() {
           .style( "font-family", "'Fira Sans', sans-serif" )
           .style( "font-size", "11px" );
   for( var r = 0; r < singulars.length; r++ ){
-    push();
+    singulars[r] = createImage( wW, wH );
     singulars[r].loadPixels();
     halves.append( 4 * width * height/2 );
     for( var f = 0; f < halves.length; f++ ){
