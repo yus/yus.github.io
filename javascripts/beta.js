@@ -82,7 +82,9 @@ $.noConflict();
           return q;
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-        }).done( console.log( anchors, q ) );
+        });
+      } else {
+        console.log( anchors, q );
       }
     });
   });
