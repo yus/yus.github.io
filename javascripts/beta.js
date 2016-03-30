@@ -73,7 +73,7 @@ function draw() {
         .style("margin", mg+"px");
   //rendrr.beginDraw();
   for(var s = 0; s < singulars.length; s++){
-    rendrr.image(singulars)[s], 0*s, 0*s);
+    rendrr.image(singulars[s]), 0*s, 0*s);
   }
 }
 
