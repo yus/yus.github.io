@@ -2,26 +2,18 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var cntnr, rendrr, mg, pg, wW, wH, singulars, halves, anchors, q;
+var cntnr, rendrr, mg, pg, wW, wH, art, singulars, halves, anchors, q;
 
 function preload() {
   anchors = new Array([]);
-
+  if( q ) {
+    ( !anchors ) ? anchors.append( q ) : print( q );
+  } else {
+    print( "there are " + anchors );
+  }
   mg = 5, pg = 20;
   wW = windowWidth - 2*pg - 2*mg;
   wH = windowHeight - 2*pg - 2*mg;
-
-  for( var j = 0; j < anchors.length; j++ ) {
-    loadImage( anchors[j], function( singulars ) {
-      image( singulars, 0, 0 );
-    }, function( singulars, q ) {
-      if( q ) {
-        ( !anchors ) ? anchors.append( q ) : print( q );
-      } else {
-        print( "there are " + anchors );
-      }
-    });
-  }
 }
 
 function setup() {
@@ -35,7 +27,18 @@ function setup() {
           .style( "font-family", "'Fira Sans', sans-serif" )
           .style( "font-size", "11px" );
   for( var r = 0; r < singulars.length; r++ ){
-    singulars[r] = createImage( wW, wH );
+    //createImage( wW, wH );
+    for( var j = 0; j < anchors.length; j++ ) {
+      art = loadImage( anchors[j], function( singulars[r] ) {
+        image( singulars[r], 0, 0 );
+      }, function( q ) {
+        if( q ) {
+          ( !anchors ) ? anchors.append( q ) : print( q );
+        } else {
+          print( "there are " + anchors );
+        }
+      });
+    }
     singulars[r].loadPixels();
     halves.append( 4 * width * height/2 );
     for( var f = 0; f < halves.length; f++ ){
