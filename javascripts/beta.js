@@ -4,64 +4,6 @@
 */
 var cntnr, rendrr, mg, pg, wW, wH, art, singulars, halves, anchors, q;
 
-function preload() {
-  anchors = new Array([]);
-  if( q ) {
-    ( !anchors ) ? anchors.append( q ) : print( q );
-  } else {
-    print( "there are " + anchors );
-  }
-  mg = 5, pg = 20;
-  wW = windowWidth - 2*pg - 2*mg;
-  wH = windowHeight - 2*pg - 2*mg;
-}
-
-function setup() {
-  createCanvas( wW, wH );
-  rendrr = createGraphics( wW, wH );
-  cntnr = createDiv( "thinking up the tints" ).id( "bg" ).class( "bg" )
-          .style( "background-color", "rgba(25, 25, 25, .29)" )
-          .style( "color", "rgba(255, 129, 29, .29)" )
-          .style( "overflow-x", "hidden" )
-          .style( "overflow-y", "auto" )
-          .style( "font-family", "'Fira Sans', sans-serif" )
-          .style( "font-size", "11px" );
-  for( var r = 0; r < singulars.length; r++ ){
-    //createImage( wW, wH );
-    for( var j = 0; j < anchors.length; j++ ) {
-      art = loadImage( anchors[j], function( singulars[r] ) {
-        image( singulars[r], 0, 0 );
-      }, function( q ) {
-        if( q ) {
-          ( !anchors ) ? anchors.append( q ) : print( q );
-        } else {
-          print( "there are " + anchors );
-        }
-      });
-    }
-    singulars[r].loadPixels();
-    halves.append( 4 * width * height/2 );
-    for( var f = 0; f < halves.length; f++ ){
-      singulars[r].pixels[f+halves[f]] = singulars[r].pixels[f];
-    }
-    singulars[r].updatePixels();
-  }
-}
-
-function draw() {
-  cntnr.size( wW, wH )
-        .style( "padding", pg+"px" )
-        .style( "margin", mg+"px" );
-  //rendrr.beginDraw();
-  for( var s = 0; s < singulars.length; s++ ){
-    rendrr.image( singulars[s], 0*s, 0*s );
-  }
-}
-
-function windowResized() {
-  resizeCanvas( wW, wH );
-}
-
 $.noConflict();
 (function( $ ) {
   $(function() {
@@ -93,3 +35,62 @@ $.noConflict();
     });
   });
 })(jQuery);
+
+function preload() {
+  anchors = new Array([]);
+  if( q ) {
+    ( !anchors ) ? anchors.append( q ) : print( q );
+  } else {
+    print( "there are " + anchors );
+  }
+  mg = 5, pg = 20;
+  wW = windowWidth - 2*pg - 2*mg;
+  wH = windowHeight - 2*pg - 2*mg;
+}
+
+function setup() {
+  createCanvas( 222, 222 );
+  rendrr = createGraphics( 222, 222 );
+  cntnr = createDiv( "thinking up the tints" ).id( "bg" ).class( "bg" )
+          .style( "background-color", "rgba(25, 25, 25, .29)" )
+          .style( "color", "rgba(255, 129, 29, .29)" )
+          .style( "overflow-x", "hidden" )
+          .style( "overflow-y", "auto" )
+          .style( "font-family", "'Fira Sans', sans-serif" )
+          .style( "font-size", "11px" );
+  for( var r = 0; r < singulars; r++ ){
+    createImage( 144, 144 );
+    for( var j = 0; j < anchors; j++ ) {
+      art = loadImage( anchors[j], function( singulars[r] ) {
+        image( singulars[r], 0, 0 );
+      }, function( q ) {
+        if( q ) {
+          ( !anchors ) ? anchors.append( q ) : print( q );
+        } else {
+          print( "there are " + anchors );
+        }
+      });
+    }
+    singulars[r].loadPixels();
+    halves.append( 4 * width * height/2 );
+    for( var f = 0; f < halves; f++ ){
+      singulars[r].pixels[f+halves[f]] = singulars[r].pixels[f];
+    }
+    singulars[r].updatePixels();
+  }
+}
+
+function draw() {
+  cntnr.size( wW, wH )
+        .style( "padding", pg+"px" )
+        .style( "margin", mg+"px" );
+  //rendrr.beginDraw();
+  for( var s = 0; s < singulars.length; s++ ){
+    rendrr.image( singulars[s], 0*s, 0*s );
+  }
+}
+
+function windowResized() {
+  resizeCanvas( wW, wH );
+}
+
