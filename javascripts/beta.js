@@ -37,8 +37,10 @@ $.noConflict();
 })(jQuery);
 
 var cnv, img, cntnr, gesso;
-var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
-gesso = document.getElementById('gesso');
+var cW, cH, wW, wH, gessoW, gessoH, r, g, b, a, rc, d, halfImage;
+gesso = $('gesso');
+gessoW = gesso.width();
+gessoH = gesso.height();
 
 function preload() {
   utistor();
@@ -58,7 +60,7 @@ function setup() {
           .style('font-size', '29px');
   cnv.class('cnv').parent( cntnr );
   cnv.style('visibility', 'visible');
-  cntnr.parent( gesso );
+  cntnr.parent( 'gesso' ); //ascend by ID
   
   noLoop();
 }
@@ -96,8 +98,8 @@ function utistor() {
   b = randomGaussian( 255,100 );
   a = randomGaussian( 255 );
   // windowWidth, windowHeight
-  wW =  gesso.width - 5;
-  wH =  gesso.height - 5;
+  wW =  gessoW - 5;
+  wH =  gessoH - 5;
   cW = wW - 5;
   cH = wH - 5;
 }
