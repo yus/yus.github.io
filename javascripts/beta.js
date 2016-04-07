@@ -2,7 +2,7 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var utistor, q;
+var utistor, gesso, q;
 
 $.noConflict();
 (function( $ ) {
@@ -54,7 +54,7 @@ function setup() {
           .style('font-size', '29px');
   cnv.class('cnv').parent( cntnr );
   cnv.style('visibility', 'visible');
-  cntnr.parent('.gesso');
+  cntnr.parent( gesso );
   
   noLoop();
 }
@@ -94,8 +94,9 @@ function utistor() {
   b = randomGaussian( 255,100 );
   a = randomGaussian( 255 );
   // windowWidth, windowHeight
-  wW =  - 5;
-  wH =  - 5;
+  gesso = $('div#gesso');
+  wW =  gesso.width - 5;
+  wH =  gesso.height - 5;
   cW = wW - 5;
   cH = wH - 5;
 }
