@@ -36,6 +36,10 @@ $.noConflict();
   });
 })(jQuery);
 
+var cnv, img, cntnr, gesso;
+var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
+gesso = document.getElementById('gesso');
+
 function preload() {
   utistor();
 }
@@ -87,14 +91,11 @@ function windowResized() {
 }
 
 function utistor() {
-  var cnv, img, cntnr, gesso;
-  var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
   b = randomGaussian( 255,100 );
   a = randomGaussian( 255 );
   // windowWidth, windowHeight
-  gesso = document.getElementById('gesso');
   wW =  gesso.width - 5;
   wH =  gesso.height - 5;
   cW = wW - 5;
