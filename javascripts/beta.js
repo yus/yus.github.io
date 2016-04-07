@@ -7,6 +7,7 @@ var utistor, gesso, q;
 $.noConflict();
 (function( $ ) {
   $(function() {
+    gesso = $('div#gesso');
     var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
@@ -94,7 +95,6 @@ function utistor() {
   b = randomGaussian( 255,100 );
   a = randomGaussian( 255 );
   // windowWidth, windowHeight
-  gesso = $('div#gesso');
   wW =  gesso.width - 5;
   wH =  gesso.height - 5;
   cW = wW - 5;
