@@ -2,7 +2,7 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var cntnr, rendrr, mg, pg, wW, wH, art, singulars, halves, anchors, q;
+var utistor, q;
 
 $.noConflict();
 (function( $ ) {
@@ -37,60 +37,65 @@ $.noConflict();
 })(jQuery);
 
 function preload() {
-  anchors = new Array([]);
-  if( q ) {
-    ( !anchors ) ? anchors.append( q ) : print( q );
-  } else {
-    print( "there are " + anchors );
-  }
-  mg = 5, pg = 20;
-  wW = windowWidth - 2*pg - 2*mg;
-  wH = windowHeight - 2*pg - 2*mg;
+  utistor();
 }
 
 function setup() {
-  createCanvas( 222, 222 );
-  rendrr = createGraphics( 222, 222 );
-  cntnr = createDiv( "thinking up the tints" ).id( "bg" ).class( "bg" )
-          .style( "background-color", "rgba(25, 25, 25, .29)" )
-          .style( "color", "rgba(255, 129, 29, .29)" )
-          .style( "overflow-x", "hidden" )
-          .style( "overflow-y", "auto" )
-          .style( "font-family", "'Fira Sans', sans-serif" )
-          .style( "font-size", "11px" );
-  for( var r = 0; r < singulars; r++ ){
-    createImage( 144, 144 );
-    for( var j = 0; j < anchors; j++ ) {
-      art = loadImage( anchors[j], function( singulars[r] ) {
-        image( singulars[r], 0, 0 );
-      }, function( q ) {
-        if( q ) {
-          ( !anchors ) ? anchors.append( q ) : print( q );
-        } else {
-          print( "there are " + anchors );
-        }
-      });
-    }
-    singulars[r].loadPixels();
-    halves.append( 4 * width * height/2 );
-    for( var f = 0; f < halves; f++ ){
-      singulars[r].pixels[f+halves[f]] = singulars[r].pixels[f];
-    }
-    singulars[r].updatePixels();
-  }
+  print( wW + " ¤ " + wH );
+  console.log( wW + " ¤ " + wH );
+  
+  cnv = createCanvas( cW, cH );
+  cntnr = createDiv('').class('cntnr')
+          .style('background-color', 'rgb(25, 25, 25)')
+          .style('color', 'rgb(255, 129, 29)')
+          .style('overflow-x', 'hidden')
+          .style('overflow-y', 'auto')
+          .style('font-family', '"Fira Sans", sans-serif')
+          .style('font-size', '29px');
+  cnv.class('cnv').parent( cntnr );
+  cnv.style('visibility', 'visible');
+  cntnr.parent('.gesso');
+  
+  noLoop();
 }
 
 function draw() {
-  cntnr.size( wW, wH )
-        .style( "padding", pg+"px" )
-        .style( "margin", mg+"px" );
-  //rendrr.beginDraw();
-  for( var s = 0; s < singulars.length; s++ ){
-    rendrr.image( singulars[s], 0*s, 0*s );
+  utistor();
+  cntnr.size( wW, wH );
+  img = createImage( cW, cH );
+  rc = color(r, g, b, a);
+  img.loadPixels();
+  d = pixelDensity();
+  halfImage = 2 * d ^ 2 * img.width * img.height;
+  for (var i = 0; i < halfImage; i += 4) {
+    img.pixels[i] = red(rc);
+    img.pixels[i + 1] = green(rc);
+    img.pixels[i + 2] = blue(rc);
+    img.pixels[i + 3] = alpha(rc);
   }
+  img.updatePixels();
+  image( img, 5, 5 );
+}
+
+function mousePressed() {
+  redraw();
 }
 
 function windowResized() {
-  resizeCanvas( wW, wH );
+  utistor();
+  resizeCanvas( cW, cH );
 }
 
+function utistor() {
+  var cnv, img, cntnr;
+  var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
+  r = randomGaussian( 255,5 );
+  g = randomGaussian( 255,50 );
+  b = randomGaussian( 255,100 );
+  a = randomGaussian( 255 );
+  // windowWidth, windowHeight
+  wW =  - 5;
+  wH =  - 5;
+  cW = wW - 5;
+  cH = wH - 5;
+}
