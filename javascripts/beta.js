@@ -2,11 +2,15 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var utistor, q;
+var utistor, gesso, wG, hG, q;
 
 $.noConflict();
 (function( $ ) {
   $(function() {
+    gesso = $('div#gesso');
+    wG = gesso.width();
+    hG = gesso.height();
+    
     var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
@@ -36,11 +40,8 @@ $.noConflict();
   });
 })(jQuery);
 
-var cnv, img, cntnr, gesso;
-var cW, cH, wW, wH, gessoW, gessoH, r, g, b, a, rc, d, halfImage;
-gesso = $('gesso');
-gessoW = gesso.width();
-gessoH = gesso.height();
+var cnv, img, cntnr;
+var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
 
 function preload() {
   utistor();
@@ -98,8 +99,8 @@ function utistor() {
   b = randomGaussian( 255,100 );
   a = randomGaussian( 255 );
   // windowWidth, windowHeight
-  wW =  gessoW - 5;
-  wH =  gessoH - 5;
+  wW =  wG - 5;
+  wH =  hG - 5;
   cW = wW - 5;
   cH = wH - 5;
 }
