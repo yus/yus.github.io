@@ -67,6 +67,7 @@ function draw() {
   img = createImage( cW, cH );
   
   rc = color(r, g, b, a);
+  bg = color(r, g, b, a);
   img.loadPixels();
   d = pixelDensity();
   halfImage = 2 * d ^ 2 * img.width * img.height;
@@ -95,7 +96,7 @@ function utistor() {
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
   b = randomGaussian( 255,100 );
-  a = randomGaussian( 255 );
+  a = randomGaussian( 255, 5 );
   // windowWidth, windowHeight
   wW =  wG - 5;
   wH =  hG - 5;
