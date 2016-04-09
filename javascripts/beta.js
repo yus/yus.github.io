@@ -2,16 +2,30 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var utistor, gesso, wG, hG, q;
+var cntnr, utistor, gesso, wG, hG, q;
 
 $.noConflict();
 (function( $ ) {
   $(function() {
+
     gesso = $('div#gesso');
     wG = gesso.width();
     hG = gesso.height();
+    console.log( wG + ' /// ' + hG );
+    
+    $('<div>').attr('id','cntnr').appendTo( gesso );
+    cntnr = $('div#cntnr');
+    cntnr.css({
+      'background-color':'rgb(25, 25, 25)',
+      'color':'rgb(255, 129, 29)',
+      'overflow-x':'hidden',
+      'overflow-y':'auto',
+      'font-family':'"Fira Sans", sans-serif',
+      'font-size', '29px'
+    }).addClass('cntnr');
     
     var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
+    
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -40,7 +54,7 @@ $.noConflict();
   });
 })(jQuery);
 
-var cnv, img, cntnr;
+var cnv, img, holder;
 var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
 
 function preload() {
@@ -49,26 +63,15 @@ function preload() {
 
 function setup() {
   print( wW + " ¤ " + wH );
-  console.log( wW + " ¤ " + wH );
-  
   cnv = createCanvas( cW, cH );
-  cntnr = createDiv('').class('cntnr')
-          .style('background-color', 'rgb(25, 25, 25)')
-          .style('color', 'rgb(255, 129, 29)')
-          .style('overflow-x', 'hidden')
-          .style('overflow-y', 'auto')
-          .style('font-family', '"Fira Sans", sans-serif')
-          .style('font-size', '29px');
-  cnv.class('cnv').parent( cntnr );
+  cnv.class( 'cnv' ).id( 'cnv' ).parent( holder );
   cnv.style('visibility', 'visible');
-  cntnr.parent( 'gesso' ); //ascend by ID
-  
   noLoop();
 }
 
 function draw() {
   utistor();
-  cntnr.size( wW, wH );
+  //cntnr.size( wW, wH );
   img = createImage( cW, cH );
   rc = color(r, g, b, a);
   img.loadPixels();
@@ -94,6 +97,7 @@ function windowResized() {
 }
 
 function utistor() {
+  holder = select('#cntnr');
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
   b = randomGaussian( 255,100 );
