@@ -21,7 +21,7 @@ $.noConflict();
       'overflow-x':'hidden',
       'overflow-y':'auto',
       'font-family':'"Fira Sans", sans-serif',
-      'font-size', '29px'
+      'font-size':'29px'
     }).addClass('cntnr');
     
     var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
