@@ -80,8 +80,8 @@ function windowResized() {
 
 function utistor() {
   gesso = select('#gesso');
-  wG = gesso.width();
-  hG = gesso.height();
+  wG = gesso.width;
+  hG = gesso.height;
   print( wG + ' /// ' + hG );
   
   createDiv('').id('cntnr').parent( gesso );
