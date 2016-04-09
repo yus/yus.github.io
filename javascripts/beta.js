@@ -60,9 +60,10 @@ function setup() {
     .style('font-size','29px')
     .class('cntnr');
   
-  createCanvas( cW, cH ).class( 'cnv' ).id( 'cnv' );
-  cnv = select( 'cnv' );
-  cnv.style( 'visibility', 'visible' ).parent( cntnr );
+  cnv = createCanvas( cW, cH );
+  cnv.style( 'visibility', 'visible' )
+      .class( 'cnv' ).id( 'cnv' )
+      .parent( cntnr );
   noLoop();
 }
 
