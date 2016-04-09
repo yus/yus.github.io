@@ -2,30 +2,12 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var cntnr, utistor, gesso, wG, hG, q;
+var utistor, q;
 
 $.noConflict();
 (function( $ ) {
   $(function() {
-
-    gesso = $('div#gesso');
-    wG = gesso.width();
-    hG = gesso.height();
-    console.log( wG + ' /// ' + hG );
-    
-    $('<div>').attr('id','cntnr').appendTo( gesso );
-    cntnr = $('div#cntnr');
-    cntnr.css({
-      'background-color':'rgb(25, 25, 25)',
-      'color':'rgb(255, 129, 29)',
-      'overflow-x':'hidden',
-      'overflow-y':'auto',
-      'font-family':'"Fira Sans", sans-serif',
-      'font-size':'29px'
-    }).addClass('cntnr');
-    
     var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
-    
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -54,8 +36,8 @@ $.noConflict();
   });
 })(jQuery);
 
-var cnv, img, holder;
-var cW, cH, wW, wH, r, g, b, a, rc, d, halfImage;
+var cnv, img, cntnr, gesso;
+var cW, cH, wW, wH, wG, hG, r, g, b, a, rc, d, halfImage;
 
 function preload() {
   utistor();
@@ -64,14 +46,14 @@ function preload() {
 function setup() {
   print( wW + " ¤ " + wH );
   cnv = createCanvas( cW, cH );
-  cnv.class( 'cnv' ).id( 'cnv' ).parent( holder );
+  cnv.class( 'cnv' ).id( 'cnv' ).parent( cntnr );
   cnv.style('visibility', 'visible');
   noLoop();
 }
 
 function draw() {
   utistor();
-  //cntnr.size( wW, wH );
+  cntnr.size( wW, wH );
   img = createImage( cW, cH );
   rc = color(r, g, b, a);
   img.loadPixels();
@@ -97,7 +79,22 @@ function windowResized() {
 }
 
 function utistor() {
-  holder = select('#cntnr');
+  gesso = select('#gesso');
+  wG = gesso.width();
+  hG = gesso.height();
+  print( wG + ' /// ' + hG );
+  
+  createDiv('').id('cntnr').parent( gesso );
+  cntnr = select('#cntnr');
+  cntnr.style({
+    'background-color':'rgb(25, 25, 25)',
+    'color':'rgb(255, 129, 29)',
+    'overflow-x':'hidden',
+    'overflow-y':'auto',
+    'font-family':'"Fira Sans", sans-serif',
+    'font-size':'29px'
+  }).class('cntnr');
+    
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
   b = randomGaussian( 255,100 );
