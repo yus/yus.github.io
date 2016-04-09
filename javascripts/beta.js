@@ -52,13 +52,7 @@ function setup() {
   
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
-  cntnr.style('background-color','rgb(25, 25, 25)')
-    .style('color','rgb(255, 129, 29)')
-    .style('overflow-x','hidden')
-    .style('overflow-y','auto')
-    .style('font-family','"Fira Sans", sans-serif')
-    .style('font-size','29px')
-    .class('cntnr');
+  cntnr.class('cntnr');
   
   cnv = createCanvas( cW, cH );
   cnv.style( 'visibility', 'visible' )
@@ -71,6 +65,7 @@ function draw() {
   utistor();
   cntnr.size( wW, wH );
   img = createImage( cW, cH );
+  background(img, 0);
   rc = color(r, g, b, a);
   img.loadPixels();
   d = pixelDensity();
