@@ -45,6 +45,21 @@ function preload() {
 
 function setup() {
   print( wW + " ¤ " + wH );
+  gesso = select('#gesso');
+  wG = gesso.width;
+  hG = gesso.height;
+  print( wG + ' /// ' + hG );
+  
+  createDiv('').id('cntnr').parent( gesso );
+  cntnr = select('#cntnr');
+  cntnr.style('background-color','rgb(25, 25, 25)')
+    .style('color','rgb(255, 129, 29)')
+    .style('overflow-x','hidden')
+    .style('overflow-y','auto')
+    .style('font-family','"Fira Sans", sans-serif')
+    .style('font-size','29px')
+    .class('cntnr');
+  
   cnv = createCanvas( cW, cH );
   cnv.class( 'cnv' ).id( 'cnv' ).parent( cntnr );
   cnv.style('visibility', 'visible');
@@ -79,21 +94,6 @@ function windowResized() {
 }
 
 function utistor() {
-  gesso = select('#gesso');
-  wG = gesso.width;
-  hG = gesso.height;
-  print( wG + ' /// ' + hG );
-  
-  createDiv('').id('cntnr').parent( gesso );
-  cntnr = select('#cntnr');
-  cntnr.style('background-color','rgb(25, 25, 25)')
-    .style('color','rgb(255, 129, 29)')
-    .style('overflow-x','hidden')
-    .style('overflow-y','auto')
-    .style('font-family','"Fira Sans", sans-serif')
-    .style('font-size','29px')
-    .class('cntnr');
-    
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
   b = randomGaussian( 255,100 );
