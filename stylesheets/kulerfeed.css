@@ -11,6 +11,23 @@
   padding:10px;
   background-color:#222;
 }
+#cntnr{
+  color: rgb(255, 129, 29);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 29px;
+  background-color: rgb(25, 25, 25);
+  position: absolute;
+  top: 20px;
+  left: 0;
+  bottom: 40px;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
 #kulerfeed{
   display: flex;
   margin: 0px auto 20px;
