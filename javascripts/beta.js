@@ -63,9 +63,9 @@ function setup() {
 
 function draw() {
   utistor();
-  cntnr.size( wW, wH );
+  //cntnr.size( wW, wH );
   img = createImage( cW, cH );
-  background(img, 0);
+  
   rc = color(r, g, b, a);
   img.loadPixels();
   d = pixelDensity();
@@ -77,8 +77,9 @@ function draw() {
     img.pixels[i + 3] = alpha(rc);
   }
   img.updatePixels();
-  tint(255, 126);
-  image( img, 0, 0 );
+  //tint(255, 126);
+  var bg = image( img, 0, 0 );
+  background(bg, 0);
 }
 
 function mousePressed() {
