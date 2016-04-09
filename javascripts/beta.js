@@ -23,7 +23,7 @@ $.noConflict();
           entry = items[i];
           themeImageLink = $( $( entry ).find( 'link' )[1] ).text();
           q = themeImageLink;
-          console.log( q );
+          //console.log( q );
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
@@ -40,14 +40,14 @@ var cnv, img, cntnr, gesso;
 var cW, cH, wW, wH, wG, hG, r, g, b, a, rc, d, halfImage;
 
 function preload() {
+  gesso = select('#gesso');
+  wG = gesso.width;
+  hG = gesso.height;
   utistor();
 }
 
 function setup() {
   print( wW + " ¤ " + wH );
-  gesso = select('#gesso');
-  wG = gesso.width;
-  hG = gesso.height;
   print( wG + ' /// ' + hG );
   
   createDiv('').id('cntnr').parent( gesso );
@@ -60,9 +60,9 @@ function setup() {
     .style('font-size','29px')
     .class('cntnr');
   
-  cnv = createCanvas( cW, cH );
-  cnv.class( 'cnv' ).id( 'cnv' ).parent( cntnr );
-  cnv.style('visibility', 'visible');
+  createCanvas( cW, cH ).class( 'cnv' ).id( 'cnv' );
+  cnv = select( 'cnv' );
+  cnv.style( 'visibility', 'visible' ).parent( cntnr );
   noLoop();
 }
 
