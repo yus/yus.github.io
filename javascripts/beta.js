@@ -82,7 +82,8 @@ function draw() {
     img.pixels[i + 3] = alpha(rc);
   }
   img.updatePixels();
-  image( img, 5, 5 );
+  tint(255, 126);
+  image( img, 0, 0 );
 }
 
 function mousePressed() {
