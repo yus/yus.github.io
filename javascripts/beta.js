@@ -78,8 +78,8 @@ function draw() {
   }
   img.updatePixels();
   //tint(255, 126);
-  var bg = image( img, 0, 0 );
-  background(bg, 0);
+  image( img, 0, 0 );
+  background('azure', 0);
 }
 
 function mousePressed() {
