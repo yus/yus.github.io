@@ -86,14 +86,13 @@ function utistor() {
   
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
-  cntnr.style({
-    'background-color':'rgb(25, 25, 25)',
-    'color':'rgb(255, 129, 29)',
-    'overflow-x':'hidden',
-    'overflow-y':'auto',
-    'font-family':'"Fira Sans", sans-serif',
-    'font-size':'29px'
-  }).class('cntnr');
+  cntnr.style('background-color','rgb(25, 25, 25)')
+    .style('color','rgb(255, 129, 29)')
+    .style('overflow-x','hidden')
+    .style('overflow-y','auto')
+    .style('font-family','"Fira Sans", sans-serif')
+    .style('font-size','29px')
+    .class('cntnr');
     
   r = randomGaussian( 255,5 );
   g = randomGaussian( 255,50 );
