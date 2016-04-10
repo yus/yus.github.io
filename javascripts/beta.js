@@ -93,8 +93,9 @@ function windowResized() {
 }
 
 function utistor() {
-  r = randomGaussian();
-  g = randomGaussian();
-  b = randomGaussian();
-  a = randomGaussian();
+  
+  r = randomGaussian(255);
+  g = randomGaussian(255);
+  b = randomGaussian(255);
+  a = randomGaussian(0,1);
 }
