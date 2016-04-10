@@ -58,7 +58,7 @@ function setup() {
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
   
-  cnv = createCanvas( cW, cH );
+  cnv = createCanvas( cW, 580 );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
       .parent( cntnr );
@@ -68,9 +68,10 @@ function setup() {
 function draw() {
   utistor();
   //cntnr.size( wW, wH );
-  img = createImage( cW, cH );
+  img = createImage( cW, 55 );
   
   rc = color(r, g, b, a);
+  utistor();
   bg = color(r, g, b, a);
   img.loadPixels();
   d = pixelDensity();
@@ -84,7 +85,7 @@ function draw() {
   img.updatePixels();
   //tint(255, 126);
   image( img, 0, 0 );
-  background( rc, 1 );
+  background( bg, .29 );
 }
 
 function mousePressed() {
