@@ -7,7 +7,7 @@ var utistor;
 $.noConflict();
 (function( $ ) {
   $(function() {
-    var entry, entryTitle, themeLink, themeImageLink, entryID, quler;
+    var entry, entryTitle, themeLink, themeImageLink, entryID, quler, ql;
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -18,18 +18,19 @@ $.noConflict();
       if ( !response.error ) {
         var items = $( response ).find( 'item' );
         $.each( items, function( i, u ) {
-          quler = $( '<div id="qi'+i+'"></div>' ).addClass('fentry');
-          quler.css( 'font-family', '"Fira Sans", sans-serif' ).appendTo( '.gesso' );
           entry = items[i];
           themeImageLink = $( $( entry ).find( 'link' )[1] ).text();
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
           
-          var ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
+          quler = $( '<div id="qi'+i+'"></div>' ).addClass( 'fentry' );
+          $( 'div#kulerfeed' ).append( quler );
+          ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
           ql.append( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
+          
           //quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
