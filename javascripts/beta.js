@@ -55,7 +55,7 @@ function setup() {
   
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
-  cntnr.class('cntnr');
+  cntnr.class('cntnr').class( 'gesso' );
   
   cnv = createCanvas( cW, cH );
   cnv.style( 'visibility', 'visible' )
