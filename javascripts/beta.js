@@ -98,10 +98,10 @@ function windowResized() {
 }
 
 function utistor() {
-  r = randomGaussian( 255,5 );
-  g = randomGaussian( 255,50 );
-  b = randomGaussian( 255,100 );
-  a = randomGaussian( 255, 5 );
+  r = randomGaussian( 5,29 );
+  g = randomGaussian( 55,29 );
+  b = randomGaussian( 155,29 );
+  a = randomGaussian( 222,29 );
   // windowWidth, windowHeight
   wW =  wG - 5;
   wH =  hG - 5;
