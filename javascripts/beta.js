@@ -51,13 +51,10 @@ function preload() {
 }
 
 function setup() {
-  print( wW + " ¤ " + wH );
-  print( wG + ' /// ' + hG );
-  
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
-  
+  cW = cntnr.width;
   cnv = createCanvas( cW, 580 );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
@@ -67,12 +64,10 @@ function setup() {
 
 function draw() {
   utistor();
-  //cntnr.size( wW, wH );
-  img = createImage( cW, 55 );
-  
   rc = color(r, g, b, a);
   utistor();
   bg = color(r, g, b, a);
+  img = createImage( 11, 11 );
   img.loadPixels();
   d = pixelDensity();
   halfImage = 2 * d ^ 2 * img.width * img.height;
@@ -93,18 +88,13 @@ function mousePressed() {
 }
 
 function windowResized() {
-  utistor();
-  resizeCanvas( cW, cH );
+  //utistor();
+  resizeCanvas( cW, 580 );
 }
 
 function utistor() {
-  r = randomGaussian( 5,29 );
-  g = randomGaussian( 55,29 );
-  b = randomGaussian( 155,29 );
-  a = randomGaussian( 222,29 );
-  // windowWidth, windowHeight
-  wW =  wG - 5;
-  wH =  hG - 5;
-  cW = wW - 5;
-  cH = wH - 5;
+  r = randomGaussian();
+  g = randomGaussian();
+  b = randomGaussian();
+  a = randomGaussian();
 }
