@@ -4,12 +4,17 @@
 * copyright: yusdesign (c) 2013
 */
 #gesso{
-  padding:0;
-  margin:0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: row;
 }
 .gesso{
-  padding:10px;
-  background-color:#222;
+  height: 580px;
+  padding: 10px;
+  background-color: #222;
 }
 #cntnr{
   color: rgb(255, 129, 29);
@@ -18,24 +23,21 @@
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
   background-color: rgb(25, 25, 25);
-  position: absolute;
-  top: 20px;
-  left: 0;
-  bottom: 40px;
-  right: 0;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
+  justify-content: flex-end;
+  align-content: flex-end;
+  flex: 1;
 }
 #kulerfeed{
   display: flex;
   margin: 0px auto 20px;
   overflow: hidden;
-  height: 580px;
   flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
+  justify-content: flex-start;
+  align-content: flex-start;
+  flex-direction: row;
+  align-items: flex-start;
+  flex: 1;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
