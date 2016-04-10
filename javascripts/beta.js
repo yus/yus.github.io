@@ -2,7 +2,7 @@
 *  Name: Yusdesign Kuler Feed
 *  License: CC-NC-ND 3.0 Unported
 */
-var utistor, q;
+var utistor;
 
 $.noConflict();
 (function( $ ) {
@@ -27,13 +27,12 @@ $.noConflict();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
           
           var ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
-          ql.html( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
-          ql.html( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
-
+          ql.append( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
+          ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
+          quler.html( ql );
           //quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
-          q = themeImageLink; // links array
         });
       }
     });
