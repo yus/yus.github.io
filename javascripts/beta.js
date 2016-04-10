@@ -29,7 +29,7 @@ $.noConflict();
           var ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
           ql.append( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
-          quler.html( ql );
+          quler.append( ql );
           //quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
