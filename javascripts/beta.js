@@ -18,18 +18,23 @@ $.noConflict();
       if ( !response.error ) {
         var items = $( response ).find( 'item' );
         $.each( items, function( i, u ) {
-          quler = $( '<div id="qi'+i+'"></div>' );
+          quler = $( '<div id="qi'+i+'"></div>' ).addClass('fentry');
           quler.css( 'font-family', '"Fira Sans", sans-serif' ).appendTo( '.gesso' );
           entry = items[i];
           themeImageLink = $( $( entry ).find( 'link' )[1] ).text();
-          q = themeImageLink;
-          //console.log( q );
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-          quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
+          
+          var ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
+          ql.html( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
+          ql.html( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
+
+          .appendTo( quler );
+          //quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
           //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
+          q = themeImageLink; // links array
         });
       }
     });
