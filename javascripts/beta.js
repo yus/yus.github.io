@@ -41,7 +41,10 @@ $.noConflict();
 })(jQuery);
 
 var cnv, img, cntnr, gesso;
-var cW, cH, wW, wH, wG, hG, r, g, b, a, rc, d, halfImage;
+var cW, cH, wW, wH, wG, hG, r, g, b, a, rc, bg, d, isum;
+var distances = [];
+var maxDistance;
+var spacer;
 
 function preload() {
   gesso = select('#gesso');
@@ -54,33 +57,59 @@ function setup() {
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
-  cW = cntnr.width;
+  cW = cntnr.width - 10;
   cnv = createCanvas( cW, 580 );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
       .parent( cntnr );
+  
+  maxDistance = dist(width/2, height/2, width, height);
+  for (var x = 0; x < width; x++) {
+    distances[x] = []; // create nested array
+    for (var y = 0; y < height; y++) {
+      var distance = dist(width/2, height/2, x, y);
+      distances[x][y] = distance/maxDistance * 255;
+    }
+  }
+  spacer = 10;
+  
   noLoop();
 }
 
 function draw() {
   utistor();
-  rc = color(r, g, b, a);
+  rc = color('rgba('+r+','+g+','+b+','+a+')');
   utistor();
-  bg = color(r, g, b, a);
-  img = createImage( 11, 11 );
+  bg = color('rgba('+r+','+g+','+b+','+a+')');
+  img = createImage( 9, 9 );
   img.loadPixels();
   d = pixelDensity();
-  halfImage = 2 * d ^ 2 * img.width * img.height;
-  for (var i = 0; i < halfImage; i += 4) {
+  isum = 4 * d ^ 2 * img.width * img.height;
+  for (var i = 0; i < isum; i += 4) {
     img.pixels[i] = red(rc);
     img.pixels[i + 1] = green(rc);
     img.pixels[i + 2] = blue(rc);
     img.pixels[i + 3] = alpha(rc);
   }
+  /**
+  for (i = 0; i < img.width; i++) {
+    for (j = 0; j < img.height; j++) {
+      img.set(i, j, rc);
+    }
+  }
+  */
   img.updatePixels();
   //tint(255, 126);
   image( img, 0, 0 );
-  background( bg, .29 );
+  background( bg );
+  
+  for (var x = 0; x < width; x += spacer) {
+    for (var y = 0; y < height; y += spacer) {
+      stroke(distances[x][y]);
+      image( img, x + spacer/2, y + spacer/2 );
+      point( x + spacer/2, y + spacer/2 );
+    }
+  }
 }
 
 function mousePressed() {
@@ -88,14 +117,13 @@ function mousePressed() {
 }
 
 function windowResized() {
-  //utistor();
+  utistor();
   resizeCanvas( cW, 580 );
 }
 
 function utistor() {
-  
   r = randomGaussian(255);
   g = randomGaussian(255);
   b = randomGaussian(255);
-  a = randomGaussian(0,1);
+  a = randomGaussian(255);
 }
