@@ -82,7 +82,8 @@ function draw() {
   img = createImage( 9, 9 );
   img.loadPixels();
   d = pixelDensity();
-  isum = 4 * d ^ 2 * img.width * img.height;
+  isum = 4 * (d ^ 2) * img.width * img.height;
+  print(isum);
   for (var i = 0; i < isum; i += 4) {
     img.pixels[i] = red(rc);
     img.pixels[i + 1] = green(rc);
