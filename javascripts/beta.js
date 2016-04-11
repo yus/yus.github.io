@@ -71,7 +71,7 @@ function setup() {
       distances[x][y] = distance/maxDistance * 255;
     }
   }
-  spacer = 10;
+  spacer = 29;
   
   noLoop();
 }
