@@ -23,7 +23,7 @@ $.noConflict();
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-          qex = $( $( entry ).find( 'kuler:swatchHexColor' )[0] ).text();
+          qex = $( $( entry ).find( 'kuler\\:swatchHexColor' )[0] ).text();
           console.log( qex );
           
           quler = $( '<div id="qi'+i+'"></div>' ).addClass( 'fentry' );
