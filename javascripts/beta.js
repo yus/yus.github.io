@@ -23,6 +23,8 @@ $.noConflict();
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
+          brief = $( $( entry ).find( 'description' )[0] ).text();
+          console.log( brief );
           
           quler = $( '<div id="qi'+i+'"></div>' ).addClass( 'fentry' );
           $( 'div#kulerfeed' ).append( quler );
@@ -120,6 +122,6 @@ function utistor() {
   r = randomGaussian(5, 255);
   g = randomGaussian(55, 255);
   b = randomGaussian(155, 255);
-  a = randomGaussian(55);
+  a = randomGaussian(1,1);
   return color( r,g,b,a );
 }
