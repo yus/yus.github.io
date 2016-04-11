@@ -23,8 +23,8 @@ $.noConflict();
           entryTitle = $( $( entry ).find( 'title' )[1] ).text();
           themeLink = $( $( entry ).find( 'link' )[0] ).text();
           entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-          brief = $( $( entry ).find( 'description' )[0] ).text();
-          console.log( brief );
+          qex = $( $( entry ).find( 'kuler:swatchHexColor' )[0] ).text();
+          console.log( qex );
           
           quler = $( '<div id="qi'+i+'"></div>' ).addClass( 'fentry' );
           $( 'div#kulerfeed' ).append( quler );
