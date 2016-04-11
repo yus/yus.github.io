@@ -41,7 +41,7 @@ $.noConflict();
 })(jQuery);
 
 var cnv, img, cntnr, gesso;
-var cW, cH, wW, wH, wG, hG, r, g, b, a, rc, bg, d, isum;
+var cW, r, g, b, a, rc, bg, d, isum;
 var distances = [];
 var maxDistance;
 var spacer;
@@ -77,10 +77,8 @@ function setup() {
 }
 
 function draw() {
-  utistor();
-  rc = color('rgba('+r+','+g+','+b+','+a+')');
-  utistor();
-  bg = color('rgba('+r+','+g+','+b+','+a+')');
+  rc = color( utistor() );
+  bg = color( utistor() );
   img = createImage( 9, 9 );
   img.loadPixels();
   d = pixelDensity();
@@ -117,13 +115,13 @@ function mousePressed() {
 }
 
 function windowResized() {
-  utistor();
   resizeCanvas( cW, 580 );
 }
 
 function utistor() {
-  r = randomGaussian(255);
-  g = randomGaussian(255);
-  b = randomGaussian(255);
-  a = randomGaussian(255);
+  r = randomGaussian(255, 255);
+  g = randomGaussian(255, 255);
+  b = randomGaussian(255, 255);
+  a = randomGaussian(255, .29);
+  return color( r,g,b,a );
 }
