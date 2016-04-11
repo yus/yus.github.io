@@ -48,8 +48,6 @@ var spacer;
 
 function preload() {
   gesso = select('#gesso');
-  wG = gesso.width;
-  hG = gesso.height;
   utistor();
 }
 
@@ -119,9 +117,9 @@ function windowResized() {
 }
 
 function utistor() {
-  r = randomGaussian(255, 255);
-  g = randomGaussian(255, 255);
-  b = randomGaussian(255, 255);
-  a = randomGaussian(255, .29);
+  r = randomGaussian(5, 255);
+  g = randomGaussian(55, 255);
+  b = randomGaussian(155, 255);
+  a = randomGaussian(55);
   return color( r,g,b,a );
 }
