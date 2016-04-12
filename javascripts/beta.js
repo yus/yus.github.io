@@ -21,8 +21,9 @@ $.noConflict();
 
         $.each( items, function( q, u ) {
           entry = items[q];
+          console.log( u );
 
-          tID = ( $( $( entry ).find( 'kuler\\:themeID' )[0] ).text() );
+          tID = $( $( entry ).find( 'kuler\\:themeID' )[0] ).text();
           entryTitle = $( $( entry ).find( 'kuler\\:themeTitle' )[0] ).text();
           themeImageLink = $( $( entry ).find( 'kuler\\:themeImage' )[0] ).text();
 
@@ -30,7 +31,7 @@ $.noConflict();
           
           quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
-          for (i = 0; i < 5; i++){
+          for (i = 0; i < 4; i++){
             tinge = $( $( quartz )[i] ).text();
             console.log( tinge );
           }
