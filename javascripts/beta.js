@@ -7,35 +7,43 @@ var utistor;
 $.noConflict();
 (function( $ ) {
   $(function() {
-    var entry, entryTitle, themeLink, themeImageLink, entryID, quler, ql;
+    var entry, tID, entryTitle, themeLink, themeImageLink, entryID, quartz, hex, quler, ql;
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     $.ajax({ 
       url:qu,
-      dataType: 'xml'
+      dataType: 'xml',
+      namespace: 'kuler'
     }).done( function( response ) {
       if ( !response.error ) {
         var items = $( response ).find( 'item' );
-        $.each( items, function( i, u ) {
-          entry = items[i];
-          themeImageLink = $( $( entry ).find( 'link' )[1] ).text();
-          entryTitle = $( $( entry ).find( 'title' )[1] ).text();
-          themeLink = $( $( entry ).find( 'link' )[0] ).text();
-          entryID = themeLink.slice( themeLink.lastIndexOf('/')+1 );
-          qex = $( $( entry ).find( 'kuler\\:swatchHexColor' )[0] ).text();
-          console.log( i + ' ››› ' + entryTitle + ' ››› ' + qex );
+
+        $.each( items, function( q, u ) {
+          entry = items[q];
+
+          tID = ( $( $( entry ).find( 'kuler\\:themeID' )[0] ).text() );
+          entryTitle = $( $( entry ).find( 'kuler\\:themeTitle' )[0] ).text();
+          themeImageLink = $( $( entry ).find( 'kuler\\:themeImage' )[0] ).text();
+
+          themeLink = 'https://color.adobe.com/themeID/' + tID;
           
-          quler = $( '<div id="qi'+i+'"></div>' ).addClass( 'fentry' );
+          quartz = $( $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' ) );
+
+          for ( let tinge of quartz ){
+            console.log( $( tinge )[0] );
+          }
+
+          hex = $( $( entry ).find( 'kuler\\:swatchHexColor' )[0] ).text();
+
+          quler = $( '<div id="qi'+q+'"></div>' ).addClass( 'fentry' );
           $( 'div#kulerfeed' ).append( quler );
           ql = $('<a>').attr( 'href', themeLink ).addClass( 'flink' );
           ql.append( $('<img/>').attr( 'src', themeImageLink ).addClass( 'penta' ) );
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
-          
-          //quler.html( '<a href="'+themeLink+'"><img src="'+themeImageLink+'"/><span>'+entryTitle+'</span></a>' );
-          //console.log( i + ' > ' + typeof entry + ' >> ' + themeLink + ' >> ' + entryTitle + ' <' );
-          //console.log( i + ' > ' + typeof entry + ' >> ' + themeImageLink + ' >> ' + entryID + ' <' );
+
+          console.log( i + ' ››› ' + entryTitle + ' ››› ' + hex );
         });
       }
     });
