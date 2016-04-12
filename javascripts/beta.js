@@ -13,8 +13,7 @@ $.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     $.ajax({ 
       url:qu,
-      dataType: 'xml',
-      namespace: 'kuler'
+      dataType: 'xml'
     }).done( function( response ) {
       if ( !response.error ) {
         var items = $( response ).find( 'item' );
@@ -31,7 +30,7 @@ $.noConflict();
           
           quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
-          for (i = 0; i < 4; i++){
+          for (i = 0; i <== 4; i++){
             tinge = $( $( quartz )[i] ).text();
             console.log( tinge );
           }
