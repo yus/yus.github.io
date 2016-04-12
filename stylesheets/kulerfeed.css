@@ -27,6 +27,7 @@
   overflow: hidden;
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
+  flex-basis: 29vw;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
