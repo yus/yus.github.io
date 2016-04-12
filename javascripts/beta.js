@@ -7,7 +7,7 @@ var utistor;
 $.noConflict();
 (function( $ ) {
   $(function() {
-    var entry, tID, entryTitle, themeLink, themeImageLink, entryID, quartz, hex, quler, ql;
+    var entry, tID, entryTitle, themeLink, themeImageLink, entryID, quartz, tinge, hex, quler, ql;
     // More code using $ as alias to jQuery
     var qc = '?searchQuery=userID:102986', qn = '&itemsPerPage=50', qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -43,7 +43,7 @@ $.noConflict();
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
 
-          console.log( i + ' ››› ' + entryTitle + ' ››› ' + hex );
+          console.log( q + ' ››› ' + entryTitle + ' ››› ' + hex );
         });
       }
     });
