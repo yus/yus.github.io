@@ -106,7 +106,7 @@ function draw() {
     for (var y = 0; y < height; y += spacer) {
       stroke(distances[x][y]);
       image( img, x + spacer/2, y + spacer/2 );
-      point( x + spacer/2, y + spacer/2 );
+      //point( x + spacer/2, y + spacer/2 );
     }
   }
 }
