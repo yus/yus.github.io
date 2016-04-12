@@ -5,7 +5,7 @@ reworked Slate Theme by Jason Costello, @jsncostello
 @import url(pygment_trac.css);
 *******************************************************************************/
 
-
+@import url(kulerfeed.css);
 
 /*******************************************************************************
 MeyerWeb Reset
@@ -58,7 +58,7 @@ Theme Styles
 
 body {
   box-sizing: border-box;
-  color:#363636;
+  color:#555;
   background: #222;
   font-size: 16px;
 }
@@ -252,8 +252,7 @@ Full-Width Styles
 .inner {
   position: relative;
   max-width: 841px;
-  max-height: 551px;
-  padding: 20px 10px;
+  padding: 29px 29px;
   margin: 0 auto;
 }
 
