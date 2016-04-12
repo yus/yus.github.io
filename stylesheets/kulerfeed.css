@@ -6,40 +6,35 @@
 #gesso{
   display: flex;
 }
-
 .gesso{
   height: 580px;
+  padding: 8px;
   background-color: #222;
-}
-
-#kulerfeed{
   display: flex;
+  justify-content: center;
+  align-content: center;
+}
+#kulerfeed{
   margin: 0px auto 20px;
   overflow-x: hidden;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  flex: 1;
-  align-content: baseline;
-  align-items: center;
+  justify-content: space-around;
   direction: rtl;
+  flex-direction: row-reverse;
 }
 #cntnr{
   color: rgb(255, 129, 29);
   overflow: hidden;
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
-  display: flex;
-  justify-content: center;
-  flex: 1;
-  align-content: center;
-  align-items: center;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
   display:flex;
   margin:0px 0px 1px 1px;
   padding:4px 4px 0px;
-  flex-basis:25%;
+  min-width: 145px;
+  flex-grow: 1;
 }
 .flink{
   color:silver;
