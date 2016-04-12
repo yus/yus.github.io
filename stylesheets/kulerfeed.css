@@ -9,20 +9,7 @@
 
 .gesso{
   height: 580px;
-  padding: 10px;
   background-color: #222;
-  overflow: scroll;
-}
-.gesso::-webkit-scrollbar{
-  width: 8px;
-}
-.gesso::-webkit-scrollbar-track{
-  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.2); 
-  border-radius: 4px;
-}
-.gesso::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.4); 
 }
 
 #kulerfeed{
