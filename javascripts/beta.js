@@ -28,10 +28,11 @@ $.noConflict();
 
           themeLink = 'https://color.adobe.com/themeID/' + tID;
           
-          quartz = $( $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' ) );
+          quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
-          for ( let tinge of quartz ){
-            console.log( $( tinge ).text() ) );
+          for (i = 0; i < 5; i++){
+            tinge = $( $( quartz )[i] ).text();
+            console.log( tinge );
           }
 
           hex = $( $( entry ).find( 'kuler\\:swatchHexColor' )[0] ).text();
