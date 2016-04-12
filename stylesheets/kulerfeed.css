@@ -7,18 +7,18 @@
   display: flex;
 }
 .gesso{
-  height: 580px;
+  height: auto;
   padding: 8px;
   background-color: #222;
   display: flex;
-  justify-content: center;
-  align-content: center;
+  flex-grow: 1;
+  flex-basis: 29vw;
+  align-content: space-evenly;
+  justify-content: space-around;
 }
 #kulerfeed{
-  margin: 0px auto 20px;
   overflow-x: hidden;
   flex-wrap: wrap;
-  justify-content: space-around;
   direction: rtl;
   flex-direction: row-reverse;
 }
