@@ -4,38 +4,28 @@
 * copyright: yusdesign (c) 2013
 */
 #gesso{
-  padding: 0;
-  margin: 0;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-direction: row;
 }
 .gesso{
   height: 580px;
   padding: 10px;
   background-color: #222;
 }
-#cntnr{
-  color: rgb(255, 129, 29);
-  overflow-x: hidden;
-  overflow-y: hidden;
-  font-family: 'Fira Sans', sans-serif;
-  font-size: 29px;
-  display: flex;
-  justify-content: flex-end;
-  align-content: flex-end;
-  flex: 1;
-}
 #kulerfeed{
   display: flex;
   margin: 0px auto 20px;
   overflow: hidden;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-content: flex-start;
-  flex-direction: row;
-  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+}
+#cntnr{
+  color: rgb(255, 129, 29);
+  overflow: hidden;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 29px;
+  display: flex;
+  justify-content: flex-end;
   flex: 1;
 }
 .fentry{
@@ -61,7 +51,7 @@
   clear:both;
 }
 .thitle{
-  font-family: 'Fira Sans';
+  font-family: 'Fira Sans', sans-serif;
   font-weight: 200;
   font-style:normal;
   font-size:12px;
