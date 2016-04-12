@@ -30,7 +30,7 @@ $.noConflict();
           
           quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
-          for (i = 0; i <== 4; i++){
+          for (i = 0; i <= 4; i++){
             tinge = $( $( quartz )[i] ).text();
             console.log( tinge );
           }
