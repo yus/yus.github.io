@@ -1,23 +1,40 @@
 /*
-* name: Yusdesign Kuler Feed
+* name: yusdesign theme for kuler feed
 * author: Yuri Skorodelov
-* copyright: yusdesign (c) 2013
+* copyright: yusdesign (c) 2016
 */
 #gesso{
   display: flex;
 }
+
 .gesso{
   height: 580px;
   padding: 10px;
   background-color: #222;
+  overflow: scroll;
 }
+.gesso::-webkit-scrollbar{
+  width: 8px;
+}
+.gesso::-webkit-scrollbar-track{
+  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.2); 
+  border-radius: 4px;
+}
+.gesso::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.4); 
+}
+
 #kulerfeed{
   display: flex;
   margin: 0px auto 20px;
-  overflow: hidden;
+  overflow-x: hidden;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
   flex: 1;
+  align-content: baseline;
+  align-items: center;
+  direction: rtl;
 }
 #cntnr{
   color: rgb(255, 129, 29);
@@ -25,14 +42,17 @@
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   flex: 1;
+  align-content: center;
+  align-items: center;
 }
 .fentry{
   background-color:rgb(85, 85, 85);
   display:flex;
   margin:0px 0px 1px 1px;
   padding:4px 4px 0px;
+  flex-basis:25%;
 }
 .flink{
   color:silver;
