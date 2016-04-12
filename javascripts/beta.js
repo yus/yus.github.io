@@ -20,22 +20,20 @@ $.noConflict();
 
         $.each( items, function( q, u ) {
           entry = items[q];
-          console.log( u );
+          console.log( entry );
 
-          tID = $( $( entry ).find( 'kuler\\:themeID' )[0] ).text();
-          entryTitle = $( $( entry ).find( 'kuler\\:themeTitle' )[0] ).text();
-          themeImageLink = $( $( entry ).find( 'kuler\\:themeImage' )[0] ).text();
+          tID = $( $( u ).find( 'kuler\\:themeID' )[0] ).text();
+          entryTitle = $( $( u ).find( 'kuler\\:themeTitle' )[0] ).text();
+          themeImageLink = $( $( u ).find( 'kuler\\:themeImage' )[0] ).text();
 
           themeLink = 'https://color.adobe.com/themeID/' + tID;
           
-          quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
+          quartz = $( u ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
           for (i = 0; i <= 4; i++){
             tinge = $( $( quartz )[i] ).text();
             console.log( tinge );
           }
-
-          hex = $( $( entry ).find( 'kuler\\:swatchHexColor' )[0] ).text();
 
           quler = $( '<div id="qi'+q+'"></div>' ).addClass( 'fentry' );
           $( 'div#kulerfeed' ).append( quler );
@@ -44,7 +42,7 @@ $.noConflict();
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
 
-          console.log( q + ' ››› ' + entryTitle + ' ››› ' + hex );
+          console.log( q + ' ››› ' + entryTitle + ' ››› ' );
         });
       }
     });
