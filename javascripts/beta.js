@@ -18,7 +18,9 @@ $.noConflict();
       namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        var xmlDoc = $.parseXML( response ), $xml = $( xmlDoc ), $items = $( $xml ).find( 'item' );
+        var xmlDoc = $.parseXML( response );
+        var $xml = $( xmlDoc );
+        var $items = $( $xml ).find( 'item' );
 
         $.each( $items, function (q, u) {
           var entry = $items[q];
