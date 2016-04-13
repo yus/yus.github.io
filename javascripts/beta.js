@@ -56,15 +56,14 @@ var maxDistance;
 var spacer;
 
 function preload() {
+  gesso = select( '#gesso' );
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
-  
+ 
   cH = cntnr.height - 10;
   cW = cntnr.width - 10;
-  
-  gesso = select( '#gesso' );
-  
+
   utistor();
 }
 
