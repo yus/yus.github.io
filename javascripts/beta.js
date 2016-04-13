@@ -32,13 +32,13 @@ $.noConflict();
           // [nodeName=z:row] didn't works Chrome
           // .find("row,z\\:row")
 
-          var tID = $($(entry).find('themeID, kuler\\:themeID')[0]).val();
-          var entryTitle = $($(entry).find('themeTitle, kuler\\:themeTitle')[0]).val();
-          var themeImageLink = $($(entry).find('themeImage, kuler\\:themeImage')[0]).val();
+          var tID = $($(entry).find('themeID, kuler\\\\:themeID')[0]).val();
+          var entryTitle = $($(entry).find('themeTitle, kuler\\\\:themeTitle')[0]).val();
+          var themeImageLink = $($(entry).find('themeImage, kuler\\\\:themeImage')[0]).val();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
 
-          var quartz = $(entry).find('swatch, kuler\\:swatch').find('swatchHexColor, kuler\\:swatchHexColor');
+          var quartz = $(entry).find('swatch, kuler\\\\:swatch').find('swatchHexColor, kuler\\\\:swatchHexColor');
 
           $.each(quartz, function ( qrtz, hclr ) {
             console.log( qrtz + ' ››› ' + $(hclr).val() );
