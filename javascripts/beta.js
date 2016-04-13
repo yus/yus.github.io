@@ -67,10 +67,6 @@ function preload() {
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class('gesso');
 
-  cH = cntnr.height - 10;
-  cW = cntnr.width - 10;
-
-  utistor();
 }
 
 function setup() {
@@ -93,6 +89,9 @@ function setup() {
 }
 
 function draw() {
+  cH = cntnr.height - 10;
+  cW = cntnr.width - 10;
+
   rc = color(utistor());
   bg = color(utistor());
   img = createImage(29, 29);
