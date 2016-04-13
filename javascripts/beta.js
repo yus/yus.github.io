@@ -20,7 +20,7 @@ $.noConflict();
 
         $.each( items, function( q, u ) {
           entry = items[q];
-          console.log( entry );
+          //console.log( entry );
 
           tID = $( $( u ).find( 'kuler\\:themeID' )[0] ).text();
           entryTitle = $( $( u ).find( 'kuler\\:themeTitle' )[0] ).text();
@@ -32,7 +32,7 @@ $.noConflict();
 
           for (i = 0; i <= 4; i++){
             tinge = $( $( quartz )[i] ).text();
-            console.log( tinge );
+            //console.log( tinge );
           }
 
           quler = $( '<div id="qi'+q+'"></div>' ).addClass( 'fentry' );
@@ -42,7 +42,7 @@ $.noConflict();
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
 
-          console.log( q + ' ››› ' + entryTitle + ' ››› ' );
+          //console.log( q + ' ››› ' + entryTitle + ' ››› ' );
         });
       }
     });
@@ -56,7 +56,11 @@ var maxDistance;
 var spacer;
 
 function preload() {
-  gesso = select('#gesso');
+  cH = cntnr.height - 10;
+  cW = cntnr.width - 10;
+  
+  gesso = select( '#gesso' );
+  
   utistor();
 }
 
@@ -64,8 +68,7 @@ function setup() {
   createDiv('').id('cntnr').parent( gesso );
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
-  cW = cntnr.width - 10;
-  cW = cntnr.height - 10;
+  
   cnv = createCanvas( cW, cH );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
@@ -105,6 +108,9 @@ function draw() {
     }
   }
   */
+  img.updatePixels();
+  //tint(255, 126);
+  //image( img, 0, 0 );
   for (var x = 0; x < width; x += spacer) {
     for (var y = 0; y < height; y += spacer) {
       stroke(distances[x][y]);
@@ -112,9 +118,6 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }
-  img.updatePixels();
-  //tint(255, 126);
-  //image( img, 0, 0 );
   background( bg );
 }
 
