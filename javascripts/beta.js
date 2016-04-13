@@ -56,6 +56,10 @@ var maxDistance;
 var spacer;
 
 function preload() {
+  createDiv('').id('cntnr').parent( gesso );
+  cntnr = select('#cntnr');
+  cntnr.class('cntnr').class( 'gesso' );
+  
   cH = cntnr.height - 10;
   cW = cntnr.width - 10;
   
@@ -65,10 +69,6 @@ function preload() {
 }
 
 function setup() {
-  createDiv('').id('cntnr').parent( gesso );
-  cntnr = select('#cntnr');
-  cntnr.class('cntnr').class( 'gesso' );
-  
   cnv = createCanvas( cW, cH );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
