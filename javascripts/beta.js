@@ -50,7 +50,7 @@ $.noConflict();
 })(jQuery);
 
 var cnv, img, cntnr, gesso;
-var cW, r, g, b, a, rc, bg, d, isum;
+var cW, cH, r, g, b, a, rc, bg, d, isum;
 var distances = [];
 var maxDistance;
 var spacer;
@@ -65,7 +65,8 @@ function setup() {
   cntnr = select('#cntnr');
   cntnr.class('cntnr').class( 'gesso' );
   cW = cntnr.width - 10;
-  cnv = createCanvas( cW, 580 );
+  cW = cntnr.height - 10;
+  cnv = createCanvas( cW, cH );
   cnv.style( 'visibility', 'visible' )
       .class( 'cnv' ).id( 'cnv' )
       .parent( cntnr );
@@ -86,7 +87,7 @@ function setup() {
 function draw() {
   rc = color( utistor() );
   bg = color( utistor() );
-  img = createImage( 9, 9 );
+  img = createImage( 29, 29 );
   img.loadPixels();
   d = pixelDensity();
   isum = 4 * (d ^ 2) * img.width * img.height;
@@ -104,11 +105,6 @@ function draw() {
     }
   }
   */
-  img.updatePixels();
-  //tint(255, 126);
-  image( img, 0, 0 );
-  background( bg );
-  
   for (var x = 0; x < width; x += spacer) {
     for (var y = 0; y < height; y += spacer) {
       stroke(distances[x][y]);
@@ -116,6 +112,10 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }
+  img.updatePixels();
+  //tint(255, 126);
+  //image( img, 0, 0 );
+  background( bg );
 }
 
 function mousePressed() {
@@ -123,7 +123,7 @@ function mousePressed() {
 }
 
 function windowResized() {
-  resizeCanvas( cW, 580 );
+  resizeCanvas( cW, cH );
 }
 
 function utistor() {
