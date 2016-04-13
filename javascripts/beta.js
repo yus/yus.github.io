@@ -13,14 +13,15 @@ $.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     $.ajax({ 
       url:qu,
-      dataType: 'xml'
+      dataType: 'xml',
+      namespace: 'kuler'
     }).done( function( response ) {
       if ( !response.error ) {
         var items = $( response ).find( 'item' );
 
         $.each( items, function( q, u ) {
           entry = items[q];
-          //console.log( entry );
+          console.log( entry );
 
           tID = $( $( u ).find( 'kuler\\:themeID' )[0] ).text();
           entryTitle = $( $( u ).find( 'kuler\\:themeTitle' )[0] ).text();
@@ -32,7 +33,7 @@ $.noConflict();
 
           for (i = 0; i <= 4; i++){
             tinge = $( $( quartz )[i] ).text();
-            //console.log( tinge );
+            console.log( tinge );
           }
 
           quler = $( '<div id="qi'+q+'"></div>' ).addClass( 'fentry' );
@@ -42,7 +43,7 @@ $.noConflict();
           ql.append( $('<span>').text( entryTitle ).addClass( 'thitle' ) );
           quler.append( ql );
 
-          //console.log( q + ' ››› ' + entryTitle + ' ››› ' );
+          console.log( q + ' ››› ' + entryTitle + ' ››› ' );
         });
       }
     });
@@ -75,14 +76,14 @@ function setup() {
   
   maxDistance = dist(width/2, height/2, width, height);
   for (var x = 0; x < width; x++) {
-    distances[x] = []; // create nested array
+    distances[x] = [];
     for (var y = 0; y < height; y++) {
       var distance = dist(width/2, height/2, x, y);
       distances[x][y] = distance/maxDistance * 255;
     }
   }
   spacer = 41;
-  
+
   noLoop();
 }
 
@@ -108,8 +109,6 @@ function draw() {
   }
   */
   img.updatePixels();
-  //tint(255, 126);
-  //image( img, 0, 0 );
   for (var x = 0; x < width; x += spacer) {
     for (var y = 0; y < height; y += spacer) {
       stroke(distances[x][y]);
