@@ -70,16 +70,18 @@ function preload() {
 }
 
 function setup() {
+
   cnv = createCanvas(cW, cH);
   cnv.style('visibility', 'visible')
     .class('cnv').id('cnv')
     .parent(cntnr);
 
-  maxDistance = dist(width / 2, height / 2, width, height);
-  for (var x = 0; x < width; x++) {
+  maxDistance = dist(cnv.width / 2, cnv.height / 2, cnv.width, cnv.height);
+
+  for (var x = 0; x < cnv.width; x++) {
     distances[x] = [];
-    for (var y = 0; y < height; y++) {
-      var distance = dist(width / 2, height / 2, x, y);
+    for (var y = 0; y < cnv.height; y++) {
+      var distance = dist(cnv.width / 2, cnv.height / 2, x, y);
       distances[x][y] = distance / maxDistance * 255;
     }
   }
@@ -89,8 +91,6 @@ function setup() {
 }
 
 function draw() {
-  cH = cntnr.height - 10;
-  cW = cntnr.width - 10;
 
   rc = color(utistor());
   bg = color(utistor());
@@ -113,8 +113,8 @@ function draw() {
   }
   */
   img.updatePixels();
-  for (var x = 0; x < width; x += spacer) {
-    for (var y = 0; y < height; y += spacer) {
+  for (var x = 0; x < cnv.width; x += spacer) {
+    for (var y = 0; y < cnv.height; y += spacer) {
       stroke(distances[x][y]);
       image(img, x + spacer / 2, y + spacer / 2);
       //point( x + spacer/2, y + spacer/2 );
@@ -138,4 +138,9 @@ function utistor() {
   b = randomGaussian(155);
   a = randomGaussian(1, .29);
   return color(r, g, b, a);
+}
+
+function cntnrSize() {
+  cH = cntnr.height - 10;
+  cW = cntnr.width - 10;
 }
