@@ -32,20 +32,20 @@ $.noConflict();
           // [nodeName=z:row] didn't works Chrome
           // .find("row,z\\:row")
 
-          var tID = $($(entry).find('kuler\\:themeID')[0]).val();
-          var entryTitle = $($(entry).find('kuler\\:themeTitle')[0]).val();
-          var themeImageLink = $($(entry).find('kuler\\:themeImage')[0]).val();
+          var tID = $($(entry).find('kuler\\:themeID')[0]).text();
+          var entryTitle = $($(entry).find('kuler\\:themeTitle')[0]).text();
+          var themeImageLink = $($(entry).find('kuler\\:themeImage')[0]).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
 
           var quartz = $(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor');
 
           $.each(quartz, function ( qrtz, hclr ) {
-            console.log( qrtz + ' ››› ' + $(hclr).val() );
+            console.log( qrtz + ' ››› ' + $(hclr).text() );
           });
 
           for (m = 0; m <= 4; m++) {
-            var tinge = $($(quartz)[m]).val();
+            var tinge = $($(quartz)[m]).text();
             console.log(tinge);
           }
 
