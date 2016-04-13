@@ -138,9 +138,9 @@ function windowResized() {
 
 function utistor() {
   var r, g, b, a;
-  r = randomGaussian(5);
-  g = randomGaussian(55);
-  b = randomGaussian(155);
+  r = randomGaussian(5, .29);
+  g = randomGaussian(55, .29);
+  b = randomGaussian(155, .29);
   a = randomGaussian(1, .29);
   return color(r, g, b, a);
 }
