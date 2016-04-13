@@ -50,7 +50,7 @@ $.noConflict();
 })(jQuery);
 
 var cnv, img, cntnr, gesso;
-var cW, cH, r, g, b, a, rc, bg, d, isum;
+var cW, cH, rc, bg, d, isum;
 var distances = [];
 var maxDistance;
 var spacer;
@@ -81,7 +81,7 @@ function setup() {
       distances[x][y] = distance/maxDistance * 255;
     }
   }
-  spacer = 29;
+  spacer = 41;
   
   noLoop();
 }
@@ -117,7 +117,7 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }
-  background( bg );
+  //background( bg );
 }
 
 function mousePressed() {
@@ -129,6 +129,7 @@ function windowResized() {
 }
 
 function utistor() {
+  var r, g, b, a;
   r = randomGaussian(5, 255);
   g = randomGaussian(55, 255);
   b = randomGaussian(155, 255);
