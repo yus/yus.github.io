@@ -28,16 +28,18 @@ $.noConflict();
         $.each( $items, function (q, u) {
           var entry = $items[q];
           console.log(u);
+          
+          // [nodeName=z:row]
 
-          var tID = $($(entry).find('kuler\\:themeID')[0]).text();
-          var entryTitle = $($(entry).find('kuler\\:themeTitle')[0]).text();
-          var themeImageLink = $($(entry).find('kuler\\:themeImage')[0]).text();
+          var tID = $($(entry).find('[nodeName=kuler:themeID]')[0]).text();
+          var entryTitle = $($(entry).find('[nodeName=kuler:themeTitle]')[0]).text();
+          var themeImageLink = $($(entry).find('[nodeName=kuler:themeImage]')[0]).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
 
-          var quartz = $(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor');
+          var quartz = $(entry).find('[nodeName=kuler:swatch]').find('[nodeName=kuler:swatchHexColor]');
 
-          $.each(quartz, function (qrtz, hclr) {
+          $.each(quartz, function ( qrtz, hclr ) {
             console.log( qrtz + ' ››› ' + $(hclr).text() );
           });
 
