@@ -18,10 +18,10 @@ $.noConflict();
       namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        var items = $(response).find('item');
+        var xmlDoc = $.parseXML( response ), $xml = $( xmlDoc ), $items = $( $xml ).find( 'item' );
 
-        $.each(items, function (q, u) {
-          var entry = items[q];
+        $.each( $items, function (q, u) {
+          var entry = $items[q];
           console.log(u);
 
           var tID = $($(entry).find('kuler\:themeID')[0]).text();
