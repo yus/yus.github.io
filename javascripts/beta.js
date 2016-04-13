@@ -21,15 +21,15 @@ $.noConflict();
 
         $.each( items, function( q, u ) {
           entry = items[q];
-          console.log( entry );
+          console.log( u );
 
-          tID = $( $( u ).find( 'kuler\\:themeID' )[0] ).text();
-          entryTitle = $( $( u ).find( 'kuler\\:themeTitle' )[0] ).text();
-          themeImageLink = $( $( u ).find( 'kuler\\:themeImage' )[0] ).text();
+          tID = $( $( entry ).find( 'kuler\\:themeID' )[0] ).text();
+          entryTitle = $( $( entry ).find( 'kuler\\:themeTitle' )[0] ).text();
+          themeImageLink = $( $( entry ).find( 'kuler\\:themeImage' )[0] ).text();
 
           themeLink = 'https://color.adobe.com/themeID/' + tID;
           
-          quartz = $( u ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
+          quartz = $( entry ).find( 'kuler\\:swatch' ).find( 'kuler\\:swatchHexColor' );
 
           for (i = 0; i <= 4; i++){
             tinge = $( $( quartz )[i] ).text();
