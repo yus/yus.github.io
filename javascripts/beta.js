@@ -29,15 +29,16 @@ $.noConflict();
           var entry = $items[q];
           console.log(u);
           
-          // [nodeName=z:row]
+          // [nodeName=z:row] didn't works Chrome
+          // .find("row,z\\:row")
 
-          var tID = $($(entry).find('[nodeName=kuler:themeID]')[0]).text();
-          var entryTitle = $($(entry).find('[nodeName=kuler:themeTitle]')[0]).text();
-          var themeImageLink = $($(entry).find('[nodeName=kuler:themeImage]')[0]).text();
+          var tID = $($(entry).find('themeID, kuler\\:themeID')[0]).text();
+          var entryTitle = $($(entry).find('themeTitle, kuler\\:themeTitle')[0]).text();
+          var themeImageLink = $($(entry).find('themeImage, kuler\\:themeImage')[0]).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
 
-          var quartz = $(entry).find('[nodeName=kuler:swatch]').find('[nodeName=kuler:swatchHexColor]');
+          var quartz = $(entry).find('swatch, kuler\\:swatch').find('swatchHexColor, kuler\\:swatchHexColor');
 
           $.each(quartz, function ( qrtz, hclr ) {
             console.log( qrtz + ' ››› ' + $(hclr).text() );
