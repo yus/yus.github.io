@@ -19,12 +19,12 @@ jQuery.noConflict();
       if (!response.error) {
         var xmlDoc = $.parseXML(response);
         var $xml = $(xmlDoc);
-        var $items = $(response).find('item');
+        var $items = $.makeArray($(response).find('item'));
         console.log($xml);
         $.each($items, function (q, u) {
           var entry = $items[q];
           console.log(entry);
-          var quartz = $($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor'));
+          var quartz = $.makeArray($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor'));
           var entryTitle = $($(entry).find('kuler\\:themeTitle') [0]).text();
           var tID = $($(entry).find('kuler\\:themeID') [0]).text();
 
@@ -65,8 +65,7 @@ rc,
 bg,
 d,
 isum;
-var distances = [
-];
+var distances = [];
 var maxDistance;
 var spacer;
 function preload() {
@@ -81,8 +80,7 @@ function setup() {
   cnv.style('visibility', 'visible').class('cnv').id('cnv').parent(cntnr);
   maxDistance = dist(cnv.width / 2, cnv.height / 2, cnv.width, cnv.height);
   for (var x = 0; x < cnv.width; x++) {
-    distances[x] = [
-    ];
+    distances[x] = [];
     for (var y = 0; y < cnv.height; y++) {
       var distance = dist(cnv.width / 2, cnv.height / 2, x, y);
       distances[x][y] = distance / maxDistance * 255;
