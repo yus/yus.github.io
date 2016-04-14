@@ -24,27 +24,31 @@ jQuery.noConflict();
         $.each($items, function (q, u) {
           var entry = $items[q];
           console.log(entry);
+          var quartz = $($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor') [0]).text();
           var entryTitle = $($(entry).find('kuler\\:themeTitle') [0]).text();
           var tID = $($(entry).find('kuler\\:themeID') [0]).text();
+
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
-          var quler = $('<div id="quartz' + q + '"></div>').addClass('fentry');
-          $('div#kulerfeed').append(quler);
+          var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
+          var qlrtitle = $('<div id="title' + q + '"></div>').addClass('fentry');
           var ql = $('<a>').attr('href', themeLink).addClass('flink');
           ql.append($('<span>').text(entryTitle).addClass('thitle'));
-          quler.append(ql);
-          var quartz = $(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor');
+          qlrtitle.append(ql);
+
           $.each(quartz, function (qrtz, hclr) {
-            sclr = $(hclr).text();
+            sclr = hclr[qrtz].text();
             console.log(qrtz + ' ››› ' + sclr);
             // tell me what you say layout
-            ql.append($('<div>').css({
+            quler.append($('<div>').css({
               'background-color': '#' + sclr,
               'width': '25px',
               'height': '25px',
               'display': 'flex',
               'flex-grow': '1'
-            }).addClass('sclr').addClass('penta'));
+            }).addClass('sclr'));
           });
+          $('div#kulerfeed').append( quler );
+          $('div#kulerfeed').append( qlrtitle );
           console.log(q + ' ››› ' + entryTitle + ' ››› ');
         });
       }
