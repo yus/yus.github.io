@@ -24,7 +24,7 @@ jQuery.noConflict();
         $.each($items, function (q, u) {
           var entry = $items[q];
           console.log(entry);
-          var quartz = $($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor') [0]).text();
+          var quartz = $($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor'));
           var entryTitle = $($(entry).find('kuler\\:themeTitle') [0]).text();
           var tID = $($(entry).find('kuler\\:themeID') [0]).text();
 
@@ -35,8 +35,8 @@ jQuery.noConflict();
           ql.append($('<span>').text(entryTitle).addClass('thitle'));
           qlrtitle.append(ql);
 
-          $.each(quartz, function (qrtz, hclr) {
-            sclr = hclr.text();
+          $.each(quartz, function (t, hclr) {
+            sclr = $(hclr)[t].text();
             console.log(qrtz + ' ››› ' + sclr);
             // tell me what you say layout
             quler.append($('<div>').css({
