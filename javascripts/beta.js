@@ -37,7 +37,7 @@ jQuery.noConflict();
 
           $.each(quartz, function (t, hclr) {
             sclr = hclr[t];
-            console.log(t + ' ››› ' + sclr);
+            console.log(t + ' ››› ' + hclr);
             // tell me what you say layout
             quler.append($('<div>').css({
               'background-color': '#' + 'abc',
