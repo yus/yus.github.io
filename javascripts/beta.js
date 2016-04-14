@@ -40,7 +40,7 @@ jQuery.noConflict();
             console.log(t + ' ››› ' + sclr);
             // tell me what you say layout
             quler.append($('<div>').css({
-              'background-color': '#' + 'abc',
+              'background-color': '#' + sclr,
               'width': '25px',
               'height': '25px',
               'display': 'flex',
