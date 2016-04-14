@@ -36,7 +36,7 @@ jQuery.noConflict();
           qlrtitle.append(ql);
 
           $.each(quartz, function (t, hclr) {
-            sclr = $(hclr)[t].text();
+            sclr = $(hclr[t]).text();
             console.log(t + ' ››› ' + sclr);
             // tell me what you say layout
             quler.append($('<div>').css({
