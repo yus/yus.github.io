@@ -36,11 +36,11 @@ jQuery.noConflict();
           qlrtitle.append(ql);
 
           $.each(quartz, function (t, hclr) {
-            sclr = $(hclr[t]).text();
+            sclr = hclr[t];
             console.log(t + ' ››› ' + sclr);
             // tell me what you say layout
             quler.append($('<div>').css({
-              'background-color': '#' + sclr,
+              'background-color': '#' + 'abc',
               'width': '25px',
               'height': '25px',
               'display': 'flex',
@@ -49,7 +49,7 @@ jQuery.noConflict();
           });
           $('div#kulerfeed').append( quler );
           $('div#kulerfeed').append( qlrtitle );
-          console.log(q + ' ››› ' + entryTitle + ' ››› ');
+          console.log('Title ››› ' + q + ' ››› ' + entryTitle + ' ››› ');
         });
       }
     });
