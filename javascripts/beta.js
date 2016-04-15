@@ -22,10 +22,10 @@ jQuery.noConflict();
       if (!response.error) {
         
         var $items = $(response).find('themeItem'), $ns_items = $(response).find('kuler\\:themeItem');
-        var sortout = (undefined) ? $items : $ns_items;
-        console.log( sortout );
+        var $f = (undefined) ? $items : $ns_items;
+        console.log( $found );
         //console.log( $(response, document.item) );
-        $items.each(function(q, u){
+        $f.each(function(q, u){
           var item = u[q];
           console.log(item);
         });
