@@ -12,24 +12,25 @@ jQuery.noConflict();
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     $.ajax({
+      type: 'GET',
+      data: null,
       url: qu,
       dataType: 'xml',
       namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        var xmlDoc = $.parseXML(response);
-        var $xml = $(xmlDoc);
-        var $items = $.makeArray($(response).find('item'));
-        console.log($xml);
-        $.each($items, function (q, u) {
-          var entry = $items[q];
+        var $items = $(response).find('item');
+        console.log( $items );
+        console.log( $(response, document.channel.item) );
+        $items.each(function (q, u) {
+          var $entry = $(this); //$items[q]
+          var entry = $entry[0]; // DOM element
           console.log(entry);
-          var quark = $(entry).find('kuler\\:themeSwatches'),
-          quart = $(quark).find('kuler\\:swatch'),
-          quarta = $(quart).find('kuler\\:swatchHexColor');
-          quartz = $.makeArray(quarta);
-          var entryTitle = $($(entry).find('kuler\\:themeTitle')).text();
-          var tID = $($(entry).find('kuler\\:themeID')).text();
+          
+          var $quares = $(entry).find('kuler\\:themeSwatches');
+          
+          var entryTitle = $(entry).find('kuler\\:themeTitle').text();
+          var tID = $(entry).find('kuler\\:themeID').text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
@@ -38,7 +39,10 @@ jQuery.noConflict();
           ql.append($('<span>').text(entryTitle).addClass('thitle'));
           qlrtitle.append(ql);
 
-          $.each(quartz, function (t, hclr) {
+          $quark.each(function (t, hclr) {
+            var quart = $(quark).find('kuler\\:swatch');
+            quarta = $.makeArray($(quart).find('kuler\\:swatchHexColor'));
+            quartz = quarta;
             sclr = $(hclr).text();
             console.log(t + ' ››› ' + sclr);
             // tell me what you say layout
