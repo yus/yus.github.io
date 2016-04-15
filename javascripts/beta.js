@@ -23,7 +23,7 @@ jQuery.noConflict();
         
         var $items = $(response).find('themeItem'), $ns_items = $(response).find('kuler\\:themeItem');
         var $f = (undefined) ? $items : $ns_items;
-        console.log( $found );
+        console.log( $f );
         //console.log( $(response, document.item) );
         $f.each(function(q, u){
           var item = u[q];
