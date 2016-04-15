@@ -21,29 +21,18 @@ jQuery.noConflict();
     }).done(function (response) {
       if (!response.error) {
         var $items = $(response).find('item');
-        var $themeSwatches = $($items).find( 'themeSwatches' ) || $($items).find( 'kuler\\:themeSwatches' );
+        
         //console.log( $items );
         //console.log( $(response, document.item) );
         $items.each(function (q, u) {
           var $entry = $(this); //$items[q]
           var entry = $entry[0]; // DOM element
           //console.log(entry);
-          
-          // xmlns:kuler
-          // element.getElementsByTagNameNS(namespaceURI, localName)
-           /**
-          nsURI = "http://kuler.adobe.com/kuler/API/rss/";
-          var $themeSwatches = entry.getElementsByTagNameNS( nsURI, 'themeSwatches' ),
-
-          $swtchs = $themeSwatches.getElementsByTagNameNS( nsURI, 'swatch' ),
-          $quartz = $swtchs.getElementsByTagNameNS( nsURI, 'swatchHexColor' ),
-          entryTitle = entry.getElementsByTagNameNS( nsURI, 'themeTitle' ),
-          tID = entry.getElementsByTagNameNS( nsURI, 'themeID' ),
-*/
-          var $swtchs = $($themeSwatches).find( 'swatch' ) || $($themeSwatches).find( 'kuler\\:swatch'),
-          $quartz = $($swtchs).find( 'swatchHexColor' ) || $($swtchs).find( 'kuler\\:swatchHexColor' ),
-          entryTitle = $(entry).find( 'themeTitle' ).text() || $(entry).find( 'kuler\\:themeTitle' ).text(),
-          tID = $(entry).find( 'themeID' ).text() || $(entry).find( 'kuler\\:themeID' ).text();
+          var $themeSwatches = (undefined) ? $(entry).find( 'themeSwatches' ) : $($items).find( 'kuler\\:themeSwatches' );
+          var $swtchs = (undefined) ? $($themeSwatches).find( 'swatch' ) : $($themeSwatches).find( 'kuler\\:swatch'),
+          $quartz = (undefined) ? $($swtchs).find( 'swatchHexColor' ) : $($swtchs).find( 'kuler\\:swatchHexColor' ),
+          entryTitle = (undefined) ? $(entry).find( 'themeTitle' ).text() : $(entry).find( 'kuler\\:themeTitle' ).text(),
+          tID = (undefined) ? $(entry).find( 'themeID' ).text() : $(entry).find( 'kuler\\:themeID' ).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
