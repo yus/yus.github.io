@@ -26,7 +26,7 @@ jQuery.noConflict();
         console.log( $f );
         //console.log( $(response, document.item) );
         $f.each(function(q, u){
-          var item = u[q];
+          var item = $(u);
           console.log(item);
         });
       } // if !error
