@@ -17,18 +17,19 @@ jQuery.noConflict();
       data: null,
       url: qu,
       dataType: 'xml',
-      namespace: 'kuler',
-      context: document.item
+      namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        var $items = $(response).find('themeItem');
-        var $ns_items = $(response).find('kuler\\:themeItem');
+        
+        var $items = $(response).find('themeItem'), $ns_items = $(response).find('kuler\\:themeItem');
         var sortout = (undefined) ? $items : $ns_items;
         console.log( sortout );
-        var store = $.data(sortout);
-        console.log(store);
         //console.log( $(response, document.item) );
-      }
-    });
+        $items.each(function(q, u){
+          var item = u[q];
+          console.log(item);
+        });
+      } // if !error
+    }); // ajax done
   });
 }) (jQuery);
