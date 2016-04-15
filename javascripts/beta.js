@@ -28,11 +28,11 @@ jQuery.noConflict();
           var $entry = u[q]; // $(this); //$items[q]
           // var entry = $entry[0]; // DOM element
           //console.log(entry);
-          var $themeSwatches = (undefined) ? $($entry).find( 'themeSwatches' ) : $($items).find( 'kuler\\:themeSwatches' ),
+          var $themeSwatches = (undefined) ? $($entry).find( 'themeSwatches' ) : $($entry).find( 'kuler\\:themeSwatches' ),
           $swtchs = (undefined) ? $($themeSwatches).find( 'swatch' ) : $($themeSwatches).find( 'kuler\\:swatch'),
           $quartz = (undefined) ? $($swtchs).find( 'swatchHexColor' ) : $($swtchs).find( 'kuler\\:swatchHexColor' ),
-          entryTitle = (undefined) ? $($entry).find( 'themeTitle' ).text() : $(entry).find( 'kuler\\:themeTitle' ).text(),
-          tID = (undefined) ? $($entry).find( 'themeID' ).text() : $(entry).find( 'kuler\\:themeID' ).text();
+          entryTitle = (undefined) ? $($entry).find( 'themeTitle' ).text() : $($entry).find( 'kuler\\:themeTitle' ).text(),
+          tID = (undefined) ? $($entry).find( 'themeID' ).text() : $($entry).find( 'kuler\\:themeID' ).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
