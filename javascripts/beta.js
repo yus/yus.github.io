@@ -30,7 +30,7 @@ jQuery.noConflict();
           
           ettl = undefined ? ettl = $(rr).find( 'themeTitle' ).text() : ettl = $(rr).find( 'kuler\\:themeTitle' ).text();
           tID = undefined ? tID = $(rr).find( 'themeID' ).text() : tID = $(rr).find( 'kuler\\:themeID' ).text();
-          console.log( q + '›››' + entryTitle + '›››' + tID );
+          console.log( q + '›››' + ettl + '›››' + tID );
           
           $thS = undefined ? $thS = $(rr).find('themeSwatches') : $thS = $(rr).find('kuler\\:themeSwatches');
           $sws = undefined ? $sws = $($thS).find('swatch') : $sws = $($thS).find('kuler\\:swatch');
