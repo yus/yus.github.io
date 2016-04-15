@@ -20,13 +20,12 @@ jQuery.noConflict();
       namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        
         var $items = $(response).find('themeItem'), $ns_items = $(response).find('kuler\\:themeItem');
         var $f = (undefined) ? $items : $ns_items;
         console.log( $f );
         //console.log( $(response, document.item) );
-        $f.each(function(q, r){
-          var $r = $(r)[0];
+        $.each( $f, function(q, r){
+          var $r = $f[q]; //$(r)
           console.log($r);
         });
       } // if !error
