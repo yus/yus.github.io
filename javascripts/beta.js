@@ -43,7 +43,7 @@ jQuery.noConflict();
             var $swtch = $(this);
             var swtch = $swtch[0];
             var quart = $(swtch).find('kuler\\:swatch');
-            $quartz = $.makeArray($(quart).find('kuler\\:swatchHexColor'));
+            $quartz = $(quart).find('kuler\\:swatchHexColor');
             $quartz.each(function(n, sclr){
               $sclr = $(sclr).text();
               console.log(n + ' ››› ' + $sclr);
