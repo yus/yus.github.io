@@ -29,12 +29,20 @@ jQuery.noConflict();
           //console.log(entry);
           
           // xmlns:kuler
+          // element.getElementsByTagNameNS(namespaceURI, localName)
+          nsURI = "http://kuler.adobe.com/kuler/API/rss/";
+          var $themeSwatches = entry.getElementsByTagNameNS( nsURI, 'themeSwatches' ),
+          $swtchs = $themeSwatches.getElementsByTagNameNS( nsURI, 'swatch' ),
+          $quartz = $swtchs.getElementsByTagNameNS( nsURI, 'swatchHexColor' ),
+          entryTitle = entry.getElementsByTagNameNS( nsURI, 'themeTitle' ),
+          tID = entry.getElementsByTagNameNS( nsURI, 'themeID' );
+/**
           var $themeSwatches = $(entry).find( 'kuler\\:themeSwatches' || 'themeSwatches' ), 
           $swtchs = $($themeSwatches).find( 'kuler\\:swatch' || 'swatch'),
           $quartz = $($swtchs).find( 'kuler\\:swatchHexColor' || 'swatchHexColor' ),
           entryTitle = $(entry).find( 'kuler\\:themeTitle' || 'themeTitle' ).text(),
           tID = $(entry).find( 'kuler\\:themeID' || 'themeID' ).text();
-
+*/
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
           var qlrtitle = $('<div id="title' + q + '"></div>').addClass('fentry');
