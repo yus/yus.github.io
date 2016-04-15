@@ -27,6 +27,8 @@ jQuery.noConflict();
         $.each( $items, function(q, r){
           var $r = $items[q]; //$(r)
           //console.log($r);
+          var entryTitle = (undefined) ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
+          var tID = (undefined) ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
           var $themeSwatches = (undefined) ? $($r).find('themeSwatches') : $($r).find('kuler\\:themeSwatches');
           var $swtchs = (undefined) ? $($themeSwatches).find('swatch') : $($themeSwatches).find('kuler\\:swatch');
           console.log($themeSwatches);
@@ -36,8 +38,6 @@ jQuery.noConflict();
             var $quartz = (undefined) ? $($sclr).find('swatchHexColor') : $($sclr).find('kuler\\:swatchHexColor');
             console.log($($quartz).text());
           });
-          var entryTitle = (undefined) ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
-          var tID = (undefined) ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
           console.log(q + '›››' + entryTitle + '›››' + tID);
         });
       } // if !error
