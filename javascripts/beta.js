@@ -25,7 +25,7 @@ jQuery.noConflict();
         console.log( $items );
         //console.log( $(response, document.item) );
         $.each( $items, function(q, r){
-          var $r = $items[q]; //$(r)
+          var $r = (undefined) ? $items[q] : $(r)[0];
           //console.log($r);
           var entryTitle = (undefined) ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
           var tID = (undefined) ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
