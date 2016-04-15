@@ -24,22 +24,26 @@ jQuery.noConflict();
         //console.log( $(response, document.item) );
         
         $.each( $items, function(q, r){
-          var $r = undefined ? $items[q] : $(r)[q];
-          console.log($r);
+          var rr, ettl, tID, $thS, $sws;
+          rr = undefined ? rr = $items[q] : rr = $(r)[q];
+          console.log(rr);
           
-          var entryTitle = undefined ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text(),
-          tID = undefined ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
-          
-          var $themeSwatches = undefined ? $($r).find('themeSwatches') : $($r).find('kuler\\:themeSwatches'),
-          $swtchs = undefined ? $($themeSwatches).find('swatch') : $($themeSwatches).find('kuler\\:swatch');
-          console.log($themeSwatches);
-          console.log($swtchs);
-          $.each($swtchs, function(h, sclr){
-            var $sclr = $swtchs[h];
-            var $quartz = undefined ? $($sclr).find('swatchHexColor') : $($sclr).find('kuler\\:swatchHexColor');
-            console.log( $($quartz).text() );
-          });
+          ettl = undefined ? ettl = $(rr).find( 'themeTitle' ).text() : ettl = $(rr).find( 'kuler\\:themeTitle' ).text();
+          tID = undefined ? tID = $(rr).find( 'themeID' ).text() : tID = $(rr).find( 'kuler\\:themeID' ).text();
           console.log( q + '›››' + entryTitle + '›››' + tID );
+          
+          $thS = undefined ? $thS = $(rr).find('themeSwatches') : $thS = $(rr).find('kuler\\:themeSwatches');
+          $sws = undefined ? $sws = $($thS).find('swatch') : $sws = $($thS).find('kuler\\:swatch');
+          console.log(typeof $thS + 'brings' + typeof $sws);
+          console.log('--------------------------------------------------------------------------------');
+          
+          $.each($sws, function(h, sclr){
+            var $sclr, $q, $quartz;
+            $sclr = undefined ? $sclr = $sws[h] : $sclr = $(sclr)[h];
+            $q = undefined ? $q = $($sclr).find('swatchHexColor') : $q = $($sclr).find('kuler\\:swatchHexColor');
+            console.log( $($q).text() );
+          });
+          
         });
       } // if !error
     }); // ajax done
