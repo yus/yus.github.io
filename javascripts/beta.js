@@ -17,13 +17,16 @@ jQuery.noConflict();
       data: null,
       url: qu,
       dataType: 'xml',
-      namespace: 'kuler'
+      namespace: 'kuler',
+      context: document.item
     }).done(function (response) {
       if (!response.error) {
         var $items = $(response).find('themeItem');
         var $ns_items = $(response).find('kuler\\:themeItem');
         var sortout = (undefined) ? $items : $ns_items;
         console.log( sortout );
+        var store = $.data(sortout);
+        console.log(store);
         //console.log( $(response, document.item) );
       }
     });
