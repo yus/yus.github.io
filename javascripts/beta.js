@@ -21,7 +21,7 @@ jQuery.noConflict();
       if (!response.error) {
         var $items = $(response).find('item');
         console.log( $items );
-        console.log( $(response, document.channel.item) );
+        console.log( $(response, document.item) );
         $items.each(function (q, u) {
           var $entry = $(this); //$items[q]
           var entry = $entry[0]; // DOM element
