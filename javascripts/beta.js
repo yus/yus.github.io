@@ -25,8 +25,8 @@ jQuery.noConflict();
           var entry = $items[q];
           console.log(entry);
           var quartz = $.makeArray($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor'));
-          var entryTitle = $($(entry).find('kuler\\:themeTitle') [0]).text();
-          var tID = $($(entry).find('kuler\\:themeID') [0]).text();
+          var entryTitle = $($(entry).find('kuler\\:themeTitle')).text();
+          var tID = $($(entry).find('kuler\\:themeID')).text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
