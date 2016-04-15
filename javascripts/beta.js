@@ -24,7 +24,10 @@ jQuery.noConflict();
         $.each($items, function (q, u) {
           var entry = $items[q];
           console.log(entry);
-          var quartz = $.makeArray($(entry).find('kuler\\:swatch').find('kuler\\:swatchHexColor'));
+          var quark = $(entry).find('kuler\\:themeSwatches'),
+          quart = $(quark).find('kuler\\:swatch'),
+          quarta = $(quart).find('kuler\\:swatchHexColor');
+          quartz = $.makeArray(quarta);
           var entryTitle = $($(entry).find('kuler\\:themeTitle')).text();
           var tID = $($(entry).find('kuler\\:themeID')).text();
 
