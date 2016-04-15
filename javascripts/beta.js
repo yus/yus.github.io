@@ -26,14 +26,15 @@ jQuery.noConflict();
         $items.each(function (q, u) {
           var $entry = $(this); //$items[q]
           var entry = $entry[0]; // DOM element
-          console.log(entry);
+          //console.log(entry);
           
-          var $themeSwatches = $(entry).find('kuler\\:themeSwatches'),
-          $swtchs = $($themeSwatches).find('kuler\\:swatch'),
-          $quartz = $($swtchs).find('kuler\\:swatchHexColor');
+          // kuler\\:
+          var $themeSwatches = $(entry).find('themeSwatches'), 
+          $swtchs = $($themeSwatches).find('swatch'),
+          $quartz = $($swtchs).find('swatchHexColor');
           
-          var entryTitle = $(entry).find('kuler\\:themeTitle').text();
-          var tID = $(entry).find('kuler\\:themeID').text();
+          var entryTitle = $(entry).find('themeTitle').text(),
+          tID = $(entry).find('themeID').text();
 
           var themeLink = 'https://color.adobe.com/themeID/' + tID;
           var quler = $('<div id="quartz' + q + '"></div>').addClass('tinge');
