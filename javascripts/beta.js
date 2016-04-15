@@ -19,22 +19,22 @@ jQuery.noConflict();
       if (!responseXML.error) {
         var items = $(responseXML).find('themeItem').get(),
         ns_items = $(responseXML).find('kuler\\:themeItem').get();
-        var $items = (undefined) ? items : ns_items;
+        var $items = undefined ? items : ns_items;
         console.log( typeof $items );
         //console.log( $(response, document.item) );
         
         $.each( $items, function(q, r){
-          var $r = (undefined) ? $items[0] : $(r)[0];
+          var $r = undefined ? $items[0] : $(r)[0];
           //console.log($r);
-          var entryTitle = (undefined) ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
-          var tID = (undefined) ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
-          var $themeSwatches = (undefined) ? $($r).find('themeSwatches') : $($r).find('kuler\\:themeSwatches');
-          var $swtchs = (undefined) ? $($themeSwatches).find('swatch') : $($themeSwatches).find('kuler\\:swatch');
+          var entryTitle = undefined ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
+          var tID = undefined ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
+          var $themeSwatches = undefined ? $($r).find('themeSwatches') : $($r).find('kuler\\:themeSwatches');
+          var $swtchs = undefined ? $($themeSwatches).find('swatch') : $($themeSwatches).find('kuler\\:swatch');
           console.log($themeSwatches);
           console.log($swtchs);
           $.each($swtchs, function(rr, sclr){
             var $sclr = $swtchs[0];
-            var $quartz = (undefined) ? $($sclr).find('swatchHexColor') : $($sclr).find('kuler\\:swatchHexColor');
+            var $quartz = undefined ? $($sclr).find('swatchHexColor') : $($sclr).find('kuler\\:swatchHexColor');
             console.log($($quartz).text());
           });
           console.log(q + '›››' + entryTitle + '›››' + tID);
