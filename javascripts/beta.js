@@ -25,9 +25,9 @@ jQuery.noConflict();
         var $f = (undefined) ? $items : $ns_items;
         console.log( $f );
         //console.log( $(response, document.item) );
-        $f.each(function(q, u){
-          var item = $(u);
-          console.log(item);
+        $f.each(function(q, r){
+          var $r = $(r)[0];
+          console.log($r);
         });
       } // if !error
     }); // ajax done
