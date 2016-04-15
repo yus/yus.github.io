@@ -7,7 +7,7 @@ jQuery.noConflict();
 (function ($) {
   $(function () {
     // “$” jQuery alias
-    $('body').addClass('yus');
+    $('body').addClass('ysdsgn');
     var qc = '?searchQuery=userID:102986',
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
