@@ -35,19 +35,18 @@
   display:flex;
   margin:0px 0px 1px 1px;
   padding:4px 4px 0px;
-  min-width: 145px;
   flex-grow: 1;
+  flex-direction: column;
+}
+.tinge{
+  display:flex;
 }
 .flink{
   color:silver;
-  display:inline-block;
-  width:100%;
-  height:100%;
-  padding:0px;
-  margin:0px;
+  display:flex;
 }
 .flink:hover{
-  color:white;
+  color:gainsboro;
 }
 .penta, .thitle{
   display:block;
