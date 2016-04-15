@@ -22,7 +22,7 @@ jQuery.noConflict();
       if (!response.error) {
         var items = $(response).find('themeItem'), ns_items = $(response).find('kuler\\:themeItem');
         var $items = (undefined) ? items : ns_items;
-        console.log( $items );
+        console.log( typeof $items.get() );
         //console.log( $(response, document.item) );
         $.each( $items, function(q, r){
           var $r = (undefined) ? $items[q] : $(r)[0];
