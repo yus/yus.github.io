@@ -20,13 +20,25 @@ jQuery.noConflict();
       namespace: 'kuler'
     }).done(function (response) {
       if (!response.error) {
-        var $items = $(response).find('themeItem'), $ns_items = $(response).find('kuler\\:themeItem');
-        var $f = (undefined) ? $items : $ns_items;
-        console.log( $f );
+        var items = $(response).find('themeItem'), ns_items = $(response).find('kuler\\:themeItem');
+        var $items = (undefined) ? items : ns_items;
+        console.log( $items );
         //console.log( $(response, document.item) );
-        $.each( $f, function(q, r){
-          var $r = $f[q]; //$(r)
-          console.log($r);
+        $.each( $items, function(q, r){
+          var $r = $items[q]; //$(r)
+          //console.log($r);
+          var $themeSwatches = (undefined) ? $($r).find('themeSwatches') : $($r).find('kuler\\:themeSwatches');
+          var $swtchs = (undefined) ? $($themeSwatches).find('swatch') : $($themeSwatches).find('kuler\\:swatch');
+          console.log($themeSwatches);
+          console.log($swtchs);
+          $.each($swtchs, function(m, sclr){
+            var $sclr = $swtchs[m];
+            var $quartz = (undefined) ? $($sclr).find('swatchHexColor') : $($sclr).find('kuler\\:swatchHexColor');
+            console.log($($quartz).text());
+          });
+          var entryTitle = (undefined) ? $($r).find( 'themeTitle' ).text() : $($r).find( 'kuler\\:themeTitle' ).text();
+          var tID = (undefined) ? $($r).find( 'themeID' ).text() : $($r).find( 'kuler\\:themeID' ).text();
+          console.log(q + '›››' + entryTitle + '›››' + tID);
         });
       } // if !error
     }); // ajax done
