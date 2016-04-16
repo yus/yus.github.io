@@ -44,9 +44,9 @@ jQuery.noConflict();
     $.ajax({
       type: 'GET',  
       url: qu
-    }).done(function( xhr.responseText ){
-      if ( !xhr.responseText.error ){
-        var jsn = jeesonify( xhr.responseText );
+    }).done(function( responseText ){
+      if ( !responseText.error ){
+        var jsn = jeesonify( responseText );
         console.log( typeof jsn );
         //$('.gesso').html( jsn );
       }
