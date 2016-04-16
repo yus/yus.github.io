@@ -27,8 +27,8 @@ jQuery.noConflict();
         $xml = $( xmlDoc ),
         $items = $xml.find( 'item' );
         $items.each(function(i, j){
-          $title = $(j).find('themeTitle').get();
-          console.log( $title.text() );
+          $title = $(j).find('themeTitle').text();
+          console.log( $title );
         });
       }
     });  
