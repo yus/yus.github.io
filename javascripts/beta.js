@@ -21,12 +21,19 @@ jQuery.noConflict();
       if ( !responseXML.error ){
         var $book = $( responseXML ).find( 'item' );
         $.each($book, function( j,q ){
-          var $q, $l, $s;
-          $q ? $q = $(q).find('themeID').text() : $q = $(q).find('kuler\\:themeID').text();
-          $l ? $l = $(q).find('themeTitle').text() : $l = $(q).find('kuler\\:themeTitle').text();
-          $s ? $s = $(q).find('swatch').text() : $s = $(q).find('kuler\\:swatch').text();
+          var $q, $l, $r, $g, $b, $a;
+          $q ? $q = $(q).find('themeID').text() || $(q).find('kuler\\:themeID').text();
+          $l ? $l = $(q).find('themeTitle').text() || $(q).find('kuler\\:themeTitle').text();
+          $r ? $r = $(q).find('swatchChannel1') || $(q).find('kuler\\:swatchChannel1');
+          $g ? $g = $(q).find('swatchChannel2') || $(q).find('kuler\\:swatchChannel2');
+          $b ? $b = $(q).find('swatchChannel3') || $(q).find('kuler\\:swatchChannel3');
+          $a ? $a = $(q).find('swatchChannel4') || $(q).find('kuler\\:swatchChannel4');
           
-          console.log( $q + ' › ' + $l + ' \n›››' + $s );
+          console.log( $q + ' › ' + $l );
+          console.log( ' R ›››' + typeof $r );
+          console.log( ' G ›››' + typeof $g );
+          console.log( ' B ›››' + typeof $b );
+          console.log( ' A ›››' + typeof $a );
           //$('.gesso').html( jsn );
         });  
       }
