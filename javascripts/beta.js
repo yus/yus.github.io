@@ -20,9 +20,9 @@ jQuery.noConflict();
     }).done(function( responseXML ){
       if ( !responseXML.error ){
         var $book = $( responseXML ).find( 'item' );
-        $.each($book, function(j,q){
-          var $q = $(q)[j];
-          console.log( $q.find('themeTitle').text() );
+        $.each($book, function( j,q ){
+          var $q = $(q);
+          console.log( $($q).find('themeTitle').text() );
           //$('.gesso').html( jsn );
         });  
       }
