@@ -19,9 +19,8 @@ jQuery.noConflict();
       dataType: "jsonp",
       dataFilter: function(data, type){
         if(type == "xml") console.log("returned xml!");
-           // Firebug complains about this
-        var newdata = data.replace(/</g, '{');
-        newdata = newdata.replace(/>/g, '}');
+        var newdata = data.replace(/<kuler:/g, '<');
+        //newdata = newdata.replace(/>/g, '>');
         return newdata;
       },
       jsonp: "callback",
