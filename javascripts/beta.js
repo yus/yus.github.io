@@ -20,8 +20,10 @@ jQuery.noConflict();
     }).done(function( responseXML){
       if ( !responseXML.error ){
         var $book = $( responseXML ).find( 'item' );
-        console.log( $book );
-        //$('.gesso').html( jsn );
+        $book.item(0).each(function(j,q){
+          console.log( q[j] );
+          //$('.gesso').html( jsn );
+        });  
       }
     });
   });
