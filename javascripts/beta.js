@@ -21,20 +21,20 @@ jQuery.noConflict();
       if ( !responseXML.error ){
         var $book = $( responseXML ).find( 'item' );
         $.each($book, function( j,q ){
-          var $q = $(q).find('kuler\\:themeID' || 'themeID').unwrap();
-          var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').unwrap();
+          var $q = $(q).find('kuler\\:themeID' || 'themeID').unwrap().unwrap();
+          var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').unwrap().unwrap();
           var $swatches = $(q).find('kuler\\:swatch' || 'swatch');
           $.each($swatches, function( g,h ){
-            var $r = $(h).find('kuler\\:swatchChannel1' || 'swatchChannel1').unwrap();
-            var $g = $(h).find('kuler\\:swatchChannel2' || 'swatchChannel2').unwrap();
-            var $b = $(h).find('kuler\\:swatchChannel3' || 'swatchChannel3').unwrap();
-            var $a = $(h).find('kuler\\:swatchChannel4' || 'swatchChannel4').unwrap();
+            var $r = $(h).find('kuler\\:swatchChannel1' || 'swatchChannel1').unwrap().unwrap();
+            var $g = $(h).find('kuler\\:swatchChannel2' || 'swatchChannel2').unwrap().unwrap();
+            var $b = $(h).find('kuler\\:swatchChannel3' || 'swatchChannel3').unwrap().unwrap();
+            var $a = $(h).find('kuler\\:swatchChannel4' || 'swatchChannel4').unwrap().unwrap();
             console.log( ' R ››› ' + $r );
             console.log( ' G ››› ' + $g );
             console.log( ' B ››› ' + $b );
             console.log( ' A ››› ' + $a );
           });
-          console.log( $($q).html() + ' ››› ' + $($l).html() );
+          console.log( $q + ' ››› ' + $l );
           //$('.gesso').html( jsn );
         });  
       }
