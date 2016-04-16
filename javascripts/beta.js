@@ -21,12 +21,12 @@ jQuery.noConflict();
       if ( !result.error ){
         var $books = $( result ).find( 'item' );
         $.each($books, function( i,j ){
-          var $book = $(this)[i];
+          var $book = $(this);
           var $q = $($book).find('kuler\\:themeID' || 'themeID')[0];
           var $l = $($book).find('kuler\\:themeTitle' || 'themeTitle')[0];
           var $swatches = $($book).find('kuler\\:swatch' || 'swatch');
           $.each($swatches, function( k,l ){
-            var $swtch = $(this)[k];
+            var $swtch = $(this);
             var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1')[0];
             var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2')[0];
             var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3')[0];
