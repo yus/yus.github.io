@@ -21,42 +21,38 @@ jQuery.noConflict();
       }
     }).done(function( data ) {
       if ( !data.error ) {
-        console.log( 'Sample of data:\n', data.slice( 0, 55 ) );
-        console.log( $.isXMLDoc(data) + ' › ' + typeof data );
-/**
-        var xmlDoc = $.parseXML( data ),
-        $xml = $( xmlDoc ),
-        $items = $xml.find( 'item' ).get();
-        console.log( typeof $items );
-*/
-        var xml = data;
-        var regex = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
-        while (xml.match(regex)) xml = xml.replace(regex, '<$2>$3</$2>$1>');  
-        xml = xml.replace(/\s/g, ' ').  
-        replace(/< *\?[^>]*?\? *>/g, '').  
-        replace(/< *!--[^>]*?-- *>/g, '').  
-        replace(/< *(\/?) *(\w[\w-]+\b):(\w[\w-]+\b)/g, '<$1$2_$3').
-        replace(/< *(\w[\w-]+\b)([^>]*?)\/ *>/g, '< $1$2>').
-        replace(/(\w[\w-]+\b):(\w[\w-]+\b) *= *"([^>]*?)"/g, '$1_$2="$3"').
-        replace(/< *(\w[\w-]+\b)((?: *\w[\w-]+ *= *" *[^"]*?")+ *)>( *[^< ]*?\b.*?)< *\/ *\1 *>/g, '< $1$2 value="$3">').
-        replace(/< *(\w[\w-]+\b) *</g, '<$1>< ').
-        replace(/> *>/g, '>').
-        replace(/"/g, '\\"').
-        replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":"$2",').
-        replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":[{$2}],').
-        replace(/< *(\w[\w-]+\b) *>(?=("\w[\w-]+\b)":\{.*?\},\2)(.*?)< *\/ *\1 *>/, '"$1":{}$3},').
-        replace(/],\s*?".*?": *\[/g, ',').
-        replace(/< \/(\w[\w-]+\b)\},\{\1>/g, '},{').
-        replace(/< *(\w[\w-]+\b)[^>]*?>/g, '"$1":{').
-        replace(/< *\/ *\w[\w-]+ *>/g, '},').
-        replace(/\} *,(?= *(\}|\]))/g, '}').
-        replace(/] *,(?= *(\}|\]))/g, ']').
-        replace(/" *,(?= *(\}|\]))/g, '"').
-        replace(/ *, *$/g, '');
-        xml = '{' + xml + '}';
-        console.log( 'Sample of data:\n', xml.slice( 0, 55 ) );
-
+        var json = markupConverse(data);
+        console.log( 'Sample of data:\n', json.slice( 0, 55 ) );
       }
-    });  
+    });
+    
+    function markupConverse(xmldata){
+      var xml = xmldata;
+      var regex = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
+      while (xml.match(regex)) xml = xml.replace(regex, '<$2>$3</$2>$1>');  
+      xml = xml.replace(/\s/g, ' ').  
+      replace(/< *\?[^>]*?\? *>/g, '').  
+      replace(/< *!--[^>]*?-- *>/g, '').  
+      replace(/< *(\/?) *(\w[\w-]+\b):(\w[\w-]+\b)/g, '<$1$2_$3').
+      replace(/< *(\w[\w-]+\b)([^>]*?)\/ *>/g, '< $1$2>').
+      replace(/(\w[\w-]+\b):(\w[\w-]+\b) *= *"([^>]*?)"/g, '$1_$2="$3"').
+      replace(/< *(\w[\w-]+\b)((?: *\w[\w-]+ *= *" *[^"]*?")+ *)>( *[^< ]*?\b.*?)< *\/ *\1 *>/g, '< $1$2 value="$3">').
+      replace(/< *(\w[\w-]+\b) *</g, '<$1>< ').
+      replace(/> *>/g, '>').
+      replace(/"/g, '\\"').
+      replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":"$2",').
+      replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":[{$2}],').
+      replace(/< *(\w[\w-]+\b) *>(?=("\w[\w-]+\b)":\{.*?\},\2)(.*?)< *\/ *\1 *>/, '"$1":{}$3},').
+      replace(/],\s*?".*?": *\[/g, ',').
+      replace(/< \/(\w[\w-]+\b)\},\{\1>/g, '},{').
+      replace(/< *(\w[\w-]+\b)[^>]*?>/g, '"$1":{').
+      replace(/< *\/ *\w[\w-]+ *>/g, '},').
+      replace(/\} *,(?= *(\}|\]))/g, '}').
+      replace(/] *,(?= *(\}|\]))/g, ']').
+      replace(/" *,(?= *(\}|\]))/g, '"').
+      replace(/ *, *$/g, '');
+      var json = '{' + xml + '}';
+      return json;
+    }
   });
 }) (jQuery);
