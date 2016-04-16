@@ -33,10 +33,10 @@ jQuery.noConflict();
           var $ai = $a[Symbol.iterator]();
 
           console.log( typeof $q + ' ››› ' + typeof $l );
-          console.log( ' R ››› ' + $ri.next().value.html() );
-          console.log( ' G ››› ' + $gi.next().value.html() );
-          console.log( ' B ››› ' + $bi.next().value.html() );
-          console.log( ' A ››› ' + $ai.next().value.html() );
+          console.log( ' R ››› ' + $($ri.next().value).html() );
+          console.log( ' G ››› ' + $($gi.next().value).html() );
+          console.log( ' B ››› ' + $($bi.next().value).html() );
+          console.log( ' A ››› ' + $($ai.next().value).html() );
           //$('.gesso').html( jsn );
         });  
       }
