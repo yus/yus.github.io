@@ -20,21 +20,21 @@ jQuery.noConflict();
     }).done(function( result ){
       if ( !result.error ){
         var $books = $( result ).find( 'item' );
-        $.each($books, function( j,q ){
-          var $book = $(this)[j];
+        $.each($books, function( i,j ){
+          var $book = $(this)[i];
           var $q = $($book).find('kuler\\:themeID' || 'themeID').text();
           var $l = $($book).find('kuler\\:themeTitle' || 'themeTitle').text();
           var $swatches = $($book).find('kuler\\:swatch' || 'swatch');
-          $.each($swatches, function( g,h ){
-            var $swtch = $(this)[g];
-            var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1');
-            var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2');
-            var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3');
-            var $a = $($swtch).find('kuler\\:swatchChannel4' || 'swatchChannel4');
-            console.log( ' R ››› ' + $r.unwrap().html() );
-            console.log( ' G ››› ' + $g.unwrap().html() );
-            console.log( ' B ››› ' + $b.unwrap().html() );
-            console.log( ' A ››› ' + $a.unwrap().html() );
+          $.each($swatches, function( k,l ){
+            var $swtch = $(this)[k];
+            var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1').text();
+            var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2').text();
+            var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3').text();
+            var $a = $($swtch).find('kuler\\:swatchChannel4' || 'swatchChannel4').text();
+            console.log( ' R ››› ' + $r );
+            console.log( ' G ››› ' + $g );
+            console.log( ' B ››› ' + $b );
+            console.log( ' A ››› ' + $a );
           });
           console.log( $q + ' ››› ' + $l );
           //$('.gesso').html( jsn );
