@@ -19,10 +19,20 @@ jQuery.noConflict();
       dataType: 'xml'
     }).done(function( result ){
       if ( !result.error ){
-         swatchSheave(result);      }
+        var $books = $( result ).find( 'item' );
+        $.each($books, function( i,j ){
+          var $book = $(this);
+          var $q = $($book).find('kuler\\:themeID' || 'themeID');
+          var $l = $($book).find('kuler\\:themeTitle' || 'themeTitle');
+          var $swatches = $($book).find('kuler\\:swatch' || 'swatch');
+          $.each($swatches, function( k,l ){
+            var $swtch = $(this);
+            var $a = $($swtch).find('kuler\\:swatchHexColor' || 'swatchHexColor');
+            console.log( ' A ››› ' + $($a).html() );
+          });
+          console.log( $($q).html() + ' ››› ' + $($l).html() );
+        });
+      }
     });
   });
 }) (jQuery);
-
-function swatchSheave(c){c=$(c).find("item");$.each(c,function(c,g){var a=$(this),d=$(a).find("kuler\\:themeID"),e=$(a).find("kuler\\:themeTitle"),a=$(a).find("kuler\\:swatch");$.each(a,function(a,c){var b=$(this),d=$(b).find("kuler\\:swatchChannel1"),e=$(b).find("kuler\\:swatchChannel2"),f=$(b).find("kuler\\:swatchChannel3"),b=$(b).find("kuler\\:swatchChannel4");console.log(" R \u203a\u203a\u203a "+$(d).html());console.log(" G \u203a\u203a\u203a "+$(e).html());console.log(" B \u203a\u203a\u203a "+$(f).html());
-console.log(" A \u203a\u203a\u203a "+$(b).html())});console.log($(d).html()+" \u203a\u203a\u203a "+$(e).html())})};
