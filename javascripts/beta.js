@@ -8,7 +8,8 @@ jQuery.noConflict();
   $(function () {
     // “$” jQuery alias
     $('body').addClass('ysdsgn');
-    var qc = '?searchQuery=userID:102986',
+    var ns = 'http://kuler.adobe.com/kuler/API/rss/',
+    qc = '?searchQuery=userID:102986',
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
@@ -21,11 +22,14 @@ jQuery.noConflict();
         var $books = $(result).find('item');
         $.each($books, function (i, jee) {
           //var $book = $(this);
-          var $tID,
+          var $ns_tID,
+          $tID,
           $tTtl,
           $swatches;
+          $ns_tID = $(jee).getElementsByTagNameNS(ns, 'themeID')[0].html();
           !$tID ? $tID = $(jee).find('themeID') : $tID = $(jee).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $(jee).find('themeTitle') : $tTtl = $(jee).find('kuler\\:themeTitle');
+          console.log($ns_tID);
           console.log($($tID).html() + ' ››› ' + $($tTtl).html());
           
           !$swatches ? $swatches = $(jee).find('swatch') : $swatches = $(jee).find('kuler\\:swatch');
