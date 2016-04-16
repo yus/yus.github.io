@@ -27,7 +27,7 @@ jQuery.noConflict();
           $tID,
           $tTtl,
           $swatches;
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].innerHTML();
+          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].value;
           !$tID ? $tID = $(jee).find('themeID') : $tID = $(jee).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $(jee).find('themeTitle') : $tTtl = $(jee).find('kuler\\:themeTitle');
           console.log($ns_tID);
