@@ -30,10 +30,10 @@ jQuery.noConflict();
           $a = $(q).find('kuler\\:swatchChannel4' || 'swatchChannel4');
           
           console.log( typeof $q + ' ››› ' + typeof $l );
-          console.log( ' R ››› ' + $r.toString() );
-          console.log( ' G ››› ' + $g.toString() );
-          console.log( ' B ››› ' + $b.toString() );
-          console.log( ' A ››› ' + $a.toString() );
+          console.log( ' R ››› ' + $.each($r).html() );
+          console.log( ' G ››› ' + $.each($g).html() );
+          console.log( ' B ››› ' + $.each($b).html() );
+          console.log( ' A ››› ' + $.each($a).html() );
           //$('.gesso').html( jsn );
         });  
       }
