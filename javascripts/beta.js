@@ -16,19 +16,21 @@ jQuery.noConflict();
     $.ajax({
       type: 'GET',  
       url: qu,
-      dataType: 'xml'
-    }).done(function( responseXML ){
-      if ( !responseXML.error ){
-        var $book = $( responseXML ).find( 'item' );
-        $.each($book, function( j,q ){
-          var $q = $(q).find('kuler\\:themeID' || 'themeID').unwrap().unwrap();
-          var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').unwrap().unwrap();
-          var $swatches = $(q).find('kuler\\:swatch' || 'swatch');
+      dataType: 'json'
+    }).done(function( result ){
+      if ( !result.error ){
+        var $books = $( result ).find( 'item' );
+        $.each($books, function( j,q ){
+          var $book = $books[j];
+          var $q = $($book).find('kuler\\:themeID' || 'themeID').text();
+          var $l = $($book).find('kuler\\:themeTitle' || 'themeTitle').text();
+          var $swatches = $.makeArray($(q).find('kuler\\:swatch' || 'swatch'));
           $.each($swatches, function( g,h ){
-            var $r = $(h).find('kuler\\:swatchChannel1' || 'swatchChannel1').unwrap().unwrap();
-            var $g = $(h).find('kuler\\:swatchChannel2' || 'swatchChannel2').unwrap().unwrap();
-            var $b = $(h).find('kuler\\:swatchChannel3' || 'swatchChannel3').unwrap().unwrap();
-            var $a = $(h).find('kuler\\:swatchChannel4' || 'swatchChannel4').unwrap().unwrap();
+            var $swtch = $swatches[g];
+            var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1').unwrap();
+            var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2').unwrap();
+            var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3').unwrap();
+            var $a = $($swtch).find('kuler\\:swatchChannel4' || 'swatchChannel4').unwrap();
             console.log( ' R ››› ' + $r );
             console.log( ' G ››› ' + $g );
             console.log( ' B ››› ' + $b );
