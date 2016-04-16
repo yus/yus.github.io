@@ -49,9 +49,9 @@ jQuery.noConflict();
       }
     }).done(function( data ) {
       if ( !data.error ) {
-        // xhr.responseXML
         var jsn = jeesonify( data );
-        console.log(JSON.stringify( jsn, null, '\t'));
+        console.log( typeof jsn );
+        $('.gesso').html( jsn );
       }
     });
   });
