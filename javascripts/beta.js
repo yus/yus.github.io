@@ -17,11 +17,11 @@ jQuery.noConflict();
       type: 'GET',  
       url: qu,
       beforeSend: function( xhr ) {
-        xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+        xhr.overrideMimeType( 'text/plain; charset=x-user-defined' );
       }
     }).done(function( data ) {
       if ( !data.error ) {
-        console.log( "Sample of data:", data.slice( 0, 100 ) );
+        console.log( 'Sample of data:\n', data.slice( 0, 555 ) );
       }
     });  
   });
