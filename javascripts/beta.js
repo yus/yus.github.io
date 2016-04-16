@@ -19,9 +19,10 @@ jQuery.noConflict();
       dataType: 'xml'
     }).done(function( responseXML){
       if ( !responseXML.error ){
-        var $book = $( responseXML ).find( 'item' );
-        $book.item(0).each(function(j,q){
-          console.log( q[j] );
+        var $book = $( responseXML.item(0) ).find( 'themeItem' );
+        $.each($book, function(j,q){
+          var $$ = q[j];
+          console.log( $$ );
           //$('.gesso').html( jsn );
         });  
       }
