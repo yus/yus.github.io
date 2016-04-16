@@ -14,20 +14,21 @@ jQuery.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     
     $.ajax({
-      type: "GET",  
+      type: 'GET',  
+      data: null,
       url: qu,  
-      dataType: "jsonp",
+      dataType: 'jsonp',
       dataFilter: function(data, type){
-        if(type == "xml") console.log("returned xml!");
+        if(type == 'xml') console.log('returned xml!');
         var newdata = data.replace(/kuler:/g, '');
         //newdata = newdata.replace(/>/g, '>');
         return newdata;
       },
-      jsonp: "callback",
-      jsonpCallback: "jsonpcallback"
+      jsonp: 'callback',
+      jsonpCallback: 'jsonpcallback'
     });  
     function jsonpcallback(returndata) {
-      console.log( "data returned: " + returndata );
+      console.log( 'data returned: ' + returndata );
     };
 
   });
