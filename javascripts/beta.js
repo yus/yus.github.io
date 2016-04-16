@@ -21,8 +21,8 @@ jQuery.noConflict();
       if ( !responseXML.error ){
         var $book = $( responseXML ).find( 'item' );
         $.each($book, function( j,q ){
-          var $q = $(q).find('kuler\\:themeID' || 'themeID').text();
-          var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').text();
+          var $q = $(q).find('kuler\\:themeID' || 'themeID')[0];
+          var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle')[0];
           var $swatches = $(q).find('kuler\\:swatch' || 'swatch');
           $.each($swatches, function( g,h ){
             var $r = $(h).find('kuler\\:swatchChannel1' || 'swatchChannel1')[0];
@@ -34,7 +34,7 @@ jQuery.noConflict();
             console.log( ' B ››› ' + $($b).html() );
             console.log( ' A ››› ' + $($a).html() );
           });
-          console.log( $q + ' ››› ' + $l );
+          console.log( $($q).html() + ' ››› ' + $($l).html() );
           //$('.gesso').html( jsn );
         });  
       }
