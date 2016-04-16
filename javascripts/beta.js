@@ -12,42 +12,29 @@ jQuery.noConflict();
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
-
     $.ajax({
-      type: 'GET',  
+      type: 'GET',
       url: qu,
       dataType: 'xml'
-    }).done(function( result ){
-      if ( !result.error ){
-        var $books = $( result ).find( 'item' );
-        $.each($books, function( i,j ){
+    }).done(function (result) {
+      if (!result.error) {
+        var $books = $(result).find('item');
+        $.each($books, function (i, jee) {
           //var $book = $(this);
-          var $tID, $tTtl, $swatches;
-          if (!$tID) {
-            $tID = $(this).find('kuler\\:themeID');
-          } else {
-            $tID = $(this).find('themeID');
-          }
-          if (!$tTtl) {
-            $tTtl = $(this).find('kuler\\:themeTitle');
-          } else {
-            $tTtl = $(this).find('themeTitle');
-          }
-          if (!$swatches) {
-            $swatches = $(this).find('kuler\\:swatch');
-          } else {
-            $swatches = $(this).find('swatch');
-          }
-          $.each($swatches, function( l,val ){
+          var $tID,
+          $tTtl,
+          $swatches;
+          !$tID ? $tID = $(jee).find('themeID') : $tID = $(jee).find('kuler\\:themeID');
+          !$tTtl ? $tTtl = $(jee).find('themeTitle') : $tTtl = $(jee).find('kuler\\:themeTitle');
+          console.log($($tID).html() + ' ››› ' + $($tTtl).html());
+          
+          !$swatches ? $swatches = $(jee).find('swatch') : $swatches = $(jee).find('kuler\\:swatch');
+          $.each($swatches, function (l, val) {
             var $swtch;
-            if (!$swtch) {
-              $swtch = $(val).find('kuler\\:swatchHexColor');
-            } else {
-              $swtch = $(val).find('swatchHexColor');
-            }
-            console.log( ' SWATCH 🕛 ››› ' + $($swtch).html() );
+            !$swtch ? $swtch = $(val).find('swatchHexColor') : $swtch = $(val).find('kuler\\:swatchHexColor');
+            console.log(' SWATCH 🕛 ››› ' + $($swtch).html());
           });
-          console.log( $($tID).html() + ' ››› ' + $($tTtl).html() );
+          
         });
       }
     });
