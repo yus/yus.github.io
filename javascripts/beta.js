@@ -25,7 +25,7 @@ jQuery.noConflict();
         console.log( $.isXMLDoc(data) + ' › ' + typeof data );
         var xmlDoc = $.parseXML( data ),
         $xml = $( xmlDoc ),
-        $items = $xml.find( 'item' );
+        $items = $xml.find( 'item' ).get();
         $items.each(function(i, unit){
           $unit = $(unit[i]);
           $themeTitle = $( $unit ).find('themeTitle').text();
