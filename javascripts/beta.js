@@ -51,7 +51,7 @@ jQuery.noConflict();
       if ( !data.error ) {
         var jsn = jeesonify( data );
         console.log( typeof jsn );
-        $('.gesso').html( jsn );
+        //$('.gesso').html( jsn );
       }
     });
   });
