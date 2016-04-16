@@ -22,13 +22,15 @@ jQuery.noConflict();
         var $books = $( result ).find( 'item' );
         $.each($books, function( i,j ){
           var $book = $(this);
-          var $q = $($book).find('kuler\\:themeID' || 'themeID');
-          var $l = $($book).find('kuler\\:themeTitle' || 'themeTitle');
-          var $swatches = $($book).find('kuler\\:swatch' || 'swatch');
+          var $q, $l, $swatches;
+          $q ? $q = $($book).find('kuler\\:themeID') : $q = $($book).find('themeID');
+          $l ? $l = $($book).find('kuler\\:themeTitle') : $l = $($book).find('themeTitle');
+          $swatches ? $swatches = $($book).find('kuler\\:swatch') : $swatches = $('swatch');
           $.each($swatches, function( k,l ){
             var $swtch = $(this);
-            var $a = $($swtch).find('kuler\\:swatchHexColor' || 'swatchHexColor');
-            console.log( ' A ››› ' + $($a).html() );
+            var $a;
+            $a ? $a = $($swtch).find('kuler\\:swatchHexColor') : $a = $($swtch).find('swatchHexColor');
+            console.log( ' SWATCH 🕛 ››› ' + $($a).html() );
           });
           console.log( $($q).html() + ' ››› ' + $($l).html() );
         });
