@@ -20,8 +20,8 @@ jQuery.noConflict();
       dataType: 'jsonp',
       dataFilter: function(data, type){
         if(type == 'xml') console.log('returned xml!');
-        var newdata = data.replace(/kuler:/g, '');
-        //newdata = newdata.replace(/>/g, '>');
+        var newdata = $.parseJSON(data).replace(/</g, '{');
+        newdata = $.parseJSON(newdata).replace(/>/g, '}');
         return newdata;
       },
       jsonp: 'callback',
