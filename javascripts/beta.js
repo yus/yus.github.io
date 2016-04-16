@@ -29,11 +29,11 @@ jQuery.noConflict();
           $b = $(q).find('kuler\\:swatchChannel3' || 'swatchChannel3');
           $a = $(q).find('kuler\\:swatchChannel4' || 'swatchChannel4');
           
-          console.log( $q + ' › ' + $l );
-          console.log( ' R ›››' + typeof $r );
-          console.log( ' G ›››' + typeof $g );
-          console.log( ' B ›››' + typeof $b );
-          console.log( ' A ›››' + typeof $a );
+          console.log( typeof $q + ' ››› ' + typeof $l );
+          console.log( ' R ››› ' + $r.text() );
+          console.log( ' G ››› ' + $g.text() );
+          console.log( ' B ››› ' + $b.text() );
+          console.log( ' A ››› ' + $a.text() );
           //$('.gesso').html( jsn );
         });  
       }
