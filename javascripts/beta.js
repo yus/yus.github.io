@@ -13,12 +13,14 @@ jQuery.noConflict();
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     $.ajax({
+      data: null,
+      dataType: 'xml',
       url: qu,
-      dataType: 'xml'
-    }).done(function (responseXML) {
-      if (!responseXML.error) {
-        var items = $(responseXML).find('themeItem').get(),
-        ns_items = $(responseXML).find('kuler\\:themeItem').get();
+      dataFilter: function('kuler'){ return resp; }
+    }).done(function (resp) {
+      if (!resp.error) {
+        var items = $(resp).find('themeItem').get(),
+        ns_items = $(resp).find('kuler\\:themeItem').get();
         var $items = undefined ? items : ns_items;
         console.log( $($items).text() ); // typeof 
         //console.log( $(response, document.item) );
