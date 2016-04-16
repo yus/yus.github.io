@@ -27,10 +27,10 @@ jQuery.noConflict();
           var $swatches = $($book).find('kuler\\:swatch' || 'swatch');
           $.each($swatches, function( g,h ){
             var $swtch = $(this)[g];
-            var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1').html();
-            var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2').html();
-            var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3').html();
-            var $a = $($swtch).find('kuler\\:swatchChannel4' || 'swatchChannel4').html();
+            var $r = $($swtch).find('kuler\\:swatchChannel1' || 'swatchChannel1').unwrap().html();
+            var $g = $($swtch).find('kuler\\:swatchChannel2' || 'swatchChannel2').unwrap().html();
+            var $b = $($swtch).find('kuler\\:swatchChannel3' || 'swatchChannel3').unwrap().html();
+            var $a = $($swtch).find('kuler\\:swatchChannel4' || 'swatchChannel4').unwrap().html();
             console.log( ' R ››› ' + $r );
             console.log( ' G ››› ' + $g );
             console.log( ' B ››› ' + $b );
