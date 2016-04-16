@@ -27,7 +27,7 @@ jQuery.noConflict();
         $xml = $( xmlDoc ),
         $items = $xml.find( 'item' );
         $items.each(function(i, unit){
-          $unit = $(unit)[i];
+          $unit = $(unit[i]);
           $themeTitle = $( $unit ).find('themeTitle').text();
           console.log( $themeTitle );
         });
