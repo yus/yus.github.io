@@ -17,9 +17,9 @@ jQuery.noConflict();
       type: 'GET',  
       url: qu,
       dataType: 'xml'
-    }).done(function( responseXML){
+    }).done(function( responseXML ){
       if ( !responseXML.error ){
-        var $book = $( responseXML.item(0) ).find( 'themeItem' );
+        var $book = $( responseXML ).find( 'item' );
         $.each($book, function(j,q){
           var $$ = q[j];
           console.log( $$ );
