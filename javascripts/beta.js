@@ -22,12 +22,12 @@ jQuery.noConflict();
         var $book = $( responseXML ).find( 'item' );
         $.each($book, function( j,q ){
           var $q, $l, $r, $g, $b, $a;
-          $q ? $q = $(q).find('themeID').text() || $(q).find('kuler\\:themeID').text();
-          $l ? $l = $(q).find('themeTitle').text() || $(q).find('kuler\\:themeTitle').text();
-          $r ? $r = $(q).find('swatchChannel1') || $(q).find('kuler\\:swatchChannel1');
-          $g ? $g = $(q).find('swatchChannel2') || $(q).find('kuler\\:swatchChannel2');
-          $b ? $b = $(q).find('swatchChannel3') || $(q).find('kuler\\:swatchChannel3');
-          $a ? $a = $(q).find('swatchChannel4') || $(q).find('kuler\\:swatchChannel4');
+          $q = $(q).find('kuler\\:themeID' || 'themeID').text();
+          $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').text();
+          $r = $(q).find('kuler\\:swatchChannel1' || 'swatchChannel1');
+          $g = $(q).find('kuler\\:swatchChannel2' || 'swatchChannel2');
+          $b = $(q).find('kuler\\:swatchChannel3' || 'swatchChannel3');
+          $a = $(q).find('kuler\\:swatchChannel4' || 'swatchChannel4');
           
           console.log( $q + ' › ' + $l );
           console.log( ' R ›››' + typeof $r );
