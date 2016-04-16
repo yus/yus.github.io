@@ -43,18 +43,13 @@ jQuery.noConflict();
     
     $.ajax({
       type: 'GET',  
-      url: qu,
-      beforeSend: function( xhr ){
-        xhr.overrideMimeType( 'text/plain, charset=x-user-defined' );
-      }
-    }).done(function( data ){
-      if ( !data.error ){
-        var jsn = jeesonify( data );
+      url: qu
+    }).done(function( xhr.responseText ){
+      if ( !xhr.responseText.error ){
+        var jsn = jeesonify( xhr.responseText );
         console.log( typeof jsn );
         //$('.gesso').html( jsn );
       }
     });
-    
-    
   });
 }) (jQuery);
