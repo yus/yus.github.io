@@ -21,18 +21,33 @@ jQuery.noConflict();
       if ( !result.error ){
         var $books = $( result ).find( 'item' );
         $.each($books, function( i,j ){
-          var $book = $(this);
-          var $q, $l, $swatches;
-          $q ? $q = $($book).find('kuler\\:themeID') : $q = $($book).find('themeID');
-          $l ? $l = $($book).find('kuler\\:themeTitle') : $l = $($book).find('themeTitle');
-          $swatches ? $swatches = $($book).find('kuler\\:swatch') : $swatches = $('swatch');
-          $.each($swatches, function( k,l ){
-            var $swtch = $(this);
-            var $a;
-            $a ? $a = $($swtch).find('kuler\\:swatchHexColor') : $a = $($swtch).find('swatchHexColor');
-            console.log( ' SWATCH 🕛 ››› ' + $($a).html() );
+          //var $book = $(this);
+          var $tID, $tTtl, $swatches;
+          if (!$tID) {
+            $tID = $(this).find('kuler\\:themeID');
+          } else {
+            $tID = $(this).find('themeID');
+          }
+          if (!$tTtl) {
+            $tTtl = $(this).find('kuler\\:themeTitle');
+          } else {
+            $tTtl = $(this).find('themeTitle');
+          }
+          if (!$swatches) {
+            $swatches = $(this).find('kuler\\:swatch');
+          } else {
+            $swatches = $(this).find('swatch');
+          }
+          $.each($swatches, function( l,val ){
+            var $swtch;
+            if (!$swtch) {
+              $swtch = $(val).find('kuler\\:swatchHexColor');
+            } else {
+              $swtch = $(val).find('swatchHexColor');
+            }
+            console.log( ' SWATCH 🕛 ››› ' + $($swtch).html() );
           });
-          console.log( $($q).html() + ' ››› ' + $($l).html() );
+          console.log( $($tID).html() + ' ››› ' + $($tTtl).html() );
         });
       }
     });
