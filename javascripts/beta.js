@@ -19,7 +19,7 @@ jQuery.noConflict();
       dataType: "jsonp",
       dataFilter: function(data, type){
         if(type == "xml") console.log("returned xml!");
-        var newdata = data.replace(/<kuler:/g, '<');
+        var newdata = data.replace(/kuler:/g, '');
         //newdata = newdata.replace(/>/g, '>');
         return newdata;
       },
