@@ -15,21 +15,14 @@ jQuery.noConflict();
     
     $.ajax({
       type: 'GET',  
-      data: null,
-      url: qu,  
-      dataType: 'jsonp',
-      dataFilter: function(data, type){
-        if(type == 'xml') console.log('returned xml!');
-        var newdata = $.parseJSON(data); // .replace(/</g, '{')
-        // newdata = $.parseJSON(newdata); // .replace(/>/g, '}')
-        return newdata;
-      },
-      jsonp: 'callback',
-      jsonpCallback: 'jsonpcallback'
+      url: qu,
+      beforeSend: function( xhr ) {
+        xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+      }
+    }).done(function( data ) {
+      if ( !data.error ) {
+        console.log( "Sample of data:", data.slice( 0, 100 ) );
+      }
     });  
-    function jsonpcallback(returndata) {
-      console.log( 'data returned: ' + returndata );
-    };
-
   });
 }) (jQuery);
