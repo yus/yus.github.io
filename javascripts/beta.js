@@ -12,8 +12,7 @@ jQuery.noConflict();
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
-    var rs;
-    
+
     function jeesonify(result){
       var xml = result;
       var rgx = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
@@ -46,17 +45,16 @@ jQuery.noConflict();
       type: 'GET',  
       url: qu,
       beforeSend: function( xhr ){
-        xhr.overrideMimeType( 'text/plain' );
+        xhr.overrideMimeType( 'text/plain, charset=x-user-defined' );
       }
     }).done(function( data ){
       if ( !data.error ){
-        rs = data;
-        return rs;
+        var jsn = jeesonify( data );
+        console.log( typeof jsn );
+        //$('.gesso').html( jsn );
       }
     });
     
-    var jsn = jeesonify( rs );
-    console.log( typeof jsn );
-    //$('.gesso').html( jsn );
+    
   });
 }) (jQuery);
