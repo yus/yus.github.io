@@ -16,7 +16,7 @@ jQuery.noConflict();
     $.ajax({
       type: 'GET',  
       url: qu,
-      dataType: 'json'
+      dataType: 'xml'
     }).done(function( result ){
       if ( !result.error ){
         var $books = $( result ).find( 'item' );
