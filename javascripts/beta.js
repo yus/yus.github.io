@@ -21,7 +21,9 @@ jQuery.noConflict();
       }
     }).done(function( data ) {
       if ( !data.error ) {
-        console.log( 'Sample of data:\n', data.slice( 0, 555 ) );
+        console.log( 'Sample of data:\n', data.slice( 0, 55 ) );
+        //var xmlDoc = data;
+        console.log( $.isXMLDoc(data) );
       }
     });  
   });
