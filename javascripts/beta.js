@@ -12,9 +12,9 @@ jQuery.noConflict();
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
+    var rs;
     
-    function jeesonify(xmldata){
-      var xml = xmldata;
+    function jeesonify(xml){
       var rgx = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
       while (xml.match(rgx)) xml = xml.replace(rgx, '<$2>$3</$2>$1>');  
       xml = xml.replace(/\s/g, ' ')
@@ -44,15 +44,18 @@ jQuery.noConflict();
     $.ajax({
       type: 'GET',  
       url: qu,
-      beforeSend: function( xhr ) {
-        xhr.overrideMimeType( 'text/plain; charset=x-user-defined' );
+      beforeSend: function( xhr ){
+        xhr.overrideMimeType( 'text/plain' );
       }
-    }).done(function( data ) {
-      if ( !data.error ) {
-        var jsn = jeesonify( data );
-        console.log( typeof jsn );
-        //$('.gesso').html( jsn );
+    }).done(function( data ){
+      if ( !data.error ){
+        rs = data;
+        return rs;
       }
     });
+    
+    var jsn = jeesonify( rs );
+    console.log( typeof jsn );
+    //$('.gesso').html( jsn );
   });
 }) (jQuery);
