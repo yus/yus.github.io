@@ -22,8 +22,11 @@ jQuery.noConflict();
     }).done(function( data ) {
       if ( !data.error ) {
         console.log( 'Sample of data:\n', data.slice( 0, 55 ) );
-        //var xmlDoc = data;
         console.log( $.isXMLDoc(data) + ' › ' + typeof data );
+        var xmlDoc = $.parseXML( data ),
+        $xml = $( xmlDoc ),
+        $title = $xml.find( 'title' );
+        console.log( $title );
       }
     });  
   });
