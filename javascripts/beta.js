@@ -27,12 +27,16 @@ jQuery.noConflict();
           var $g = $(q).find('kuler\\:swatchChannel2' || 'swatchChannel2');
           var $b = $(q).find('kuler\\:swatchChannel3' || 'swatchChannel3');
           var $a = $(q).find('kuler\\:swatchChannel4' || 'swatchChannel4');
-          
+          var $ri = $r[Symbol.iterator]();
+          var $gi = $g[Symbol.iterator]();
+          var $bi = $b[Symbol.iterator]();
+          var $ai = $a[Symbol.iterator]();
+
           console.log( typeof $q + ' ››› ' + typeof $l );
-          console.log( ' R ››› ' + JSON.parse( $($r) ) );
-          console.log( ' G ››› ' + JSON.parse( $($g) ) );
-          console.log( ' B ››› ' + JSON.parse( $($b) ) );
-          console.log( ' A ››› ' + JSON.parse( $($a) ) );
+          console.log( ' R ››› ' + $ri.next().value );
+          console.log( ' G ››› ' + $gi.next().value );
+          console.log( ' B ››› ' + $bi.next().value );
+          console.log( ' A ››› ' + $ai.next().value );
           //$('.gesso').html( jsn );
         });  
       }
