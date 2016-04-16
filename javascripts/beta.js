@@ -43,7 +43,8 @@ jQuery.noConflict();
     
     $.ajax({
       type: 'GET',  
-      url: qu
+      url: qu,
+      dataType: 'text'
     }).done(function( responseText ){
       if ( !responseText.error ){
         var jsn = jeesonify( responseText );
