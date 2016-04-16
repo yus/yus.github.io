@@ -23,20 +23,18 @@ jQuery.noConflict();
         $.each($book, function( j,q ){
           var $q = $(q).find('kuler\\:themeID' || 'themeID').text();
           var $l = $(q).find('kuler\\:themeTitle' || 'themeTitle').text();
-          var $r = $(q).find('kuler\\:swatchChannel1' || 'swatchChannel1');
-          var $g = $(q).find('kuler\\:swatchChannel2' || 'swatchChannel2');
-          var $b = $(q).find('kuler\\:swatchChannel3' || 'swatchChannel3');
-          var $a = $(q).find('kuler\\:swatchChannel4' || 'swatchChannel4');
-          var $ri = $r[Symbol.iterator]();
-          var $gi = $g[Symbol.iterator]();
-          var $bi = $b[Symbol.iterator]();
-          var $ai = $a[Symbol.iterator]();
-
-          console.log( typeof $q + ' ››› ' + typeof $l );
-          console.log( ' R ››› ' + $($ri.next().value).html() );
-          console.log( ' G ››› ' + $($gi.next().value).html() );
-          console.log( ' B ››› ' + $($bi.next().value).html() );
-          console.log( ' A ››› ' + $($ai.next().value).html() );
+          var $swatches = $(q).find('kuler\\:swatch' || 'swatch');
+          $.each($swatches, function( g,h ){
+            var $r = $(h).find('kuler\\:swatchChannel1' || 'swatchChannel1')[0];
+            var $g = $(h).find('kuler\\:swatchChannel2' || 'swatchChannel2')[0];
+            var $b = $(h).find('kuler\\:swatchChannel3' || 'swatchChannel3')[0];
+            var $a = $(h).find('kuler\\:swatchChannel4' || 'swatchChannel4')[0];
+            console.log( ' R ››› ' + $($r).html() );
+            console.log( ' G ››› ' + $($g).html() );
+            console.log( ' B ››› ' + $($b).html() );
+            console.log( ' A ››› ' + $($a).html() );
+          });
+          console.log( $q + ' ››› ' + $l );
           //$('.gesso').html( jsn );
         });  
       }
