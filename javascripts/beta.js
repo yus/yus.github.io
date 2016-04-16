@@ -14,7 +14,8 @@ jQuery.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     var rs;
     
-    function jeesonify(xml){
+    function jeesonify(result){
+      var xml = result;
       var rgx = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
       while (xml.match(rgx)) xml = xml.replace(rgx, '<$2>$3</$2>$1>');  
       xml = xml.replace(/\s/g, ' ')
