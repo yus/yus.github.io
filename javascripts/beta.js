@@ -2,85 +2,6 @@
  *  Name: Yusdesign Kuler Feed
  *  License: CC-NC-ND 3.0 Unported
  */
-
-var jsonify = function (m, p) {
-  var f = 1,
-  o = 2,
-  d = 3,
-  n = 4,
-  j = 7,
-  c = 8,
-  h = 9,
-  l,
-  b,
-  a,
-  k = {},
-  g = [];
-  if (!p) {
-    p = {}
-  }
-  if (typeof p == 'string') {
-    p = {
-      find: p
-    }
-  }
-  p.xmlns = p.xmlns || '*';
-  if (p.parse != 'function') {
-    p.parse = e
-  }
-  function e(i) {
-    return i.split(':').pop().replace(/^ows_/, '').replace(/[^a-z,A-Z,0-9]/g, '')
-  }
-  switch (m.nodeType) {
-    case h:
-      a = (!p.find) ? m.childNodes : (m.getElementsByTagNameNS) ? m.getElementsByTagNameNS(p.xmlns, p.find.split(':').pop())  : m.getElementsByTagName(p.find);
-      for (l = 0; l < a.length; l++) {
-        k = xml2js(a[l]);
-        if (k) {
-          g.push(k)
-        }
-      }
-      k = (g.length && g.length == 1) ? g[0] : g;
-      break;
-    case f:
-      if (m.attributes.length == 0 && m.childNodes.length == 1 && m.childNodes.item(0).nodeValue) {
-        k = m.childNodes.item(0).nodeValue
-      }
-      for (l = 0; l < m.attributes.length; l++) {
-        b = p.parse(m.attributes.item(l).nodeName);
-        k[b] = m.attributes.item(l).nodeValue
-      }
-      for (l = 0; l < m.childNodes.length; l++) {
-        if (m.childNodes.item(l).nodeType != d) {
-          b = p.parse(m.childNodes.item(l).nodeName);
-          if (typeof k[b] == 'undefined') {
-            k[b] = jsonify(m.childNodes.item(l))
-          } else {
-            if (typeof k[b].push == 'undefined') {
-              k[b] = [
-                k[b]
-              ]
-            }
-            k[b].push(jsonify(m.childNodes.item(l)))
-          }
-        }
-      }
-      break;
-    case n:
-      k = '<![CDATA[' + m.nodeValue + ']]>';
-      break;
-    case d:
-      k = m.nodeValue;
-      break;
-    case c:
-      k = '';
-      break;
-    default:
-      k = null
-  }
-  return k
-};
-
 var utistor;
 jQuery.noConflict();
 (function ($) {
@@ -92,6 +13,34 @@ jQuery.noConflict();
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk;
     
+    function jeesonify(xmldata){
+      var xml = xmldata;
+      var rgx = /(<\w+[^<]*?)\s+([\w-]+)="([^"]+)">/;
+      while (xml.match(rgx)) xml = xml.replace(rgx, '<$2>$3</$2>$1>');  
+      xml = xml.replace(/\s/g, ' ')
+        .replace(/< *\?[^>]*?\? *>/g, '')
+        .replace(/< *!--[^>]*?-- *>/g, '')
+        .replace(/< *(\/?) *(\w[\w-]+\b):(\w[\w-]+\b)/g, '<$1$2_$3')
+        .replace(/< *(\w[\w-]+\b)([^>]*?)\/ *>/g, '< $1$2>')
+        .replace(/(\w[\w-]+\b):(\w[\w-]+\b) *= *"([^>]*?)"/g, '$1_$2="$3"')
+        .replace(/< *(\w[\w-]+\b)((?: *\w[\w-]+ *= *" *[^"]*?")+ *)>( *[^< ]*?\b.*?)< *\/ *\1 *>/g, '< $1$2 value="$3">')
+        .replace(/< *(\w[\w-]+\b) *</g, '<$1>< ').replace(/> *>/g, '>')
+        .replace(/"/g, '\\"')
+        .replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":"$2",')
+        .replace(/< *(\w[\w-]+\b) *>([^<>]*?)< *\/ *\1 *>/g, '"$1":[{$2}],')
+        .replace(/< *(\w[\w-]+\b) *>(?=("\w[\w-]+\b)":\{.*?\},\2)(.*?)< *\/ *\1 *>/, '"$1":{}$3},')
+        .replace(/],\s*?".*?": *\[/g, ',')
+        .replace(/< \/(\w[\w-]+\b)\},\{\1>/g, '},{')
+        .replace(/< *(\w[\w-]+\b)[^>]*?>/g, '"$1":{')
+        .replace(/< *\/ *\w[\w-]+ *>/g, '},')
+        .replace(/\} *,(?= *(\}|\]))/g, '}')
+        .replace(/] *,(?= *(\}|\]))/g, ']')
+        .replace(/" *,(?= *(\}|\]))/g, '"')
+        .replace(/ *, *$/g, '');
+      var json = '{' + xml + '}';
+      return json;
+    }
+    
     $.ajax({
       type: 'GET',  
       url: qu,
@@ -101,8 +50,7 @@ jQuery.noConflict();
     }).done(function( data ) {
       if ( !data.error ) {
         // xhr.responseXML
-        var nodeName = 'themeTitle'
-        var jsn = jsonify( data , nodeName );
+        var jsn = jeesonify( data );
         console.log(JSON.stringify( jsn, null, '\t'));
       }
     });
