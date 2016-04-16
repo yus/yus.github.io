@@ -26,11 +26,9 @@ jQuery.noConflict();
         var xmlDoc = $.parseXML( data ),
         $xml = $( xmlDoc ),
         $items = $xml.find( 'item' ).get();
-        $items.each(function(i, unit){
-          $unit = $(unit[i]);
-          $themeTitle = $( $unit ).find('themeTitle').text();
-          console.log( $themeTitle );
-        });
+
+        console.log( typeof $items );
+
       }
     });  
   });
