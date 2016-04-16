@@ -23,7 +23,7 @@ jQuery.noConflict();
       if ( !data.error ) {
         console.log( 'Sample of data:\n', data.slice( 0, 55 ) );
         //var xmlDoc = data;
-        console.log( $.isXMLDoc(data) );
+        console.log( $.isXMLDoc(data) + ' › ' + typeof data );
       }
     });  
   });
