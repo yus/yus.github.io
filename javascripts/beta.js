@@ -25,8 +25,11 @@ jQuery.noConflict();
         console.log( $.isXMLDoc(data) + ' › ' + typeof data );
         var xmlDoc = $.parseXML( data ),
         $xml = $( xmlDoc ),
-        $title = $xml.find( 'title' );
-        console.log( $title.text() );
+        $items = $xml.find( 'item' );
+        $items.each(function(i, j){
+          $title = $(j).find('themeTitle').get();
+          console.log( $title.text() );
+        });
       }
     });  
   });
