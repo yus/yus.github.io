@@ -26,7 +26,7 @@ jQuery.noConflict();
         var xmlDoc = $.parseXML( data ),
         $xml = $( xmlDoc ),
         $title = $xml.find( 'title' );
-        console.log( $title );
+        console.log( $title.text() );
       }
     });  
   });
