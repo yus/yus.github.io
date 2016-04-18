@@ -38,7 +38,7 @@ jQuery.noConflict();
           console.log( typeof $ns_tID );
           !$tID ? $tID = $($book).find('themeID') : $tID = $($book).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $($book).find('themeTitle') : $tTtl = $($book).find('kuler\\:themeTitle');
-          console.log(  ' ››› the kid take the gift ››› '  $($ns_tID).children().html() );
+          console.log(  ' ››› child ›››  ' + $($ns_tID).children().html() );
           console.log($($tID).html() + ' ››› ' + $($tTtl).html());
           
         });
