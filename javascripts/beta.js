@@ -60,6 +60,7 @@ function draw() {
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
+    bugs[i].veloz = 8;
     bugs[i].move();
     bugs[i].display();
   }
@@ -83,13 +84,21 @@ function cntnrSize() {
   cW = cntnr.width;
   return cH, cW;
 }
-
+function mouseWheel(event) {
+  print(event.delta);
+  bv = bugs[i].veloz;
+  print(bv);
+  bv += event.delta;
+  print(bv);
+  redraw();
+  //return false;
+}
 // Jitter class
 function Jitter() {
   this.x = random(width);
   this.y = random(height);
   this.dia = random(10, 30);
-  this.veloz = 1;
+  this.veloz = 2;
 
   this.move = function() {
     this.x += random(-this.veloz, this.veloz);
