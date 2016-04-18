@@ -13,7 +13,6 @@ m="//color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addClass("t
 "#"+c).addClass("scalar"))});c.append(e);a("div#kulerfeed").append(c)}))})})})(jQuery);
 
 // Processing
-var $j = jQuery.noConflict();
 function preload() {
   gesso = select('#gesso');
   createDiv('').id('cntnr').parent(gesso);
@@ -21,6 +20,9 @@ function preload() {
   cntnr.class('cntnr').class('gesso');
   cntnrSize();
 }
+
+var xoff = 0.0;
+
 function setup() {
   cnv = createCanvas(cW, cH);
   cnv.style('visibility', 'visible').class('cnv').id('cnv').parent(cntnr);
@@ -33,6 +35,8 @@ function setup() {
     }
   }
   spacer = 4;
+  noiseSeed(99);
+  stroke(0, 10);
   noLoop();
 }
 function draw() {
@@ -54,6 +58,9 @@ function draw() {
     for (var y = 0; y < cnv.height; y += spacer) {
       stroke(distances[x][y]);
       image(img, x + spacer / 2, y + spacer / 2);
+      xoff = xoff + .01;
+      var n = noise(xoff) * cnv.width;
+      line(n, 0, n, cnv.height);
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
@@ -70,10 +77,11 @@ function utistor() {
   g = randomGaussian(255);
   b = randomGaussian(255);
   a = randomGaussian(1);
-  var tng = $j.makeArray($j('div[id^="quartz"]').next('.scalar').css('background-color'));
+  //var tng = $j.makeArray($j('div[id^="quartz"]').next('.scalar').css('background-color').toString());
+  var tng = new Array(document.getElementsByClassName('scalar'));
   var tea = floor(random(tng.length));
-  var tango = [ color(tng[tea]), color(r, g, b, a) ];
-  var tinge = floor(random(tango.length));
+  var tinge = tng[tea].style('background-color').toString();
+  var rgba = color(r, g, b, a);
   return color(tinge);
 }
 function cntnrSize() {
