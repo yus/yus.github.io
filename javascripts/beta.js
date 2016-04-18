@@ -86,7 +86,7 @@ function cntnrSize() {
 }
 function mouseWheel(event) {
   print(event.delta);
-  bv = bugs[i].veloz;
+  bv = bugs.veloz;
   print(bv);
   bv += event.delta;
   print(bv);
