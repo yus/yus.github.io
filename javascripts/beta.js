@@ -80,7 +80,7 @@ function utistor() {
   //var tng = $j.makeArray($j('div[id^="quartz"]').next('.scalar').css('background-color').toString());
   var tng = new Array(document.getElementsByClassName('scalar'));
   var tea = floor(random(tng.length));
-  var tinge = tng[tea].style('background-color').toString();
+  var tinge = select(tng[tea]).style('background-color');
   var rgba = color(r, g, b, a);
   return color(tinge);
 }
