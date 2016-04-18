@@ -27,18 +27,18 @@ jQuery.noConflict();
           $tID,
           $tTtl,
           $swatches;
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].toString();
-          !$tID ? $tID = $(jee).find('themeID') : $tID = $(jee).find('kuler\\:themeID');
-          !$tTtl ? $tTtl = $(jee).find('themeTitle') : $tTtl = $(jee).find('kuler\\:themeTitle');
-          console.log($ns_tID);
-          console.log($($tID).html() + ' ››› ' + $($tTtl).html());
-          
-          !$swatches ? $swatches = $(jee).find('swatch') : $swatches = $(jee).find('kuler\\:swatch');
+          !$swatches ? $swatches = $($book).find('swatch') : $swatches = $($book).find('kuler\\:swatch');
           $.each($swatches, function (l, val) {
             var $swtch;
             !$swtch ? $swtch = $(val).find('swatchHexColor') : $swtch = $(val).find('kuler\\:swatchHexColor');
             console.log(' SWATCH 🕛 ››› ' + $($swtch).html());
           });
+          
+          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].toString();
+          !$tID ? $tID = $($book).find('themeID') : $tID = $($book).find('kuler\\:themeID');
+          !$tTtl ? $tTtl = $($book).find('themeTitle') : $tTtl = $($book).find('kuler\\:themeTitle');
+          console.log($ns_tID);
+          console.log($($tID).html() + ' ››› ' + $($tTtl).html());
           
         });
       }
