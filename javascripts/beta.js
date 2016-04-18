@@ -2,7 +2,7 @@
  *  Name: Yusdesign Kuler Feed Javascript Processing
  *  License: CC-NC-ND 3.0 Unported
  */
-var utistor, cnv, img, cntnr, gesso;
+var utistor, cnv, img, cntnr, gesso, lDot, sDot;
 var cW, cH, rc, bg, d, sclr, tinge;
 var distances = [], maxDistance, spacer;
 
@@ -14,6 +14,7 @@ m="//color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addClass("t
 
 // Processing
 function preload() {
+  tinge = loadImage('../images/yus143.png');
   gesso = select('#gesso');
   createDiv('').id('cntnr').parent(gesso);
   cntnr = select('#cntnr');
@@ -31,7 +32,12 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
-  spacer = 4;
+  spacer = 9;
+  sDot = 5;
+  lDot = 55;
+  imageMode(CENTER);
+  noStroke();
+  tinge.loadPixels)();
   noLoop();
 }
 function draw() {
@@ -51,11 +57,17 @@ function draw() {
   img.updatePixels();
   for (var x = 0; x < cnv.width; x += spacer) {
     for (var y = 0; y < cnv.height; y += spacer) {
-      stroke(distances[x][y]);
+      //stroke(distances[x][y]);
       image(img, x + spacer / 2, y + spacer / 2);
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
+  var scout = map(mouseX, 0, cnv.width, sDot, lDot);
+  var x = floor(random(tinge.width));
+  var y = floor(random(tinge.height));
+  var tn = tinge.get(x, y);
+  fill(tn, 31);
+  ellipse(x, y, scout, scout);
 }
 function mousePressed() {
   redraw();
@@ -68,7 +80,7 @@ function utistor() {
   r = randomGaussian(255);
   g = randomGaussian(255);
   b = randomGaussian(255);
-  a = randomGaussian(1);
+  a = 1; // randomGaussian(0);
   return color(r, g, b, a);
 }
 function cntnrSize() {
@@ -76,3 +88,4 @@ function cntnrSize() {
   cW = cntnr.width;
   return cH, cW;
 }
+
