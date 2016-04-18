@@ -76,8 +76,8 @@ function utistor() {
   return color(r, g, b, a);
 }
 function cntnrSize() {
-  cH = cntnr.height - 10;
-  cW = cntnr.width - 10;
+  cH = cntnr.height;
+  cW = cntnr.width;
   return cH,
   cW;
 }
