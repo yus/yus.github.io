@@ -37,16 +37,16 @@ function setup() {
   spacer = 4;
   noiseSeed(99);
   stroke(0, 10);
-  noLoop();
+  //noLoop();
 }
 function draw() {
   rc = color(utistor());
   bg = color(utistor());
-  img = createImage(29, 29);
+  img = createImage(8, 8);
   img.loadPixels();
   d = pixelDensity();
   sclr = 4 * (d ^ 2) * img.width * img.height;
-  print(sclr);
+  //print(sclr);
   for (var i = 0; i < sclr; i += 4) {
     img.pixels[i] = red(rc);
     img.pixels[i + 1] = green(rc);
