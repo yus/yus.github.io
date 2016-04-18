@@ -23,20 +23,20 @@ jQuery.noConflict();
         $.each($books, function (i, jee) {
           var $book = $(this);
           var book = $book[0];
-          var $ns_tID,
-          $tID,
-          $tTtl,
-          $swatches;
-          $swatches = book.getElementsByTagNameNS(ns, 'swatch');
-          $.each($swatches, function (l, val) {
+          var $ns_themeID,
+          $ns_themeTitle,
+          $ns_swatches;
+          $ns_swatches = book.getElementsByTagNameNS(ns, 'swatch');
+          $.each($ns_swatches, function (l, val) {
             var $swatch = $(this);
             var swatch = $swatch[0];
-            var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor'); 
+            var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString(); 
             console.log( ' SWATCH 🕛 ››› ' + $swtch ); 
           });
 
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
-          console.log( typeof $ns_tID + ' ››› html ›››  ' + $ns_tID );
+          $ns_themeID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
+          $ns_themeTitle = book.getElementsByTagNameNS(ns, 'themeTitle')[0].valueOf().innerHTML.toString();
+          console.log( $ns_themeID +' ››› '+$ns_themeTitle );
  
         });
       }
