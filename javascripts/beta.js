@@ -27,23 +27,17 @@ jQuery.noConflict();
           $tID,
           $tTtl,
           $swatches;
-          !$swatches ? $swatches = $($book).find('swatch') : $swatches = $($book).find('kuler\\:swatch');
           $swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($swatches, function (l, val) {
             var $swatch = $(val);
             swatch = $swatch[0];
-            //!$swtch ? $swtch = $(swatch).find('swatchHexColor') : $swtch = $(swatch).find('kuler\\:swatchHexColor');
-            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf(); // .innerHTML.toString()
+            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf(); 
             console.log( ' SWATCH 🕛 ››› ' + $swtch.html() ); 
           });
-          
+
           $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
           console.log( typeof $ns_tID + ' ››› html ›››  ' + $ns_tID );
-          
-          !$tID ? $tID = $($book).find('themeID') : $tID = $($book).find('kuler\\:themeID');
-          !$tTtl ? $tTtl = $($book).find('themeTitle') : $tTtl = $($book).find('kuler\\:themeTitle');
-          console.log($($tID).html() + ' ››› ' + $($tTtl).html());
-          
+ 
         });
       }
     });
