@@ -29,7 +29,7 @@ jQuery.noConflict();
           $swatches;
           $swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($swatches, function (l, val) {
-            var $swatch = $(val);
+            var $swatch = $(this);
             swatch = $swatch[0];
             !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor'); 
             console.log( ' SWATCH 🕛 ››› ' + $swtch.html() ); 
