@@ -20,9 +20,6 @@ function preload() {
   cntnr.class('cntnr').class('gesso');
   cntnrSize();
 }
-
-var xoff = 0.0;
-
 function setup() {
   cnv = createCanvas(cW, cH);
   cnv.style('visibility', 'visible').class('cnv').id('cnv').parent(cntnr);
@@ -35,9 +32,7 @@ function setup() {
     }
   }
   spacer = 4;
-  noiseSeed(99);
-  stroke(0, 10);
-  //noLoop();
+  noLoop();
 }
 function draw() {
   rc = color(utistor());
@@ -58,9 +53,6 @@ function draw() {
     for (var y = 0; y < cnv.height; y += spacer) {
       stroke(distances[x][y]);
       image(img, x + spacer / 2, y + spacer / 2);
-      xoff = xoff + .01;
-      var n = noise(xoff) * cnv.width;
-      line(n, 0, n, cnv.height);
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
