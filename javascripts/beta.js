@@ -31,7 +31,7 @@ jQuery.noConflict();
           $.each($swatches, function (l, val) {
             var $swatch = $(val);
             swatch = $swatch[0];
-            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf(); 
+            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor'); 
             console.log( ' SWATCH 🕛 ››› ' + $swtch.html() ); 
           });
 
