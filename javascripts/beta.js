@@ -49,7 +49,7 @@ function draw() {
     img.pixels[i + 2] = blue(rc);
     img.pixels[i + 3] = alpha(rc);
   }
-  tinge = $.each( $('div[id^="quartz"]').next('.scalar') ).css('background-color');
+  tinge = $j.each( $('div[id^="quartz"]').next('.scalar') ).css('background-color');
   for (w = 0; w < img.width; w++) {
     for (h = 0; h < img.height; h++) {
       for (t = 0; t <= tinge; t++) {
