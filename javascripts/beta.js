@@ -37,7 +37,7 @@ function setup() {
   lDot = 55;
   imageMode(CENTER);
   noStroke();
-  tinge.loadPixels)();
+  tinge.loadPixels();
   noLoop();
 }
 function draw() {
