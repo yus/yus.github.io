@@ -3,7 +3,7 @@
  *  License: CC-NC-ND 3.0 Unported
  */
 var utistor, cnv, img, cntnr, gesso;
-var cW, cH, rc, bg, d, scalar;
+var cW, cH, rc, bg, d, sclr;
 var distances = [], maxDistance, spacer;
 
 //* Yusdesign jQuery Kuler Feed *// 
@@ -30,35 +30,38 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
-  spacer = 41;
+  spacer = 4;
   noLoop();
 }
 function draw() {
   rc = color(utistor());
   bg = color(utistor());
-  img = createImage(29, 29);
+  img = createImage(8, 8);
   img.loadPixels();
   d = pixelDensity();
-  scalar = 4 * (d ^ 2) * img.width * img.height;
-  print(scalar);
-  for (var i = 0; i < scalar; i += 4) {
+  sclr = 4 * (d ^ 2) * img.width * img.height;
+  print(sclr);
+  for (var i = 0; i < sclr; i += 4) {
     img.pixels[i] = red(rc);
     img.pixels[i + 1] = green(rc);
     img.pixels[i + 2] = blue(rc);
     img.pixels[i + 3] = alpha(rc);
-  }  /**
-  for (i = 0; i < img.width; i++) {
-    for (j = 0; j < img.height; j++) {
-      img.set(i, j, rc);
+  }
+  
+  for (q = 0; q < img.width; q++) {
+    var quartz = select('#quartz'+q);
+    for (r = 0; r < img.height; r++) {
+      var tinge = quartz.getElementsByClassName('scalar');
+      var tng = color(tinge.style('background-color'));
+      img.set(q, r, tng);
     }
   }
-  */
   img.updatePixels();
   for (var x = 0; x < cnv.width; x += spacer) {
     for (var y = 0; y < cnv.height; y += spacer) {
       stroke(distances[x][y]);
       image(img, x + spacer / 2, y + spacer / 2);
-      //point( x + spacer/2, y + spacer/2 );
+      point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
 }
