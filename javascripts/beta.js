@@ -4,7 +4,7 @@
  */
 var utistor, cnv, img, cntnr, gesso;
 var cW, cH, rc, bg, d, scalar;
-var distances = [], var maxDistance, spacer;
+var distances = [], maxDistance, spacer;
 
 //* Yusdesign jQuery Kuler Feed *// 
 jQuery.noConflict();(function(a){a(function(){a("body").addClass("ysdsgn");a.ajax({type:"GET",url:"https://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996",dataType:"xml"}).done(function(b){b.error||(b=a(b).find("item"),a.each(b,function(b,h){var e=a(this)[0],c,g,f,d;c=e.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","themeID")[0].valueOf().innerHTML.toString();g=e.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","themeTitle")[0].valueOf().innerHTML.toString();
@@ -52,7 +52,6 @@ function draw() {
     }
   }
   */
-
   img.updatePixels();
   for (var x = 0; x < cnv.width; x += spacer) {
     for (var y = 0; y < cnv.height; y += spacer) {
@@ -61,7 +60,6 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
-
 }
 function mousePressed() {
   redraw();
