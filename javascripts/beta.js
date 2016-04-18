@@ -38,7 +38,7 @@ function setup() {
   imageMode(CENTER);
   noStroke();
   tinge.loadPixels();
-  //noLoop();
+  noLoop();
 }
 function draw() {
   rc = color(utistor());
