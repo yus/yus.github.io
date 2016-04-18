@@ -25,19 +25,40 @@ jQuery.noConflict();
           var book = $book[0];
           var $ns_themeID,
           $ns_themeTitle,
-          $ns_swatches;
+          $ns_swatches,
+          quler,
+          themeLink,
+          qlrtitle,
+          qlr;
+          $ns_themeID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
+          $ns_themeTitle = book.getElementsByTagNameNS(ns, 'themeTitle')[0].valueOf().innerHTML.toString();
+          console.log( $ns_themeID +' ››› '+$ns_themeTitle );
+          
+          themeLink = themeLink = '//color.adobe.com/themeID/' + $ns_themeID;
+          themeImageLink = '//color.adobe.com/kuler/themeImages/theme_' + $ns_themeID + '.png';
+          quler = $('<div id="quartz' + i + '"></div>').addClass('tinge');
+          qlrtitle = $('<div id="title' + i + '"></div>').addClass('fentry');
+          qlr = $('<a>').attr( 'href', themeLink ).addClass('flink');
+          qlr.append( $('<span>').text( $ns_themeTitle ).addClass('thitle') );
+          qlrtitle.append(qlr);
+          
           $ns_swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($ns_swatches, function (l, val) {
             var $swatch = $(this);
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString(); 
-            console.log( ' SWATCH 🕛 ››› ' + $swtch ); 
+            console.log( ' SWATCH 🕛 ››› ' + $swtch );
+            
+            quler.append($('<div>').css({
+              'background-color': '#' + $swtch,
+              'width': '25px',
+              'height': '25px',
+              'display': 'flex',
+              'flex-grow': '1'
+            }).addClass('scalar'));
           });
-
-          $ns_themeID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
-          $ns_themeTitle = book.getElementsByTagNameNS(ns, 'themeTitle')[0].valueOf().innerHTML.toString();
-          console.log( $ns_themeID +' ››› '+$ns_themeTitle );
- 
+          qlrtitle.append(quler);
+          $('div#kulerfeed').append( qlrtitle );
         });
       }
     });
