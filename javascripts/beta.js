@@ -2,9 +2,9 @@
  *  Name: Yusdesign Kuler Feed Javascript Processing
  *  License: CC-NC-ND 3.0 Unported
  */
-var utistor, cnv, img, cntnr, gesso, lDot, sDot;
+var utistor, cnv, img, cntnr, gesso;
 var cW, cH, rc, bg, d, sclr, tinge;
-var distances = [], maxDistance, spacer;
+var bugs = [], distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
@@ -14,7 +14,6 @@ m="http://color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addCla
 
 // Processing
 function preload() {
-  tinge = loadImage('../images/yus143.png');
   gesso = select('#gesso');
   createDiv('').id('cntnr').parent(gesso);
   cntnr = select('#cntnr');
@@ -32,12 +31,10 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
+  for (var i=0; i<50; i++) {
+    bugs.push(new Jitter());
+  }
   spacer = 9;
-  sDot = 5;
-  lDot = 55;
-  imageMode(CENTER);
-  noStroke();
-  tinge.loadPixels();
   noLoop();
 }
 function draw() {
@@ -62,12 +59,10 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
-  var scout = map(mouseX, 0, width, sDot, lDot);
-  var x = floor(random(tinge.width));
-  var y = floor(random(tinge.height));
-  var tn = tinge.get(x, y);
-  fill(tn, 31);
-  ellipse(x, y, scout, scout);
+  for (var i=0; i<bugs.length; i++) {
+    bugs[i].move();
+    bugs[i].display();
+  }
 }
 function mousePressed() {
   redraw();
@@ -89,3 +84,19 @@ function cntnrSize() {
   return cH, cW;
 }
 
+// Jitter class
+function Jitter() {
+  this.x = random(width);
+  this.y = random(height);
+  this.dia = random(10, 30);
+  this.veloz = 1;
+
+  this.move = function() {
+    this.x += random(-this.veloz, this.veloz);
+    this.y += random(-this.veloz, this.veloz);
+  };
+
+  this.display = function() {
+    ellipse(this.x, this.y, this.dia, this.dia);
+  };
+}
