@@ -28,17 +28,20 @@ jQuery.noConflict();
           $tTtl,
           $swatches;
           !$swatches ? $swatches = $($book).find('swatch') : $swatches = $($book).find('kuler\\:swatch');
+          $swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($swatches, function (l, val) {
-            var $swtch;
-            !$swtch ? $swtch = $(val).find('swatchHexColor') : $swtch = $(val).find('kuler\\:swatchHexColor');
-            console.log(' SWATCH 🕛 ››› ' + $($swtch).html());
+            var $swatch = $(val);
+            swatch = $swatch[0];
+            //!$swtch ? $swtch = $(swatch).find('swatchHexColor') : $swtch = $(swatch).find('kuler\\:swatchHexColor');
+            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf(); // .innerHTML.toString()
+            console.log( ' SWATCH 🕛 ››› ' + $swtch.html() ); 
           });
           
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf();
-          console.log( typeof $ns_tID );
+          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
+          console.log( typeof $ns_tID + ' ››› html ›››  ' + $ns_tID );
+          
           !$tID ? $tID = $($book).find('themeID') : $tID = $($book).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $($book).find('themeTitle') : $tTtl = $($book).find('kuler\\:themeTitle');
-          console.log(  ' ››› html ›››  ' + $ns_tID.innerHTML.toString() );
           console.log($($tID).html() + ' ››› ' + $($tTtl).html());
           
         });
