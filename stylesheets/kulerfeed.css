@@ -15,7 +15,6 @@
   flex-grow: 1;
   flex-basis: 29vw;
   align-content: space-evenly;
-  justify-content: space-around;
 }
 #kulerfeed{
   overflow-x: hidden;
@@ -33,10 +32,11 @@
 .fentry{
   background-color:rgb(85, 85, 85);
   display:flex;
-  margin:0px 0px 1px 1px;
-  padding:4px 4px 0px;
-  flex-grow: 1;
+  margin: 2px;
+  padding: 5px;
+  flex-grow: 0;
   flex-direction: column;
+  align-items: center;
 }
 .tinge{
   display:flex;
