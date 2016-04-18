@@ -21,13 +21,13 @@ jQuery.noConflict();
       if (!result.error) {
         var $books = $(result).find('item');
         $.each($books, function (i, jee) {
-          var $book = $(this)[0];
-          var book = $($book);
+          var $book = $(this);
+          var book = $book[0];
           var $ns_tID,
           $tID,
           $tTtl,
           $swatches;
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].value;
+          $ns_tID = this.getElementsByTagNameNS(ns, 'themeID')[0].value;
           !$tID ? $tID = $(jee).find('themeID') : $tID = $(jee).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $(jee).find('themeTitle') : $tTtl = $(jee).find('kuler\\:themeTitle');
           console.log($ns_tID);
