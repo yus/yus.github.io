@@ -70,9 +70,9 @@ function utistor() {
   g = randomGaussian(255);
   b = randomGaussian(255);
   a = randomGaussian(1);
-  var tng = $j.each( $j('div[id^="quartz"]').next('.scalar') ).css('background-color');
-  var tea = floor(random(tng.length));  // Convert to integer
-  var tango = [color(tng[tea]), color(r, g, b, a)];
+  var tng = $j.makeArray($j('div[id^="quartz"]').next('.scalar').css('background-color'));
+  var tea = floor(random(tng.length));
+  var tango = [ color(tng[tea]), color(r, g, b, a) ];
   var tinge = floor(random(tango.length));
   return color(tinge);
 }
