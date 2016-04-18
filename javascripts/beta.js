@@ -34,7 +34,7 @@ jQuery.noConflict();
             console.log(' SWATCH 🕛 ››› ' + $($swtch).html());
           });
           
-          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf();
+          $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().html();
           !$tID ? $tID = $($book).find('themeID') : $tID = $($book).find('kuler\\:themeID');
           !$tTtl ? $tTtl = $($book).find('themeTitle') : $tTtl = $($book).find('kuler\\:themeTitle');
           console.log($ns_tID);
