@@ -42,10 +42,10 @@
   display:flex;
 }
 .scalar{
-  width:25px,
-  height:25px,
-  display:flex,
-  flex-grow:0
+  width:25px;
+  height:25px;
+  display:flex;
+  flex-grow: 0;
 }
 .flink{
   color:silver;
