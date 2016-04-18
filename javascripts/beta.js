@@ -30,9 +30,9 @@ jQuery.noConflict();
           $swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($swatches, function (l, val) {
             var $swatch = $(this);
-            swatch = $swatch[0];
-            !$swtch ? $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor'); 
-            console.log( ' SWATCH 🕛 ››› ' + $swtch.html() ); 
+            var swatch = $swatch[0];
+            var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor'); 
+            console.log( ' SWATCH 🕛 ››› ' + $swtch ); 
           });
 
           $ns_tID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
