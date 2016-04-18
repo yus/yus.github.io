@@ -38,7 +38,7 @@ function setup() {
 function draw() {
   rc = color(utistor());
   bg = color(utistor());
-  img = createImage(8, 8);
+  img = createImage(29, 29);
   img.loadPixels();
   d = pixelDensity();
   sclr = 4 * (d ^ 2) * img.width * img.height;
@@ -48,15 +48,6 @@ function draw() {
     img.pixels[i + 1] = green(rc);
     img.pixels[i + 2] = blue(rc);
     img.pixels[i + 3] = alpha(rc);
-  }
-  tinge = $j.each( $j('div[id^="quartz"]').next('.scalar') ).css('background-color');
-  for (w = 0; w < img.width; w++) {
-    for (h = 0; h < img.height; h++) {
-      for (t = 0; t <= tinge; t++) {
-         var tng = tinge[t];
-         img.set(w, h, color(tng));
-      }
-    }
   }
   img.updatePixels();
   for (var x = 0; x < cnv.width; x += spacer) {
@@ -79,7 +70,11 @@ function utistor() {
   g = randomGaussian(255);
   b = randomGaussian(255);
   a = randomGaussian(1);
-  return color(r, g, b, a);
+  var tng = $j.each( $j('div[id^="quartz"]').next('.scalar') ).css('background-color');
+  var tea = floor(random(tng.length));  // Convert to integer
+  var tango = [color(tng[tea]), color(r, g, b, a)];
+  var tinge = floor(random(tango.length));
+  return color(tinge);
 }
 function cntnrSize() {
   cH = cntnr.height;
