@@ -10,7 +10,7 @@ var distances = [], maxDistance, spacer;
 jQuery.noConflict();
 (function(a){a(function(){a("body").addClass("yusdesign");var g,d,h,k,l,e,m,c,f;a.ajax({type:"GET",url:"https://kuler-api.adobe.com/rss/search.cfm?searchQuery=userID:102986&itemsPerPage=50&key=5F8FD294DC6015C63AEF97E329246996",dataType:"xml"}).done(function(b){b.error||(b=a(b).find("item"),a.each(b,function(b,n){g=a(this);d=g[0];h=d.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","themeID")[0].valueOf().innerHTML.toString();k=d.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","themeTitle")[0].valueOf().innerHTML.toString();
 m="//color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addClass("tinge");c=a('<div id="title'+b+'"></div>').addClass("tetra");f=a("<a>").attr("href",m).addClass("tange");f.append(a("<span>").text(k).addClass("titre"));c.append(f);l=d.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatch");a.each(l,function(b,d){var c=a(this)[0].getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatchHexColor")[0].valueOf().innerHTML.toString();e.append(a("<div>").css("background-color",
-"#"+c).addClass("scalar"))});c.append(e);a("div#kulerfeed").append(c)}))});tinge=a.each('div[id^="quartz"]').next(".scalar").css("background-color")})})(jQuery);
+"#"+c).addClass("scalar"))});c.append(e);a("div#kulerfeed").append(c)}))})})})(jQuery);
 
 // Processing
 var $j = jQuery.noConflict();
@@ -49,6 +49,7 @@ function draw() {
     img.pixels[i + 2] = blue(rc);
     img.pixels[i + 3] = alpha(rc);
   }
+  tinge = $.each( $('div[id^="quartz"]').next('.scalar') ).css('background-color');
   for (w = 0; w < img.width; w++) {
     for (h = 0; h < img.height; h++) {
       for (t = 0; t <= tinge; t++) {
