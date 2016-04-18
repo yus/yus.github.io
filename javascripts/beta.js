@@ -21,8 +21,8 @@ jQuery.noConflict();
       if (!result.error) {
         var $books = $(result).find('item');
         $.each($books, function (i, jee) {
-          var $book = $(this);
-          var book = $($book)[0];
+          var $book = $(this)[0];
+          var book = $($book);
           var $ns_tID,
           $tID,
           $tTtl,
