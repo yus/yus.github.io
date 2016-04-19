@@ -4,7 +4,7 @@
  */
 var utistor, cnv, img, cntnr, gesso;
 var cW, cH, rc, bg, d, sclr, tinge;
-var bugs = [], distances = [], maxDistance, spacer;
+var bugs = [], rival, distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
@@ -89,10 +89,10 @@ function cntnrSize() {
 }
 function mouseWheel(event) {
   //print(event.delta);
-  bv = bugs.rival;
-  bv += event.delta;
+  bugs.rival += event.delta;
+  return bugs.rival;
   //print(bv);
-  redraw();
+  //redraw();
   //return false;
 }
 // Jitter class
