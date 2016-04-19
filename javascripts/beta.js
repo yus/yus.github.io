@@ -108,8 +108,8 @@ function Jitter(rival) {
   };
 
   this.move = function() {
-    this.x += random(-this.velox, this.velox) * this.rival;
-    this.y += random(-this.velox, this.velox) * this.rival;
+    this.x += random(-this.velox, this.velox) + this.rival;
+    this.y += random(-this.velox, this.velox) + this.rival;
   };
 
   this.display = function() {
