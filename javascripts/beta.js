@@ -32,10 +32,10 @@ function setup() {
     }
   }
   for (var i=0; i<50; i++) {
-    bugs.push(new Jitter());
+    bugs.push(new Jitter(5));
   }
   spacer = 9;
-  noLoop();
+  //noLoop();
   framerate(25);
 }
 function draw() {
@@ -61,7 +61,7 @@ function draw() {
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
-    bugs[i].veloz = 8;
+    bugs[i].velox = 8;
     bugs[i].move();
     bugs[i].display();
   }
@@ -97,13 +97,15 @@ function mouseWheel(event) {
   //return false;
 }
 // Jitter class
-function Jitter() {
+function Jitter(rival) {
   this.x = random(width);
   this.y = random(height);
+  this.dia = random(10, 30);
+  this.speed = 8;
+  this.rival = rival;
 
-  this.velox = function() {
-    this.x += random(-this.velox, this.velox);
-    this.y += random(-this.velox, this.velox);
+  this.velox = function(rvr) {
+    this.speed += random(-this.speed, this.speed) * this.rival;
   };
 
   this.move = function() {
