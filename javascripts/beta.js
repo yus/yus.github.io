@@ -36,7 +36,7 @@ function setup() {
   }
   spacer = 9;
   //noLoop();
-  framerate(25);
+  frameRate(25);
 }
 function draw() {
   rc = color(utistor());
