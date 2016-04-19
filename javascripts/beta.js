@@ -89,7 +89,7 @@ function cntnrSize() {
 }
 function mouseWheel(event) {
   print(event.delta);
-  bv = bugs.veloz;
+  bv = bugs.velox;
   print(bv);
   bv += event.delta;
   print(bv);
@@ -109,8 +109,8 @@ function Jitter(rival) {
   };
 
   this.move = function() {
-    this.x += random(-this.velox, this.velox);
-    this.y += random(-this.velox, this.velox);
+    this.x += random(-this.velox, this.velox) * this.rival;
+    this.y += random(-this.velox, this.velox) * this.rival;
   };
 
   this.display = function() {
