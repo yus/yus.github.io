@@ -35,7 +35,7 @@ function setup() {
     bugs.push(new Jitter(5));
   }
   spacer = 9;
-  //noLoop();
+  noLoop();
   frameRate(12);
 }
 function draw() {
