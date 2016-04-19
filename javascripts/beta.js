@@ -36,6 +36,7 @@ function setup() {
   }
   spacer = 9;
   noLoop();
+  framerate(25);
 }
 function draw() {
   rc = color(utistor());
@@ -64,6 +65,8 @@ function draw() {
     bugs[i].move();
     bugs[i].display();
   }
+  line(mouseX, mouseY, pmouseX, pmouseY);
+  print(pmouseX + " -> " + mouseX);
 }
 function mousePressed() {
   redraw();
@@ -97,12 +100,15 @@ function mouseWheel(event) {
 function Jitter() {
   this.x = random(width);
   this.y = random(height);
-  this.dia = random(10, 30);
-  this.veloz = 2;
+
+  this.velox = function() {
+    this.x += random(-this.velox, this.velox);
+    this.y += random(-this.velox, this.velox);
+  };
 
   this.move = function() {
-    this.x += random(-this.veloz, this.veloz);
-    this.y += random(-this.veloz, this.veloz);
+    this.x += random(-this.velox, this.velox);
+    this.y += random(-this.velox, this.velox);
   };
 
   this.display = function() {
