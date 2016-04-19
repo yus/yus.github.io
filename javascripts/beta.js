@@ -36,7 +36,7 @@ function setup() {
   }
   spacer = 9;
   //noLoop();
-  frameRate(25);
+  frameRate(12);
 }
 function draw() {
   rc = color(utistor());
@@ -61,12 +61,12 @@ function draw() {
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
-    bugs[i].velox = 8;
+    bugs[i].rival = randomGaussian(8);
     bugs[i].move();
     bugs[i].display();
   }
   line(mouseX, mouseY, pmouseX, pmouseY);
-  print(pmouseX + " -> " + mouseX);
+  //print(pmouseX + " -> " + mouseX);
 }
 function mousePressed() {
   redraw();
@@ -88,11 +88,10 @@ function cntnrSize() {
   return cH, cW;
 }
 function mouseWheel(event) {
-  print(event.delta);
-  bv = bugs.velox;
-  print(bv);
+  //print(event.delta);
+  bv = bugs.rival;
   bv += event.delta;
-  print(bv);
+  //print(bv);
   redraw();
   //return false;
 }
