@@ -50,6 +50,10 @@
   width:8px;
   height:25px;
 }
+#cntnr .scalar {
+  min-width:8px;
+  min-height:25px;
+}
 .scalar{
   display:flex;
   flex-grow: 0;
