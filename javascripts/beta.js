@@ -65,7 +65,7 @@ function utistor() {
   var r, g, b;
   r = red(tinge);
   g = green(tinge);
-  b = random(tinge);
+  b = blue(tinge);
   return color(r,g,b);
 }
 function cntnrSize() {
