@@ -29,7 +29,8 @@ function preload() {
 }
 function setup() {
   cnv = createCanvas(cW, cH);
-  cnv.style('visibility', 'visible').class('cnv').id('cnv').parent(cntnr);
+  cnv.style('visibility', 'visible');
+  cnv.class('cnv').id('cnv').parent(cntnr);
   maxDistance = dist(cW / 2, cH / 2, cW, cH);
   for (var x = 0; x < cW; x++) {
     distances[x] = [];
@@ -39,7 +40,6 @@ function setup() {
     }
   }
   for (var i=0; i<50; i++) {
-    rival = random(-8,8);
     bugs.push(new Jitter());
   }
   spacer = 8;
@@ -49,7 +49,7 @@ function setup() {
 function draw() {
   rc = color(utistor());
   bg = color(utistor());
-  img = createImage(8, 8);
+  img = createImage(45, 45);
   img.loadPixels();
   d = pixelDensity();
   sclr = 4 * (d ^ 2) * img.width * img.height;
@@ -64,13 +64,14 @@ function draw() {
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
       //stroke(distances[x][y]);
-      image(img, x + spacer / 2, y + spacer / 2, distances[x][y]);
+      image(img, x + spacer / 2, y + spacer / 2);
+      line(distances[x][y]);
       //
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
-    bugs[i].rival = randomGaussian(8);
+    bugs[i].rival = randomGaussian(1, 25);
     bugs[i].move();
     bugs[i].display();
   }
@@ -85,10 +86,10 @@ function windowResized() {
 }
 function utistor() {
   var r, g, b, a;
-  r = randomGaussian(255);
-  g = randomGaussian(255);
-  b = randomGaussian(255);
-  a = 1; // randomGaussian(0);
+  r = randomGaussian(255,255);
+  g = randomGaussian(111,122);
+  b = randomGaussian(5,25);
+  a = randomGaussian(0,1);
   return color(r, g, b, a);
 }
 function cntnrSize() {
