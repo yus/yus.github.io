@@ -12,7 +12,6 @@
 }
 .gesso{
   height: auto;
-  padding: 8px;
   background-color: #222;
   display: flex;
   flex-grow: 1;
@@ -31,7 +30,6 @@
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
   flex-basis: 42vw;
-  padding: 0;
 }
 .tetra{
   background-color:rgb(85, 85, 85);
