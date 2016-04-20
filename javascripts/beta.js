@@ -64,7 +64,7 @@ function utistor() {
   r = randomGaussian(255,255);
   g = randomGaussian(111,122);
   b = randomGaussian(5,25);
-  a = randomGaussian(.72,1);
+  a = randomGaussian(255);
   return color(r, g, b, a);
 }
 function cntnrSize() {
