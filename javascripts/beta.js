@@ -3,7 +3,7 @@
  *  License: CC-NC-ND 3.0 Unported
  */
 var utistor, cnv, img, cntnr, gesso;
-var cW, cH, rc, bg, d, sclr, tinge, tint;
+var cW, cH, rc, bg, d, sclr, tinge, tincture;
 var mobs = [], distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
@@ -40,11 +40,14 @@ function draw() {
   sclr = 2 * (.05 ^ 2) * cW * cH;
   print(sclr);
   
+  
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
-
-      createDiv('').id('tint').style('background-color', rc).parent(cnv);
-      select('#tint').size(29, 29).position(x + spacer / 2, y + spacer / 2);
+      createDiv('').id('t' + x +'_' + y).class('tint');
+      tincture = select('#t' + x +'_' + y);
+      tincture.style('background-color', rc).parent(cnv);
+      tincture.size(29, 29);
+      tincture.position(x + spacer / 2, y + spacer / 2);
       //image(img, x + spacer / 2, y + spacer / 2);
       //line(distances[x][y]);
     }
