@@ -4,7 +4,7 @@
  */
 var utistor, cnv, img, cntnr, gesso;
 var cW, cH, rc, bg, d, sclr, tinge, tincture;
-var mobs = [], distances = [], maxDistance, spacer;
+var tinges = [], distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
@@ -33,7 +33,7 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
-  spacer = 29;
+  spacer = 87;
   noLoop();
 }
 function draw() {
