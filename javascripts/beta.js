@@ -14,7 +14,7 @@ jQuery.noConflict();
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk,
-    $book, book, $cntnr, $ns_themeID, $ns_themeTitle, $ns_swatches,
+    $book, book, $skalar, $ns_themeID, $ns_themeTitle, $ns_swatches,
     quler, themeLink, qlrtitle, qlr;
     $.ajax({
       type: 'GET',
@@ -39,12 +39,12 @@ jQuery.noConflict();
             var $swatch = $(this);
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
-            quler.append($('<div>').css('background-color', '#' + $swtch).addClass('scalar'));
+            $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
+            quler.append( $skalar );
+            $('div#cntnr').append( $skalar.clone() );
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
-          $cntnr = $('div#cntnr');
-          $('.scalar').clone().appendTo( $cntnr );
         });
       }
     });
