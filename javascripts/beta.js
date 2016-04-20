@@ -4,7 +4,6 @@
  */
 
 // Yusdesign jQuery Kuler Feed
-var ut = [];
 jQuery.noConflict();
 (function ($) {
   $(function () {
@@ -14,7 +13,8 @@ jQuery.noConflict();
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk,
-    $book, book, $ns_themeID, $ns_themeTitle, $ns_swatches, quler, themeLink, qlrtitle, qlr;
+    $book, book, $cntnr, $ns_themeID, $ns_themeTitle, $ns_swatches,
+    quler, themeLink, qlrtitle, qlr;
     $.ajax({
       type: 'GET',
       url: qu,
@@ -39,15 +39,13 @@ jQuery.noConflict();
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             quler.append($('<div>').css('background-color', '#' + $swtch).addClass('scalar'));
-            ut.push( $swtch );
           });
           qlrtitle.append(quler);
           $('div#kulerfeed').append( qlrtitle );
+          $cntnr = $('div#kulerfeed').find('scalar').clone().appendTo( $('<div>').attr('id', 'cntnr') );
+          $('div#gesso').append( $cntnr ); 
         });
       }
-    });
-    $.each( ut, function( index, value ) {
-      console.log( "index", index, "value", value );
     });
   });
 })(jQuery);
