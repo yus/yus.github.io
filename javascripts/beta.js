@@ -61,12 +61,11 @@ function windowResized() {
   cntnrSize();
 }
 function utistor() {
-  var r, g, b, a;
-  r = random(255,255);
-  g = random(111,122);
-  b = random(5,25);
-  a = random(255);
-  return color(r, g, b, a);
+  var r, g, b;
+  r = random(25,255);
+  g = random(25,255);
+  b = random(25,255);
+  return color(r, g, b);
 }
 function cntnrSize() {
   cH = cntnr.height;
