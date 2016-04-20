@@ -12,13 +12,6 @@ jQuery.noConflict();
 m="http://color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addClass("tinge");c=a('<div id="title'+b+'"></div>').addClass("tetra");f=a("<a>").attr("href",m).addClass("tange");f.append(a("<span>").text(k).addClass("titre"));c.append(f);l=d.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatch");a.each(l,function(b,d){var c=a(this)[0].getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatchHexColor")[0].valueOf().innerHTML.toString();e.append(a("<div>").css("background-color",
 "#"+c).addClass("scalar"))});c.append(e);a("div#kulerfeed").append(c)}))})})})(jQuery);
 
-var $$ = jQuery.noConflict();
-(function ($$) {
-  $$(function () {
-    console.log($$.fn.jquery);
-  });
-})(jQuery);
-
 // Processing
 function preload() {
   gesso = select('#gesso');
@@ -39,13 +32,11 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
-  for (var i=0; i<50; i++) {
+  for (var u=0; u<50; u++) {
     bugs.push(new Jitter());
   }
   spacer = 9;
   //noLoop();
-  noSmooth();
-  imageMode(CENTER);
   frameRate(12);
 }
 function draw() {
@@ -74,7 +65,7 @@ function draw() {
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
-    bugs[i].rival = random(-5,5);
+    bugs[i].rival();
     bugs[i].move();
     bugs[i].display();
   }
@@ -99,18 +90,18 @@ function cntnrSize() {
   return cH, cW;
 }
 function mouseWheel(event) {
-  redraw();
   print(event.delta);
-  rival += event.delta;
-  //return bugs.rival;
+  bugs.rival += event.delta;
+  redraw();
+  return rival;
   //return false;
 }
 // Jitter class
 function Jitter() {
-  this.x = random(cW);
-  this.y = random(cH);
+  this.x = random(width);
+  this.y = random(height);
   this.dia = random(10, 30);
-  this.rival = rival;
+  this.rival = random(-5, 5);
   this.velox = function() {
     this.rival += random(-this.rival, this.rival);
   };
