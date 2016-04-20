@@ -31,8 +31,11 @@
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
   flex-basis: 42vw;
-  align-content: space-around;
   flex-wrap: wrap;
+  direction: rtl;
+  flex-direction: row-reverse;
+  align-content: space-between;
+  align-items: stretch;
 }
 .tetra{
   background-color:rgb(85, 85, 85);
@@ -51,12 +54,12 @@
   height:25px;
 }
 #cntnr .scalar {
-  min-width:8px;
-  min-height:25px;
+  min-width: 25px;
+  min-height: 25px;
 }
 .scalar{
   display:flex;
-  flex-grow: 0;
+  flex-grow: 1;
 }
 .tangle{
   color:silver;
