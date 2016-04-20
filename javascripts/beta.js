@@ -15,7 +15,7 @@ m="http://color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addCla
 var $$ = jQuery.noConflict();
 (function ($$) {
   $$(function () {
-    console.log($$.jquery);
+    console.log($$.fn.jquery);
   });
 })(jQuery);
 
@@ -108,7 +108,7 @@ function Jitter(rival) {
   this.y = random(height);
   this.dia = random(10, 30);
   this.rival = rival;
-  this.velox = function(rvr) {
+  this.velox = function(rival) {
     this.rival += random(-this.rival, this.rival);
   };
   this.move = function() {
