@@ -12,6 +12,13 @@ jQuery.noConflict();
 m="http://color.adobe.com/themeID/"+h;e=a('<div id="quartz'+b+'"></div>').addClass("tinge");c=a('<div id="title'+b+'"></div>').addClass("tetra");f=a("<a>").attr("href",m).addClass("tange");f.append(a("<span>").text(k).addClass("titre"));c.append(f);l=d.getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatch");a.each(l,function(b,d){var c=a(this)[0].getElementsByTagNameNS("http://kuler.adobe.com/kuler/API/rss/","swatchHexColor")[0].valueOf().innerHTML.toString();e.append(a("<div>").css("background-color",
 "#"+c).addClass("scalar"))});c.append(e);a("div#kulerfeed").append(c)}))})})})(jQuery);
 
+var $$ = jQuery.noConflict();
+(function ($$) {
+  $$(function () {
+    console.log($$.jquery);
+  });
+})(jQuery);
+
 // Processing
 function preload() {
   gesso = select('#gesso');
@@ -100,18 +107,14 @@ function Jitter(rival) {
   this.x = random(width);
   this.y = random(height);
   this.dia = random(10, 30);
-  this.speed = 8;
   this.rival = rival;
-
   this.velox = function(rvr) {
-    this.speed += random(-this.speed, this.speed) * this.rival;
+    this.rival += random(-this.rival, this.rival);
   };
-
   this.move = function() {
     this.x += random(-this.velox, this.velox) + this.rival;
     this.y += random(-this.velox, this.velox) + this.rival;
   };
-
   this.display = function() {
     ellipse(this.x, this.y, this.dia, this.dia);
   };
