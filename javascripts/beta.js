@@ -40,9 +40,9 @@ function draw() {
   rc = utistor();
   for (var x = 0; x < cW; x += spacer/2) {
     for (var y = 0; y < cH; y += spacer/2) {
-      createDiv('').id('t' + x +'_' + y).class('tint');
+      createDiv('').id('t' + x +'_' + y).class('tint').parent(cnv);
       tincture = select('#t' + x +'_' + y);
-      tincture.style('background-color', rc).parent(cnv);
+      tincture.style('background-color', rc);
       tincture.size(29, 29);
       tincture.position(x, y);
     }
