@@ -61,12 +61,9 @@ function windowResized() {
   cntnrSize();
 }
 function utistor() {
-  var tinge = tumultu[floor(random(tumultu.length))];
-  var r, g, b;
-  r = red(tinge);
-  g = green(tinge);
-  b = blue(tinge);
-  return color(r,g,b);
+  tinge = floor(random(tumultu.length));
+  var tmlt = '#'+ tumultu[tinge];
+  return color(tmlt);
 }
 function cntnrSize() {
   cH = cntnr.height;
