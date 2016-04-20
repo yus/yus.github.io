@@ -43,10 +43,8 @@ function draw() {
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
 
-      createDiv('').id('tint');
-      vat t = select('tint');
-      t.size(29, 29).position(x + spacer / 2, y + spacer / 2).parent(cnv);
-      t.style('background-color', rc);
+      createDiv('').id('tint').style('background-color', rc).parent(cnv);
+      select('#tint').size(29, 29).position(x + spacer / 2, y + spacer / 2);
       //image(img, x + spacer / 2, y + spacer / 2);
       //line(distances[x][y]);
     }
