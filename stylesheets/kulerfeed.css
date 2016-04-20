@@ -36,9 +36,9 @@
 }
 .tetra{
   background-color:rgb(85, 85, 85);
-  display:flex;
-  margin: 2px;
-  padding: 9px;
+  display: flex;
+  margin: -2px 4px 4px -2px;
+  padding: 12px;
   flex-grow: 1;
   flex-direction: column;
   align-items: center;
@@ -46,9 +46,11 @@
 .tinge{
   display:flex;
 }
-.scalar{
-  width:25px;
+#kulerfeed > .scalar {
+  width:8px;
   height:25px;
+}
+.scalar{
   display:flex;
   flex-grow: 0;
 }
