@@ -44,6 +44,7 @@ function setup() {
   }
   spacer = 9;
   //noLoop();
+  noSmooth();
   imageMode(CENTER);
   frameRate(12);
 }
@@ -55,16 +56,17 @@ function draw() {
   d = pixelDensity();
   sclr = 4 * (d ^ 2) * img.width * img.height;
   //print(sclr);
-  for (var i = 0; i < sclr; i += 4) {
-    img.pixels[i] = red(rc);
-    img.pixels[i + 1] = green(rc);
-    img.pixels[i + 2] = blue(rc);
-    img.pixels[i + 3] = alpha(rc);
-  }
-  img.updatePixels();
+  
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
       //stroke(distances[x][y]);
+      for (var i = 0; i < sclr; i += 4) {
+        img.pixels[i] = red(rc);
+        img.pixels[i + 1] = green(rc);
+        img.pixels[i + 2] = blue(rc);
+        img.pixels[i + 3] = alpha(rc);
+      }
+      img.updatePixels();
       image(img, x + spacer / 2, y + spacer / 2);
       line(distances[x][y]);
       //
@@ -72,12 +74,10 @@ function draw() {
     }
   }  //background( bg );
   for (var i=0; i<bugs.length; i++) {
-    bugs[i].rival = randomGaussian(1, 25);
+    bugs[i].rival = random(-5,5);
     bugs[i].move();
     bugs[i].display();
   }
-  line(mouseX, mouseY, pmouseX, pmouseY);
-  //print(pmouseX + " -> " + mouseX);
 }
 function mousePressed() {
   redraw();
