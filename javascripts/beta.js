@@ -41,7 +41,7 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
             quler.append( $skalar );
-            $('div#cntnr').append( $skalar.clone() );
+            $('div#cntnr').addClass('gesso').append( $skalar.clone() );
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
