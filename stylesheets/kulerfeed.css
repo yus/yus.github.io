@@ -15,7 +15,6 @@
   background-color: #222;
   display: flex;
   flex-grow: 1;
-  flex-basis: 29vw;
   align-content: space-evenly;
 }
 #kulerfeed{
@@ -23,6 +22,8 @@
   flex-wrap: wrap;
   direction: rtl;
   flex-direction: row-reverse;
+  align-content: space-between;
+  align-items: stretch;
 }
 #cntnr{
   color: rgb(255, 129, 29);
@@ -30,6 +31,8 @@
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
   flex-basis: 42vw;
+  align-content: space-around;
+  flex-wrap: wrap;
 }
 .tetra{
   background-color:rgb(85, 85, 85);
