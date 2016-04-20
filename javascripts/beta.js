@@ -37,7 +37,7 @@ function setup() {
   noLoop();
 }
 function draw() {
-  rc = color(utistor());
+  rc = utistor();
   sclr = 2 * (.05 ^ 2) * cW * cH;
   print(sclr);
   
