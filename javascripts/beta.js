@@ -4,7 +4,7 @@
  */
 var utistor, cnv, img, cntnr, gesso;
 var cW, cH, rc, bg, d, sclr, tinge;
-var bugs = [], rival, distances = [], maxDistance, spacer;
+var mobs = [], distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
@@ -33,11 +33,11 @@ function setup() {
     }
   }
   for (var u=0; u<50; u++) {
-    bugs.push(new Jitter());
+    mobs.push(new Jitter());
   }
   spacer = 9;
   //noLoop();
-  frameRate(12);
+  frameRate(25);
 }
 function draw() {
   rc = color(utistor());
@@ -64,10 +64,10 @@ function draw() {
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
-  for (var i=0; i<bugs.length; i++) {
-    bugs[i].rival();
-    bugs[i].move();
-    bugs[i].display();
+  for (var u=0; u<mobs.length; u++) {
+    mobs[i].rival();
+    mobs[i].move();
+    mobs[i].display();
   }
 }
 function mousePressed() {
@@ -91,7 +91,7 @@ function cntnrSize() {
 }
 function mouseWheel(event) {
   print(event.delta);
-  bugs.rival += event.delta;
+  mobs.rival += event.delta;
   redraw();
   return rival;
   //return false;
@@ -101,13 +101,13 @@ function Jitter() {
   this.x = random(width);
   this.y = random(height);
   this.dia = random(10, 30);
-  this.rival = random(-5, 5);
-  this.velox = function() {
-    this.rival += random(-this.rival, this.rival);
+  this.avis = random(-10, 10);
+  this.rival = function() {
+    this.avis += random(-this.avis, this.avis);
   };
   this.move = function() {
-    this.x += random(-this.velox, this.velox) + this.rival;
-    this.y += random(-this.velox, this.velox) + this.rival;
+    this.x += random(-this.rival, this.avis);
+    this.y += random(-this.rival, this.avis);
   };
   this.display = function() {
     ellipse(this.x, this.y, this.dia, this.dia);
