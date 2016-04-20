@@ -16,6 +16,9 @@ jQuery.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk,
     $book, book, $skalar, $ns_themeID, $ns_themeTitle, $ns_swatches,
     quler, themeLink, qlrtitle, qlr;
+    $( 'div#kulerfeed' ).scroll(function() {
+      $('div#cntnr').siblings().fadeOut(500).stop(500).scroll().fadeIn(500);
+    });
     $.ajax({
       type: 'GET',
       url: qu,
@@ -47,10 +50,6 @@ jQuery.noConflict();
           $('div#kulerfeed').append( qlrtitle );
         });
       }
-    });
-    $( window ).scroll(function() {
-      $('div#cntnr').scroll();
-      $('div#cntnr').siblings().fadeOut(500).stop(500).fadeIn(500);
     });
   });
 })(jQuery);
