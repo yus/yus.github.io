@@ -39,10 +39,11 @@ function setup() {
     }
   }
   for (var i=0; i<50; i++) {
-    bugs.push(new Jitter(5));
+    rival = random(-8,8);
+    bugs.push(new Jitter());
   }
-  spacer = 52;
-  noLoop();
+  spacer = 8;
+  //noLoop();
   frameRate(12);
 }
 function draw() {
@@ -63,8 +64,8 @@ function draw() {
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
       //stroke(distances[x][y]);
-      image(img, distances[x][y]);
-      //x + spacer / 2, y + spacer / 2
+      image(img, x + spacer / 2, y + spacer / 2, distances[x][y]);
+      //
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
@@ -98,8 +99,8 @@ function cntnrSize() {
 function mouseWheel(event) {
   redraw();
   print(event.delta);
-  bugs.rival += event.delta;
-  return bugs.rival;
+  rival += event.delta;
+  //return bugs.rival;
   //return false;
 }
 // Jitter class
