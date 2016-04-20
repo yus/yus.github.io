@@ -22,7 +22,7 @@ function preload() {
 }
 function setup() {
   cnv = createDiv('').size(cW, cH);
-  //cnv.style('visibility', 'visible');
+  cnv.style('position', 'relative');
   cnv.class('cnv').id('cnv').parent(cntnr);
   maxDistance = dist(cW / 2, cH / 2, cW, cH);
   for (var x = 0; x < cW; x++) {
