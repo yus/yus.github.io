@@ -41,7 +41,7 @@ function setup() {
   for (var i=0; i<50; i++) {
     bugs.push(new Jitter(5));
   }
-  spacer = 29;
+  spacer = 52;
   noLoop();
   frameRate(12);
 }
@@ -60,10 +60,10 @@ function draw() {
     img.pixels[i + 3] = alpha(rc);
   }
   img.updatePixels();
-  for (var x = 0; x < cnv.width; x += spacer) {
-    for (var y = 0; y < cnv.height; y += spacer) {
-      //stroke(distances[x][y]);
-      image(img, x, y, img.width, img.height, x + spacer / 2, y + spacer / 2);
+  for (var x = 0; x < cW; x += spacer) {
+    for (var y = 0; y < cH; y += spacer) {
+      stroke(distances[x][y]);
+      image(img, x, y, width, height, x + spacer / 2, y + spacer / 2);
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
