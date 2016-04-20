@@ -30,7 +30,7 @@
   overflow: hidden;
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
-  flex-basis: 42vw;
+  flex-basis: 42%;
   flex-wrap: wrap;
   direction: rtl;
   flex-direction: row-reverse;
@@ -44,7 +44,6 @@
   padding: 12px;
   flex-grow: 1;
   flex-direction: column;
-  align-items: center;
 }
 .tinge{
   display:flex;
@@ -54,8 +53,13 @@
   height:25px;
 }
 #cntnr .scalar {
-  min-width: 25px;
-  min-height: 25px;
+  min-width: 1em;
+  min-height: 1em;
+  margin: 1px;
+  padding: 3px;
+  resize: both;
+  height: auto;
+  flex: 1;
 }
 .scalar{
   display:flex;
