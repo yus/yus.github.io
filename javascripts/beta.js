@@ -42,14 +42,15 @@ function setup() {
   for (var i=0; i<50; i++) {
     bugs.push(new Jitter());
   }
-  spacer = 8;
+  spacer = 9;
   //noLoop();
+  imageMode(CENTER);
   frameRate(12);
 }
 function draw() {
   rc = color(utistor());
   bg = color(utistor());
-  img = createImage(45, 45);
+  img = createImage(8, 8);
   img.loadPixels();
   d = pixelDensity();
   sclr = 4 * (d ^ 2) * img.width * img.height;
@@ -105,12 +106,12 @@ function mouseWheel(event) {
   //return false;
 }
 // Jitter class
-function Jitter(rival) {
-  this.x = random(width);
-  this.y = random(height);
+function Jitter() {
+  this.x = random(cW);
+  this.y = random(cH);
   this.dia = random(10, 30);
   this.rival = rival;
-  this.velox = function(rival) {
+  this.velox = function() {
     this.rival += random(-this.rival, this.rival);
   };
   this.move = function() {
