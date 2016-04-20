@@ -43,7 +43,8 @@ function draw() {
       createDiv('').id('t' + x +'_' + y).class('tint');
       tincture = select('#t' + x +'_' + y);
       tincture.style('background-color', rc).parent(cnv);
-      tincture.size(29, 29).position(x, y);
+      tincture.size(29, 29);
+      tincture.position(x, y);
     }
   }
 }
@@ -68,3 +69,6 @@ function cntnrSize() {
   cW = cntnr.width;
   return cH, cW;
 }
+
+var $j = jQuery.noConflict();
+var tempo = $j.Deferred();tempo.done(utistor).done(function(n){console.log( n + " we're done." )});
