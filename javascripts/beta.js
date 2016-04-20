@@ -61,9 +61,12 @@ function windowResized() {
   cntnrSize();
 }
 function utistor() {
-  tinge = floor(random(tumultu.length));
-  var tmlt = '#'+ tumultu[tinge];
-  return color(tmlt);
+  if (tumultu.length < 41) { 
+    var tmlt = floor(random(tumultu.length));
+    tinge = '#'+ tumultu[tmlt];
+    print(tinge);
+    return color(tinge);
+  }
 }
 function cntnrSize() {
   cH = cntnr.height;
