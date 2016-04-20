@@ -23,6 +23,7 @@ function preload() {
 function setup() {
   cnv = createDiv('').size(cW, cH);
   cnv.style('position', 'relative');
+  cnv.style('overflow', 'hidden');
   cnv.class('cnv').id('cnv').parent(cntnr);
   maxDistance = dist(cW / 2, cH / 2, cW, cH);
   for (var x = 0; x < cW; x++) {
@@ -61,10 +62,10 @@ function windowResized() {
 }
 function utistor() {
   var r, g, b, a;
-  r = randomGaussian(255,255);
-  g = randomGaussian(111,122);
-  b = randomGaussian(5,25);
-  a = randomGaussian(255);
+  r = random(255,255);
+  g = random(111,122);
+  b = random(5,25);
+  a = random(255);
   return color(r, g, b, a);
 }
 function cntnrSize() {
