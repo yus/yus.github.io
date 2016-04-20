@@ -39,18 +39,15 @@ jQuery.noConflict();
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             quler.append($('<div>').css('background-color', '#' + $swtch).addClass('scalar'));
-            $(ut).append($swtch);
-            console.log($(ut)[q]);
+            ut.push( $swtch );
           });
           qlrtitle.append(quler);
           $('div#kulerfeed').append( qlrtitle );
         });
-        
-        $.each( $(ut), function( index, value ) {
-          console.log( "index", index, "value", value );
-        });
       }
     });
-    
+    $.each( ut, function( index, value ) {
+      console.log( "index", index, "value", value );
+    });
   });
 })(jQuery);
