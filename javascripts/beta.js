@@ -65,9 +65,9 @@ function draw() {
     }
   }  //background( bg );
   for (var u=0; u<mobs.length; u++) {
-    mobs[i].rival();
-    mobs[i].move();
-    mobs[i].display();
+    mobs[u].rival();
+    mobs[u].move();
+    mobs[u].display();
   }
 }
 function mousePressed() {
