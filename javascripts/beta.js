@@ -95,11 +95,10 @@ function cntnrSize() {
   return cH, cW;
 }
 function mouseWheel(event) {
-  //print(event.delta);
+  redraw();
+  print(event.delta);
   bugs.rival += event.delta;
   return bugs.rival;
-  //print(bv);
-  redraw();
   //return false;
 }
 // Jitter class
