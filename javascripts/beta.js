@@ -8,6 +8,7 @@ jQuery.noConflict();
 (function ($) {
   $(function () {
     $('body').addClass('yusdesign');
+    $('div#gesso').append( $('<div>').attr('id', 'cntnr') );
     var ns = 'http://kuler.adobe.com/kuler/API/rss/',
     qc = '?searchQuery=userID:102986',
     qn = '&itemsPerPage=50',
@@ -40,10 +41,10 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             quler.append($('<div>').css('background-color', '#' + $swtch).addClass('scalar'));
           });
-          qlrtitle.append(quler);
+          qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
-          $cntnr = $('div#kulerfeed').find('scalar').clone().appendTo( $('<div>').attr('id', 'cntnr') );
-          $('div#gesso').append( $cntnr ); 
+          $cntnr = $('div#cntnr');
+          $('.scalar').clone().appendTo( $cntnr );
         });
       }
     });
