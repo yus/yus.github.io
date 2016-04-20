@@ -46,7 +46,7 @@
 .tinge{
   display:flex;
 }
-#kulerfeed > .scalar {
+#kulerfeed .scalar {
   width:8px;
   height:25px;
 }
