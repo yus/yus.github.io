@@ -63,7 +63,8 @@ function draw() {
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
       //stroke(distances[x][y]);
-      image(img, x + spacer / 2, y + spacer / 2);
+      image(img, distances[x][y]);
+      //x + spacer / 2, y + spacer / 2
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
