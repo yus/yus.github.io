@@ -30,11 +30,11 @@ function preload() {
 function setup() {
   cnv = createCanvas(cW, cH);
   cnv.style('visibility', 'visible').class('cnv').id('cnv').parent(cntnr);
-  maxDistance = dist(cnv.width / 2, cnv.height / 2, cnv.width, cnv.height);
-  for (var x = 0; x < cnv.width; x++) {
+  maxDistance = dist(cW / 2, cH / 2, cW, cH);
+  for (var x = 0; x < cW; x++) {
     distances[x] = [];
-    for (var y = 0; y < cnv.height; y++) {
-      var distance = dist(cnv.width / 2, cnv.height / 2, x, y);
+    for (var y = 0; y < cH; y++) {
+      var distance = dist(cW / 2, cH / 2, x, y);
       distances[x][y] = distance / maxDistance * 255;
     }
   }
@@ -62,8 +62,8 @@ function draw() {
   img.updatePixels();
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
-      stroke(distances[x][y]);
-      image(img, x, y, width, height, x + spacer / 2, y + spacer / 2);
+      //stroke(distances[x][y]);
+      image(img, distances[x], distances[x][y], x + spacer / 2, y + spacer / 2);
       //point( x + spacer/2, y + spacer/2 );
     }
   }  //background( bg );
