@@ -25,11 +25,11 @@ function setup() {
   cnv.style('position', 'absolute');
   cnv.style('overflow', 'hidden');
   cnv.class('cnv').id('cnv').parent(cntnr);
-  maxDistance = dist(cW / 2, cH / 2, cW, cH);
+  maxDistance = dist(cW/2, cH/2, cW, cH);
   for (var x = 0; x < cW; x++) {
     distances[x] = [];
     for (var y = 0; y < cH; y++) {
-      var distance = dist(cW / 2, cH / 2, x, y);
+      var distance = dist(cW/2, cH/2, x, y);
       distances[x][y] = distance / maxDistance * 255;
     }
   }
@@ -38,19 +38,12 @@ function setup() {
 }
 function draw() {
   rc = utistor();
-  sclr = 2 * (.05 ^ 2) * cW * cH;
-  print(sclr);
-  
-  
-  for (var x = 0; x < cW; x += spacer) {
-    for (var y = 0; y < cH; y += spacer) {
+  for (var x = 0; x < cW; x += spacer/2) {
+    for (var y = 0; y < cH; y += spacer/2) {
       createDiv('').id('t' + x +'_' + y).class('tint');
       tincture = select('#t' + x +'_' + y);
       tincture.style('background-color', rc).parent(cnv);
-      tincture.size(29, 29);
-      tincture.position(x + spacer / 2, y + spacer / 2);
-      //image(img, x + spacer / 2, y + spacer / 2);
-      //line(distances[x][y]);
+      tincture.size(29, 29).position(x, y);
     }
   }
 }
