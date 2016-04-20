@@ -48,5 +48,9 @@ jQuery.noConflict();
         });
       }
     });
+    $( window ).scroll(function() {
+      $('div#cntnr').scroll();
+      $('div#cntnr').siblings().fadeOut(500).stop(500).fadeIn(500);
+    });
   });
 })(jQuery);
