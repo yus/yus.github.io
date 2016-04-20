@@ -3,7 +3,7 @@
  *  License: CC-NC-ND 3.0 Unported
  */
 var utistor, cnv, img, cntnr, gesso;
-var cW, cH, rc, bg, d, sclr, tinge;
+var cW, cH, rc, bg, d, sclr, tinge, tint;
 var mobs = [], distances = [], maxDistance, spacer;
 
 // Yusdesign jQuery Kuler Feed
@@ -21,8 +21,8 @@ function preload() {
   cntnrSize();
 }
 function setup() {
-  cnv = createCanvas(cW, cH);
-  cnv.style('visibility', 'visible');
+  cnv = createDiv('').size(cW, cH);
+  //cnv.style('visibility', 'visible');
   cnv.class('cnv').id('cnv').parent(cntnr);
   maxDistance = dist(cW / 2, cH / 2, cW, cH);
   for (var x = 0; x < cW; x++) {
@@ -32,49 +32,31 @@ function setup() {
       distances[x][y] = distance / maxDistance * 255;
     }
   }
-  for (var u=0; u<50; u++) {
-    mobs.push(new Jitter());
-  }
-  spacer = 9;
-  //noLoop();
-  frameRate(25);
+  spacer = 29;
+  noLoop();
 }
 function draw() {
   rc = color(utistor());
-  bg = color(utistor());
-  img = createImage(8, 8);
-  img.loadPixels();
-  d = pixelDensity();
-  sclr = 4 * (d ^ 2) * img.width * img.height;
-  //print(sclr);
+  sclr = 2 * (.05 ^ 2) * cW * cH;
+  print(sclr);
   
   for (var x = 0; x < cW; x += spacer) {
     for (var y = 0; y < cH; y += spacer) {
-      //stroke(distances[x][y]);
-      for (var i = 0; i < sclr; i += 4) {
-        img.pixels[i] = red(rc);
-        img.pixels[i + 1] = green(rc);
-        img.pixels[i + 2] = blue(rc);
-        img.pixels[i + 3] = alpha(rc);
-      }
-      img.updatePixels();
-      image(img, x + spacer / 2, y + spacer / 2);
-      line(distances[x][y]);
-      //
-      //point( x + spacer/2, y + spacer/2 );
+
+      createDiv('').id('tint');
+      vat t = select('tint');
+      t.size(29, 29).position(x + spacer / 2, y + spacer / 2).parent(cnv);
+      t.style('background-color', rc);
+      //image(img, x + spacer / 2, y + spacer / 2);
+      //line(distances[x][y]);
     }
-  }  //background( bg );
-  for (var u=0; u<mobs.length; u++) {
-    mobs[u].rival();
-    mobs[u].move();
-    mobs[u].display();
   }
 }
 function mousePressed() {
-  redraw();
+  cntnrSize();
 }
 function windowResized() {
-  resizeCanvas(cW, cH);
+  cntnrSize();
 }
 function utistor() {
   var r, g, b, a;
@@ -88,28 +70,4 @@ function cntnrSize() {
   cH = cntnr.height;
   cW = cntnr.width;
   return cH, cW;
-}
-function mouseWheel(event) {
-  //print(event.delta);
-  mobs.rival += event.delta;
-  redraw();
-  return mobs.rival;
-  //return false;
-}
-// Jitter class
-function Jitter() {
-  this.x = random(width);
-  this.y = random(height);
-  this.dia = random(10, 30);
-  this.avis = random(-10, 10);
-  this.rival = function() {
-    this.avis += random(-this.avis, this.avis);
-  };
-  this.move = function() {
-    this.x += random(-this.rival, this.avis);
-    this.y += random(-this.rival, this.avis);
-  };
-  this.display = function() {
-    ellipse(this.x, this.y, this.dia, this.dia);
-  };
 }
