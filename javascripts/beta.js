@@ -61,11 +61,11 @@ function windowResized() {
   cntnrSize();
 }
 function utistor() {
-  if (tumultu.length !== 0 ) { 
+  if (tumultu.length !== 0){ 
     var tmlt = floor(random(tumultu.length));
-    tinge = '#'+ tumultu[tmlt];
+    tinge = tumultu[tmlt];
     print(tinge);
-    return color(tinge);
+    return color(unhex(tinge));
   } else {
     print( 'Nothing to tint' );
   }
