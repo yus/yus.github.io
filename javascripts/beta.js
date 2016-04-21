@@ -13,13 +13,12 @@ jQuery.noConflict();
       'rival': 0.72,
       'start': 0,
       'stop': $offset.top + $sqrrl.height(),
-      'wTop': $(window).scrollTo(),
+      'wTop': $(window).scroll(),
       'repr': '<div id="squirrel"></div>'
     };
     var upto = $.extend(sqrrls, loot);
     return this.each(function(){
-      $(window).bind('scroll', function(upto) {
-        //var wTop = $(window).scrollTo();
+      $(window).scroll(function(upto){
         if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
           var nRival = upto.wTop * upto.rival;
           $sqrrl.siblings().wrap( upto.repr );
