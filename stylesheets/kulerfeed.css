@@ -20,6 +20,7 @@
 #kulerfeed{
   overflow-x: hidden;
   flex-wrap: wrap;
+  flex-basis: 49%;
   direction: rtl;
   flex-direction: row-reverse;
   align-content: space-between;
