@@ -18,14 +18,14 @@ jQuery.noConflict();
     };
     var auto = $.extend(sqrrls, loot);
     return this.each(function(){
-      $(window).scroll(function(){
+      $(window).bind( 'scroll', function(){
         console.log( auto.stop );
         var wTop = $(auto.parent).scrollTop(),
-        if((wTop >= auto.start) && (wTop <= auto.stop)) {
+        if((wTop >= auto.start) && (wTop <= auto.stop)){
           var nRival = wTop * auto.rival;
           var $repr = $( auto.repr );
-          $sqrrl.siblings().wrap( $repr );
-          $repr.css({
+          $sqrrl.siblings().wrap( auto.repr );
+          $sqrrl.css({
               'position': 'relative',
               'width': 52 + '%', 
               'display': 'flex',
