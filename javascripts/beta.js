@@ -13,16 +13,17 @@ jQuery.noConflict();
       'rival': 0.72,
       'start': 0,
       'stop': $offset.top + $sqrrl.height(),
-      'wTop': $(window).scroll(),
-      'repr': '<div id="squirrel"></div>'
+      'repr': '<div id="squirrel"></div>',
+      'parent': $sqrrl.parent();
     };
-    var upto = $.extend(sqrrls, loot);
+    var auto = $.extend(sqrrls, loot);
     return this.each(function(){
       $(window).scroll(function(){
-        console.log( upto.stop );
-        if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
-          var nRival = upto.wTop * upto.rival;
-          var $repr = $( upto.repr );
+        console.log( auto.stop );
+        var wTop = $(auto.parent).scrollTop(),
+        if((auto.wTop >= auto.start) && (auto.wTop <= auto.stop)) {
+          var nRival = auto.wTop * auto.rival;
+          var $repr = $( auto.repr );
           $sqrrl.siblings().wrap( $repr );
           $repr.css({
               'position': 'relative',
