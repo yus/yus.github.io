@@ -18,13 +18,15 @@ jQuery.noConflict();
     };
     var upto = $.extend(sqrrls, loot);
     return this.each(function(){
-      $(window).scroll(function(upto){
+      $(window).scroll(function(){
+        console.log( upto.stop );
         if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
           var nRival = upto.wTop * upto.rival;
-          $sqrrl.siblings().wrap( upto.repr );
           var $repr = $( upto.repr );
+          $sqrrl.siblings().wrap( $repr );
           $repr.css({
-              'position': 'absolute',
+              'position': 'relative',
+              'width': 52 + '%', 
               'display': 'flex',
               'flex-grow': 1,
               'top': nRival + 'px'
