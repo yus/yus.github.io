@@ -4,41 +4,7 @@
  */
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
-// Rival Squirrel can scroll
-(function($){
-  $.fn.squirrel = function(loot){
-    var $sqrrl = $(this);
-    var $offset = $sqrrl.offset();
-    var sqrrls = {
-      'rival': 0.72,
-      'start': 0,
-      'stop': $offset.top + $sqrrl.height(),
-      'parent': $sqrrl.parent(),
-      'repr': '<div id="squirrel"></div>'
-    };
-    var auto = $.extend(sqrrls, loot);
-    return this.each(function(){
-      $(window).bind( 'scroll', function(){
-        console.log( auto.stop );
-        var wTop = $(auto.parent).scrollTop();
-        if((wTop >= auto.start) && (wTop <= auto.stop)){
-          var nRival = wTop * auto.rival;
-          var $repr = $( auto.repr );
-          $sqrrl.siblings().wrap( auto.repr );
-          $sqrrl.css({
-              'position': 'relative',
-              'width': 52 + '%', 
-              'display': 'flex',
-              'flex-grow': 1,
-              'top': nRival + 'px'
-          });
-          $repr.siblings().fadeOut(255).stop().fadeIn(255);
-          //console.log(nRival);
-        }
-      });
-    });
-  };
-})(jQuery);
+
 (function ($) {
   $(function () {
     $('body').addClass('yusdesign');
@@ -78,10 +44,25 @@ jQuery.noConflict();
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
-          $('div#cntnr').squirrel({ 'rival':1.25 });
-          $('div#kulerfeed').squirrel({ 'rival':.55 });
         });
       }
+    });
+    $(window).scroll(function(){
+      $.each($('div#gesso').children().children(), function(h,v){
+        var $unit = $(this);
+        $unit.css({
+          'transform':'translateY(' +  + ')'
+        });
+        $unit.hover(function(){
+          this.animate({
+            'transform':'scale(' + 4 + ')'
+          }, 250, function() {
+            this.animate({
+              'transform':'scale(' + 1 + ')'
+            }
+          });
+        });
+      });
     });
   });
 })(jQuery);
