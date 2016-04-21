@@ -8,21 +8,23 @@ jQuery.noConflict();
 (function($){
   $.fn.squirrel = function(loot){
     var $sqrrl = $(this);
-    $offset = $sqrrl.offset();
+    var $offset = $sqrrl.offset();
     var sqrrls = {
       'rival': 0.72,
       'start': 0,
       'stop': $offset.top + $sqrrl.height(),
+      'wTop': $(window).scrollTop(),
     };
     var upto = $.extend(sqrrls, loot);
     return this.each(function(){
       $(window).bind('scroll', function() {
-        wTop = $(window).scrollTop();
-        if((wTop >= upto.start) && (wTop <= upto.stop)) {
-          nRival = wTop * upto.rival;
+        //var wTop = $(window).scrollTop();
+        if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
+          var nRival = upto.wTop * upto.rival;
           $sqrrl.css({
               'top': nRival + 'px'
           }).siblings().fadeOut(444).stop(111).fadeIn(444);
+          console.log(nRival);
         }
       });
     });
