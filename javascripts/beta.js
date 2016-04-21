@@ -1,10 +1,33 @@
 /*
- *  Name: Yusdesign Kuler Feed Javascript Processing
+ *  Name: Yusdesign Kuler jQuery Feed
  *  License: CC-NC-ND 3.0 Unported
  */
-
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
+// Rival Squirrel can scroll
+(function($){
+  $.fn.squirrel = function(loot){
+    var $sqrrl = $(this);
+    $offset = $sqrrl.offset();
+    var sqrrls = {
+      'rival': 0.72,
+      'start': 0,
+      'stop': $offset.top + $sqrrl.height(),
+    };
+    var upto = $.extend(sqrrls, loot);
+    return this.each(function(){
+      $(window).bind('scroll', function() {
+        wTop = $(window).scrollTop();
+        if((wTop >= upto.start) && (wTop <= upto.stop)) {
+          nRival = wTop * upto.rival;
+          $sqrrl.css({
+              'top': nRival + 'px'
+          }).siblings().fadeOut(444).stop(111).fadeIn(444);
+        }
+      });
+    });
+  };
+})(jQuery);
 (function ($) {
   $(function () {
     $('body').addClass('yusdesign');
@@ -16,9 +39,6 @@ jQuery.noConflict();
     var qu = 'https://kuler-api.adobe.com/rss/search.cfm' + qc + qn + qk,
     $book, book, $skalar, $ns_themeID, $ns_themeTitle, $ns_swatches,
     quler, themeLink, qlrtitle, qlr;
-    $( 'div#kulerfeed' ).scroll(function() {
-      $('div#cntnr').siblings().fadeOut(500).stop(500).fadeIn(500);
-    });
     $.ajax({
       type: 'GET',
       url: qu,
@@ -48,6 +68,8 @@ jQuery.noConflict();
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
+          $('div#cntnr').squirrel({ 'rival':1.25 });
+          $('div#gesso').squirrel({ 'rival':.55 });
         });
       }
     });
