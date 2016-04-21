@@ -13,8 +13,8 @@ jQuery.noConflict();
       'rival': 0.72,
       'start': 0,
       'stop': $offset.top + $sqrrl.height(),
-      'repr': '<div id="squirrel"></div>',
-      'parent': $sqrrl.parent();
+      'parent': $sqrrl.parent(),
+      'repr': '<div id="squirrel"></div>'
     };
     var auto = $.extend(sqrrls, loot);
     return this.each(function(){
