@@ -54,9 +54,8 @@ jQuery.noConflict();
           themeLink = '//color.adobe.com/themeID/' + $ns_themeID;
           quler = $('<div id="quartz' + i + '"></div>').addClass('tinge');
           qlrtitle = $('<div id="title' + i + '"></div>').addClass('tetra');
-          qlr = $('<a>').attr( 'href', themeLink ).addClass('tange');
-          qlr.append( $('<span>').text( $ns_themeTitle ).addClass('titre') );
-          qlrtitle.append(qlr);
+          qlr = $('<a>').attr('href', themeLink).addClass('tange');
+          qlrtitle.append( qlr.append($('<span>').text($ns_themeTitle).addClass('titre')));
           $ns_swatches = book.getElementsByTagNameNS(ns, 'swatch');
           $.each($ns_swatches, function (q, r) {
             var $swatch = $(this);
@@ -64,12 +63,12 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
             quler.append( $skalar );
-            $('div#cntnr').addClass('gesso').append( $skalar.clone() );
+            $('div#cntnr').addClass('gesso').append($skalar.clone());
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
           $('div#cntnr').squirrel({ 'rival':1.25 });
-          $('div#gesso').squirrel({ 'rival':.55 });
+          $('div#kulerfeed').squirrel({ 'rival':.55 });
         });
       }
     });
