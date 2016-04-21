@@ -21,8 +21,8 @@ jQuery.noConflict();
       $(window).scroll(function(){
         console.log( auto.stop );
         var wTop = $(auto.parent).scrollTop(),
-        if((auto.wTop >= auto.start) && (auto.wTop <= auto.stop)) {
-          var nRival = auto.wTop * auto.rival;
+        if((wTop >= auto.start) && (wTop <= auto.stop)) {
+          var nRival = wTop * auto.rival;
           var $repr = $( auto.repr );
           $sqrrl.siblings().wrap( $repr );
           $repr.css({
