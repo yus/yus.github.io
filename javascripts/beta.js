@@ -13,17 +13,24 @@ jQuery.noConflict();
       'rival': 0.72,
       'start': 0,
       'stop': $offset.top + $sqrrl.height(),
-      'wTop': $(window).scrollTop(),
+      'wTop': $(window).scrollTo(),
+      'repr': '<div id="squirrel"></div>'
     };
     var upto = $.extend(sqrrls, loot);
     return this.each(function(){
-      $(window).bind('scroll', function() {
-        //var wTop = $(window).scrollTop();
+      $(window).bind('scroll', function(upto.wTop, upto.repr) {
+        //var wTop = $(window).scrollTo();
         if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
           var nRival = upto.wTop * upto.rival;
-          $sqrrl.css({
+          $sqrrl.siblings().wrap( upto.repr );
+          var $repr = $( upto.repr );
+          $repr.css({
+              'position': 'absolute',
+              'display': 'flex',
+              'flex-grow': 1,
               'top': nRival + 'px'
-          }).siblings().fadeOut(444).stop(111).fadeIn(444);
+          });
+          $repr.siblings().fadeOut(255).stop().fadeIn(255);
           console.log(nRival);
         }
       });
