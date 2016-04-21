@@ -18,7 +18,7 @@ jQuery.noConflict();
     };
     var upto = $.extend(sqrrls, loot);
     return this.each(function(){
-      $(window).bind('scroll', function(upto.wTop, upto.repr) {
+      $(window).bind('scroll', function(upto) {
         //var wTop = $(window).scrollTo();
         if((upto.wTop >= upto.start) && (upto.wTop <= upto.stop)) {
           var nRival = upto.wTop * upto.rival;
@@ -31,7 +31,7 @@ jQuery.noConflict();
               'top': nRival + 'px'
           });
           $repr.siblings().fadeOut(255).stop().fadeIn(255);
-          console.log(nRival);
+          //console.log(nRival);
         }
       });
     });
