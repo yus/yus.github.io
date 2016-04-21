@@ -20,7 +20,7 @@ jQuery.noConflict();
     return this.each(function(){
       $(window).bind( 'scroll', function(){
         console.log( auto.stop );
-        var wTop = $(auto.parent).scrollTop(),
+        var wTop = $(auto.parent).scrollTop();
         if((wTop >= auto.start) && (wTop <= auto.stop)){
           var nRival = wTop * auto.rival;
           var $repr = $( auto.repr );
