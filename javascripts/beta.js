@@ -51,9 +51,10 @@ jQuery.noConflict();
     $( document ).on( 'mousemove', function( e ) {
       $rvr = $('.kuler');
       rvr = $rvr.scrollTop();
-      do {
-        $rvr.scrollTop( e.originalEvent.wheelDelta * e.pageY);
-      } while (rvr > rv);
+      if (rvr > rv) {
+        $rvr.scrollTop( rvr + e.pageY );
+      }
+      
     });
     
     $.each($scaler, function( ae, ea ) {
