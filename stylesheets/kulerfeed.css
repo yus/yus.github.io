@@ -6,37 +6,43 @@
 .yusdesign{
   
 }
+.kuler {
+  overflow-x: auto;
+  height: 555px;
+  margin: 29px auto;
+}
 #gesso{
   display: flex;
-  height: 555px;
 }
 .gesso{
   height: auto;
   background-color: #222;
   display: flex;
   flex-grow: 1;
-  align-content: space-evenly;
 }
+/** ^^^ align-content: space-evenly*/
 #kulerfeed{
   overflow-x: hidden;
   flex-wrap: wrap;
   flex-basis: 49%;
   direction: rtl;
-  flex-direction: row-reverse;
+  flex-direction: column-reverse;
   align-content: space-between;
   align-items: stretch;
+  padding: 8px 0 0 8px;
 }
 #cntnr{
   color: rgb(255, 129, 29);
   overflow: hidden;
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
-  flex-basis: 52%;
+  flex-basis: 122%;
   flex-wrap: wrap;
   direction: rtl;
-  flex-direction: row-reverse;
+  flex-direction: column-reverse;
   align-content: space-between;
-  align-items: stretch;
+  padding: 6px 0;
+  justify-content: space-between;
 }
 .tetra{
   background-color:rgb(85, 85, 85);
@@ -57,16 +63,12 @@
 #cntnr .scalar {
   min-width: 1em;
   min-height: 1em;
-  margin: 1px;
-  padding: 3px;
   resize: both;
   height: auto;
-  flex: 1;
-  transform: scale(1);
+  transform: scale(1, .72);
 }
 .scalar{
   display:flex;
-  flex-grow: 0;
 }
 .tangle{
   color:silver;
