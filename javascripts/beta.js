@@ -47,6 +47,11 @@ jQuery.noConflict();
         });
       }
     });
+  });
+})(jQuery);
+/** + roll */
+(function ($) {
+  $(function () {
     $(window).scroll(function(){
       $.each($('div#gesso').children().children(), function(h,v){
         var $unit = $(this);
