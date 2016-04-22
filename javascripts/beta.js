@@ -47,16 +47,21 @@ jQuery.noConflict();
         });
       }
     });
-    var rvr, alt, rv = 0, $scaler = $('.scalar');
+    var rvr, hght, alt, rv = 0, $scaler = $('.scalar');
     $( document ).on( 'mousemove', function( e ) {
+      
+    });
+    $(window).scroll(function(e) {
+      hght = $(window).scrollTop();
       $rvr = $('.kuler');
       rvr = $rvr.scrollTop();
       if (rvr > rv) {
-        $rvr.scrollTop( rvr + e.pageY );
+        $rvr.scrollTop( -rvr );
       }
-      
+      if(hght  > rvr) {
+        $rvr.scrollTop( -rvr );
+      }
     });
-    
     $.each($scaler, function( ae, ea ) {
       console.log( ae + ': ‹ƒ› ' + $(this).css('background-color') );
       $( this ).on( 'mouseover', function( e ) {
