@@ -46,27 +46,40 @@ jQuery.noConflict();
         });
       }
     });
-    var rv = 0;
-    var $scaler = $('.scalar');
-    $('div#cntnr').scroll(function () {
-        var rvr = $(this).scrollTop();
-          if (rvr > rv) {
-            if(!$scaler.data('scaled')) {
-              $scaler.data('scaled', 1)
-              .stop(true).animate({'transform':'scale(' + 4 + ')'}, 250, function(){
-                console.log('scale 4');  
-              });
-            }
+    var rv = 0, alt, $scaler = $('.scalar');
+    $(window).bind('mousewheel', function(e){
+      alt = e.originalEvent.wheelDelta;
+      if( alt > 0) {
+        alt;
+        console.log(alt);
+      }
+    });
+
+    $('div#cntnr').bind('mousewheel', function(e){
+        alt = e.originalEvent.wheelDelta;
+        if( alt > 0) {
+          alt;
+          console.log(alt);
+        }
+        var rvr = $(this).scrollTop(+=alt);
+        if (rvr > rv) {
+          if(!$scaler.data('scaled')) {
+            $scaler.data('scaled', 1)
+            .stop(true).animate({'transform':'scale(' + 4 + ')'}, 250, function(){
+              console.log('scale 4');  
+            });
+          }
         } else {
-            //Scrolling Up
-            if(!!$scaler.data('scaled')) {
-              $scaler.data('scaled', 0)
-              .stop(true).animate({'transform':'scale(' + 1 + ')'}, 250, function(){
-                console.log('scale 1');  
-              });
-            }
+          //Scrolling Up
+          if(!!$scaler.data('scaled')) {
+            $scaler.data('scaled', 0)
+            .stop(true).animate({'transform':'scale(' + 1 + ')'}, 250, function(){
+              console.log('scale 1');  
+            });
+          }
         }
         rv = rvr;
     });
+
   });
 })(jQuery);
