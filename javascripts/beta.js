@@ -65,7 +65,7 @@ jQuery.noConflict();
             this.animate({
               'transform':'scale(' + 1 + ')'
             }, 250, function() {
-              console.log('does hover')
+              console.log('does hover');
             });
           });
         });
