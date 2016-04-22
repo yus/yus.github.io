@@ -45,9 +45,9 @@
   justify-content: space-between;
 }
 .tetra{
-  background-color:rgb(85, 85, 85);
+  background-color: rgb(85, 85, 85);
   display: flex;
-  margin: -2px 4px 4px -2px;
+  margin: -2px 6px 6px -2px;
   padding: 12px;
   flex-grow: 1;
   flex-direction: column;
