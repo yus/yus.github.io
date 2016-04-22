@@ -50,24 +50,35 @@ jQuery.noConflict();
   });
 })(jQuery);
 /** + roll */
-(function ($) {
-  $(function () {
+(function($){
+  $(function(){
+    
     $(window).scroll(function(){
       $.each($('div#gesso').children().children(), function(h,v){
         var $unit = $(this);
-        var $rival = 'translateY(' + $(+=25) + 'px)';
+        var $rival = 'translateY(' + (+=25) + 'px)';
         $unit.css({
           'transform': $rival
         });
         $unit.hover(function(){
           this.animate({'transform':'scale(' + 4 + ')'}, 250, function() {
             console.log('does hover');
-            this.animate({'transform':'scale(' + 1 + ')'}, 250, function() {
-              console.log('done hover');
-            });
+            this.animate({'transform':'scale(' + 1 + ')'}, 250, function(){console.log('done hover')});
           });
         });
       });
+    });
+    var rv = 0;
+    var $scaler = $('.scalar');
+    $('#content-container').scroll(function () {
+        var rvr = $(this).scrollTop();
+        if (rvr > rv) {
+            !$scaler.data('scaled') ? $scaler.data('scaled', 1).stop(true).animate({ 'transform':'scale(' + 4 + ')'}, 250, function(){console.log('done hover')});
+        } else {
+            //Scrolling Up
+            !!$scaler.data('scaled') ? $scaler.data('scaled', 0).stop(true).animate({'transform':'scale(' + 1 + ')'}, 250);
+        }
+        rv = rvr;
     });
   });
 })(jQuery);
