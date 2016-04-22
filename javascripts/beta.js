@@ -4,7 +4,6 @@
  */
 // Yusdesign jQuery Kuler Feed
 jQuery.noConflict();
-
 (function ($) {
   $(function () {
     $('body').addClass('yusdesign');
@@ -52,31 +51,18 @@ jQuery.noConflict();
 /** + roll */
 (function($){
   $(function(){
-    
-    $(window).scroll(function(){
-      $.each($('div#gesso').children().children(), function(h,v){
-        var $unit = $(this);
-        var $rival = 'translateY(' + (+=25) + 'px)';
-        $unit.css({
-          'transform': $rival
-        });
-        $unit.hover(function(){
-          this.animate({'transform':'scale(' + 4 + ')'}, 250, function() {
-            console.log('does hover');
-            this.animate({'transform':'scale(' + 1 + ')'}, 250, function(){console.log('done hover')});
-          });
-        });
-      });
-    });
+    //var $w = $(window).scroll(function(){});
     var rv = 0;
     var $scaler = $('.scalar');
-    $('#content-container').scroll(function () {
+    $('div#cntnr').scroll(function () {
         var rvr = $(this).scrollTop();
         if (rvr > rv) {
-            !$scaler.data('scaled') ? $scaler.data('scaled', 1).stop(true).animate({ 'transform':'scale(' + 4 + ')'}, 250, function(){console.log('done hover')});
+            !$scaler.data('scaled') ? $scaler.data('scaled', 1).stop(true).animate({ 'transform':'scale(' + 4 + ')'}, 250);
+            console.log('scale 4');
         } else {
             //Scrolling Up
             !!$scaler.data('scaled') ? $scaler.data('scaled', 0).stop(true).animate({'transform':'scale(' + 1 + ')'}, 250);
+            console.log('scale 1');
         }
         rv = rvr;
     });
