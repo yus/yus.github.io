@@ -50,13 +50,23 @@ jQuery.noConflict();
     var $scaler = $('.scalar');
     $('div#cntnr').scroll(function () {
         var rvr = $(this).scrollTop();
+        var $sclr4 = 
+        var $sclr1 = $scaler.stop(true).animate({ 'transform':'scale(' + 1 + ')'}, 250);
         if (rvr > rv) {
-            !$scaler.data('scaled') ? $scaler.data('scaled', 1).stop(true).animate({ 'transform':'scale(' + 4 + ')'}, 250);
-            console.log('scale 4');
+            if(!$scaler.data('scaled')) {
+              $scaler.data('scaled', 1)
+              .stop(true).animate({'transform':'scale(' + 4 + ')'}, 250, function(){
+                console.log('scale 4');  
+              });
+            }
         } else {
             //Scrolling Up
-            !!$scaler.data('scaled') ? $scaler.data('scaled', 0).stop(true).animate({'transform':'scale(' + 1 + ')'}, 250);
-            console.log('scale 1');
+            if(!!$scaler.data('scaled')) {
+              $scaler.data('scaled', 0)
+              .stop(true).animate({'transform':'scale(' + 1 + ')'}, 250, function(){
+                console.log('scale 1');  
+              });
+            }
         }
         rv = rvr;
     });
