@@ -47,37 +47,24 @@ jQuery.noConflict();
         });
       }
     });
-    var rv = 0, rvr, alt, $scaler = $('.scalar');
-    $('div#cntnr').bind('mousewheel', function(e){
+    var rvr, alt, rv = 0, $scaler = $('.scalar');
+    $( document ).on( 'mousemove', function( e ) {
+      $rvr = $('.kuler');
+      rvr = $rvr.scrollTop(e.pageY);
+    });
+    $scaler.on( 'mouseover', function( e ) {
+      $( this ).text( e.pageX + ' ‹ƒ› ' + e.pageY )
+      .css({'transform':'translateZ('+(2)+'px)'})
+      .animate({'transform':'scale('+ 2 +')'});
+    }).on( 'mouseout', function( e ) {
+      $( this ).text( e.pageX + ' ‹ƒ› ' + e.pageY )
+      .css({'transform':'translateZ('+(0)+'px)'})
+      .animate({'transform':'scale('+ 1 +')'});
+    });
+    
+    $('div#cntnr').scroll(function(){
         alt = e.originalEvent.wheelDelta;
         !!alt > 0 ? console.log(alt) : alt;
-        
-        $rvr = $(this);
-        rvr = $rvr.scrollTop();
-        $rvr.wrapInner('<div id="warp">');
-        $warp = $('div#warp').children();
-        $.each($warp, function(){
-          $(this).text( rvr );
-        });
-        
-        if (rvr > rv) {
-          if(!$scaler.data('scaled')) {
-            $scaler.data('scaled', 1)
-            .stop(true).animate({'transform':'scale(' + 4 + ')'}, 250, function(){
-              console.log('scale 4');  
-            });
-          }
-        } else {
-          //Scrolling Up
-          if(!!$scaler.data('scaled')) {
-            $scaler.data('scaled', 0)
-            .stop(true).animate({'transform':'scale(' + 1 + ')'}, 250, function(){
-              console.log('scale 1');  
-            });
-          }
-        }
-        rv = rvr;
     });
-
   });
 })(jQuery);
