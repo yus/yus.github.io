@@ -8,6 +8,7 @@ jQuery.noConflict();
   $(function () {
     $('body').addClass('yusdesign');
     $('div#gesso').append( $('<div>').attr('id', 'cntnr') );
+    $('div#gesso').parent('section').attr('class', 'kuler');
     var ns = 'http://kuler.adobe.com/kuler/API/rss/',
     qc = '?searchQuery=userID:102986',
     qn = '&itemsPerPage=50',
