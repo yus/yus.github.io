@@ -64,7 +64,9 @@ jQuery.noConflict();
           }, 250, function() {
             this.animate({
               'transform':'scale(' + 1 + ')'
-            }
+            }, 250, function() {
+              console.log('does hover')
+            });
           });
         });
       });
