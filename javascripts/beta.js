@@ -55,17 +55,15 @@ jQuery.noConflict();
     $(window).scroll(function(){
       $.each($('div#gesso').children().children(), function(h,v){
         var $unit = $(this);
+        var $rival = 'translateY(' + $(+=25) + 'px)';
         $unit.css({
-          'transform':'translateY(' +  + ')'
+          'transform': $rival
         });
         $unit.hover(function(){
-          this.animate({
-            'transform':'scale(' + 4 + ')'
-          }, 250, function() {
-            this.animate({
-              'transform':'scale(' + 1 + ')'
-            }, 250, function() {
-              console.log('does hover');
+          this.animate({'transform':'scale(' + 4 + ')'}, 250, function() {
+            console.log('does hover');
+            this.animate({'transform':'scale(' + 1 + ')'}, 250, function() {
+              console.log('done hover');
             });
           });
         });
