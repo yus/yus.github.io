@@ -50,9 +50,7 @@ jQuery.noConflict();
     var $scaler = $('.scalar');
     $('div#cntnr').scroll(function () {
         var rvr = $(this).scrollTop();
-        var $sclr4 = 
-        var $sclr1 = $scaler.stop(true).animate({ 'transform':'scale(' + 1 + ')'}, 250);
-        if (rvr > rv) {
+          if (rvr > rv) {
             if(!$scaler.data('scaled')) {
               $scaler.data('scaled', 1)
               .stop(true).animate({'transform':'scale(' + 4 + ')'}, 250, function(){
