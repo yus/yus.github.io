@@ -46,22 +46,17 @@ jQuery.noConflict();
         });
       }
     });
-    var rv = 0, alt, $scaler = $('.scalar');
+    var rv = 0, rvr, alt, $scaler = $('.scalar');
     $(window).bind('mousewheel', function(e){
       alt = e.originalEvent.wheelDelta;
-      if( alt > 0) {
-        alt;
-        console.log(alt);
+      alt > 0 ? alt; console.log(alt) : alt;
       }
     });
 
     $('div#cntnr').bind('mousewheel', function(e){
         alt = e.originalEvent.wheelDelta;
-        if( alt > 0) {
-          alt;
-          console.log(alt);
-        }
-        var rvr = $(this).scrollTop(+=alt);
+        alt > 0 ? alt; console.log(alt) : alt;
+        rvr = $(this).scrollTop();
         if (rvr > rv) {
           if(!$scaler.data('scaled')) {
             $scaler.data('scaled', 1)
