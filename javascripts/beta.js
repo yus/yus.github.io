@@ -46,12 +46,6 @@ jQuery.noConflict();
         });
       }
     });
-  });
-})(jQuery);
-/** + roll */
-(function($){
-  $(function(){
-    //var $w = $(window).scroll(function(){});
     var rv = 0;
     var $scaler = $('.scalar');
     $('div#cntnr').scroll(function () {
