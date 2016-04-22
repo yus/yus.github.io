@@ -50,16 +50,21 @@ jQuery.noConflict();
     var rvr, alt, rv = 0, $scaler = $('.scalar');
     $( document ).on( 'mousemove', function( e ) {
       $rvr = $('.kuler');
-      rvr = $rvr.scrollTop(e.pageY);
+      rvr = $rvr.scrollTop();
+      while (rvr > rv) do $rvr.scrollTop( e.originalEvent.wheelDelta * e.pageY );
     });
-    $scaler.on( 'mouseover', function( e ) {
-      $( this ).text( e.pageX + ' ‹ƒ› ' + e.pageY )
-      .css({'transform':'translateZ('+(2)+'px)'})
-      .animate({'transform':'scale('+ 2 +')'});
-    }).on( 'mouseout', function( e ) {
-      $( this ).text( e.pageX + ' ‹ƒ› ' + e.pageY )
-      .css({'transform':'translateZ('+(0)+'px)'})
-      .animate({'transform':'scale('+ 1 +')'});
+    
+    $.each($scaler, function( ae, ea ) {
+      console.log( ae + ': ‹ƒ› ' + $(this).css('background-color') );
+      $( this ).on( 'mouseover', function( e ) {
+        $( this ).text( e.pageX + '‹›' + e.pageY )
+        .css({'transform':'translateZ('+(2)+'px)'})
+        .animate({'transform':'scale('+ 2 +')'});
+      }).on( 'mouseout', function( e ) {
+        $( this ).text( e.pageX + '‹›' + e.pageY )
+        .css({'transform':'translateZ('+(0)+'px)'})
+        .animate({'transform':'scale('+ 1 +')'});
+      });
     });
     
     $('div#cntnr').scroll(function(){
