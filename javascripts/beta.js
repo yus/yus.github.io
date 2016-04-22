@@ -47,15 +47,9 @@ jQuery.noConflict();
       }
     });
     var rv = 0, rvr, alt, $scaler = $('.scalar');
-    $(window).bind('mousewheel', function(e){
-      alt = e.originalEvent.wheelDelta;
-      alt > 0 ? console.log(alt) : alt;
-      }
-    });
-
     $('div#cntnr').bind('mousewheel', function(e){
         alt = e.originalEvent.wheelDelta;
-        alt > 0 ? console.log(alt) : alt;
+        !!alt > 0 ? console.log(alt) : alt;
         rvr = $(this).scrollTop(alt);
         if (rvr > rv) {
           if(!$scaler.data('scaled')) {
