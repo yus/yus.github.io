@@ -50,7 +50,15 @@ jQuery.noConflict();
     $('div#cntnr').bind('mousewheel', function(e){
         alt = e.originalEvent.wheelDelta;
         !!alt > 0 ? console.log(alt) : alt;
-        rvr = $(this).scrollTop(alt);
+        
+        $rvr = $(this);
+        rvr = $rvr.scrollTop();
+        $rvr.wrapInner('<div id="warp">');
+        $warp = $('div#warp').children();
+        $.each($warp, function(){
+          $(this).text( rvr );
+        });
+        
         if (rvr > rv) {
           if(!$scaler.data('scaled')) {
             $scaler.data('scaled', 1)
