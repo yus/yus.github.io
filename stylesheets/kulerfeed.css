@@ -10,6 +10,7 @@
   overflow-x: auto;
   height: 555px;
   margin: 29px auto !important;
+  padding: 0 !important;
 }
 #gesso{
   display: flex;
