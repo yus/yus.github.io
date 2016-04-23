@@ -49,9 +49,6 @@ jQuery.noConflict();
     });
     var rvr, hght, alt, rv = 0, $scaler = $('.scalar');
     $scaler.on( 'mouseover', function( e ) {
-      
-    });
-    $scaler.on( 'mouseover', function( e ) {
       $(this).text( e.pageY )
       .css('transform','translateZ('+(2)+'px)')
       .animate({'transform':'scale('+ 2 +')'});
