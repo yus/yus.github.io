@@ -40,11 +40,15 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
             quler.append( $skalar );
-            $('div#cntnr').addClass('gesso').append($skalar.clone().mouseenter(function(e) {
-              $(this).css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'}).html(e.pageY);
-            }).mouseout(function(e){
-              $(this).css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'}).html(e.pageY);
-            }));
+            var $sklr = $skalar.clone().each(function(){
+              sklr = $(this);
+              sklr.mouseenter(function(e) {
+                sklr.css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'}).html(e.pageY);
+              }).mouseout(function(e){
+                sklr.css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'}).html(e.pageY);
+              })
+            });
+            $('div#cntnr').addClass('gesso').append();
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
