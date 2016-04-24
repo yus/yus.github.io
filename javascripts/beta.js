@@ -39,7 +39,7 @@ jQuery.noConflict();
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch)
-            .addClass('scalar').mouseover(function(e) {
+            .addClass('scalar').mouseenter(function(e) {
               $(this).text( e.pageY ).css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'})
             }).mouseout(function(e){
               $(this).text(e.pageY ).css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'})
@@ -50,20 +50,6 @@ jQuery.noConflict();
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
         });
-      }
-    });
-    var rvr, hght, alt, rv = 0, $scaler = $('.scalar');
-
-    $(window).scroll(function(e) {
-      hght = $(window).scrollTop();
-      $rvr = $('.kuler');
-      rvr = $rvr.scrollTop();
-      console.log(rvr);
-      if (rvr > rv) {
-        $rvr.scrollTop( -rvr );
-      }
-      if(hght  > rvr) {
-        $rvr.scrollTop( -rvr );
       }
     });
   });
