@@ -38,7 +38,12 @@ jQuery.noConflict();
             var $swatch = $(this);
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
-            $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
+            $skalar = $('<div>').css('background-color', '#' + $swtch)
+            .addClass('scalar').mouseover(function(e) {
+              $(this).text( e.pageY ).css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'})
+            }).mouseout(function(e){
+              $(this).text(e.pageY ).css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'})
+            });
             quler.append( $skalar );
             $('div#cntnr').addClass('gesso').append($skalar.clone());
           });
@@ -48,16 +53,7 @@ jQuery.noConflict();
       }
     });
     var rvr, hght, alt, rv = 0, $scaler = $('.scalar');
-    $scaler.on( 'mouseover', function( e ) {
-      $(this).text( e.pageY )
-      .css('transform','translateZ('+(2)+'px)')
-      .animate({'transform':'scale('+ 2 +')'});
-    }).on( 'mouseout', function( e ) {
-      $(this).text(e.pageY )
-      .css('transform','translateZ('+(0)+'px)')
-      .animate({'transform':'scale('+ 1 +')'});
-    });
-    
+
     $(window).scroll(function(e) {
       hght = $(window).scrollTop();
       $rvr = $('.kuler');
@@ -69,11 +65,6 @@ jQuery.noConflict();
       if(hght  > rvr) {
         $rvr.scrollTop( -rvr );
       }
-    });
-
-    $('div#cntnr').scroll(function(){
-        alt = e.originalEvent.wheelDelta;
-        !!alt > 0 ? console.log(alt) : alt;
     });
   });
 })(jQuery);
