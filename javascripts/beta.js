@@ -43,11 +43,9 @@ jQuery.noConflict();
             var $sklr = $skalar.clone();
             $sklr.each(function(){
               $(this).mouseenter(function(e) {
-                $(this).css('transform','translateZ('+(1)+'px)').html(e.pageY);
-                $(this).animate({transform:'perspective(1px) scale('+ 2 +')'}, 222);
+                $(this).animate({transform:'perspective(1px) scale(2, .72)'}, 222).html(e.pageY);
               }).mouseout(function(e){
-                $(this).css('transform','translateZ('+(0)+'px)').html(e.pageY);
-                $(this).animate({transform:'perspective(1px) scale('+ 1 +')'}, 222);
+                $(this).animate({transform:'perspective(1px) scale(1, .72)'}, 222).html(e.pageY);
               })
             });
             $('div#cntnr').addClass('gesso').append($sklr);
