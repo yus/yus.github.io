@@ -44,10 +44,10 @@ jQuery.noConflict();
             $sklr.each(function(){
               $(this).mouseenter(function(e) {
                 $(this).css('transform','translateZ('+(1)+'px)').html(e.pageY);
-                $(this).animate({transform:'perspective(1px) scale('+ 2 +')'});
+                $(this).animate({transform:'perspective(1px) scale('+ 2 +')'}, 222);
               }).mouseout(function(e){
                 $(this).css('transform','translateZ('+(0)+'px)').html(e.pageY);
-                $(this).animate({transform:'perspective(1px) scale('+ 1 +')'});
+                $(this).animate({transform:'perspective(1px) scale('+ 1 +')'}, 222);
               })
             });
             $('div#cntnr').addClass('gesso').append($sklr);
