@@ -40,9 +40,9 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch)
             .addClass('scalar').mouseenter(function(e) {
-              $(this).text( e.pageY ).css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'})
+              $(this).css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'}).html(e.pageY);
             }).mouseout(function(e){
-              $(this).text(e.pageY ).css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'})
+              $(this).css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'}).html(e.pageY);
             });
             quler.append( $skalar );
             $('div#cntnr').addClass('gesso').append($skalar.clone());
