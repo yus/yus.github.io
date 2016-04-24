@@ -40,12 +40,12 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalar = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
             quler.append( $skalar );
-            var $sklr = $skalar.clone().each(function(){
-              sklr = $(this);
-              sklr.mouseenter(function(e) {
-                sklr.css('transform','translateZ('+(2)+'px)').animate({'transform':'scale('+ 2 +')'}).html(e.pageY);
+            var $sklr = $skalar.clone();
+            $sklr.each(function(){
+              $(this).mouseenter(function(e) {
+                $(this).css('transform','translateZ('+(1)+'px)').animate({'transform':'perspective(1px) scale('+ 2 +')'}).html(e.pageY);
               }).mouseout(function(e){
-                sklr.css('transform','translateZ('+(0)+'px)').animate({'transform':'scale('+ 1 +')'}).html(e.pageY);
+                $(this).css('transform','translateZ('+(0)+'px)').animate({'transform':'perspective(1px) scale('+ 1 +')'}).html(e.pageY);
               })
             });
             $('div#cntnr').addClass('gesso').append();
