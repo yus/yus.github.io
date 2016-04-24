@@ -48,7 +48,7 @@ jQuery.noConflict();
                 $(this).css('transform','translateZ('+(0)+'px)').animate({'transform':'perspective(1px) scale('+ 1 +')'}).html(e.pageY);
               })
             });
-            $('div#cntnr').addClass('gesso').append();
+            $('div#cntnr').addClass('gesso').append($sklr);
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
