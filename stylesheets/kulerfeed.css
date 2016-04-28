@@ -65,6 +65,7 @@
   min-width: 1em;
   min-height: 1em;
   transform: scale(1, .72);
+  transform-origin: center center;
   animation-name: sclr;
   animation-duration: 222ms;
   transition: all 0.2s ease-in-out 0s;
