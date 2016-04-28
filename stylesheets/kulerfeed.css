@@ -57,27 +57,23 @@
   display:flex;
 }
 #kulerfeed .scalar {
-  width:8px;
+  width:25px;
   height:25px;
 }
 #cntnr .scalar {
   min-width: 1em;
   min-height: 1em;
   transform: scale(1, .72);
-  animation-name: sclrx;
+  animation-name: sclr;
   animation-duration: 222ms;
+  transition: all 0.2s ease-in-out 0s;
 }
 #cntnr .scalar:hover {
-  animation-name: sclry;
-  animation-duration: 222ms;
+  transform: scale(1, 2.72)
 }
-@keyframes sclrx {
+@keyframes sclr {
     0%   {transform: scale(1, 2.72)}
     100% {transform: scale(1, .72)}
-}
-@keyframes sclry {
-    0%   {transform: scale(1, .72)}
-    100% {transform: scale(1, 2.72)}
 }
 .scalar{
   display:flex;
