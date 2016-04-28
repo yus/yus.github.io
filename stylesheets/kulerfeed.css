@@ -5,6 +5,7 @@
 */
 .yusdesign{
   display: flex;
+  flex-direction: column;
 }
 .kuler {
   overflow-x: auto;
