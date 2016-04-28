@@ -245,11 +245,11 @@ Custom
 Full-Width Styles
 *******************************************************************************/
 
-.outer {
+.outr {
   width: 100%;
 }
 
-.inner {
+.innr {
   position: relative;
   max-width: 841px;
   padding: 29px 29px;
