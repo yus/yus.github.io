@@ -61,6 +61,7 @@
   height:25px;
 }
 #cntnr .scalar {
+  cursor:pointer;
   min-width: 1em;
   min-height: 1em;
   transform: scale(1, .72);
