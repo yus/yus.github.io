@@ -111,18 +111,17 @@
   padding:5px 0 0;
 }
 footer{
-  display: flex;
+  display: flex !important;
   flex-direction: row-reverse;
   align-content: center;
   align-items: center;
-  margin: 0px auto;
+  margin: 0px auto !important;
 }
 .copyright{
   height:20px;
   min-width: 20vw;
   background:url(../images/yus.png) no-repeat scroll 50% 50%;
 }
-
 .regards{
   height:40px;
   min-width: 20vw;
