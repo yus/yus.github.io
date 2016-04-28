@@ -110,12 +110,22 @@
   height:16px;
   padding:5px 0 0;
 }
+footer{
+  display: flex;
+  flex-direction: row-reverse;
+  align-content: center;
+  align-items: center;
+  margin: 0px auto;
+}
 .copyright{
   height:20px;
+  min-width: 20vw;
   background:url(../images/yus.png) no-repeat scroll 50% 50%;
 }
+
 .regards{
   height:40px;
+  min-width: 20vw;
   background:
     url(../images/blacktocat18.png) no-repeat scroll 0 50%,
     url(../images/ku18.png) 36px 50% no-repeat;
