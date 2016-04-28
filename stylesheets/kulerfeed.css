@@ -34,7 +34,7 @@
 #kulerfeed{
   overflow-x: hidden;
   flex-wrap: wrap;
-  flex-basis: 49%;
+  flex-basis: 55%;
   direction: rtl;
   flex-direction: column-reverse;
   align-content: space-between;
@@ -46,7 +46,7 @@
   overflow: hidden;
   font-family: 'Fira Sans', sans-serif;
   font-size: 29px;
-  flex-basis: 122%;
+  flex-basis: 45%;
   flex-wrap: wrap;
   direction: rtl;
   flex-direction: column-reverse;
