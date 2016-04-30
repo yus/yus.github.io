@@ -43,9 +43,9 @@ jQuery.noConflict();
             $sklr = $skalares.clone().addClass('sclr' + q);
             quler.append( $skalares );
             $('div#cntnr').addClass('gesso').append( $sklr );
-            $('sclr' + q).mouseover(function(q){
+            $('sclr' + q).mouseenter(function(q){
               $('sqlr' + q).css({'animation-play-state':'running'});
-            }).mouseout(function(q){
+            }).mouseleave(function(q){
               $('sqlr' + q).css({'animation-play-state':'paused'});
             });
           });
