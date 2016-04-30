@@ -39,9 +39,8 @@ jQuery.noConflict();
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar').addClass('sqlr' + q);
-            $skalares.css( 'animation-name','sclr' );
             $sklr = $skalares.clone().attr('class','scalar sclr' + q);
-            quler.append( $skalares );
+            quler.append( $skalares.css( 'animation-name','sclr' ) );
             $('div#cntnr').addClass('gesso').append( $sklr );
             $('sclr' + q).mouseenter(function(q){
               $('sqlr' + q).css({'animation-play-state':'running'});
