@@ -40,13 +40,13 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar' + q);
             $sklr = $skalares.clone().addClass('sclr' + q).css('animation-name','sclr');
-            $('sclr' + q).mouseover(function(){
-              $('scalar' + q).css({'animation-play-state':'running'});
-            }).mouseout(function(){
-              $('scalar' + q).css({'animation-play-state':'paused'});
-            });
             quler.append( $skalares );
             $('div#cntnr').addClass('gesso').append();
+            $('sclr' + q).mouseover(function(q){
+              $('scalar' + q).css({'animation-play-state':'running'});
+            }).mouseout(function(q){
+              $('scalar' + q).css({'animation-play-state':'paused'});
+            });
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
