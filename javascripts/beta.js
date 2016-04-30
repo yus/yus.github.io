@@ -38,14 +38,14 @@ jQuery.noConflict();
             var $swatch = $(this);
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
-            $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar' + q);
+            $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar').addClass('sqlr' + q);
             $sklr = $skalares.clone().addClass('sclr' + q).css('animation-name','sclr');
             quler.append( $skalares );
-            $('div#cntnr').addClass('gesso').append();
+            $('div#cntnr').addClass('gesso').append($sklr);
             $('sclr' + q).mouseover(function(q){
-              $('scalar' + q).css({'animation-play-state':'running'});
+              $('sqlr' + q).css({'animation-play-state':'running'});
             }).mouseout(function(q){
-              $('scalar' + q).css({'animation-play-state':'paused'});
+              $('sqlr' + q).css({'animation-play-state':'paused'});
             });
           });
           qlrtitle.append( quler );
