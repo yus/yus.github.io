@@ -38,9 +38,15 @@ jQuery.noConflict();
             var $swatch = $(this);
             var swatch = $swatch[0];
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
-            $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar');
+            $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar' + q);
+            $sklr = $skalares.clone().addClass('sclr' + q).css('animation-name','sclr');
+            $('sclr' + q).mouseover(function(){
+              $('scalar' + q).css({'animation-play-state':'running'});
+            }).mouseout(function(){
+              $('scalar' + q).css({'animation-play-state':'paused'});
+            });
             quler.append( $skalares );
-            $('div#cntnr').addClass('gesso').append($skalares.clone());
+            $('div#cntnr').addClass('gesso').append();
           });
           qlrtitle.append( quler );
           $('div#kulerfeed').append( qlrtitle );
