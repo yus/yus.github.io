@@ -40,7 +40,7 @@ jQuery.noConflict();
             var $swtch = swatch.getElementsByTagNameNS(ns, 'swatchHexColor')[0].valueOf().innerHTML.toString();
             $skalares = $('<div>').css('background-color', '#' + $swtch).addClass('scalar').addClass('sqlr' + q);
             $skalares.css( 'animation-name','sclr' );
-            $sklr = $skalares.clone().addClass('sclr' + q);
+            $sklr = $skalares.clone().attr('class','scalar sclr' + q);
             quler.append( $skalares );
             $('div#cntnr').addClass('gesso').append( $sklr );
             $('sclr' + q).mouseenter(function(q){
