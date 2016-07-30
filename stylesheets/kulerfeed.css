@@ -28,7 +28,7 @@
 .gesso{
   height: auto;
   background-color: #222;
-  display: flex;
+  /*display: flex;*/
   flex-grow: 1;
 }
 #kulerfeed{
