@@ -1,12 +1,13 @@
 /*
 * name: yusdesign theme for kuler feed
-* author: Yuri Skorodelov
+* author: yusdesign
 * copyright: yusdesign (c) 2016
 */
-.yusdesign{
+.yusdesign {
   display: flex;
   flex-direction: column;
 }
+
 .kuler {
   overflow-x: auto;
   width: 841px;
@@ -16,102 +17,122 @@
   justify-content: flex-end;
   direction: rtl;
 }
+
 .outer {
-    min-width: 841px;
-    display: flex;
-    flex: 1;
+  min-width: 841px;
+  display: flex;
+  flex: 1;
 }
-#gesso{
+
+#gesso {
   display: flex;
   min-width: 29%;
 }
-.gesso{
+
+.gesso {
   height: auto;
-  background-color: #222;
-  /*display: flex;*/
   flex-grow: 1;
 }
-#kulerfeed{
+
+#kulerfeed {
   flex-wrap: wrap;
   flex-basis: 55%;
   flex-direction: column-reverse;
   align-content: space-around;
-  padding: 2vh;
+  /* padding: 2vh; */
+  /* padding: 1vh; */
 }
-#cntnr{
-  color: rgb(255, 129, 29);
-  font-family: 'Fira Sans', sans-serif;
+
+#cntnr {
+  color: rgb(255,129,29);
+  font-family: 'Fira Sans',sans-serif;
   font-size: 2vh;
   flex-basis: 45%;
   flex-wrap: wrap;
   flex-direction: column-reverse;
   justify-content: space-around;
-  padding: 2vh;
 }
-.tetra{
-  background-color: rgb(85, 85, 85);
+
+.tetra {
+  background-color: rgb(85,85,85);
   display: flex;
-  margin: 2vh;
-  padding: 2vh;
-  flex-direction: column-reverse;
-  align-items: center;
+  margin: 2px;
+  padding: 12px;
+  flex-direction: column;
+  align-items: flex-end;
+  min-height: 156px;
 }
-.tinge{
-  display:flex;
+
+.tinge {
+  display: flex;
 }
+
 #kulerfeed .scalar {
-  width:25px;
-  height:25px;
+  width: 25px;
+  height: 25px;
 }
+
 #cntnr .scalar {
   cursor: pointer;
-  min-width: 2vh;
-  min-height: 2vh;
-  transform: scale(1, .72);
+  min-height: 4vh;
+  transform: scale(1,.72);
   transition: all 0.2s ease-in-out 0s;
   animation-name: sclr;
   animation-duration: 222ms;
 }
+
 #cntnr .scalar:hover {
-  transform: scale(1, 1.72)
+  transform: scale(1,1.72)
 }
+
 @keyframes sclr {
-    0%   {transform: scale(1, 1.72)}
-    100% {transform: scale(1, .72)}
+  0% {
+    transform: scale(1,1.72)
+  }
+
+  100% {
+    transform: scale(1,.72)
+  }
 }
-.scalar{
-  display:flex;
+
+.scalar {
+  display: flex;
 }
-.tangle{
-  color:silver;
-  display:flex;
+
+.tangle {
+  color: silver;
+  display: flex;
 }
-.tangle:hover{
-  color:gainsboro;
+
+.tangle:hover {
+  color: gainsboro;
 }
-.titre{
-  font-family: 'Fira Sans', sans-serif;
+
+.titre {
+  font-family: 'Fira Sans',sans-serif;
   font-size: 12px;
 }
-footer{
-  display: flex !important;
+
+footer {
+  display: flex!important;
   flex-direction: row;
   flex: initial;
   flex-grow: unset;
   flex-shrink: unset;
 }
-#footer_wrap{
+
+#footer_wrap {
   justify-content: center;
 }
-.copyright{
-  height:40px;
+
+.copyright {
+  height: 40px;
   min-width: 29vw;
-  background:url(../images/yus.png) no-repeat scroll 50% 50%;
+  background: url(../images/yus.png) no-repeat scroll 50% 50%;
 }
-.regards{
-  height:40px;
+
+.regards {
+  height: 40px;
   min-width: 29vw;
-  background:
-    url(../images/blacktocat18.png) no-repeat scroll 0 50%,
-    url(../images/ku18.png) 36px 50% no-repeat;
+  background: url(../images/blacktocat18.png) no-repeat scroll 0 50%,url(../images/ku18.png) 36px 50% no-repeat;
 }
