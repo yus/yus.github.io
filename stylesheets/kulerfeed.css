@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .kuler {
   overflow-x: auto;
   width: 841px;
@@ -17,42 +16,35 @@
   justify-content: flex-end;
   direction: rtl;
 }
-
 .outer {
   min-width: 841px;
   display: flex;
   flex: 1;
 }
-
 #gesso {
   display: flex;
   min-width: 29%;
 }
-
 .gesso {
   height: auto;
   flex-grow: 1;
 }
-
 #kulerfeed {
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
   flex-basis: 55%;
   flex-direction: column-reverse;
   align-content: space-around;
-  /* padding: 2vh; */
-  /* padding: 1vh; */
 }
-
 #cntnr {
+  display: flex;
   color: rgb(255,129,29);
   font-family: 'Fira Sans',sans-serif;
-  font-size: 2vh;
-  flex-basis: 45%;
-  flex-wrap: wrap;
-  flex-direction: column-reverse;
-  justify-content: space-around;
+  flex-basis: 100%;
+  flex-wrap: wrap-reverse;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
 }
-
 .tetra {
   background-color: rgb(85,85,85);
   display: flex;
@@ -62,57 +54,49 @@
   align-items: flex-end;
   min-height: 156px;
 }
-
 .tinge {
   display: flex;
 }
-
 #kulerfeed .scalar {
   width: 25px;
   height: 25px;
 }
-
 #cntnr .scalar {
   cursor: pointer;
-  min-height: 4vh;
-  transform: scale(1,.72);
+  height: 29px;
+  width: 29px;
   transition: all 0.2s ease-in-out 0s;
   animation-name: sclr;
   animation-duration: 222ms;
 }
-
 #cntnr .scalar:hover {
-  transform: scale(1,1.72)
+  transform: scale(.72);
 }
-
 @keyframes sclr {
   0% {
-    transform: scale(1,1.72)
+    transform: scale(1);
   }
 
   100% {
-    transform: scale(1,.72)
+    transform: scale(.72);
   }
 }
-
 .scalar {
   display: flex;
+  align-self: stretch;
+  flex-grow: 1;
 }
-
 .tangle {
   color: silver;
   display: flex;
 }
-
 .tangle:hover {
   color: gainsboro;
 }
-
 .titre {
   font-family: 'Fira Sans',sans-serif;
   font-size: 12px;
 }
-
 footer {
   display: flex!important;
   flex-direction: row;
@@ -120,17 +104,14 @@ footer {
   flex-grow: unset;
   flex-shrink: unset;
 }
-
 #footer_wrap {
   justify-content: center;
 }
-
 .copyright {
   height: 40px;
   min-width: 29vw;
   background: url(../images/yus.png) no-repeat scroll 50% 50%;
 }
-
 .regards {
   height: 40px;
   min-width: 29vw;
