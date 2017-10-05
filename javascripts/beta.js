@@ -9,7 +9,7 @@ jQuery.noConflict();
     $('body').addClass('yusdesign');
     $('div#gesso').append( $('<div>').attr('id', 'cntnr') );
     $('div#gesso').parent('section').addClass('kuler');
-    var ns = 'http://kuler.adobe.com/kuler/API/rss/',
+    var ns = 'https://kuler.adobe.com/kuler/API/rss/',
     qc = '?searchQuery=userID:102986',
     qn = '&itemsPerPage=50',
     qk = '&key=5F8FD294DC6015C63AEF97E329246996';
@@ -29,7 +29,7 @@ jQuery.noConflict();
           book = $book[0];
           $ns_themeID = book.getElementsByTagNameNS(ns, 'themeID')[0].valueOf().innerHTML.toString();
           $ns_themeTitle = book.getElementsByTagNameNS(ns, 'themeTitle')[0].valueOf().innerHTML.toString();
-          themeLink = '//color.adobe.com/themeID/' + $ns_themeID;
+          themeLink = 'https://color.adobe.com/themeID/' + $ns_themeID;
           quler = $('<div id="quartz' + i + '"></div>').addClass('tinge');
           qlrtitle = $('<div id="title' + i + '"></div>').addClass('tetra');
           qlr = $('<a>').attr('href', themeLink).addClass('tangle');
