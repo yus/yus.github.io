@@ -5,7 +5,7 @@ reworked Slate Theme by Jason Costello, @jsncostello
 @import url(pygment_trac.css);
 *******************************************************************************/
 
-@import url(kulerfeed.css);
+/**@import url(kulerfeed.css);**/
 
 /*******************************************************************************
 MeyerWeb Reset
