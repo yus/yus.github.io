@@ -4,6 +4,7 @@ function setup() {
   cnt.size(windowWidth, 600);
   cnt.parent('gesso');
   cnvs.parent(cnt);
+  cnt.center();
   cnvs.center();
 }
 
