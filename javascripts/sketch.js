@@ -18,4 +18,6 @@ function draw() {
 }
 function windowResized() {
   cnt.size(windowWidth, 600);
+  cnt.center();
+  cnvs.center();
 }
