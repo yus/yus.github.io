@@ -1,7 +1,10 @@
 function setup() {
-  var canvas = createCanvas(640, 480);
-  canvas.parent('gesso');
-  canvas.center();
+  var cnt = createDiv('');
+  var cnvs = createCanvas(640, 480);
+  cnt.size(windowWidth, 600);
+  cnt.parent('gesso');
+  cnvs.parent(cnt);
+  cnvs.center();
 }
 
 function draw() {
