@@ -15,3 +15,6 @@ function draw() {
   }
   ellipse(mouseX, mouseY, 80, 80);
 }
+function windowResized() {
+  cnt.size(windowWidth, 600);
+}
