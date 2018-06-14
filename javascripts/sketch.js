@@ -1,6 +1,7 @@
 function setup() {
   var canvas = createCanvas(640, 480);
   canvas.parent('gesso');
+  canvas.center();
 }
 
 function draw() {
