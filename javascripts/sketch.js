@@ -5,7 +5,7 @@ function setup() {
   var cnvs = createCanvas(windowWidth, windowHeight-220);
   cnvs.parent(cnt).position(0,120).background(52);
   var hdr = createDiv('').id('header').parent(cnt);
-  select('#header').size(windowWidth,120).position(0,120);
+  select('#header').size(windowWidth,120).position(0,0);
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
 }
@@ -21,6 +21,6 @@ function draw() {
 function windowResized() {
   cnt.size(windowWidth, windowHeight);
   resizeCanvas(windowWidth, windowHeight-220);
-  select('#header').size(windowWidth,120).position(0,120);
+  select('#header').size(windowWidth,120).position(0,0);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
 }
