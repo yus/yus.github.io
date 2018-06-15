@@ -1,8 +1,8 @@
 function setup() {
-  body.style('margin', '0 0');
+  body.style('margin', 0);
   var cnt = createDiv('');
-  cnt.size(windowWidth-100, windowHeight-100);
   cnt.parent(body);
+  cnt.size(windowWidth-100, windowHeight-100);
   cnt.center();
   var cnvs = createCanvas(640, 480);
   cnvs.parent(cnt);
