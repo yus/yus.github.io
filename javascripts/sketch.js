@@ -1,6 +1,7 @@
 // John Conway Game of Life
 
 var w;
+var h;
 var columns;
 var rows;
 var board;
@@ -17,9 +18,10 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   
-  w = 50;
+  w = 71;
+  h = 192;
   columns = floor(cnvs.width/w);
-  rows = floor(cnvs.height/w);
+  rows = floor(cnvs.height/h);
   board = new Array(columns);
   for (var i = 0; i < columns; i++) {
     board[i] = new Array(rows);
@@ -39,7 +41,7 @@ function draw() {
       if ((board[i][j] == 1)) fill(0);
       else fill(255); 
       stroke(0);
-      rect(i*w, j*w, w-1, w-1);
+      rect(i*w, j*h, w-1, h-1, 20);
     }
   }
 }
