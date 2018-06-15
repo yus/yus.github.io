@@ -1,17 +1,10 @@
 // John Conway Game of Life
 
 var clrtable;
-var rndclr;
+var clr;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  clrtable.removeColumn('label');
-  
-  for (var r = 0; r < clrtable.getRowCount(); r++) {
-    for (var c = 0; c < clrtable.getColumnCount(); c++) {
-      rndclr = clrtable.getString(r, c);
-    }
-  }
 }
 
 var w;
@@ -21,6 +14,14 @@ var board;
 var next;
 
 function setup() {
+  clrtable.removeColumn('label');
+  
+  for (var r = 0; r < clrtable.getRowCount(); r++) {
+    for (var c = 0; c < clrtable.getColumnCount(); c++) {
+      clr = clrtable.getString(r, c);
+    }
+  }
+  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   var cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
@@ -50,7 +51,7 @@ function draw() {
   generate();
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
-      if ((board[i][j] == 1)) fill(rndclr);
+      if ((board[i][j] == 1)) fill(clr);
       else fill(255); 
         stroke(0);
         rect(i*w, j*w, w-1, w-1, 5);
