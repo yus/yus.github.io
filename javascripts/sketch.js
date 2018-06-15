@@ -18,8 +18,8 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   
-  w = 71;
-  h = 192;
+  w = 192;
+  h = 71;
   columns = floor(cnvs.width/w);
   rows = floor(cnvs.height/h);
   board = new Array(columns);
