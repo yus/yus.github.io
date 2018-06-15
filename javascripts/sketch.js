@@ -3,7 +3,7 @@ function setup() {
   var cnvs = createCanvas(640, 480);
   cnvs.parent(cnt);
   cnvs.center();
-  cnt.center();
+  cnt.center('horizontal');
 }
 
 function draw() {
