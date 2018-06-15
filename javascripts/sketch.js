@@ -5,6 +5,13 @@ var rndclr;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  clrtable.removeColumn('label');
+  
+  for (var r = 0; r < clrtable.getRowCount(); r++) {
+    for (var c = 0; c < clrtable.getColumnCount(); c++) {
+      rndclr = clrtable.getString(r, c);
+    }
+  }
 }
 
 var w;
@@ -23,14 +30,6 @@ function setup() {
   select('#header').size(windowWidth,120).position(0,0);
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
-  
-  clrtable.removeColumn('label');
-  
-  for (var r = 0; r < clrtable.getRowCount(); r++) {
-    for (var c = 0; c < clrtable.getColumnCount(); c++) {
-      rndclr = clrtable.getString(r, c);
-    }
-  }
   
   w = 50;
   columns = floor(cnvs.width/w);
