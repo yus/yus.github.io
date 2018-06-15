@@ -16,12 +16,6 @@ var next;
 function setup() {
   clrtable.removeColumn('label');
   
-  for (var r = 0; r < clrtable.getRowCount(); r++) {
-    for (var c = 0; c < clrtable.getColumnCount(); c++) {
-      clr = clrtable.getString(r, c);
-    }
-  }
-  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   var cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
@@ -49,9 +43,10 @@ function setup() {
 
 function draw() {
   generate();
+  getColors();
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
-      if ((board[i][j] == 1)) fill(clr);
+      if ((board[i][j] == 1)) fill('\''+clr+'\'');
       else fill(255); 
         stroke(0);
         rect(i*w, j*w, w-1, w-1, 5);
@@ -97,6 +92,14 @@ function generate() {
   var temp = board;
   board = next;
   next = temp;
+}
+
+function getColors() {
+  for (var r = 0; r < clrtable.getRowCount(); r++) {
+    for (var c = 0; c < clrtable.getColumnCount(); c++) {
+      clr = clrtable.getString(r, c);
+    }
+  }
 }
 
 function windowResized() {
