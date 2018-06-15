@@ -1,10 +1,9 @@
 function setup() {
   var cnt = createDiv('');
   var cnvs = createCanvas(640, 480);
-  cnt.size(windowWidth, 600);
-  cnt.parent('gesso');
+  cnt.size(windowWidth, windowHeight);
+  cnt.parent(body);
   cnvs.parent(cnt);
-  cnt.center();
   cnvs.center();
 }
 
@@ -17,5 +16,5 @@ function draw() {
   ellipse(mouseX, mouseY, 80, 80);
 }
 function windowResized() {
-  cnt.size(windowWidth, 600);
+  cnt.size(windowWidth, windowHeight);
 }
