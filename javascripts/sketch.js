@@ -1,4 +1,5 @@
 function setup() {
+  select('body').attribute('style', 'margin:0; overflow:hidden');
   var cnt = createDiv('').size(windowWidth, windowHeight);
   var cnvs = createCanvas(windowWidth, windowHeight);
   cnvs.parent(cnt);
