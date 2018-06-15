@@ -3,7 +3,7 @@ function setup() {
   var cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
   var cnvs = createCanvas(windowWidth, windowHeight-220);
-  cnvs.parent(cnt).position(0,120);
+  cnvs.parent(cnt).position(0,120).background(52);
   var hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth,120).position(0,120);
   var ftr = createDiv('').id('footer').parent(cnt);
@@ -11,7 +11,6 @@ function setup() {
 }
 
 function draw() {
-  background(52);
   if (mouseIsPressed) {
     fill(0);
   } else {
