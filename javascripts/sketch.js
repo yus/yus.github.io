@@ -1,10 +1,5 @@
 function setup() {
-  var b = select(body);
-  b.style('margin', 0);
-  var cnt = createDiv('');
-  cnt.parent(b);
-  cnt.size(windowWidth-100, windowHeight-100);
-  cnt.center();
+  var cnt = createDiv('').size(windowWidth-100, windowHeight-100);
   var cnvs = createCanvas(640, 480);
   cnvs.parent(cnt);
   cnvs.center();
