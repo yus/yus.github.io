@@ -1,9 +1,9 @@
 function setup() {
-  var cnt = createDiv('').size(windowWidth-100, windowHeight-100);
-  var cnvs = createCanvas(cnt.size());
+  var cnt = createDiv('').size(windowWidth, windowHeight);
+  var cnvs = createCanvas(windowWidth, windowHeight);
   cnvs.parent(cnt);
-  cnvs.center();
-  cnt.center('horizontal');
+  //cnvs.center();
+  //cnt.center('horizontal');
 }
 
 function draw() {
@@ -15,6 +15,6 @@ function draw() {
   ellipse(mouseX, mouseY, 25, 25);
 }
 function windowResized() {
-  cnt.size(windowWidth-100, windowHeight-100);
-  resizeCanvas(cnt.size());
+  cnt.size(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
 }
