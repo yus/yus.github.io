@@ -4,7 +4,7 @@ var clrtable;
 var clr;
 
 function preload() {
-  clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  clrtable = loadTable('javascripts/colors.csv', 'csv');
 }
 
 var w;
@@ -43,10 +43,10 @@ function setup() {
 
 function draw() {
   generate();
-  getColors();
+  colors();
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
-      if ((board[i][j] == 1)) fill('\''+clr+'\'');
+      if ((board[i][j] == 1)) fill(clr);
       else fill(255); 
         stroke(0);
         rect(i*w, j*w, w-1, w-1, 5);
@@ -94,7 +94,7 @@ function generate() {
   next = temp;
 }
 
-function getColors() {
+function colors() {
   for (var r = 0; r < clrtable.getRowCount(); r++) {
     for (var c = 0; c < clrtable.getColumnCount(); c++) {
       clr = clrtable.getString(r, c);
