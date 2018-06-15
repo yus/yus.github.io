@@ -18,8 +18,8 @@ function setup() {
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   
   w = 50;
-  columns = cnvs.width/w; //floor();
-  rows = cnvs.height/w;
+  columns = floor(cnvs.width/w);
+  rows = floor(cnvs.height/w);
   board = new Array(columns);
   for (var i = 0; i < columns; i++) {
     board[i] = new Array(rows);
