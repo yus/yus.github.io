@@ -51,8 +51,8 @@ function draw() {
     for ( var j = 0; j < rows;j++) {
       if ((board[i][j] == 1)) buff.fill(clr);
       else buff.fill(folor); 
-        buff.stroke(0);
-        buff.rect(i*w, j*w, w-1, w-1, 5);
+        buff.noStroke();
+        buff.rect(i*w, j*w, w-1, w-1, 2);
         image(buff,0,0);
     }
   }
