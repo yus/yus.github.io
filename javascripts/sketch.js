@@ -39,7 +39,6 @@ function setup() {
 function draw() {
   generate();
   colors();
-  console.log(clr+' is type of '+typeof clr);
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
       if ((board[i][j] == 1)) fill(clr);
@@ -94,6 +93,7 @@ function colors() {
   for (var r = 0; r < clrtable.getRowCount(); r++) {
     for (var c = 0; c < clrtable.getColumnCount(); c++) {
       clr = clrtable.getString(r, c);
+      console.log(clr+' is type of '+typeof clr);
     }
   }
 }
