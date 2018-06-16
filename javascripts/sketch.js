@@ -100,7 +100,8 @@ function generate() {
 
 function colors() {
   shuffle(tinges);
-  clr = tinges[29];
+  var q = floor(random(tinges.length));
+  clr = tinges[q];
 }
 
 function shuffle(a) {
