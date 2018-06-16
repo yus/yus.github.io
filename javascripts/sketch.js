@@ -44,7 +44,7 @@ function setup() {
 
 function draw() {
   generate();
-  colors();
+  //colors();
   // console.log(clr+' is type of '+typeof clr);
   
   for ( var i = 0; i < columns;i++) {
@@ -62,6 +62,7 @@ function mousePressed() {
 }
 
 function init() {
+  colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
       // Lining the edges with 0s
