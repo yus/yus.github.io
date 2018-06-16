@@ -52,7 +52,7 @@ function draw() {
       if ((board[i][j] == 1)) buff.fill(clr);
       else buff.fill(folor); 
         buff.noStroke();
-        buff.rect(i*w, j*w, w-1, w-1, 5);
+        buff.rect(i*w, j*w, w-1, w-1);
         image(buff,0,0);
     }
   }
