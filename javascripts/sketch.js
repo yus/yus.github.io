@@ -1,6 +1,6 @@
 // John Conway Game of Life
 
-var clrtable, clr, cnt, cnvs, tinges;
+var clrtable, clr, folor, cnt, cnvs, tinges;
 var w, columns, rows, board, next;
 
 function preload() {
@@ -45,13 +45,10 @@ function setup() {
 
 function draw() {
   generate();
-  //colors();
-  // console.log(clr+' is type of '+typeof clr);
-  
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
       if ((board[i][j] == 1)) fill(clr);
-      else fill(255); 
+      else fill(folor); 
         stroke(0);
         rect(i*w, j*w, w-1, w-1, 5);
     }
@@ -102,7 +99,9 @@ function generate() {
 function colors() {
   shuffle(tinges);
   var q = floor(random(tinges.length));
+  var qf = floor(random(tinges.length));
   clr = tinges[q];
+  folor = tinges[qf];
 }
 
 function shuffle(a) {
