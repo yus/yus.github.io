@@ -8,7 +8,7 @@ function preload() {
 }
 
 function setup() {
-  clrtable = clrtable.removeColumn(0);
+  clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
 
   select('body').attribute('style', 'margin:0; overflow:hidden');
