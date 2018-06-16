@@ -26,6 +26,7 @@ function setup() {
   select('#header').size(windowWidth,120).position(0,0);
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
+  var logo = createImg('images/yusdesign.png').parent('#header').position(20,20);
   
   w = 50;
   columns = floor(cnvs.width/w);
