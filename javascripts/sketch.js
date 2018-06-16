@@ -1,6 +1,6 @@
 // John Conway Game of Life
 
-var clrtable, clr, cnt, cnvs;
+var clrtable, clr, cnt, cnvs, tinges;
 var w, columns, rows, board, next;
 
 function preload() {
@@ -10,6 +10,12 @@ function preload() {
 function setup() {
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
+  tinges = [];
+  for (var r = 0; r < clrtable.getRowCount(); r++) {
+    for (var c = 0; c < clrtable.getColumnCount(); c++) {
+      tinges.push(clrtable.getString(r, c));
+    }
+  }
 
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
@@ -39,6 +45,8 @@ function setup() {
 function draw() {
   generate();
   colors();
+  // console.log(clr+' is type of '+typeof clr);
+  
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
       if ((board[i][j] == 1)) fill(clr);
@@ -90,12 +98,19 @@ function generate() {
 }
 
 function colors() {
-  for (var r = 0; r < clrtable.getRowCount(); r++) {
-    for (var c = 0; c < clrtable.getColumnCount(); c++) {
-      clr = clrtable.getString(r, c);
-      console.log(clr+' is type of '+typeof clr);
+  shuffle(tinges);
+  clr = tinges[29];
+}
+
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
     }
-  }
+    return a;
 }
 
 function windowResized() {
