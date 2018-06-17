@@ -127,6 +127,7 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight-220);
   select('#header').size(windowWidth,120).position(0,0);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
-  
+  loff = (cnvs.width - buff.width)/2;
+  toff = (cnvs.height - buff.height)/2;
   init();
 }
