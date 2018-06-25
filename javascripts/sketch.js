@@ -55,7 +55,7 @@ function draw() {
     for ( var j = 0; j < rows;j++) {
       if ((board[i][j] == 1)) buff.fill(clr);
       else buff.fill(folor); 
-        buff.noStroke();
+        buff.stroke(255);
         buff.rect(i*w, j*w, w-1, w-1);
         image(buff, loff, toff);
     }
