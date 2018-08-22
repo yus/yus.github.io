@@ -27,8 +27,8 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
-  var kryptexlogo = createImg('https://www.kryptex.org/static/images/logo_v2_128x128_white.png');
-  var rlink = createA('https://www.kryptex.org/?ref=27f18c0f', kryptexlogo).parent('#footer').position(72,29);
+  var rlink = createA('https://www.kryptex.org/?ref=27f18c0f').parent('#footer').position(72,29);
+  var kryptexlogo = createImg('images/kryptexlogo.png').parent(rlink).position(0,0);
   
   buff = createGraphics(500, 500);
   
