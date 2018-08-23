@@ -27,10 +27,14 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
-  var rlink = createA('https://www.kryptex.org/?ref=27f18c0f',
-                      '<img src="images/kryptexlogo.png" alt="kryptex" height="24" width="24">')
+  var rl1 = createA('https://www.kryptex.org/?ref=27f18c0f',
+                      '<img src="images/kryptexlogo.png" alt="kryptex" height="24">')
     .parent('#footer')
     .position(72,29);
+  var rl2 = createA('https://www.eobot.com/new.aspx?referid=2090425',
+                      '<img src="images/eobot.png" alt="eobot" height="24">')
+    .parent('#footer')
+    .position(120,29);
   
   buff = createGraphics(500, 500);
   
