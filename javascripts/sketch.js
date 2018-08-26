@@ -36,6 +36,11 @@ function setup() {
     .parent('#footer')
     .position(120,29);
   
+  var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
+                      '<img src="images/fractured.png" alt="fractured" height="24">')
+    .parent('#footer')
+    .position(222,29);
+  
   buff = createGraphics(500, 500);
   
   w = 25;
