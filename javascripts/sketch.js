@@ -37,9 +37,9 @@ function setup() {
     .position(120,29);
   
   var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
-                      '<img src="images/fractured.png" alt="fractured" height="24">')
+                      '<img src="images/fractured.png" alt="fractured" height="50">')
     .parent('#footer')
-    .position(222,29);
+    .position(windowWidth-200,29);
   
   buff = createGraphics(500, 500);
   
