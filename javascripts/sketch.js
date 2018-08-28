@@ -42,7 +42,7 @@ function setup() {
     .position(windowWidth-200,29);
   
   var rl4 = createA('https://www.flaticon.com/search?author_id=1',
-                      '<img src="images/flaticon.svg" alt="fractured" height="25">')
+                      '<img src="images/flaticon.svg" alt="flaticon" height="25">')
     .parent('#footer')
     .position(windowWidth-400,40);
   
