@@ -46,6 +46,12 @@ function setup() {
     .parent('#footer')
     .position(windowWidth-400,40);
   
+  var rl5 = createA('https://processing.org',
+                      '<img src="images/processing.png" alt="processing" height="19">')
+    .parent('#footer')
+    .position(windowWidth-555,40);
+  
+  
 buff = createGraphics(500, 500);
   
   buff = createGraphics(500, 500);
