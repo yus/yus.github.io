@@ -51,7 +51,6 @@ function setup() {
     .parent('#footer')
     .position(windowWidth-555,40);
   
-  
 buff = createGraphics(500, 500);
   
   buff = createGraphics(500, 500);
