@@ -46,7 +46,7 @@ function setup() {
   var rl6 = createA('https://hdrihaven.com/',
                       '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">')
     .parent('#footer')
-    .position(windowWidth-700,45);  
+    .position(windowWidth-770,42);  
   
 buff = createGraphics(500, 500);
   
