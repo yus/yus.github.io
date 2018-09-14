@@ -27,14 +27,6 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
-  var rl1 = createA('https://www.kryptex.org/?ref=27f18c0f',
-                      '<img src="images/kryptexlogo.png" alt="kryptex" height="24">')
-    .parent('#footer')
-    .position(72,29);
-  var rl2 = createA('https://www.eobot.com/new.aspx?referid=2090425',
-                      '<img src="images/eobot.png" alt="eobot" height="24">')
-    .parent('#footer')
-    .position(120,29);
   
   var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
                       '<img src="images/fractured.png" alt="fractured" height="50">')
@@ -50,6 +42,11 @@ function setup() {
                       '<img src="images/processing.png" alt="processing" height="19">')
     .parent('#footer')
     .position(windowWidth-555,45);
+  
+  var rl6 = createA('https://hdrihaven.com/',
+                      '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">')
+    .parent('#footer')
+    .position(windowWidth-700,45);  
   
 buff = createGraphics(500, 500);
   
