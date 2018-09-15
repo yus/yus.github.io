@@ -27,26 +27,26 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
+
+  var rlgh = createA('https://github.com/',
+                      '<img src="images/github.png" alt="github" height="50">')
+    .parent('#footer').position(72,29);
   
   var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
                       '<img src="images/fractured.png" alt="fractured" height="50">')
-    .parent('#footer')
-    .position(windowWidth-200,29);
+    .parent('#footer').position(windowWidth-200,29);
   
   var rl4 = createA('https://www.flaticon.com/search?author_id=1',
                       '<img src="images/flaticon.svg" alt="flaticon" height="25">')
-    .parent('#footer')
-    .position(windowWidth-400,40);
+    .parent('#footer').position(windowWidth-400,40);
   
   var rl5 = createA('https://processing.org',
                       '<img src="images/processing.png" alt="processing" height="19">')
-    .parent('#footer')
-    .position(windowWidth-555,45);
+    .parent('#footer').position(windowWidth-555,45);
   
   var rl6 = createA('https://hdrihaven.com/',
                       '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">')
-    .parent('#footer')
-    .position(windowWidth-770,42);  
+    .parent('#footer').position(windowWidth-770,42);  
   
 buff = createGraphics(500, 500);
   
