@@ -29,7 +29,7 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
   var rlgh = createA('https://github.com/',
-                      '<img src="images/github.png" alt="github" height="50">')
+                      '<img src="images/github.png" alt="github" height="29">')
     .parent('#footer').position(72,29);
   
   var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
