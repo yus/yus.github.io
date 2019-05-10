@@ -29,8 +29,7 @@ function setup() {
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
   var btmnr = createDiv( createA('https://bitminer.io/3636945',
-                                 createImg('https://bitminer.io/s/bitminer_4.gif',
-                                           'BitMiner - free and simple next generation Bitcoin mining software'),
+                                 '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />',
                                  '_blank') ).parent('#header').position(windowWidth-498,30);
   
   var rlgh = createA('https://github.com/',
