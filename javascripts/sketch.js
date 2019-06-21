@@ -2,7 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-var hads, ami, ama, amb, amc;
+var adv1, adv2, ami, ama, amb, amc;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -147,13 +147,12 @@ function colors() {
 }
 
 function advertoggle() {
-  if ( select('#adv2').hasClass('show') ) {
-    select('#adv2').removeClass('show').hide();
-    select('#adv1').show().addClass('show');
-   } else {
-    select('#adv1').removeClass('show').hide();
-    select('#adv2').show().addClass('show');  
-   }
+  if (adv2.elt.hasClass('show'))
+    adv2.elt.removeClass('show').hide();
+    adv1.elt.show().addClass('show');
+  else
+    adv1.elt.removeClass('show').hide();
+    adv2.elt.show().addClass('show');
 }
 
 function shuffle(a) {
