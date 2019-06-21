@@ -3,6 +3,13 @@
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
 
+// Adverts
+var hads;
+var ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
+var ama = createA('https://bitminer.io/3636945', ami, '_blank');
+var amb = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
+var amc = createA('https://surfe.be/212406', amb, '_blank');
+
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
@@ -28,9 +35,10 @@ function setup() {
   var ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
-  var btmnr = createDiv('').id('bitminer').parent('#header').position(windowWidth-498,30);
-  var bmi = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
-  var bma = createA('https://bitminer.io/3636945', bmi, '_blank').parent('#bitminer');
+
+// Adv  
+  hads = createDiv('').id('hads').parent('#header').position(windowWidth-498,30);
+// TODO pattern
   
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
@@ -94,6 +102,7 @@ function mousePressed() {
 
 function init() {
   colors();
+  advertoggle();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
       // Lining the edges with 0s
@@ -135,6 +144,14 @@ function colors() {
   var qf = floor(random(tinges.length));
   clr = tinges[q];
   folor = tinges[qf];
+}
+
+function advertoggle() {
+  //ama, amc … .parent('#hads');
+  var noadv = 'claim your biz';
+  if ( hads.child() == ama ) amc.parent('#hads');
+  else if ( hads.child() == amc ) ama.parent('#hads');
+  else hads.child( noadv );
 }
 
 function shuffle(a) {
