@@ -4,7 +4,6 @@ var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
 
 // Adverts
-var hads;
 var ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
 var ama = createA('https://bitminer.io/3636945', ami, '_blank');
 var amb = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
@@ -37,7 +36,7 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
 // Adv  
-  hads = createDiv('').id('hads').parent('#header').position(windowWidth-498,30);
+  var hads = createDiv('').id('hads').parent('#header').position(windowWidth-498,30);
 // TODO pattern
   
   var rlgh = createA('https://github.com/',
@@ -149,9 +148,9 @@ function colors() {
 function advertoggle() {
   //ama, amc … .parent('#hads');
   var noadv = 'claim your biz';
-  if ( hads.child() == ama ) amc.parent('#hads');
-  else if ( hads.child() == amc ) ama.parent('#hads');
-  else hads.child( noadv );
+  if ( !noadv.parent('#hads') ) amc.parent('#hads');
+  else if ( noadv.parent('#hads') ) ama.parent('#hads');
+  else noadv.parent('#hads');
 }
 
 function shuffle(a) {
