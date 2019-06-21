@@ -101,8 +101,8 @@ function mousePressed() {
 }
 
 function init() {
-  colors();
   advertoggle();
+  colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
       // Lining the edges with 0s
@@ -147,11 +147,9 @@ function colors() {
 }
 
 function advertoggle() {
-  if (adv2.elt.hasClass('show'))
-    adv2.elt.removeClass('show').hide();
+  if (adv2.elt.hasClass('show')) adv2.elt.removeClass('show').hide();
     adv1.elt.show().addClass('show');
-  else
-    adv1.elt.removeClass('show').hide();
+  else if (adv1.elt.hasClass('show')) adv1.elt.removeClass('show').hide();
     adv2.elt.show().addClass('show');
 }
 
