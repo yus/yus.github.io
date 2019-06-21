@@ -31,7 +31,7 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
 // Adv  
-  adv1 = createDiv('').id('adv1').parent('#header').position(windowWidth-498,30);
+  adv1 = createDiv('').id('adv1').addClass('show').parent('#header').position(windowWidth-498,30);
   adv2 = createDiv('').id('adv2').parent('#header').position(windowWidth-498,30);
   ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
   ama = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv1');
@@ -147,12 +147,13 @@ function colors() {
 }
 
 function advertoggle() {
-  if ( select('#adv2').style('display', 'none') )
-    select('#adv1').hide();
-    select('#adv2').show();
-  else if ( select('#adv1').style('display', 'none') )
-    select('#adv1').show();
-    select('#adv2').hide();
+  if ( select('#adv2').hasClass('show') ) {
+    select('#adv2').removeClass('show').hide();
+    select('#adv1').show().addClass('show');
+   } else {
+    select('#adv1').removeClass('show').hide();
+    select('#adv2').show().addClass('show');  
+   }
 }
 
 function shuffle(a) {
