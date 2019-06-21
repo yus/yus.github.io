@@ -2,12 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-
-// Adverts
-var ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
-var ama = createA('https://bitminer.io/3636945', ami, '_blank');
-var amb = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
-var amc = createA('https://surfe.be/212406', amb, '_blank');
+var hads, ami, ama, amb, amc;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -36,7 +31,11 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
 // Adv  
-  var hads = createDiv('').id('hads').parent('#header').position(windowWidth-498,30);
+  hads = createDiv('').id('hads').parent('#header').position(windowWidth-498,30);
+  ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
+  ama = createA('https://bitminer.io/3636945', ami, '_blank');
+  amb = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
+  amc = createA('https://surfe.be/212406', amb, '_blank');
 // TODO pattern
   
   var rlgh = createA('https://github.com/',
