@@ -147,10 +147,13 @@ function colors() {
 }
 
 function atoggle() {
-  if (select('#adv2').hasClass('show')) select('#adv2').removeClass('show').hide();
-    select('#adv1').show().addClass('show');
-  if (select('#adv1').hasClass('show')) select('#adv1').removeClass('show').hide();
-    select('#adv2').show().addClass('show');
+  if( adv2.hasClass('show') ) {
+    adv2.removeClass( 'show' ).hide();
+    adv1.show().addClass( 'show' );
+  } else if( adv1.hasClass( 'show' ) ) {
+    adv1.removeClass( 'show' ).hide();
+    adv2.show().addClass( 'show' );
+  }
 }
 
 function shuffle(a) {
