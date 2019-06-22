@@ -33,14 +33,12 @@ function setup() {
 // Adv  
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
   ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
-  ama = createA('https://bitminer.io/3636945', ami, '_blank');
-  adv.html(ama);
+  ama = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv');
   amb = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
   amc = createA('https://surfe.be/ext/212406', amb, '_blank');
-  adv.html(amc);
   
-  
-// TODO pattern
+  var za = (mouseIsPressed) ? adv.html(amc.html()) : adv.html(ama.html());
+
   
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
@@ -103,7 +101,6 @@ function mousePressed() {
 }
 
 function init() {
-  tggl();
   colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
@@ -146,10 +143,6 @@ function colors() {
   var qf = floor(random(tinges.length));
   clr = tinges[q];
   folor = tinges[qf];
-}
-
-function tggl() {
-  return !adv.html() ? adv.html(amc) : adv.html() ? adv.html(ama) : adv.html('');
 }
 
 function shuffle(a) {
