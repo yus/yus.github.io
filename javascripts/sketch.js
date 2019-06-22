@@ -98,10 +98,10 @@ function draw() {
 
 function mousePressed() {
   init();
+  atoggle();
 }
 
 function init() {
-  advertoggle();
   colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
@@ -146,11 +146,11 @@ function colors() {
   folor = tinges[qf];
 }
 
-function advertoggle() {
-  if (adv2.elt.hasClass('show')) adv2.elt.removeClass('show').hide();
-    adv1.elt.show().addClass('show');
-  if (adv1.elt.hasClass('show')) adv1.elt.removeClass('show').hide();
-    adv2.elt.show().addClass('show');
+function atoggle() {
+  if (select('#adv2').hasClass('show')) select('#adv2').removeClass('show').hide();
+    select('#adv1').show().addClass('show');
+  if (select('#adv1').hasClass('show')) select('#adv1').removeClass('show').hide();
+    select('#adv2').show().addClass('show');
 }
 
 function shuffle(a) {
