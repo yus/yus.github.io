@@ -149,7 +149,7 @@ function colors() {
 function advertoggle() {
   if (adv2.elt.hasClass('show')) adv2.elt.removeClass('show').hide();
     adv1.elt.show().addClass('show');
-  else if (adv1.elt.hasClass('show')) adv1.elt.removeClass('show').hide();
+  if (adv1.elt.hasClass('show')) adv1.elt.removeClass('show').hide();
     adv2.elt.show().addClass('show');
 }
 
