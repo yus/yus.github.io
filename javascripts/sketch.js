@@ -31,10 +31,11 @@ function setup() {
 
   var adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
   var ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
+  adv.html(createA('https://bitminer.io/3636945', ami, '_blank'));
   var ama = '<img src="https://static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
+  adv.html(createA('https://surfe.be/ext/212406', ama, '_blank'), true);
 
-  var za = (!mouseIsPressed) ? select('#adv').html(createA('https://bitminer.io/3636945', ami, '_blank'), false)
-                            : select('#adv').html(createA('https://surfe.be/ext/212406', ama, '_blank'), false);
+  // var za = (!mouseIsPressed) ? : ;
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
