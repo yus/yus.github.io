@@ -2,6 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
+var adv, ami, ama;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -29,13 +30,11 @@ function setup() {
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
-  var adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
-  var ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
-  adv.html(createA('https://bitminer.io/3636945', ami, '_blank'));
-  var ama = '<img src="https://static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
-  adv.html(createA('https://surfe.be/ext/212406', ama, '_blank'), true);
-
-  // var za = (!mouseIsPressed) ? : ;
+  adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
+  ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
+  select('#adv').html(createA('https://bitminer.io/3636945', ami, '_blank'));
+  ama = '<img src="https://static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
+  select('#adv').html(createA('https://surfe.be/ext/212406', ama, '_blank'));
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
@@ -94,6 +93,7 @@ function draw() {
 
 function mousePressed() {
   init();
+  adv.html() ? : ;
 }
 
 function init() {
