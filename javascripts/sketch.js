@@ -2,7 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-var adv1, adv2, ami, ama, amb, amc;
+var adv, ami, ama, amb, amc;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
