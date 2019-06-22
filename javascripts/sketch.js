@@ -35,8 +35,8 @@ function setup() {
   ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software" />';
   ama = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
 
-  var za = (mouseIsPressed) ? select('#adv').html(createA('https://bitminer.io/3636945', ami, '_blank'))
-                            : select('#adv').html(createA('https://surfe.be/ext/212406', ama, '_blank'));
+  var za = (mouseIsPressed) ? select('#adv').html(createA('https://bitminer.io/3636945', ami, '_blank'), false)
+                            : select('#adv').html(createA('https://surfe.be/ext/212406', ama, '_blank'), false);
 
   
   var rlgh = createA('https://github.com/',
