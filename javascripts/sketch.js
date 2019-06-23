@@ -94,7 +94,7 @@ function draw() {
 function mousePressed() {
   init();
   let ad = select('a', '#adv');
-  ad.style(display) == 'none' ? ad.show() : ad.hide();
+  ad.style('display') == 'none' ? ad.show() : ad.hide();
 }
 
 function init() {
