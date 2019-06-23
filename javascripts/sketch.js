@@ -32,9 +32,9 @@ function setup() {
 
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
   ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
-  amii = select('#adv').html(createA('https://bitminer.io/3636945', ami, '_blank'));
+  amii = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv');
   ama = '<img src="https://static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
-  amaa = select('#adv').html(createA('https://surfe.be/ext/212406', ama, '_blank'));
+  amaa = createA('https://surfe.be/ext/212406', ama, '_blank').parent('#adv').hide();
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
@@ -93,7 +93,7 @@ function draw() {
 
 function mousePressed() {
   init();
-  adv.html() == amaa ? adv.html() == amii : adv.html() == amaa;
+  adv.elt.a.style(display) == 'none' ? adv.elt.a.show() : adv.elt.a.hide();
 }
 
 function init() {
