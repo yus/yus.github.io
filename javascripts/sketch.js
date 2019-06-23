@@ -32,9 +32,9 @@ function setup() {
 
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
   ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
-  amii = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv');
-  ama = '<img src="https://static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
-  amaa = createA('https://surfe.be/ext/212406', ama, '_blank').parent('#adv').hide();
+  amii = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv').hide();
+  ama = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
+  amaa = createA('https://surfe.be/ext/212406', ama, '_blank').parent('#adv');
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
