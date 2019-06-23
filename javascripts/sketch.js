@@ -93,8 +93,10 @@ function draw() {
 
 function mousePressed() {
   init();
-  let ad = select('a', '#adv');
-  ad.style('display') == 'none' ? ad.show() : ad.hide();
+  let a = select('a', '#adv');
+  for (a in '#adv') {
+    a.style('display') ? a.show() : a.hide();
+  } 
 }
 
 function init() {
