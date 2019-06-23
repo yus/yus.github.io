@@ -93,7 +93,8 @@ function draw() {
 
 function mousePressed() {
   init();
-  adv.elt.a.style(display) == 'none' ? adv.elt.a.show() : adv.elt.a.hide();
+  let ad = select('#adv > a');
+  ad.style(display) == 'none' ? ad.show() : ad.hide();
 }
 
 function init() {
