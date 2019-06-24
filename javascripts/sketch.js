@@ -95,7 +95,7 @@ function mousePressed() {
   init();
   let ad = select('a', '#adv');
   for (ad in '#adv') {
-    ad.style('display', 'none') == true ? ad.show() : ad.hide();
+    ad.style() == 'display: none;' ? ad.show() : ad.hide();
   } 
 }
 
