@@ -2,7 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-var adv, ami, amii, ama, amma;
+var adv, feb, fab;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -31,10 +31,8 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
-  ami = '<img src="https://bitminer.io/s/bitminer_4.gif" alt="BitMiner - next generation Bitcoin mining software">';
-  amii = createA('https://bitminer.io/3636945', ami, '_blank').parent('#adv').hide();
-  ama = '<img src="//static.surfe.be/images/banners/banner-1.gif" alt="Surfe.be - passive income">';
-  amaa = createA('https://surfe.be/ext/212406', ama, '_blank').parent('#adv');
+  feb = '<img src="https://febbit.com/assets/img/ad-sizes/468x60.png" alt="Febbit.com - mine your coins">';
+  fab = createA('https://febbit.com/?ref=5ce8e270d7f541000181d33e', feb, '_blank').parent('#adv');
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
@@ -93,10 +91,6 @@ function draw() {
 
 function mousePressed() {
   init();
-  let ad = select('a', '#adv');
-  for (ad in '#adv') {
-    ad.style() == 'display: none;' ? ad.show() : ad.hide();
-  } 
 }
 
 function init() {
