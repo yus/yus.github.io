@@ -31,7 +31,7 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
-  feb = '<img src="images/horizen.png" alt="Unbounded by design">';
+  feb = '<img src="images/horizen.png" alt="Unbounded by design" height="59">';
   fab = createA('https://getzen.cash/auth/register?ref=102141', feb, '_blank').parent('#adv');
 
   var rlgh = createA('https://github.com/',
