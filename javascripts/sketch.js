@@ -31,8 +31,8 @@ function setup() {
   var logo = createImg('images/yus143.png').parent('#header').position(72,29);
 
   adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
-  feb = '<img src="https://febbit.com/assets/img/ad-sizes/468x60.png" alt="Febbit.com - mine your coins">';
-  fab = createA('https://febbit.com/?ref=5ce8e270d7f541000181d33e', feb, '_blank').parent('#adv');
+  feb = '<img src="images/horizen.png" alt="Unbounded by design">';
+  fab = createA('https://getzen.cash/auth/register?ref=102141', feb, '_blank').parent('#adv');
 
   var rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">')
