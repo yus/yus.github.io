@@ -54,7 +54,7 @@ function setup() {
                       '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">')
     .parent('#footer').position(windowWidth-770,42);  
   
-// buff = createGraphics(500, 500);
+// create Graphics
   
   buff = createGraphics(500, 500);
   
