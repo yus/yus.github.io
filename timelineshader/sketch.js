@@ -49,7 +49,7 @@ function draw() {
   uniformsShader.setUniform('mouse', [mx, my]);
 
   // rect gives us some geometry on the screen
-  rect(0,0,width, height);
+  rect(width/4,height/4,width/2, height/2);
 
   // drawingContext test
   drawingContext.shadowOffsetX = 5;
