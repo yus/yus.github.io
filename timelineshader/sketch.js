@@ -15,13 +15,7 @@ function preload(){
 function setup() {
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
-  // drawingContext test
-  drawingContext.shadowOffsetX = 5;
-  drawingContext.shadowOffsetY = -5;
-  drawingContext.shadowBlur = 10;
-  drawingContext.shadowColor = 'black';
-  ellipse(width / 2, height / 2, 50, 50);
-  // noStroke();
+  noStroke();
 }
 
 function draw() {  
@@ -56,6 +50,14 @@ function draw() {
 
   // rect gives us some geometry on the screen
   rect(0,0,width, height);
+
+  // drawingContext test
+  drawingContext.shadowOffsetX = 5;
+  drawingContext.shadowOffsetY = -5;
+  drawingContext.shadowBlur = 10;
+  drawingContext.shadowColor = 'black';
+  srroke(1);
+  ellipse(50, 50, 50, 50);
 }
 
 function windowResized(){
