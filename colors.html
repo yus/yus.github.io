@@ -12,6 +12,12 @@
 		color:gainsboro;
 		font-size:smaller;
 	}
+	.tabloid{
+		display:grid;
+	}
+	.swatchbook{
+		dispkay:flex;
+	}
 	.group {
 		display: flex;
 		flex-wrap: nowrap;
@@ -20,13 +26,13 @@
 	}
 	.swatch {
 		flex:1;
-		width:auto;
+		min-width:20%;
 		height:100px;
 		margin:auto;
 	}
 	.group_title {
 		flex:0;
-		width:auto;
+		width:72%;
 		height:100px;
 		margin:0.2rem;
 		row-gap:10px;
@@ -46,6 +52,7 @@
 </head>
 
 <body>
+<div class="tabloid">
 <a name="1_"></a>
 
 <p id="title">Adelard of Bath</p>
@@ -981,6 +988,7 @@
 <div class="swatch" style="background-color:#7a5353" title="[0.47843137383460999, 0.32549020648002625, 0.32549020648002625]"></div>
 <div class="swatch" style="background-color:#4c3434" title="[0.29803922772407532, 0.20392157137393951, 0.20392157137393951]"></div>
 <div class="swatch" style="background-color:#291c1c" title="[0.16078431904315948, 0.10980392247438431, 0.10980392247438431]"></div>
+</div>
 </div>
 </div>
 </body>
