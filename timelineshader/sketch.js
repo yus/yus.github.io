@@ -50,13 +50,6 @@ function draw() {
 
   // rect gives us some geometry on the screen
   rect(220,220,width/4, height/4);
-
-  // drawingContext test
-  drawingContext.shadowOffsetX = 5;
-  drawingContext.shadowOffsetY = -5;
-  drawingContext.shadowBlur = 10;
-  drawingContext.shadowColor = 'black';
-  ellipse(50, 50, 50, 50);
 }
 
 function windowResized(){
