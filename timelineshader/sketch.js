@@ -13,16 +13,15 @@ function preload(){
 }
 
 function setup() {
+  // shaders require WEBGL mode to work
+  createCanvas(windowWidth, windowHeight, WEBGL);
   // drawingContext test
   drawingContext.shadowOffsetX = 5;
   drawingContext.shadowOffsetY = -5;
   drawingContext.shadowBlur = 10;
   drawingContext.shadowColor = 'black';
   ellipse(width / 2, height / 2, 50, 50);
-  stroke(1);
-  // shaders require WEBGL mode to work
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  noStroke();
+  // noStroke();
 }
 
 function draw() {  
