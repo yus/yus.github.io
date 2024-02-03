@@ -49,7 +49,7 @@ function draw() {
   uniformsShader.setUniform('mouse', [mx, my]);
 
   // rect gives us some geometry on the screen
-  rect(220,220,width/4, height/4);
+  rect(0,0,width, height);
 }
 
 function windowResized(){
