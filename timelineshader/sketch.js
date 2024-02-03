@@ -49,14 +49,13 @@ function draw() {
   uniformsShader.setUniform('mouse', [mx, my]);
 
   // rect gives us some geometry on the screen
-  rect(width/4,height/4,width/2, height/2);
+  rect(220,220,width/4, height/4);
 
   // drawingContext test
   drawingContext.shadowOffsetX = 5;
   drawingContext.shadowOffsetY = -5;
   drawingContext.shadowBlur = 10;
   drawingContext.shadowColor = 'black';
-  srroke(1);
   ellipse(50, 50, 50, 50);
 }
 
