@@ -13,8 +13,7 @@ function preload(){
 
 function setup() {
   let div = createDiv().class('container');
-  elt.class('container')
-     .center()
+  div.center()
      .html('p5*js')
      .style('font-size','144pt');
   
