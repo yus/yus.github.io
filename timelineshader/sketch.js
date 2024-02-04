@@ -12,7 +12,7 @@ function preload(){
 }
 
 function setup() {
-  let div = createDiv()
+  let div = createDiv();
   div.class('container');
   div.center();
   div.html('p5*js');
