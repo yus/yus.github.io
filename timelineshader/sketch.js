@@ -12,10 +12,11 @@ function preload(){
 }
 
 function setup() {
-  let div = createDiv().class('container');
-  div.center()
-     .html('p5*js')
-     .style('font-size','144pt');
+  let div = createDiv()
+  div.class('container');
+  div.center();
+  div.html('p5*js');
+  div.style('font-size','144pt');
   
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
