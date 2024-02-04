@@ -12,8 +12,11 @@ function preload(){
 }
 
 function setup() {
-  let div = createDiv('p5*js');
-  div.position(25, 35);
+  let div = createDiv();
+  div.position(0,0)
+     .size(windowWidth,windowHeight)
+     .html('p5*js');
+  
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
