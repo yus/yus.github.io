@@ -1,4 +1,3 @@
-
 // in this example we will send a value from our p5 sketch to the shader
 // these values are called "uniform" variables
 // we will use p5's setUniform function to make this happen
@@ -13,6 +12,8 @@ function preload(){
 }
 
 function setup() {
+  let div = createDiv('p5*js');
+  div.position(25, 35);
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
