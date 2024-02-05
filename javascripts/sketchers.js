@@ -3,6 +3,9 @@
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
 //var adv, feb, fab;
+let gwW = windowWidth;
+let gwH = windowHeight;
+let wH = gwW;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -19,16 +22,17 @@ function setup() {
   }
 
   select('body').attribute('style', 'margin:0; overflow:hidden');
-  cnt = createDiv('').size(windowWidth, windowHeight);
+  cnt = createDiv('').size(gwW, gwH);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowWidth);
+  
+  cnvs = createCanvas(gwW, wH);
   cnvs.parent(cnt).position(0,120).background(52);
-  cnvs.size(555, 555);
+  //cnvs.size(555, 555);
   let hdr = createDiv('').id('header').parent(cnt);
-  select('#header').size(windowWidth,120).position(0,0);
+  select('#header').size(gwW,120).position(0,0);
   
   let ftr = createDiv('').id('footer').parent(cnt);
-  select('#footer').size(windowWidth,100).position(0,windowHeight-100);
+  select('#footer').size(gwW,100).position(0,gwH-100);
   let logo = createImg('images/yus143.png'); 
   logo.parent('#header').position(72,29);
 
@@ -67,8 +71,10 @@ function draw() {
   generate();
   for ( var i = 0; i < columns;i++) {
     for ( var j = 0; j < rows;j++) {
-      if ((board[i][j] == 1)) buff.fill(clr);
-      else buff.fill(folor); 
+      if ((board[i][j] == 1))
+        buff.fill(clr);
+      else 
+        buff.fill(folor); 
         buff.stroke(52);
         buff.rect(i*w, j*w, w-1, w-1);
         image(buff, loff, toff);
@@ -76,17 +82,21 @@ function draw() {
   }
 }
 
-function mousePressed() {init();}
+function mousePressed() {
+  init();
+}
 
 function init() {
   colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
       // Lining the edges with 0s
-      if (i == 0 || j == 0 || i == columns-1 || j == rows-1) board[i][j] = 0;
+      if (i == 0 || j == 0 || i == columns-1 || j == rows-1) 
+        board[i][j] = 0;
       // Filling the rest randomly
-      else board[i][j] = floor(random(2));
-      next[i][j] = 0;
+      else 
+        board[i][j] = floor(random(2));
+        next[i][j] = 0;
     }
   }
 }
@@ -102,13 +112,16 @@ function generate() {
       }
 
       neighbors -= board[x][y];
-      if      ((board[x][y] == 1) && (neighbors <  2)) next[x][y] = 0; // Loneliness
-      else if ((board[x][y] == 1) && (neighbors >  3)) next[x][y] = 0; // Overpopulation
-      else if ((board[x][y] == 0) && (neighbors == 3)) next[x][y] = 1; // Reproduction
-      else next[x][y] = board[x][y]; // Stasis
+      if      ((board[x][y] == 1) && (neighbors <  2)) 
+        next[x][y] = 0; // Loneliness
+      else if ((board[x][y] == 1) && (neighbors >  3)) 
+        next[x][y] = 0; // Overpopulation
+      else if ((board[x][y] == 0) && (neighbors == 3)) 
+        next[x][y] = 1; // Reproduction
+      else 
+        next[x][y] = board[x][y]; // Stasis
     }
   }
-
   // Swap!
   var temp = board;
   board = next;
@@ -124,21 +137,23 @@ function colors() {
 }
 
 function shuffle(a) {
-    var j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-    }
-    return a;
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+      x = a[i];
+      a[i] = a[j];
+      a[j] = x;
+  }
+  return a;
 }
 
 function windowResized() {
-  cnt.size(windowWidth, windowHeight);
-  resizeCanvas(windowWidth, windowWidth);
-  select('#header').size(windowWidth,120).position(0,0);
-  select('#footer').size(windowWidth,100).position(0,windowHeight-100);
+  cnt.size(gwW, gwH);
+  resizeCanvas(gwW, gwH);
+  select('#header')
+    .size(gwW,120).position(0,0);
+  select('#footer')
+    .size(gwW,100).position(0,gwH-100);
   loff = (cnvs.width - buff.width)/2;
   toff = (cnvs.height - buff.height)/2;
   init();
