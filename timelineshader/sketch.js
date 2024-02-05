@@ -5,8 +5,8 @@
 
 // a shader variable
 let uniformsShader;
-let div = createDiv('p5*js');
-let colorpicker = createColorPicker('navy');
+let div;
+let clrpckr;
 
 function preload(){
   // load the shader
@@ -14,11 +14,12 @@ function preload(){
 }
 
 function setup() {
-  div.class('container');
+  div.createDiv('p5*js').class('container');
   div.parent().position().center();
-  div.html('<div>p5*js</div>');
+  div.html('<div class="tigle">***</div>');
   div.style('font-size','144pt');
-  colorpicker.position(25, 25, 25);
+  clrpckr = createColorPicker('navy');
+  clrpckr.position(25, 25, 25);
   
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
