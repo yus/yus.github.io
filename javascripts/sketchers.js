@@ -23,7 +23,7 @@ function setup() {
   cnt.style('background', '#222');
   cnvs = createCanvas(windowWidth, windowWidth);
   cnvs.parent(cnt).position(0,120).background(52);
-  cnvs.size(555, AUTO);
+  cnvs.size(555, 555);
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth,120).position(0,0);
   
@@ -42,7 +42,8 @@ function setup() {
 
 // create Graphics
   
-  buff = createGraphics(555, 555);
+  buff = createGraphics(500, 500);
+  buff.center();
   
   w = 25;
   columns = floor(buff.width/w); //cnvs
