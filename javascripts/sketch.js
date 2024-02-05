@@ -29,24 +29,16 @@ function setup() {
   let ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   let logo = createImg('images/yus143.png'); 
-  //.parent('#header')
-  logo.position(72,29);
+  logo.parent('#header').position(72,29);
 
   let rlgh = createA('https://github.com/',
                       '<img src="images/ghmarkw.png" alt="github" height="29">');
-    //.parent('#footer')
-  rlgh.position(72,29);
+  rlgh.parent('#footer').position(72,29);
 
   let rl5 = createA('https://processing.org',
                       '<img src="images/processing.png" alt="processing" height="19">');
-    //.parent('#footer')
-  rl5.position(129,45);
-  
-  let rl6 = createA('https://hdrihaven.com/',
-                      '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">');
-    //.parent('#footer')
-  rl6.position(windowWidth-770,42);  
-  
+  rl5.parent('#footer').position(129,45);
+
 // create Graphics
   
   buff = createGraphics(500, 500);
