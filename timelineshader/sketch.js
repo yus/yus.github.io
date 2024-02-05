@@ -16,7 +16,7 @@ function preload(){
 function setup() {
   div = createDiv('p5*js');
   div.class('container');
-  div.parent().position().center();
+  div.center();
   div.html('<div class="tigle">***</div>');
   div.style('font-size','144pt');
   clrpckr = createColorPicker('navy');
