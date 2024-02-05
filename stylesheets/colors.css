@@ -1,1 +1,46 @@
-
+body {
+		background-color:black;
+} 
+#title {
+		display:none;
+		color:gainsboro;
+		font-size:smaller;
+}
+.tabloid{
+		display:grid;
+}
+.swatchbook{
+		dispkay:flex;
+}
+.group {
+		display: flex;
+		flex-wrap: nowrap;
+		row-gap: 10px;
+		column-gap: 0;
+}
+.swatch {
+		flex:1;
+		min-width:20%;
+		height:144px;
+		margin:auto;
+}
+.group_title {
+		position: absolute;
+		text-align: center;
+		align-self: center;
+		padding: 0.9rem;
+		color: gainsboro;
+		background: rgba(0,0,0,0.72);
+		font-weight: bold;
+		font-size: 24pt;
+}
+.group_descr {
+		clear: both;
+}
+.clearall {
+		clear: both;
+}
+hr {
+		dispkay:none;
+		clear: both;
+}
