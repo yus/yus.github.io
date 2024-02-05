@@ -5,6 +5,8 @@
 
 // a shader variable
 let uniformsShader;
+let div = createDiv();
+let colorpicker = createColorPicker('navyblue');
 
 function preload(){
   // load the shader
@@ -12,13 +14,11 @@ function preload(){
 }
 
 function setup() {
-  let div = createDiv();
-  let colorpicker = createColorPicker();
   div.class('container');
-  div.parent().position().center();
+  //div.parent().position().center();
   div.html('p5*js');
   div.style('font-size','144pt');
-  colorpicker.position(25, windowHeight-25);
+  colorpicker.position(25, 25, 25);
   
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
@@ -57,6 +57,7 @@ function draw() {
 
   // rect gives us some geometry on the screen
   rect(0, 0, width, height);
+  circle(windowWidth/2, windowHeight/2, 55);
 }
 
 function windowResized(){
