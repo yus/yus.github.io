@@ -42,10 +42,10 @@ function setup() {
 
 // create Graphics
   
-  buff = createGraphics(500, 500);
+  buff = createGraphics(250, 250);
   //buff.center();
   
-  w = 50;
+  w = 25;
   columns = floor(buff.width/w); //cnvs
   rows = floor(buff.height/w);
   board = new Array(columns);
