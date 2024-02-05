@@ -2,10 +2,6 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-//var adv, feb, fab;
-let gwW = windowWidth;
-let gwH = windowHeight;
-let wH = gwW;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -22,17 +18,17 @@ function setup() {
   }
 
   select('body').attribute('style', 'margin:0; overflow:hidden');
-  cnt = createDiv('').size(gwW, gwH);
+  cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
   
-  cnvs = createCanvas(gwW, wH);
+  cnvs = createCanvas(windowWidth, windowHeight-220);
   cnvs.parent(cnt).position(0,120).background(52);
   //cnvs.size(555, 555);
   let hdr = createDiv('').id('header').parent(cnt);
-  select('#header').size(gwW,120).position(0,0);
+  select('#header').size(windowWidth,120).position(0,0);
   
   let ftr = createDiv('').id('footer').parent(cnt);
-  select('#footer').size(gwW,100).position(0,gwH-100);
+  select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   let logo = createImg('images/yus143.png'); 
   logo.parent('#header').position(72,29);
 
@@ -148,12 +144,10 @@ function shuffle(a) {
 }
 
 function windowResized() {
-  cnt.size(gwW, gwH);
-  resizeCanvas(gwW, gwH);
-  select('#header')
-    .size(gwW,120).position(0,0);
-  select('#footer')
-    .size(gwW,100).position(0,gwH-100);
+  cnt.size(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight-220);
+  select('#header').size(windowWidth,120).position(0,0);
+select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   loff = (cnvs.width - buff.width)/2;
   toff = (cnvs.height - buff.height)/2;
   init();
