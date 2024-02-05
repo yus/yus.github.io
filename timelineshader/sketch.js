@@ -5,8 +5,8 @@
 
 // a shader variable
 let uniformsShader;
-let div = createDiv();
-let colorpicker = createColorPicker('navyblue');
+let div = createDiv('p5*js');
+let colorpicker = createColorPicker('navy');
 
 function preload(){
   // load the shader
@@ -15,8 +15,8 @@ function preload(){
 
 function setup() {
   div.class('container');
-  //div.parent().position().center();
-  div.html('p5*js');
+  div.parent().position().center();
+  div.html('<div>p5*js</div>');
   div.style('font-size','144pt');
   colorpicker.position(25, 25, 25);
   
