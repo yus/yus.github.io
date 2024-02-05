@@ -21,7 +21,7 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowWidth, WebGL);
+  cnvs = createCanvas(windowWidth, windowWidth, JAVA2D);
   cnvs.parent(cnt).position(0,120).background(52);
   cnvs.size(555, AUTO);
   let hdr = createDiv('').id('header').parent(cnt);
