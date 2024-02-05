@@ -21,7 +21,7 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowHeight-220);
+  cnvs = createCanvas(windowWidth, windowWidth, WebGL);
   cnvs.parent(cnt).position(0,120).background(52);
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth,120).position(0,0);
@@ -136,7 +136,7 @@ function shuffle(a) {
 
 function windowResized() {
   cnt.size(windowWidth, windowHeight);
-  resizeCanvas(windowWidth, windowHeight-220);
+  resizeCanvas(windowWidth, windowWidth);
   select('#header').size(windowWidth,120).position(0,0);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   loff = (cnvs.width - buff.width)/2;
