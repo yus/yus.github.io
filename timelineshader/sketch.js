@@ -13,10 +13,12 @@ function preload(){
 
 function setup() {
   let div = createDiv();
+  let colorpicker = createColorPicker();
   div.class('container');
-  div.center();
+  div.parent().position().center();
   div.html('p5*js');
   div.style('font-size','144pt');
+  colorpicker.position(25, windowHeight-25);
   
   // shaders require WEBGL mode to work
   createCanvas(windowWidth, windowHeight, WEBGL);
