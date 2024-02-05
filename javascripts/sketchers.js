@@ -45,7 +45,7 @@ function setup() {
   buff = createGraphics(500, 500);
   //buff.center();
   
-  w = 5;
+  w = 50;
   columns = floor(buff.width/w); //cnvs
   rows = floor(buff.height/w);
   board = new Array(columns);
