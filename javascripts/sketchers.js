@@ -43,7 +43,7 @@ function setup() {
 // create Graphics
   
   buff = createGraphics(500, 500);
-  buff.center();
+  //buff.center();
   
   w = 25;
   columns = floor(buff.width/w); //cnvs
@@ -76,9 +76,7 @@ function draw() {
   }
 }
 
-function mousePressed() {
-  init();
-}
+function mousePressed() {init();}
 
 function init() {
   colors();
@@ -138,9 +136,9 @@ function shuffle(a) {
 
 function windowResized() {
   cnt.size(windowWidth, windowHeight);
-  resizeCanvas(windowWidth, AUTO);
-  select('#header').size(windowWidth,AUTO).position(0,0);
-  select('#footer').size(windowWidth,AUTO).position(0,windowHeight-height);
+  resizeCanvas(windowWidth, windowWidth);
+  select('#header').size(windowWidth,120).position(0,0);
+  select('#footer').size(windowWidth,100).position(0,windowHeight-100);
   loff = (cnvs.width - buff.width)/2;
   toff = (cnvs.height - buff.height)/2;
   init();
