@@ -23,6 +23,7 @@ function setup() {
   cnt.style('background', '#222');
   cnvs = createCanvas(windowWidth, windowWidth, WebGL);
   cnvs.parent(cnt).position(0,120).background(52);
+  cnvs.size(555, AUTO);
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth,120).position(0,0);
   
@@ -41,7 +42,7 @@ function setup() {
 
 // create Graphics
   
-  buff = createGraphics(500, 500);
+  buff = createGraphics(555, 555);
   
   w = 25;
   columns = floor(buff.width/w); //cnvs
@@ -136,9 +137,9 @@ function shuffle(a) {
 
 function windowResized() {
   cnt.size(windowWidth, windowHeight);
-  resizeCanvas(windowWidth, windowWidth);
-  select('#header').size(windowWidth,120).position(0,0);
-  select('#footer').size(windowWidth,100).position(0,windowHeight-100);
+  resizeCanvas(windowWidth, AUTO);
+  select('#header').size(windowWidth,AUTO).position(0,0);
+  select('#footer').size(windowWidth,AUTO).position(0,windowHeight-height);
   loff = (cnvs.width - buff.width)/2;
   toff = (cnvs.height - buff.height)/2;
   init();
