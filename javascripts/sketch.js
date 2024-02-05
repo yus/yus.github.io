@@ -2,7 +2,7 @@
 
 var clrtable, clr, folor, cnt, cnvs, tinges;
 var buff, loff, toff, w, columns, rows, board, next;
-var adv, feb, fab;
+//var adv, feb, fab;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -23,36 +23,29 @@ function setup() {
   cnt.style('background', '#222');
   cnvs = createCanvas(windowWidth, windowHeight-220);
   cnvs.parent(cnt).position(0,120).background(52);
-  var hdr = createDiv('').id('header').parent(cnt);
+  let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth,120).position(0,0);
   
-  var ftr = createDiv('').id('footer').parent(cnt);
+  let ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth,100).position(0,windowHeight-100);
-  var logo = createImg('images/yus143.png').parent('#header').position(72,29);
+  let logo = createImg('images/yus143.png'); 
+  //.parent('#header')
+  logo.position(72,29);
 
-  adv = createDiv('').id('adv').parent('#header').position(windowWidth-498,30);
-  feb = '<img src="images/horizen.png" alt="Unbounded by design" height="59">';
-  fab = createA('https://getzen.cash/auth/register?ref=102141', feb, '_blank').parent('#adv');
+  let rlgh = createA('https://github.com/',
+                      '<img src="images/ghmarkw.png" alt="github" height="29">');
+    //.parent('#footer')
+  rlgh.position(72,29);
 
-  var rlgh = createA('https://github.com/',
-                      '<img src="images/ghmarkw.png" alt="github" height="29">')
-    .parent('#footer').position(72,29);
+  let rl5 = createA('https://processing.org',
+                      '<img src="images/processing.png" alt="processing" height="19">');
+    //.parent('#footer')
+  rl5.position(129,45);
   
-  var rl3 = createA('https://fracturedmmo.com/?refcode=e4a61c960835',
-                      '<img src="images/fractured.png" alt="fractured" height="50">')
-    .parent('#footer').position(windowWidth-200,29);
-  
-  var rl4 = createA('https://www.flaticon.com/search?author_id=1',
-                      '<img src="images/flaticon.svg" alt="flaticon" height="25">')
-    .parent('#footer').position(windowWidth-400,40);
-  
-  var rl5 = createA('https://processing.org',
-                      '<img src="images/processing.png" alt="processing" height="19">')
-    .parent('#footer').position(windowWidth-555,45);
-  
-  var rl6 = createA('https://hdrihaven.com/',
-                      '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">')
-    .parent('#footer').position(windowWidth-770,42);  
+  let rl6 = createA('https://hdrihaven.com/',
+                      '<img src="images/hdrihaven.svg" alt="hdrihaven" height="19">');
+    //.parent('#footer')
+  rl6.position(windowWidth-770,42);  
   
 // create Graphics
   
