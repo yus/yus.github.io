@@ -19,7 +19,7 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL2);
+  cnvs = createCanvas(windowWidth, windowHeight - 220);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
@@ -47,7 +47,7 @@ function setup() {
   );
   rl5.parent('#footer').position(129, 45);
   // create Graphics
-  buff = createGraphics(250, 250, WEBGL);
+  buff = createGraphics(250, 250);
   //buff.center();
   w = 25;
   columns = floor(buff.width / w); //cnvs
