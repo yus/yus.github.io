@@ -67,11 +67,13 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
   
+  /*
   if (mouseIsPressed === true) {
     frameRate(1);
   } else {
     frameRate(25);
   }
+  */
   
   generate();
   for (var i = 0; i < columns; i++) {
