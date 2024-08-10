@@ -45,7 +45,8 @@ function setup() {
   myRadio.parent('#footer').position(365, 45);
   myRadio.size(220);
   myRadio.option(2, '2 FPS');
-  myRadio.option(60, '60 FPS').selected();
+  myRadio.option(60, '60 FPS');
+  myRadio.selected(2);
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
