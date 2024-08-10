@@ -66,10 +66,7 @@ function setup() {
   toff = (cnvs.height - buff.height) / 2;
   init();
 }
-function draw() {
-  clear();
-  lights();
-  
+function draw() {  
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
@@ -83,9 +80,8 @@ function draw() {
        else
       buff.fill(folor);
       buff.stroke(52);
-      //buff.rect(i * w, j * w, w - 1, w - 1);
-      buff.rotate(frameCount * 0.01);
-      buff.box(20, 20, 5);
+      buff.square(i * w, j * w, w - 1);
+      buff.box(i * w, j * w, w - 1).rotate(frameCount * 0.01);
       image(buff, loff, toff);
     }
   }
