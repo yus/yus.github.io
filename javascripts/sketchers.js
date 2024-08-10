@@ -32,6 +32,7 @@ function setup() {
   slider.position(10, 10);
   slider.size(220);
 
+  textFont(font);
   textSize(30);
   textAlign(CENTER, TOP);
   
@@ -74,7 +75,6 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
   text(frameCount, 50, 50);
-  textFont(font);
   
   generate();
   for (let i = 0; i < columns; i++) {
