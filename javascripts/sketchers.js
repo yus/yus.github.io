@@ -73,7 +73,7 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
-  text(frameCount, 50, 50);
+  
   
   generate();
   for (let i = 0; i < columns; i++) {
@@ -132,6 +132,7 @@ function generate() {
 }
 function colors() {
   shuffle(tinges);
+  text(frameCount, 50, 50);
   let q = floor(random(tinges.length));
   let qf = floor(random(tinges.length));
   clr = tinges[q];
