@@ -15,7 +15,7 @@ function setup() {
       tinges.push(clrtable.getString(r, c));
     }
   }
-  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap', success, failure);  
+  font = loadFont('stylesheets/fonts/FiraCode-Regular.woff2', success, failure);  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
