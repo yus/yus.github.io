@@ -50,7 +50,7 @@ function setup() {
   rl5.parent('#footer').position(129, 45);
   // create Graphics
   buff = createGraphics(250, 250, WEBGL);
-  //buff.center();
+  buff.center();
   w = 25;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
@@ -83,7 +83,7 @@ function draw() {
       buff.stroke(52);
       //buff.square(i * w, j * w, w - 1);
       rotateWithFrameCount();
-      buff.box(i * w, j * w, w - 1);
+      buff.box(i * w, j * w, w - 15);
       //buff.pop();
       image(buff, loff, toff);
     }
@@ -146,7 +146,7 @@ function colors() {
 function shuffle(a) {
   let j, x, i;
   for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
+    j = floor(random() * (i + 1));
     x = a[i];
     a[i] = a[j];
     a[j] = x;
