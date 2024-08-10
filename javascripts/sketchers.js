@@ -20,12 +20,11 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth - 555, windowHeight - 555);
+  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
-  //cnvs.parent(cnt).position(0, 120).background(52);
-  cnvs.parent(cnt).background(52);
-  cnvs.center();
+  cnvs.parent(cnt).position(0, 120).background(52);
+  //cnvs.center();
   //cnvs.size(250, 250);
   // Create a slider and place it at the top of the canvas.
   slider = createSlider(1, 25, 1, 1);
@@ -53,7 +52,7 @@ function setup() {
   );
   rl5.parent('#footer').position(129, 45);
   // create Graphics
-  buff = createGraphics(250, 250);
+  buff = createGraphics(250, 250, WEBGL);
   //buff.center();
   w = 25;
   columns = floor(buff.width / w); //cnvs
@@ -84,7 +83,7 @@ function draw() {
        else
       buff.fill(folor);
       buff.stroke(52);
-      buff.circle(i * w, j * w, w - 1);
+      buff.square(i * w, j * w, w - 1);
       image(buff, loff, toff);
     }
   }
