@@ -67,7 +67,7 @@ function setup() {
 }
 function draw() {
   fruit.begin();
-  clear();
+  //clear();
   lights();
   rotateX(frameCount * 0.01);
   rotateY(frameCount * 0.01);
