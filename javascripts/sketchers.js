@@ -1,7 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let v, myRadio;
+let v, slider;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -23,6 +23,11 @@ function setup() {
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
   //cnvs.size(555, 555);
+  // Create a slider and place it at the top of the canvas.
+  slider = createSlider(0, 255);
+  slider.position(10, 10);
+  slider.size(220);
+  
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
   let ftr = createDiv('').id('footer').parent(cnt);
@@ -39,14 +44,6 @@ function setup() {
     '<img src="images/processing.png" alt="processing" height="19">'
   );
   rl5.parent('#footer').position(129, 45);
-  // Create a radio button element and place it
-  // in the top-left corner.
-  myRadio = createRadio();
-  myRadio.parent('#footer').position(365, 45);
-  myRadio.size(220);
-  myRadio.option(2, '2 FPS');
-  myRadio.option(60, '60 FPS');
-  myRadio.selected(2);
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
@@ -67,13 +64,15 @@ function setup() {
 }
 function draw() {
   // Set the framerate using the radio button.
-  let rv = myRadio.value();
+  let rv = slider.value();
   frameRate(rv);
+  
   if (mouseIsPressed === true) {
     frameRate(2);
   } else {
     frameRate(60);
   }
+  
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
