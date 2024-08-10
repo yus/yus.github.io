@@ -69,10 +69,7 @@ function setup() {
 function draw() {
   clear();
   lights();
-  rotateX(frameCount * 0.01);
-  rotateY(frameCount * 0.01);
-  box(20, 20, 5);
-
+  
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
@@ -86,7 +83,9 @@ function draw() {
        else
       buff.fill(folor);
       buff.stroke(52);
-      buff.rect(i * w, j * w, w - 1, w - 1);
+      //buff.rect(i * w, j * w, w - 1, w - 1);
+      buff.rotate(frameCount * 0.01);
+      buff.box(20, 20, 5);
       image(buff, loff, toff);
     }
   }
