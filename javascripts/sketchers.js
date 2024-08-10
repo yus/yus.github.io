@@ -5,7 +5,7 @@ let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  font = loadFont('stylesheets/fonts/FiraCode-Regular.woff2');
+  font = loadFont('stylesheets/fonts/FiraCode-Regular.ttf');
 }
 function setup() {
   clrtable.removeColumn(0);
