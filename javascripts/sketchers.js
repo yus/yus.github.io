@@ -7,20 +7,7 @@ function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
-  frameRate(1);
-   // Create a radio button element and place it
-  // in the top-left corner.
-  myRadio = createRadio();
-  myRadio.position(0, 0);
-  myRadio.size(60);
-
-  // Add a few options.
-  myRadio.option(1);
-  myRadio.option(25);
-
-  // Choose a default option.
-  myRadio.selected(1);
-  
+  frameRate(25);
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -53,6 +40,14 @@ function setup() {
     '<img src="images/processing.png" alt="processing" height="19">'
   );
   rl5.parent('#footer').position(129, 45);
+  // Create a radio button element and place it
+  // in the top-left corner.
+  let myRadio = createRadio();
+  myRadio.parent('#footer').position(365, 45);
+  myRadio.size(60);
+  myRadio.option(1);
+  myRadio.option(25);
+  myRadio.selected(25);
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
