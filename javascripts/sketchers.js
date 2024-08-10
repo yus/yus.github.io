@@ -1,12 +1,13 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let fruit, slider;
+let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
+  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Sans');
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -73,6 +74,7 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
   text(frameCount, 50, 50);
+  textFont(font);
   
   generate();
   for (let i = 0; i < columns; i++) {
