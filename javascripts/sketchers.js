@@ -47,9 +47,9 @@ function setup() {
   );
   rl5.parent('#footer').position(129, 45);
   // create Graphics
-  buff = createGraphics(250, 250);
+  buff = createGraphics(288, 288);
   //buff.center();
-  w = 25;
+  w = 24;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
   board = new Array(columns);
@@ -77,7 +77,7 @@ function draw() {
        else
       buff.fill(folor);
       buff.stroke(52);
-      buff.circle(i * w + 10, j * w + 10, w - 5);
+      buff.square(i * w + 12, j * w + 12, w - 1);
       image(buff, loff, toff);
     }
   }
