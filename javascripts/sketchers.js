@@ -1,8 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let v = 0.05;
-let myRadio;
+let v, myRadio;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -44,10 +43,10 @@ function setup() {
   // in the top-left corner.
   myRadio = createRadio();
   myRadio.parent('#footer').position(365, 45);
-  myRadio.size(100);
+  myRadio.size(220);
   myRadio.option(2, '2 FPS');
   myRadio.option(60, '60 FPS');
-  myRadio.selected(60);
+  myRadio.selected('60 FPS');
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
@@ -67,6 +66,14 @@ function setup() {
   init();
 }
 function draw() {
+  // Set the framerate using the radio button.
+  let rv = myRadio.value();
+  frameRate(rv);
+  if (mouseIsPressed === true) {
+    frameRate(2);
+  } else {
+    frameRate(60);
+  }
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
@@ -85,9 +92,6 @@ function mousePressed() {
   init();
 }
 function init() {
-  // Set the framerate using the radio button.
-  let rv = myRadio.value();
-  frameRate(rv);
   colors();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
