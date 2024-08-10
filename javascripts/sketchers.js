@@ -19,7 +19,7 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
+  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL2);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
