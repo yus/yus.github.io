@@ -71,7 +71,7 @@ function draw() {
   lights();
   rotateX(frameCount * 0.01);
   rotateY(frameCount * 0.01);
-  cube(20);
+  box(20, 20, 5);
   fruit.end();
   for (let x = -50; x < windowWidth; x += 25) {
     // Iterate from top to bottom.
