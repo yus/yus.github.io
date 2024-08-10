@@ -7,7 +7,7 @@ function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
-  frameRate(50);
+  // frameRate(50);
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -70,6 +70,7 @@ function draw() {
   // and display it.
   let fps = frameRate();
   text(fps, 50, 50);
+  
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
