@@ -7,7 +7,20 @@ function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
-  frameRate(25);
+  frameRate(1);
+   // Create a radio button element and place it
+  // in the top-left corner.
+  myRadio = createRadio();
+  myRadio.position(0, 0);
+  myRadio.size(60);
+
+  // Add a few options.
+  myRadio.option(1);
+  myRadio.option(25);
+
+  // Choose a default option.
+  myRadio.selected(1);
+  
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -59,17 +72,9 @@ function setup() {
   init();
 }
 function draw() {
-  // Set the x variable based
-  // on the current frameCount.
-  let fc = frameCount % 100;
-
-  // If the mouse is pressed,
-  // decrease the frame rate.
-  if (mouseIsPressed === true) {
-    frameRate(5);
-  } else {
-    frameRate(25);
-  }
+  // Set the framerate using the radio button.
+  let rv = myRadio.value();
+  frameRate(rv);
   
   generate();
   for (var i = 0; i < columns; i++) {
