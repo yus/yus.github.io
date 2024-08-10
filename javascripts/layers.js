@@ -1,7 +1,7 @@
+// John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
 let fruit, slider;
-let layer;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -60,7 +60,6 @@ function draw() {
  
   lights();
   background(52);
-  lights();
 
   rotateX(t/TAU);
   rotateY(t/TAU);
@@ -163,34 +162,4 @@ function windowResized() {
   toff = (cnvs.height - buff.height) / 2;
   init();
 }
-
-/*sketchers src
-
-// John Conway Game of Life
-
-function setup() {
-  
-  
-  
-  //cnvs.center();
-  //cnvs.size(250, 250);
-  // Create a slider and place it at the top of the canvas.
-  slider = createSlider(1, 60, 25, 1);
-  slider.position(10, 10);
-  slider.size(220);
-  
-  
-  // create Graphics
-  buff = createGraphics(288, 288);
-  //buff.center();
-  
-}
-function draw() {  
-  // Set the framerate using the radio button.
-  let rv = slider.value();
-  frameRate(rv);  
-  
-  
-}
-
-*/
+/**/
