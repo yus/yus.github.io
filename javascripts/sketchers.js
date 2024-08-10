@@ -1,22 +1,13 @@
 // John Conway Game of Life
-var clrtable,
-clr,
-folor,
-cnt,
-cnvs,
-tinges;
-var buff,
-loff,
-toff,
-w,
-columns,
-rows,
-board,
-next;
+let clrtable, clr, folor, cnt, cnvs, tinges;
+let buff, loff, toff, w, columns, rows, board, next;
+let v = 0.05;
+
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
+  frameRate(50);
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -68,6 +59,17 @@ function setup() {
   init();
 }
 function draw() {
+  // If the mouse is pressed, do lots
+  // of math to slow down drawing.
+  if (mouseIsPressed === true) {
+    for (let i = 0; i < 1000000; i += 1) {
+      random();
+    }
+  }
+  // Get the current frame rate
+  // and display it.
+  let fps = frameRate();
+  text(fps, 50, 50);
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
