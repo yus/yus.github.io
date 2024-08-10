@@ -66,11 +66,6 @@ function draw() {
       random();
     }
   }
-  // Get the current frame rate
-  // and display it.
-  let fps = frameRate();
-  text(fps, 50, 50);
-  
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
@@ -122,7 +117,7 @@ function generate() {
       next[x][y] = board[x][y]; // Stasis
     }
   }  // Swap!
-  var temp = board;
+  let temp = board;
   board = next;
   next = temp;
 }
@@ -134,7 +129,12 @@ function colors() {
   folor = tinges[qf];
 }
 function shuffle(a) {
-  var j,
+  // Get the current frame rate
+  // and display it.
+  let fps = frameRate();
+  text(fps, 50, 50);
+  
+  let j,
   x,
   i;
   for (i = a.length - 1; i > 0; i--) {
