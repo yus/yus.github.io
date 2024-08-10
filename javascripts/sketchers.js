@@ -10,8 +10,8 @@ function setup() {
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
-  for (var r = 0; r < clrtable.getRowCount(); r++) {
-    for (var c = 0; c < clrtable.getColumnCount(); c++) {
+  for (let r = 0; r < clrtable.getRowCount(); r++) {
+    for (let c = 0; c < clrtable.getColumnCount(); c++) {
       tinges.push(clrtable.getString(r, c));
     }
   }
@@ -21,7 +21,7 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL2);
+  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
@@ -83,14 +83,6 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
-  
-  /*
-  if (mouseIsPressed === true) {
-    frameRate(1);
-  } else {
-    frameRate(25);
-  }
-  */
   
   generate();
   for (let i = 0; i < columns; i++) {
