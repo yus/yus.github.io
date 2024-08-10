@@ -5,6 +5,7 @@ let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  font = loadFont('stylesheets/fonts/FiraCode-Regular.woff2');
 }
 function setup() {
   clrtable.removeColumn(0);
@@ -15,7 +16,7 @@ function setup() {
       tinges.push(clrtable.getString(r, c));
     }
   }
-  font = loadFont('stylesheets/fonts/FiraCode-Regular.woff2', success, failure);  
+  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
