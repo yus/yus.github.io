@@ -83,7 +83,7 @@ function draw() {
        else
       buff.fill(folor);
       buff.stroke(52);
-      buff.square(i * w, j * w, w - 1);
+      buff.circle(i * w, j * w, w - 5);
       image(buff, loff, toff);
     }
   }
