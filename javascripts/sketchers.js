@@ -1,11 +1,10 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let fruit, slider, font;
+let fruit, slider;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  font = loadFont('stylesheets/fonts/FiraCode-Regular.ttf');
 }
 function setup() {
   clrtable.removeColumn(0);
@@ -30,10 +29,6 @@ function setup() {
   slider = createSlider(1, 25, 1, 1);
   slider.position(10, 10);
   slider.size(220);
-
-  textFont(font);
-  textSize(30);
-  textAlign(CENTER, TOP);
   
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
@@ -72,8 +67,7 @@ function setup() {
 function draw() {  
   // Set the framerate using the radio button.
   let rv = slider.value();
-  frameRate(rv);
-  
+  frameRate(rv);  
   
   generate();
   for (let i = 0; i < columns; i++) {
@@ -132,7 +126,6 @@ function generate() {
 }
 function colors() {
   shuffle(tinges);
-  text(frameCount, 50, 50);
   let q = floor(random(tinges.length));
   let qf = floor(random(tinges.length));
   clr = tinges[q];
