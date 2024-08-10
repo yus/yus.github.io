@@ -83,9 +83,9 @@ function draw() {
       //buff.push();  
       buff.fill(folor);
       buff.stroke(52);
-      //buff.square(i * w, j * w, w - 1);
       rotateWithFrameCount(buff);
-      buff.box(i * w, j * w, w - 15);
+      buff.square(i * w, j * w, w - 1);
+      //buff.box(i * w, j * w, w - 1);
       //buff.pop();
       image(buff, loff, toff);
     }
