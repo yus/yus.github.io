@@ -19,11 +19,13 @@ function setup() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
+  cnvs = createCanvas(250, 250, WEBGL);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
-  cnvs.parent(cnt).position(0, 120).background(52);
-  //cnvs.size(555, 555);
+  //cnvs.parent(cnt).position(0, 120).background(52);
+  cnvs.parent(cnt).background(52);
+  cnvs.center();
+  cnvs.size(250, 250);
   // Create a slider and place it at the top of the canvas.
   slider = createSlider(1, 25, 1, 1);
   slider.position(10, 10);
