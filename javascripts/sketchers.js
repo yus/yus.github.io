@@ -25,7 +25,7 @@ function setup() {
   //cnvs.parent(cnt).position(0, 120).background(52);
   cnvs.parent(cnt).background(52);
   cnvs.center();
-  cnvs.size(250, 250);
+  //cnvs.size(250, 250);
   // Create a slider and place it at the top of the canvas.
   slider = createSlider(1, 25, 1, 1);
   slider.position(10, 10);
@@ -52,7 +52,7 @@ function setup() {
   rl5.parent('#footer').position(129, 45);
   // create Graphics
   buff = createGraphics(250, 250, WEBGL);
-  buff.center();
+  //buff.center();
   w = 25;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
