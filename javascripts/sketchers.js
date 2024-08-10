@@ -44,10 +44,10 @@ function setup() {
   // in the top-left corner.
   let myRadio = createRadio();
   myRadio.parent('#footer').position(365, 45);
-  myRadio.size(60);
-  myRadio.option(1);
-  myRadio.option(25);
-  myRadio.selected(25);
+  myRadio.size(100);
+  myRadio.option('1');
+  myRadio.option('25');
+  myRadio.selected('25');
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
