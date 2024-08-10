@@ -26,7 +26,7 @@ function setup() {
   //cnvs.center();
   //cnvs.size(250, 250);
   // Create a slider and place it at the top of the canvas.
-  slider = createSlider(1, 25, 1, 1);
+  slider = createSlider(1, 60, 25, 1);
   slider.position(10, 10);
   slider.size(220);
   
