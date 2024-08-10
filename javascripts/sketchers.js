@@ -49,7 +49,7 @@ function setup() {
   );
   rl5.parent('#footer').position(129, 45);
   // create Graphics
-  buff = createGraphics(250, 250);
+  buff = createGraphics(250, 250, WEBGL2);
   //buff.center();
   w = 25;
   columns = floor(buff.width / w); //cnvs
