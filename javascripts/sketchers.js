@@ -5,7 +5,6 @@ let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 }
 function setup() {
   clrtable.removeColumn(0);
@@ -16,7 +15,7 @@ function setup() {
       tinges.push(clrtable.getString(r, c));
     }
   }
-    
+  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap', success, failure);  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
