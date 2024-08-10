@@ -5,7 +5,7 @@ let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Sans');
+  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans&display=swap');
 }
 function setup() {
   clrtable.removeColumn(0);
