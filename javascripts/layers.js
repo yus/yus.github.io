@@ -63,7 +63,7 @@ function draw() {
 
   rotateX(t/TAU);
   rotateY(t/TAU);
-  box(min(width/2, height/2));
+  box(min(width/10, height/10));
 
   buff.end();
   // Draw the layer to the main canvas
