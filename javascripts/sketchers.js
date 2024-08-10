@@ -1,7 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let v, slider;
+let fruit, slider;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -15,6 +15,9 @@ function setup() {
       tinges.push(clrtable.getString(r, c));
     }
   }
+  let options = { width: 25, height: 25 };
+  fruit = createFramebuffer(options);
+  
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
@@ -51,11 +54,11 @@ function setup() {
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
   board = new Array(columns);
-  for (var i = 0; i < columns; i++) {
+  for (let i = 0; i < columns; i++) {
     board[i] = new Array(rows);
   }
   next = new Array(columns);
-  for (i = 0; i < columns; i++) {
+  for (let i = 0; i < columns; i++) {
     next[i] = new Array(rows);
   }
   loff = (cnvs.width - buff.width) / 2;
@@ -63,6 +66,20 @@ function setup() {
   init();
 }
 function draw() {
+  fruit.begin();
+  clear();
+  lights();
+  rotateX(frameCount * 0.01);
+  rotateY(frameCount * 0.01);
+  cube(20);
+  fruit.end();
+  for (let x = -50; x < windowWidth; x += 25) {
+    // Iterate from top to bottom.
+    for (let y = -50; y < windowHeight; y += 25) {
+      // Draw the p5.Framebuffer object to the canvas.
+      image(fruit, x, y);
+    }
+  }
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
@@ -76,8 +93,8 @@ function draw() {
   */
   
   generate();
-  for (var i = 0; i < columns; i++) {
-    for (var j = 0; j < rows; j++) {
+  for (let i = 0; i < columns; i++) {
+    for (let j = 0; j < rows; j++) {
       if ((board[i][j] == 1))
       buff.fill(clr);
        else
@@ -94,8 +111,8 @@ function mousePressed() {
 }
 function init() {
   colors();
-  for (var i = 0; i < columns; i++) {
-    for (var j = 0; j < rows; j++) {
+  for (let i = 0; i < columns; i++) {
+    for (let j = 0; j < rows; j++) {
       // Lining the edges with 0s
       if (i == 0 || j == 0 || i == columns - 1 || j == rows - 1)
       board[i][j] = 0;
@@ -107,11 +124,11 @@ function init() {
   }
 }
 function generate() {
-  for (var x = 1; x < columns - 1; x++) {
-    for (var y = 1; y < rows - 1; y++) {
+  for (let x = 1; x < columns - 1; x++) {
+    for (let y = 1; y < rows - 1; y++) {
       var neighbors = 0;
-      for (var i = - 1; i <= 1; i++) {
-        for (var j = - 1; j <= 1; j++) {
+      for (let i = - 1; i <= 1; i++) {
+        for (let j = - 1; j <= 1; j++) {
           neighbors += board[x + i][y + j];
         }
       }
