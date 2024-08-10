@@ -15,9 +15,7 @@ function setup() {
       tinges.push(clrtable.getString(r, c));
     }
   }
-  let options = { width: 25, height: 25 };
-  fruit = createFramebuffer(options);
-  
+    
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
@@ -30,6 +28,9 @@ function setup() {
   slider = createSlider(1, 25, 1, 1);
   slider.position(10, 10);
   slider.size(220);
+
+  textSize(30);
+  textAlign(CENTER, TOP);
   
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
@@ -66,23 +67,16 @@ function setup() {
   init();
 }
 function draw() {
-  fruit.begin();
-  //clear();
+  clear();
   lights();
   rotateX(frameCount * 0.01);
   rotateY(frameCount * 0.01);
   box(20, 20, 5);
-  fruit.end();
-  for (let x = -50; x < windowWidth; x += 25) {
-    // Iterate from top to bottom.
-    for (let y = -50; y < windowHeight; y += 25) {
-      // Draw the p5.Framebuffer object to the canvas.
-      image(fruit, x, y);
-    }
-  }
+
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
+  text(frameCount, 50, 50);
   
   generate();
   for (let i = 0; i < columns; i++) {
@@ -97,7 +91,7 @@ function draw() {
     }
   }
 }
-function mousePressed() {
+function mouseClicked() {
   buff.reset();
   init();
 }
