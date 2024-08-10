@@ -97,7 +97,6 @@ function draw() {
   }
 }
 function mouseClicked() {
-  buff.reset();
   init();
 }
 function init() {
@@ -156,7 +155,6 @@ function shuffle(a) {
   return a;
 }
 function windowResized() {
-  buff.reset();
   cnt.size(windowWidth, windowHeight);
   resizeCanvas(windowWidth, windowHeight - 220);
   select('#header').size(windowWidth, 120).position(0, 0);
