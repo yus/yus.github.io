@@ -82,6 +82,7 @@ function draw() {
   }
 }
 function mousePressed() {
+  buff.reset();
   init();
 }
 function init() {
@@ -124,8 +125,8 @@ function generate() {
 }
 function colors() {
   shuffle(tinges);
-  var q = floor(random(tinges.length));
-  var qf = floor(random(tinges.length));
+  let q = floor(random(tinges.length));
+  let qf = floor(random(tinges.length));
   clr = tinges[q];
   folor = tinges[qf];
 }
@@ -142,6 +143,7 @@ function shuffle(a) {
   return a;
 }
 function windowResized() {
+  buff.reset();
   cnt.size(windowWidth, windowHeight);
   resizeCanvas(windowWidth, windowHeight - 220);
   select('#header').size(windowWidth, 120).position(0, 0);
