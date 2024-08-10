@@ -5,9 +5,9 @@ let fruit, slider, font;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Sans');
 }
 function setup() {
-  font = loadFont('https://fonts.googleapis.com/css2?family=Fira+Sans');
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
