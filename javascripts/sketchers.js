@@ -68,9 +68,9 @@ function draw() {
   frameRate(rv);
   
   if (mouseIsPressed === true) {
-    frameRate(2);
+    frameRate(1);
   } else {
-    frameRate(60);
+    frameRate(25);
   }
   
   generate();
