@@ -82,17 +82,17 @@ function draw() {
       buff.fill(folor);
       buff.stroke(52);
       //buff.square(i * w, j * w, w - 1);
-      rotateWithFrameCount();
+      rotateWithFrameCount(buff);
       buff.box(i * w, j * w, w - 15);
       //buff.pop();
       image(buff, loff, toff);
     }
   }
 }
-function rotateWithFrameCount() {
-  rotateX(frameCount * 0.01);
-  rotateY(frameCount * 0.01);
-  rotateZ(frameCount * 0.01);
+function rotateWithFrameCount(fruit) {
+  fruit.rotateX(frameCount * 0.01);
+  fruit.rotateY(frameCount * 0.01);
+  fruit.rotateZ(frameCount * 0.01);
 }
 function mouseClicked() {
   buff.reset();
