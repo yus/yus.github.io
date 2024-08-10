@@ -78,13 +78,21 @@ function draw() {
       if ((board[i][j] == 1))
       buff.fill(clr);
        else
+      buff.push();  
       buff.fill(folor);
       buff.stroke(52);
-      buff.square(i * w, j * w, w - 1);
-      buff.box(i * w, j * w, w - 1).rotate(frameCount * 0.01);
+      //buff.square(i * w, j * w, w - 1);
+      buff.rotateWithFrameCount();
+      buff.box(i * w, j * w, w - 1);
+      buff.pop();
       image(buff, loff, toff);
     }
   }
+}
+function rotateWithFrameCount() {
+  rotateX(frameCount * 0.01);
+  rotateY(frameCount * 0.01);
+  rotateZ(frameCount * 0.01);
 }
 function mouseClicked() {
   buff.reset();
