@@ -78,13 +78,13 @@ function draw() {
       if ((board[i][j] == 1))
       buff.fill(clr);
        else
-      buff.push();  
+      //buff.push();  
       buff.fill(folor);
       buff.stroke(52);
       //buff.square(i * w, j * w, w - 1);
       rotateWithFrameCount();
       buff.box(i * w, j * w, w - 1);
-      buff.pop();
+      //buff.pop();
       image(buff, loff, toff);
     }
   }
