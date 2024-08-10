@@ -2,12 +2,12 @@
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
 let v = 0.05;
+let myRadio = createRadio();
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
-  frameRate(25);
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -42,12 +42,11 @@ function setup() {
   rl5.parent('#footer').position(129, 45);
   // Create a radio button element and place it
   // in the top-left corner.
-  let myRadio = createRadio();
   myRadio.parent('#footer').position(365, 45);
   myRadio.size(100);
-  myRadio.option('1');
-  myRadio.option('25');
-  myRadio.selected('25');
+  myRadio.option('2');
+  myRadio.option('60');
+  myRadio.selected('60');
   // create Graphics
   buff = createGraphics(250, 250);
   //buff.center();
