@@ -7,7 +7,7 @@ function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
 }
 function setup() {
-  // frameRate(50);
+  frameRate(25);
   clrtable.removeColumn(0);
   console.log(clrtable.getColumnCount());
   tinges = [];
@@ -59,13 +59,18 @@ function setup() {
   init();
 }
 function draw() {
-  // If the mouse is pressed, do lots
-  // of math to slow down drawing.
+  // Set the x variable based
+  // on the current frameCount.
+  let fc = frameCount % 100;
+
+  // If the mouse is pressed,
+  // decrease the frame rate.
   if (mouseIsPressed === true) {
-    for (let i = 0; i < 1000000; i += 1) {
-      random();
-    }
+    frameRate(5);
+  } else {
+    frameRate(25);
   }
+  
   generate();
   for (var i = 0; i < columns; i++) {
     for (var j = 0; j < rows; j++) {
@@ -129,14 +134,7 @@ function colors() {
   folor = tinges[qf];
 }
 function shuffle(a) {
-  // Get the current frame rate
-  // and display it.
-  let fps = frameRate();
-  text(fps, 50, 50);
-  
-  let j,
-  x,
-  i;
+  let j, x, i;
   for (i = a.length - 1; i > 0; i--) {
     j = Math.floor(Math.random() * (i + 1));
     x = a[i];
