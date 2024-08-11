@@ -95,6 +95,8 @@ function draw() {
   translate(-width/2, -height/2);
   rotateX(t/TAU);
   rotateY(t/TAU);
+
+  texture(buff);
   box(min(width/2, height/2));
 }
 function mouseClicked() {
