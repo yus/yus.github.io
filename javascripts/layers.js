@@ -47,6 +47,20 @@ function setup() {
   buff = createFramebuffer();
   describe('a rotating cube with Game of Life on each face');
 
+  w = 24;
+  columns = floor(buff.width / w); //cnvs
+  rows = floor(buff.height / w);
+  board = new Array(columns);
+  for (let i = 0; i < columns; i++) {
+    board[i] = new Array(rows);
+  }
+  next = new Array(columns);
+  for (let i = 0; i < columns; i++) {
+    next[i] = new Array(rows);
+  }
+  loff = (cnvs.width - buff.width) / 2;
+  toff = (cnvs.height - buff.height) / 2;
+
   init();
 }
 
@@ -61,15 +75,7 @@ function draw() {
   lights();
   background(52);
 
-  rotateX(t/TAU);
-  rotateY(t/TAU);
-  box(min(width/10, height/10));
-
-  buff.end();
-  // Draw the layer to the main canvas
-  clear();
-  translate(-width/2, -height/2);
-  generate();
+  generate();
   for (let i = 0; i < columns; i++) {
     for (let j = 0; j < rows; j++) {
       if ((board[i][j] == 1))
@@ -81,24 +87,20 @@ function draw() {
       image(buff, loff, toff);
     }
   }
+
+  buff.end();
+  // Draw the layer to the main canvas
+  clear();
+  
+  translate(-width/2, -height/2);
+  rotateX(t/TAU);
+  rotateY(t/TAU);
+  box(min(width/2, height/2));
 }
 function mouseClicked() {
   init();
 }
 function init() {
-  w = 24;
-  columns = floor(buff.width / w); //cnvs
-  rows = floor(buff.height / w);
-  board = new Array(columns);
-  for (let i = 0; i < columns; i++) {
-    board[i] = new Array(rows);
-  }
-  next = new Array(columns);
-  for (let i = 0; i < columns; i++) {
-    next[i] = new Array(rows);
-  }
-  loff = (cnvs.width - buff.width) / 2;
-  toff = (cnvs.height - buff.height) / 2;
   colors();
   for (let i = 0; i < columns; i++) {
     for (let j = 0; j < rows; j++) {
