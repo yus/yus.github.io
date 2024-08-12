@@ -58,8 +58,6 @@ function draw() {
   }
   
   lp.begin();
-  clear();
-  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -74,11 +72,8 @@ function draw() {
       layer.image(lp, column * cellSize, row * cellSize, cellSize, cellSize);
     }
   }
-  
-  lp.end();
-  clear();
-  
   image(layer, -100, -100);
+  lp.end();
 }
 
 // Reset board when mouse is pressed
