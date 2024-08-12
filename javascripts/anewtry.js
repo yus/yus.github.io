@@ -3,7 +3,7 @@ let columnCount;
 let rowCount;
 let currentCells = [];
 let nextCells = [];
-let layer, layerTorus, layerBox; 
+let layer, layerTorus, layerBox, checkbox; 
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
@@ -11,6 +11,9 @@ function setup() {
   let cnvs = createCanvas(400, 400);
   cnvs.center();
 
+  checkbox = createCheckbox();
+  checkbox.position(0, 100);
+  
   // Create an options object.
   let options = { width: 20, height: 20 };
 
@@ -57,16 +60,20 @@ function draw() {
 
       // Choose the layer to display.
       let lp;
-      if (mouseIsPressed === true) {
+      if (checkbox.checked()) {
         lp = layerBox;
+        layer.image(lp, column * cellSize, row * cellSize);
       } else {
         lp = layerTorus;
+        layer.image(lp, column * cellSize, row * cellSize);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
+      /*
       layer.fill((1 - cell) * 255);
       layer.stroke(0);
       layer.square(column * cellSize, row * cellSize, cellSize);
-      layer.image(lp, column * cellSize, row * cellSize);
+      */
+      // layer.image(lp, column * cellSize, row * cellSize);
     }
   }
   image(layer, -100, -100);
