@@ -67,9 +67,6 @@ function setup() {
 
   noLoop();
   init();
-  describe(
-    "Grid of squares that switch between white and black, demonstrating a simulation of John Conway's Game of Life. When clicked, the simulation resets."
-  );
 }
 
 function draw() {
