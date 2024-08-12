@@ -49,6 +49,8 @@ function setup() {
 
 function draw() {
   // Update and draw the layers offscreen.
+  lBox();
+  lTorus();
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -60,13 +62,13 @@ function draw() {
       if (cell) {
         lp = layerBox;
         lp.begin();
-        lBox();
+        stroke(128);
         lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       } else {
         lp = layerTorus;
         lp.begin();
-        lTorus();
+        stroke(128);
         lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       }
