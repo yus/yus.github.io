@@ -24,6 +24,7 @@ function setup() {
   // Use options for configuration.
   layerTorus = layer.createFramebuffer(options);
   layerBox = layer.createFramebuffer(options);
+  layerCube = layer.createFramebuffer(options);
   
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
@@ -51,6 +52,10 @@ function draw() {
   // Update and draw the layers offscreen.
   lBox();
   lTorus();
+  
+  let lc = layerCube;
+  lc.begin();
+  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -81,7 +86,11 @@ function draw() {
       // layer.image(lp, column * cellSize, row * cellSize);
     }
   }
-  image(layer, 0, 0);
+  lc.end();
+  orbitControl();
+  texture(layer);
+  box(500);
+  //lc.image(layer, 0, 0);
   //filter(BLUR, 0.25, true);
 }
 
