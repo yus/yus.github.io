@@ -19,8 +19,8 @@ function setup() {
 
   // Create the p5.Framebuffer objects.
   // Use options for configuration.
-  layer2D = layer.createFramebuffer(options);
-  //layer3D = layer.createFramebuffer(options);
+  layerTorus = layer.createFramebuffer(options);
+  layerBox = layer.createFramebuffer(options);
   
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
@@ -45,8 +45,18 @@ function setup() {
 }
 
 function draw() {
-  layer2D.begin();
-  clear();
+  // Update and draw the layers offscreen.
+  lTorus();
+  lBox();
+
+  // Choose the layer to display.
+  let layer;
+  if (mouseIsPressed === true) {
+    layer = layerBox;
+  } else {
+    layer = layerTorus;
+  }
+  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -57,19 +67,10 @@ function draw() {
       fill((1 - cell) * 255);
       stroke(0);
       square(column * cellSize, row * cellSize, cellSize);
-      layer.image(layer2D, 0, 0);
+      layer.image(layerTorus, 0, 0);
     }
   }
-  layer2D.end();
-
-  clear();
-  background(255);
-  lights();
-  //noStroke();
-  texture( image(layer, 0, 0) );
-  rotateX(t);
-  rotateY(t);
-  box(400);
+  image(layer, 0, 0);
 }
 
 // Reset board when mouse is pressed
@@ -137,4 +138,53 @@ function generate() {
   let temp = currentCells;
   currentCells = nextCells;
   nextCells = temp;
+}
+// Update and draw the torus layer offscreen.
+function lTorus() {
+  // Start drawing to the torus p5.Framebuffer.
+  layerTorus.begin();
+
+  // Clear the drawing surface.
+  layer.clear();
+
+  // Turn on the lights.
+  layer.lights();
+
+  // Rotate the coordinate system.
+  layer.rotateX(frameCount * 0.01);
+  layer.rotateY(frameCount * 0.01);
+
+  // Style the torus.
+  layer.noStroke();
+
+  // Draw the torus.
+  layer.torus(5, 2.5);
+
+  // Start drawing to the torus p5.Framebuffer.
+  layerTorus.end();
+}
+
+// Update and draw the box layer offscreen.
+function lBox() {
+  // Start drawing to the box p5.Framebuffer.
+  layerBox.begin();
+
+  // Clear the drawing surface.
+  layer.clear();
+
+  // Turn on the lights.
+  layer.lights();
+
+  // Rotate the coordinate system.
+  layer.rotateX(frameCount * 0.01);
+  layer.rotateY(frameCount * 0.01);
+
+  // Style the box.
+  layer.noStroke();
+
+  // Draw the box.
+  layer.box(7.5);
+
+  // Start drawing to the box p5.Framebuffer.
+  layerBox.end();
 }
