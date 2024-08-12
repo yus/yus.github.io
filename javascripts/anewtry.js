@@ -72,7 +72,7 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
 
-  frc = text(frameCount,50,50);
+  select('#framecount').html('<h2>' + text(frameCount,50,50) + '</h2>');
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -287,8 +287,8 @@ function createElts() {
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
   let logo = createImg('images/yus143.png', 'yusdesign logotype');
   logo.parent('#header').position(72, 29);
-  let fc = createDiv(frc).id('framecount');
-  fc.parent('#header').position(144, 29);
+  frc = createDiv('').id('framecount');
+  frc.parent('#header').position(144, 29);
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
