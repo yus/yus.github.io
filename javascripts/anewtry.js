@@ -60,7 +60,7 @@ function draw() {
       let cell = currentCells[column][row];
 
       // Choose the layer to display.
-      if (lp == layerTorus) {
+      if (cell) {
         lp = layerBox;
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
