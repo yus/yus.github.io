@@ -22,7 +22,7 @@ function setup() {
     }
   }
   // Set simulation framerate to 10 to avoid flickering
-  frameRate(15);
+  //frameRate(15);
 
   createElts();
   
@@ -68,6 +68,10 @@ function setup() {
 }
 
 function draw() {
+  // Set the framerate using the radio button.
+  let rv = slider.value();
+  frameRate(rv);
+  
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
   
