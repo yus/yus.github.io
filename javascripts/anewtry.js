@@ -63,7 +63,6 @@ function draw() {
         lp = layerBox;
         lp.begin();
         stroke(128);
-        normalMaterial();
         lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       } else {
@@ -194,6 +193,7 @@ function lBox() {
 
   // Style the box.
   layer.noStroke();
+  layer.normalMaterial();
 
   // Draw the box.
   layer.box(cellSize);
