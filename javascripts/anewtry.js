@@ -20,7 +20,7 @@ function setup() {
   // Create the p5.Framebuffer objects.
   // Use options for configuration.
   layer2D = layer.createFramebuffer(options);
-  layer3D = layer.createFramebuffer(options);
+  //layer3D = layer.createFramebuffer(options);
   
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
@@ -60,14 +60,13 @@ function draw() {
       layer.image(layer2D, 0, 0);
     }
   }
-  layer3D = image(layer, 0, 0);
   layer2D.end();
 
   clear();
   background(255);
   lights();
   //noStroke();
-  texture(layer3D);
+  texture( image(layer, 0, 0) );
   rotateX(t);
   rotateY(t);
   box(400);
