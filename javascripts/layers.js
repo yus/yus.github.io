@@ -27,6 +27,13 @@ function setup() {
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
 
+  camp = createCamera();
+  camp.setPosition(400, -400, 800);
+  camp.lookAt(0, 0, 0);
+  defcamp = createCamera();
+  defcamp.setPosition(0, 0, 800);
+  defcamp.lookAt(0, 0, 0);
+
   // Create a button and set its value to 0.
   // Place the button beneath the canvas.
   button = createButton('RND CAMP', 'defcamp');
@@ -34,13 +41,6 @@ function setup() {
 
   // Call randomColor() when the button is pressed.
   button.mousePressed(changeCamp);
-
-  camp = createCamera();
-  camp.setPosition(400, -400, 800);
-  camp.lookAt(0, 0, 0);
-  defcamp = createCamera();
-  defcamp.setPosition(0, 0, 800);
-  defcamp.lookAt(0, 0, 0);
   
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
@@ -157,14 +157,16 @@ function doubleClicked() {
 }
 function changeCamp() {
   if (isDefaultCamp === true) {
-    setCamera(camp);
+    let c = camp;
+    setCamera(c);
     isDefaultCamp = false;
+    button.value(c);
   } else {
-    setCamera(defcamp);
+    let c = defcamp;
+    setCamera(c);
     isDefaultCamp = true;
+    button.value(c);
   }
-  let c = random(['camp', 'defcamp']);
-  button.value(c);
 }
 function init() {
   colors();
