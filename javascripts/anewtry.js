@@ -49,29 +49,27 @@ function draw() {
   lTorus();
   lBox();
 
-  // Choose the layer to display.
-  let lp;
-  if (mouseIsPressed === true) {
-    lp = layerBox;
-  } else {
-    lp = layerTorus;
-  }
-  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       // Get cell value (0 or 1)
       let cell = currentCells[column][row];
 
-      
+      // Choose the layer to display.
+      let lp;
+      if (mouseIsPressed === true) {
+        lp = layerBox;
+      } else {
+        lp = layerTorus;
+      }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       layer.fill((1 - cell) * 255);
       layer.stroke(0);
-      //layer.square(column * cellSize, row * cellSize, cellSize);
+      layer.square(column * cellSize, row * cellSize, cellSize);
       layer.image(lp, column * cellSize, row * cellSize);
     }
   }
-  image(layer, -200, -200);
+  image(layer, -100, -100);
 }
 
 // Reset board when mouse is pressed
