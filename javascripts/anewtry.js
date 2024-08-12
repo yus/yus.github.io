@@ -50,6 +50,8 @@ function setup() {
 
 function draw() {
   // Update and draw the layers offscreen.
+  let t = millis() * 0.001;
+  
   lBox();
   lTorus();
   
@@ -87,8 +89,10 @@ function draw() {
     }
   }
   lc.end();
-  orbitControl();
+  
   texture(layer);
+  rotateX(t);
+  rotateY(t);
   box(500);
   //lc.image(layer, 0, 0);
   //filter(BLUR, 0.25, true);
