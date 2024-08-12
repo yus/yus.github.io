@@ -1,7 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let buff, loff, toff, w, columns, rows, board, next;
-let fruit, slider;
+let fruit, slider, camp, camp2, usingCamp;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
