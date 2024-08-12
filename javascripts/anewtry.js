@@ -1,4 +1,4 @@
-let cellSize = 20;
+let cellSize = 40;
 let columnCount;
 let rowCount;
 let currentCells = [];
@@ -15,7 +15,7 @@ function setup() {
   checkbox.position(0, 100);
   
   // Create an options object.
-  let options = { width: 20, height: 20 };
+  let options = { width: 40, height: 40 };
 
   // Create a p5.Graphics object using WebGL mode.
   layer = createGraphics(400, 400, WEBGL);
@@ -77,7 +77,7 @@ function draw() {
     }
   }
   image(layer, 0, 0);
-  filter(BLUR, 0.5, true);
+  filter(BLUR, 0.25, true);
 }
 
 // Reset board when mouse is pressed
@@ -165,7 +165,7 @@ function lTorus() {
   layer.stroke(0);
 
   // Draw the torus.
-  layer.torus(cellSize);
+  layer.torus(cellSize/4);
 
   // Start drawing to the torus p5.Framebuffer.
   layerTorus.end();
@@ -190,7 +190,7 @@ function lBox() {
   layer.stroke(0);
 
   // Draw the box.
-  layer.box(cellSize);
+  layer.box(cellSize/4);
 
   // Start drawing to the box p5.Framebuffer.
   layerBox.end();
