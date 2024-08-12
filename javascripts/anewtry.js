@@ -279,7 +279,7 @@ function lBox() {
   layer.fill(folor);
 
   // Draw the box.
-  layer.box(cellSize/5);
+  layer.box(cellSize/2);
 
   // Start drawing to the box p5.Framebuffer.
   layerBox.end();
