@@ -3,7 +3,7 @@ let columnCount;
 let rowCount;
 let currentCells = [];
 let nextCells = [];
-let layer, layer2D, layer3D; 
+let layer, layerTorus, layerBox; 
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
@@ -67,7 +67,7 @@ function draw() {
       fill((1 - cell) * 255);
       stroke(0);
       square(column * cellSize, row * cellSize, cellSize);
-      layer.image(lp, 0, 0);
+      layer.image(lp, column * cellSize, row * cellSize, cellSize, cellSize);
     }
   }
   image(layer, 0, 0);
