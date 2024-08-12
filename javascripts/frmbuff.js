@@ -4,7 +4,8 @@ let torusLayer;
 let boxLayer;
 
 function setup() {
-  createCanvas(100, 100);
+  let cnvs = createCanvas(100, 100);
+  cnvs.center();
 
   // Create a p5.Graphics object using WebGL mode.
   pg = createGraphics(100, 100, WEBGL);
