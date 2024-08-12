@@ -83,7 +83,7 @@ function draw() {
 
   frc = frameCount;
   select('#framecount').html('<h2> ' + frc + ' </h2>');
-  select('#framecount').style('font-family', font);
+  select('#framecount').style('font-family', 'FiraCode-Light');
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -297,7 +297,7 @@ function createElts() {
   logo.parent('#header').position(72, 29);
   frc = createDiv('').id('framecount');
   frc.parent('#header').position(288, 29);
-  frc.attribute('font', 'FiraCode-Light');
+  frc.attribute('style', 'font-family:FiraCode-Light');
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
