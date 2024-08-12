@@ -61,11 +61,15 @@ function draw() {
       // Choose the layer to display.
       let lp;
       if (cell) {
+        lp.begin();
         lp = layerBox;
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
+        lp.end();
       } else {
+        lp.begin();
         lp = layerTorus;
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
+        lp.end();
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       /*
