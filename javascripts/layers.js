@@ -75,8 +75,8 @@ function setup() {
   for (let i = 0; i < columns; i++) {
     next[i] = new Array(rows);
   }
-  loff = (cnvs.width - buff.width) / 2;
-  toff = (cnvs.height - buff.height) / 2;
+  loff = (cnvs.width - buff.width); // 2;
+  toff = (cnvs.height - buff.height); // 2;
 
   init();
   buff.end();
