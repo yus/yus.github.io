@@ -120,9 +120,8 @@ function draw() {
   // Enable orbiting with the mouse.
   orbitControl();
   // Style the box.
-  normalMaterial();
   texture(buff);
-  textureMode(NORMAL);
+  
   box(144);
 }
 function mouseClicked() {
