@@ -47,6 +47,22 @@ function setup() {
   buff = createFramebuffer();
   describe('a rotating cube with Game of Life on each face');
 
+  // Create the cameras between begin() and end().
+  buff.begin();
+
+  // Create the first camera.
+  // Keep its default settings.
+  camp = buff.createCamera();
+
+  // Create the second camera.
+  // Place it at the top-left.
+  // Point it at the origin.
+  camp2 = buff.createCamera();
+  camp2.setPosition(400, -400, 800);
+  camp2.lookAt(0, 0, 0);
+
+  buff.end();    
+  
   w = 24;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
@@ -71,10 +87,19 @@ function draw() {
   buff.begin();
 
   clear();
- 
   lights();
   background(52);
 
+  // Set the camera.
+  if (usingCamp === true) {
+    setCamera(camp);
+  } else {
+    setCamera(camp2);
+  }
+
+  // Reset all transformations.
+  resetMatrix();
+  
   generate();
   for (let i = 0; i < columns; i++) {
     for (let j = 0; j < rows; j++) {
@@ -101,6 +126,14 @@ function draw() {
 }
 function mouseClicked() {
   init();
+}
+// Toggle the current camera when the user double-clicks.
+function doubleClicked() {
+  if (usingCamp === true) {
+    usingCamp = false;
+  } else {
+    usingCamp = true;
+  }
 }
 function init() {
   colors();
