@@ -119,6 +119,7 @@ function draw() {
   // Style the box.
   normalMaterial();
   texture(buff);
+  textureMode(NORMAL);
   box(220);
 }
 function mouseClicked() {
