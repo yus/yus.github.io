@@ -92,7 +92,7 @@ function draw() {
   
   rotateX(t);
   rotateY(t);
-  box(500);
+  sphere();
   //lc.image(layer, 0, 0);
   //filter(BLUR, 0.25, true);
 }
