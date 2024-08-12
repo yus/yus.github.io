@@ -83,6 +83,7 @@ function draw() {
 
   frc = frameCount;
   select('#framecount').html('<h2> ' + frc + ' </h2>');
+  select('#framecount').style('font-family', font);
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
