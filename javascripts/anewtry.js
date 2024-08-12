@@ -70,7 +70,7 @@ function draw() {
       layer.image(lp, column * cellSize, row * cellSize, cellSize, cellSize);
     }
   }
-  image(layer, 0, 0);
+  image(layer, -200, -200);
 }
 
 // Reset board when mouse is pressed
