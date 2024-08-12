@@ -41,7 +41,7 @@ function setup() {
 
   textFont(font);
   textSize(72);
-  text(frameCount, 288, 29);
+  //text(frameCount, 288, 29);
   
   // Create an options object.
   let options = { width: 25, height: 25 };
