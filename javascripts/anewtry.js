@@ -3,6 +3,7 @@ let columnCount;
 let rowCount;
 let currentCells = [];
 let nextCells = [];
+let layer, layer2D, layer3D; 
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
@@ -10,6 +11,17 @@ function setup() {
   let cnvs = createCanvas(400, 400);
   cnvs.center();
 
+  // Create an options object.
+  let options = { width: cellSize, height: cellSize };
+
+  // Create a p5.Graphics object using WebGL mode.
+  layer = createGraphics(400, 400, WEBGL);
+
+  // Create the p5.Framebuffer objects.
+  // Use options for configuration.
+  layer2D = layer.createFramebuffer(options);
+  layer3D = layer.createFramebuffer(options);
+  
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
   rowCount = floor(height / cellSize);
@@ -42,9 +54,11 @@ function draw() {
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       fill((1 - cell) * 255);
       stroke(0);
-      rect(column * cellSize, row * cellSize, cellSize, cellSize);
+      square(column * cellSize, row * cellSize, cellSize);
+      layer2D.image(layer, 0, 0);
     }
   }
+  image(layer2D, 0, 0);
 }
 
 // Reset board when mouse is pressed
