@@ -1,4 +1,4 @@
-let cellSize = 40;
+let cellSize = 25;
 let columnCount;
 let rowCount;
 let currentCells = [];
@@ -7,18 +7,18 @@ let layer, layerTorus, layerBox, checkbox;
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
-  frameRate(25);
-  let cnvs = createCanvas(400, 400);
+  frameRate(15);
+  let cnvs = createCanvas(500, 500);
   cnvs.center();
 
   checkbox = createCheckbox();
-  checkbox.position(0, 100);
+  checkbox.position(100, 100);
   
   // Create an options object.
-  let options = { width: 40, height: 40 };
+  let options = { width: 25, height: 25 };
 
   // Create a p5.Graphics object using WebGL mode.
-  layer = createGraphics(400, 400, WEBGL);
+  layer = createGraphics(500, 500, WEBGL);
 
   // Create the p5.Framebuffer objects.
   // Use options for configuration.
@@ -62,10 +62,12 @@ function draw() {
       let lp;
       if (cell) {
         lp = layerBox;
-        layer.image(lp, column * cellSize - 200, row * cellSize - 200);
+        layer.clear();
+        layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       } else {
         lp = layerTorus;
-        layer.image(lp, column * cellSize - 200, row * cellSize - 200);
+        layer.clear();
+        layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       /*
@@ -190,7 +192,7 @@ function lBox() {
   layer.noStroke();
 
   // Draw the box.
-  layer.box(cellSize/2);
+  layer.box(cellSize);
 
   // Start drawing to the box p5.Framebuffer.
   layerBox.end();
