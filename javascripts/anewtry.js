@@ -28,7 +28,8 @@ function setup() {
   createElts();
   
   cnvs = createCanvas(windowWidth-220, windowHeight-220, WEBGL);
-  cnvs.center();
+  //cnvs.center();
+  cnvs.parent(cnt).position(0, 120).background(52);
 
   checkbox = createCheckbox();
   checkbox.position(100, 100);
