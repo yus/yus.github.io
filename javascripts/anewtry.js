@@ -88,6 +88,8 @@ function draw() {
   //let mt = image(layer, 0, 0);
   
   texture(layer);
+  orbitControl();
+  
   rotateX(t);
   rotateY(t);
   box(500);
