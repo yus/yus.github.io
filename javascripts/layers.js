@@ -63,7 +63,9 @@ function setup() {
   defcamp = createCamera();
   defcamp.setPosition(0, 0, 800);
   defcamp.lookAt(0, 0, 0);
-    
+
+  buff.autoSized(false);
+  
   w = 24;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
@@ -83,6 +85,8 @@ function setup() {
 }
 function draw() {
   let t = millis() * 0.001;
+
+  plane(buff.width, -buff.height);
   // Start drawing to the framebuffer
   buff.begin();
 
