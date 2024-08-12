@@ -60,12 +60,12 @@ function draw() {
 
       // Choose the layer to display.
       let lp;
-      if (checkbox.checked()) {
+      if (cell) {
         lp = layerBox;
-        layer.image(lp, column * cellSize, row * cellSize);
+        layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
         lp = layerTorus;
-        layer.image(lp, column * cellSize, row * cellSize);
+        layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       /*
@@ -76,7 +76,7 @@ function draw() {
       // layer.image(lp, column * cellSize, row * cellSize);
     }
   }
-  image(layer, -100, -100);
+  image(layer, 0, 0);
 }
 
 // Reset board when mouse is pressed
