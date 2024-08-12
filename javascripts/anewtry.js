@@ -81,7 +81,7 @@ function draw() {
     }
   }
   image(layer, 0, 0);
-  filter(BLUR, 0.25, true);
+  //filter(BLUR, 0.25, true);
 }
 
 // Reset board when mouse is pressed
