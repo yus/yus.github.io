@@ -12,7 +12,7 @@ function setup() {
   cnvs.center();
 
   // Create an options object.
-  let options = { width: cellSize, height: cellSize };
+  let options = { width: 20, height: 20 };
 
   // Create a p5.Graphics object using WebGL mode.
   layer = createGraphics(400, 400, WEBGL);
@@ -55,10 +55,10 @@ function draw() {
       fill((1 - cell) * 255);
       stroke(0);
       square(column * cellSize, row * cellSize, cellSize);
-      layer2D.image(layer, 0, 0);
+      layer.image(layer2D, 0, 0);
     }
   }
-  image(layer2D, 0, 0);
+  image(layer, 0, 0);
 }
 
 // Reset board when mouse is pressed
