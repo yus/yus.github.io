@@ -297,7 +297,7 @@ function createElts() {
   logo.parent('#header').position(72, 29);
   frc = createDiv('').id('framecount');
   frc.parent('#header').position(288, 29);
-  frc.attribute('font', font);
+  frc.attribute('font', 'FiraCode-Light');
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
