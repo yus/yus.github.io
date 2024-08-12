@@ -117,7 +117,7 @@ function draw() {
   // Draw the layer to the main canvas
   clear();
   
-  translate(-width/2, -height/2);
+  //translate(-width/2, -height/2);
   rotateX(t/TAU);
   rotateY(t/TAU);
 
