@@ -89,7 +89,7 @@ function draw() {
   
   texture(layer);
   orbitControl();
-  
+  noStroke();
   rotateX(t);
   rotateY(t);
   sphere();
