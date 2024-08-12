@@ -50,7 +50,7 @@ function setup() {
 
 function draw() {
   // Update and draw the layers offscreen.
-  let t = millis() * 0.001;
+  let t = millis() * 0.0001;
   
   lBox();
   lTorus();
