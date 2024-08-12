@@ -1,6 +1,6 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
-let buff, loff, toff, w, columns, rows, board, next;
+let columns, rows, board, next;
 
 let cellSize = 25;
 let columnCount;
