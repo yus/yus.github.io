@@ -29,10 +29,10 @@ function setup() {
 
   // Create a button and set its value to 0.
   // Place the button beneath the canvas.
-  button = createButton('RND CAMP');
+  button = createButton('CHANGE CAMP');
   button.position(150, 150);
 
-  // Call randomColor() when the button is pressed.
+  // Call changeCamp() when the button is pressed.
   button.mousePressed(changeCamp);
   
   let hdr = createDiv('').id('header').parent(cnt);
