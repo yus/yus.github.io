@@ -77,6 +77,7 @@ function draw() {
     }
   }
   image(layer, 0, 0);
+  filter(BLUR, 0.5, true);
 }
 
 // Reset board when mouse is pressed
@@ -161,7 +162,7 @@ function lTorus() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the torus.
-  layer.noStroke();
+  layer.stroke(0);
 
   // Draw the torus.
   layer.torus(cellSize);
@@ -186,7 +187,7 @@ function lBox() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the box.
-  layer.noStroke();
+  layer.stroke(0);
 
   // Draw the box.
   layer.box(cellSize);
