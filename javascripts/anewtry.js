@@ -24,10 +24,7 @@ function setup() {
   }
   // Set simulation framerate to 10 to avoid flickering
   //frameRate(15);
-  textFont(font);
-  textSize(72);
-  text(frameCount, 288, 29);
-
+  
   createElts();
   
   cnvs = createCanvas(windowWidth-220, windowHeight-220, WEBGL);
@@ -35,6 +32,10 @@ function setup() {
 
   checkbox = createCheckbox();
   checkbox.position(100, 100);
+
+  textFont(font);
+  textSize(72);
+  text(frameCount, 288, 29);
   
   // Create an options object.
   let options = { width: 25, height: 25 };
@@ -75,7 +76,7 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
-  text(frameCount, 288, 29);
+  
   //select('#framecount').html('<h2> ' + frameCount + ' </h2>');
   
   // Update and draw the layers offscreen.
@@ -118,6 +119,9 @@ function draw() {
   
   texture(layer);
   orbitControl();
+
+  text(frameCount, 288, 29);
+  
   noStroke();
   rotateX(t);
   rotateY(t);
