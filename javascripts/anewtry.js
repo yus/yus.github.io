@@ -1,3 +1,7 @@
+// John Conway Game of Life
+let clrtable, clr, folor, cnt, cnvs, tinges;
+let buff, loff, toff, w, columns, rows, board, next;
+
 let cellSize = 25;
 let columnCount;
 let rowCount;
@@ -5,10 +9,24 @@ let currentCells = [];
 let nextCells = [];
 let layer, layerTorus, layerBox, checkbox; 
 
+function preload() {
+  clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+}
 function setup() {
+  clrtable.removeColumn(0);
+  console.log(clrtable.getColumnCount());
+  tinges = [];
+  for (let r = 0; r < clrtable.getRowCount(); r++) {
+    for (let c = 0; c < clrtable.getColumnCount(); c++) {
+      tinges.push(clrtable.getString(r, c));
+    }
+  }
   // Set simulation framerate to 10 to avoid flickering
   frameRate(15);
-  let cnvs = createCanvas(500, 500, WEBGL);
+
+  createElts();
+  
+  cnvs = createCanvas(500, 500, WEBGL);
   cnvs.center();
 
   checkbox = createCheckbox();
@@ -43,6 +61,7 @@ function setup() {
   }
 
   noLoop();
+  init();
   describe(
     "Grid of squares that switch between white and black, demonstrating a simulation of John Conway's Game of Life. When clicked, the simulation resets."
   );
@@ -102,7 +121,23 @@ function mousePressed() {
   randomizeBoard();
   loop();
 }
-
+function mouseClicked() {
+  init();
+}
+function init() {
+  colors();
+  for (let i = 0; i < columns; i++) {
+    for (let j = 0; j < rows; j++) {
+      // Lining the edges with 0s
+      if (i == 0 || j == 0 || i == columns - 1 || j == rows - 1)
+      board[i][j] = 0;
+      // Filling the rest randomly
+       else
+      board[i][j] = floor(random(2));
+      next[i][j] = 0;
+    }
+  }
+}
 // Fill board randomly
 function randomizeBoard() {
   for (let column = 0; column < columnCount; column++) {
@@ -163,6 +198,23 @@ function generate() {
   currentCells = nextCells;
   nextCells = temp;
 }
+function colors() {
+  shuffle(tinges);
+  let q = floor(random(tinges.length));
+  let qf = floor(random(tinges.length));
+  clr = tinges[q];
+  folor = tinges[qf];
+}
+function shuffle(a) {
+  let j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = floor(random() * (i + 1));
+    x = a[i];
+    a[i] = a[j];
+    a[j] = x;
+  }
+  return a;
+}
 // Update and draw the torus layer offscreen.
 function lTorus() {
   // Start drawing to the torus p5.Framebuffer.
@@ -212,4 +264,30 @@ function lBox() {
 
   // Start drawing to the box p5.Framebuffer.
   layerBox.end();
+}
+function createElts() {
+  select('body').attribute('style', 'margin:0; overflow:hidden');
+  cnt = createDiv('').size(windowWidth, windowHeight);
+  cnt.style('background', '#222');
+  // Create a slider and place it at the top of the canvas.
+  slider = createSlider(1, 60, 25, 1);
+  slider.position(150, 220);
+  slider.size(220);
+  
+  let hdr = createDiv('').id('header').parent(cnt);
+  select('#header').size(windowWidth, 120).position(0, 0);
+  let ftr = createDiv('').id('footer').parent(cnt);
+  select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
+  let logo = createImg('images/yus143.png', 'yusdesign logotype');
+  logo.parent('#header').position(72, 29);
+  let rlgh = createA(
+    'https://github.com/',
+    '<img src="images/ghmarkw.png" alt="github" height="29">'
+  );
+  rlgh.parent('#footer').position(72, 29);
+  let rl5 = createA(
+    'https://processing.org',
+    '<img src="images/processing.png" alt="processing" height="19">'
+  );
+  rl5.parent('#footer').position(129, 45);  
 }
