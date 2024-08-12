@@ -61,13 +61,13 @@ function draw() {
       // Choose the layer to display.
       let lp;
       if (cell) {
-        lp.begin();
         lp = layerBox;
+        lp.begin();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
         lp.end();
       } else {
-        lp.begin();
         lp = layerTorus;
+        lp.begin();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
         lp.end();
       }
