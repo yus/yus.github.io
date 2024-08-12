@@ -93,19 +93,20 @@ function draw() {
   }
   */
   // Iterate from left to right.
-  for (let x = -250; x < 250; x += 50) {
+  for (let i = -250; i < 250; i += 50) {
     // Iterate from top to bottom.
-    for (let y = -250; y < 250; y += 50) {
+    for (let j = -250; j < 250; j += 50) {
       // Draw the layer to the p5.Graphics object
-      if (board[x][y] == 1) {
+      if (board[i][j] == 1) {
         buff.fill(clr);
-        buff.image(layer, x, y, 50, 50);
+        buff.square(i * w, j * w, w - 1);
+        buff.image(layer, i, j, 50, 50);
       } else {
         buff.fill(folor);
         buff.stroke(0);
         buff.square(i * w, j * w, w - 1);
         // buff.image(layer, loff, toff);
-        buff.image(layer, x, y, 50, 50);
+        buff.image(layer, i, j, 50, 50);
       }
     }
   }
