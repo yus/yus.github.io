@@ -1,7 +1,8 @@
 // John Conway Game of Life
-let clrtable, clr, folor, cnt, cnvs, tinges;
+let clrtable, clr, folor, cnt, cnvs, tinges, button;
 let buff, loff, toff, w, columns, rows, board, next;
-let fruit, slider, camp, camp2, usingCamp;
+let fruit, slider, camp, defcamp, camp1, camp2, usingCamp;
+let isDefaultCamp = true;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -25,6 +26,17 @@ function setup() {
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
+
+  // Create a button and set its value to 0.
+  // Place the button beneath the canvas.
+  button = createButton('RND CAMP', 'defcamp');
+  button.position(150, 150);
+
+  // Call randomColor() when the button is pressed.
+  button.mousePressed(changeCamp);
+
+  camp = createCamera();
+  defcamp = createCamera();
 
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
@@ -52,7 +64,7 @@ function setup() {
 
   // Create the first camera.
   // Keep its default settings.
-  camp = buff.createCamera();
+  camp1 = buff.createCamera();
 
   // Create the second camera.
   // Place it at the top-left.
@@ -82,7 +94,8 @@ function setup() {
 
 function draw() {
   let t = millis() * 0.001;
-
+  let c = button.value();
+  setCamera(c);
   // Start drawing to the framebuffer
   buff.begin();
 
@@ -92,7 +105,7 @@ function draw() {
 
   // Set the camera.
   if (usingCamp === true) {
-    setCamera(camp);
+    setCamera(camp1);
   } else {
     setCamera(camp2);
   }
@@ -134,6 +147,17 @@ function doubleClicked() {
   } else {
     usingCamp = true;
   }
+}
+function changeCamp() {
+  if (isDefaultCamp === true) {
+    setCamera(camp);
+    isDefaultCamp = false;
+  } else {
+    setCamera(defcamp);
+    isDefaultCamp = true;
+  }
+  let c = random(['camp', 'defcamp']);
+  button.value(c);
 }
 function init() {
   colors();
