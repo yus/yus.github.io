@@ -36,8 +36,12 @@ function setup() {
   button.mousePressed(changeCamp);
 
   camp = createCamera();
+  camp.setPosition(400, -400, 800);
+  camp.lookAt(0, 0, 0);
   defcamp = createCamera();
-
+  defcamp.setPosition(0, 0, 800);
+  defcamp.lookAt(0, 0, 0);
+  
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
   let ftr = createDiv('').id('footer').parent(cnt);
@@ -131,9 +135,12 @@ function draw() {
   clear();
   
   //translate(-width/2, -height/2);
-  rotateX(t/TAU);
-  rotateY(t/TAU);
-
+  //rotateX(t/TAU);
+  //rotateY(t/TAU);
+  // Enable orbiting with the mouse.
+  orbitControl();
+  // Style the box.
+  normalMaterial();
   texture(buff);
   box(min(width/2, height/2));
 }
