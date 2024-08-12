@@ -57,12 +57,16 @@ function draw() {
     lp = layerTorus;
   }
   
+  lp.begin();
+  clear();
+  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       // Get cell value (0 or 1)
       let cell = currentCells[column][row];
 
+      
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
       fill((1 - cell) * 255);
       stroke(0);
@@ -70,7 +74,11 @@ function draw() {
       layer.image(lp, column * cellSize, row * cellSize, cellSize, cellSize);
     }
   }
-  image(layer, -200, -200);
+  
+  lp.end();
+  clear();
+  
+  image(layer, -100, -100);
 }
 
 // Reset board when mouse is pressed
@@ -158,7 +166,7 @@ function lTorus() {
   layer.noStroke();
 
   // Draw the torus.
-  layer.torus(5, 2.5);
+  layer.torus(cellSize);
 
   // Start drawing to the torus p5.Framebuffer.
   layerTorus.end();
@@ -183,7 +191,7 @@ function lBox() {
   layer.noStroke();
 
   // Draw the box.
-  layer.box(7.5);
+  layer.box(cellSize);
 
   // Start drawing to the box p5.Framebuffer.
   layerBox.end();
