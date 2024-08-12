@@ -45,7 +45,7 @@ function setup() {
 }
 
 function draw() {
-  layer.begin();
+  layer2D.begin();
   clear();
   generate();
   for (let column = 0; column < columnCount; column++) {
@@ -60,14 +60,14 @@ function draw() {
       layer.image(layer2D, 0, 0);
     }
   }
-  image(layer, 0, 0);
-  layer.end();
+  layer3D = image(layer, 0, 0);
+  layer2D.end();
 
   clear();
   background(255);
   lights();
   //noStroke();
-  texture(layer);
+  texture(layer3D);
   rotateX(t);
   rotateY(t);
   box(400);
