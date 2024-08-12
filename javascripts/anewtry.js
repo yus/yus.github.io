@@ -71,6 +71,8 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
+
+  text(frameCount,50,50);
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -89,13 +91,13 @@ function draw() {
       if (cell) {
         lp = layerBox;
         lp.begin();
-        stroke(128);
+        stroke(255);
         lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       } else {
         lp = layerTorus;
         lp.begin();
-        stroke(128);
+        stroke(255);
         lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       }
