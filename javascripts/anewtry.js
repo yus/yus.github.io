@@ -33,6 +33,11 @@ function setup() {
   checkbox = createCheckbox();
   checkbox.position(100, 100);
 
+  // Create a slider and place it at the top of the canvas.
+  slider = createSlider(1, 60, 25, 1);
+  slider.position(100, 220);
+  slider.size(220);
+
   textFont(font);
   textSize(72);
   text(frameCount, 288, 29);
@@ -281,11 +286,7 @@ function createElts() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-  // Create a slider and place it at the top of the canvas.
-  slider = createSlider(1, 60, 25, 1);
-  slider.position(150, 220);
-  slider.size(220);
-  
+    
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
   let ftr = createDiv('').id('footer').parent(cnt);
