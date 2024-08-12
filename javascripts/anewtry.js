@@ -26,6 +26,7 @@ function setup() {
   //frameRate(15);
   textFont(font);
   textSize(72);
+  text(frameCount, 288, 29);
 
   createElts();
   
