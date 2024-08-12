@@ -21,7 +21,7 @@ function setup() {
     }
   }
   createElts();
-  cnvs = createCanvas(500, 500);
+  cnvs = createCanvas(1000, 1000);
   let sc = select('canvas');
   sc.attribute('alt', 'a graphics canvas');
   cnvs.center();
@@ -29,7 +29,7 @@ function setup() {
   // create Graphics
   buff = createGraphics(500, 500, WEBGL);
 
-  w = 24;
+  w = 25;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
   board = new Array(columns);
@@ -110,7 +110,7 @@ function createElts() {
   cnt.style('background', '#222');
   // Create a slider and place it at the top of the canvas.
   slider = createSlider(1, 60, 25, 1);
-  slider.position(10, 10);
+  slider.position(150, 220);
   slider.size(220);
   
   let hdr = createDiv('').id('header').parent(cnt);
@@ -201,7 +201,7 @@ function init() {
 function generate() {
   for (let x = 1; x < columns - 1; x++) {
     for (let y = 1; y < rows - 1; y++) {
-      var neighbors = 0;
+      let neighbors = 0;
       for (let i = - 1; i <= 1; i++) {
         for (let j = - 1; j <= 1; j++) {
           neighbors += board[x + i][y + j];
@@ -241,7 +241,7 @@ function shuffle(a) {
 }
 function windowResized() {
   cnt.size(windowWidth, windowHeight);
-  resizeCanvas(windowWidth, windowHeight - 220);
+  //resizeCanvas(windowWidth, windowHeight - 220);
   select('#header').size(windowWidth, 120).position(0, 0);
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
   loff = (cnvs.width - buff.width) / 2;
