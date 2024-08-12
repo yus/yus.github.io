@@ -72,7 +72,7 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
 
-  select('#framecount').html('<h2>' + text(frameCount,50,50) + '</h2>');
+  select('#framecount').html('<h2> ' + frameCount + ' </h2>');
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
