@@ -58,7 +58,7 @@ function setup() {
 
   buff.begin();
   camp = createCamera();
-  camp.setPosition(400, -400, 800);
+  camp.setPosition(random(400), -random(400), 800);
   camp.lookAt(0, 0, 0);
   defcamp = createCamera();
   defcamp.setPosition(0, 0, 800);
@@ -103,7 +103,7 @@ function draw() {
       fill(folor);
       stroke(52);
       square(i * w, j * w, w - 1);
-      image(buff, loff, toff);
+      image(buff, 0, 0);
     }
   }
 
