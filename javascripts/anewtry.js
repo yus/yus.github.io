@@ -45,6 +45,8 @@ function setup() {
 }
 
 function draw() {
+  layer.begin();
+  clear();
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -59,6 +61,16 @@ function draw() {
     }
   }
   image(layer, 0, 0);
+  layer.end();
+
+  clear();
+  background(255);
+  lights();
+  //noStroke();
+  texture(layer);
+  rotateX(t);
+  rotateY(t);
+  box(400);
 }
 
 // Reset board when mouse is pressed
