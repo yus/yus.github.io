@@ -128,7 +128,7 @@ function draw() {
   noStroke();
   rotateX(t);
   rotateY(t);
-  box(250);
+  box(250,250,250,10,10);
   //lc.image(layer, 0, 0);
   //filter(BLUR, 0.25, true);
 }
