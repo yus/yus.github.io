@@ -1,7 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges, button;
 let buff, loff, toff, w, columns, rows, board, next;
-let fruit, slider, camp, defcamp, camp1, camp2, usingCamp;
+let fruit, slider, camp, defcamp;
 let isDefaultCamp = true;
 
 function preload() {
@@ -63,22 +63,6 @@ function setup() {
   buff = createFramebuffer();
   describe('a rotating cube with Game of Life on each face');
 
-  // Create the cameras between begin() and end().
-  buff.begin();
-
-  // Create the first camera.
-  // Keep its default settings.
-  camp1 = buff.createCamera();
-
-  // Create the second camera.
-  // Place it at the top-left.
-  // Point it at the origin.
-  camp2 = buff.createCamera();
-  camp2.setPosition(400, -400, 800);
-  camp2.lookAt(0, 0, 0);
-
-  buff.end();    
-  
   w = 24;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
@@ -106,13 +90,6 @@ function draw() {
   clear();
   lights();
   background(52);
-
-  // Set the camera.
-  if (usingCamp === true) {
-    setCamera(camp1);
-  } else {
-    setCamera(camp2);
-  }
 
   // Reset all transformations.
   resetMatrix();
@@ -146,14 +123,6 @@ function draw() {
 }
 function mouseClicked() {
   init();
-}
-// Toggle the current camera when the user double-clicks.
-function doubleClicked() {
-  if (usingCamp === true) {
-    usingCamp = false;
-  } else {
-    usingCamp = true;
-  }
 }
 function changeCamp() {
   if (isDefaultCamp === true) {
