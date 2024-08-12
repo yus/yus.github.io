@@ -11,7 +11,7 @@ let layer, layerTorus, layerBox, checkbox;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
-  font = loadFont('/stylesheets/fonts/FiraCode-Light.otf');
+  font = loadFont('stylesheets/fonts/FiraCode-Light.otf');
 }
 function setup() {
   clrtable.removeColumn(0);
