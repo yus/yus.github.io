@@ -251,7 +251,8 @@ function lTorus() {
   layer.fill(clr);
 
   // Draw the torus.
-  layer.torus(cellSize);
+  //layer.torus(cellSize);
+  layer.box(cellSize*1.5);
 
   // Start drawing to the torus p5.Framebuffer.
   layerTorus.end();
