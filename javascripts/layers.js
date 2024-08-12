@@ -27,16 +27,9 @@ function setup() {
   sc.attribute('alt', 'a graphics canvas');
   cnvs.parent(cnt).position(0, 120).background(52);
 
-  camp = createCamera();
-  camp.setPosition(400, -400, 800);
-  camp.lookAt(0, 0, 0);
-  defcamp = createCamera();
-  defcamp.setPosition(0, 0, 800);
-  defcamp.lookAt(0, 0, 0);
-
   // Create a button and set its value to 0.
   // Place the button beneath the canvas.
-  button = createButton('RND CAMP', 'defcamp');
+  button = createButton('RND CAMP');
   button.position(150, 150);
 
   // Call randomColor() when the button is pressed.
@@ -63,6 +56,14 @@ function setup() {
   buff = createFramebuffer();
   describe('a rotating cube with Game of Life on each face');
 
+  buff.begin();
+  camp = createCamera();
+  camp.setPosition(400, -400, 800);
+  camp.lookAt(0, 0, 0);
+  defcamp = createCamera();
+  defcamp.setPosition(0, 0, 800);
+  defcamp.lookAt(0, 0, 0);
+    
   w = 24;
   columns = floor(buff.width / w); //cnvs
   rows = floor(buff.height / w);
@@ -78,12 +79,11 @@ function setup() {
   toff = (cnvs.height - buff.height) / 2;
 
   init();
+  buff.end();
 }
 
 function draw() {
   let t = millis() * 0.001;
-  let c = button.value();
-  setCamera(c);
   // Start drawing to the framebuffer
   buff.begin();
 
@@ -119,22 +119,18 @@ function draw() {
   // Style the box.
   normalMaterial();
   texture(buff);
-  box(min(width/2, height/2));
+  box(buff.width, buff.height);
 }
 function mouseClicked() {
   init();
 }
 function changeCamp() {
   if (isDefaultCamp === true) {
-    let c = camp;
-    setCamera(c);
+    setCamera(camp);
     isDefaultCamp = false;
-    button.value(c);
   } else {
-    let c = defcamp;
-    setCamera(c);
+    setCamera(defcamp);
     isDefaultCamp = true;
-    button.value(c);
   }
 }
 function init() {
