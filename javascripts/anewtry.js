@@ -295,7 +295,8 @@ function createElts() {
   let logo = createImg('images/yus143.png', 'yusdesign logotype');
   logo.parent('#header').position(72, 29);
   frc = createDiv('').id('framecount');
-  frc.parent('#header').position(144, 29);
+  frc.parent('#header').position(288, 29);
+  frc.attribute('font', font);
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
