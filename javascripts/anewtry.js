@@ -24,6 +24,9 @@ function setup() {
   }
   // Set simulation framerate to 10 to avoid flickering
   //frameRate(15);
+  textFont(font);
+  textSize(72);
+  //text(frameCount, 288, 29);
   
   createElts();
   
@@ -39,9 +42,7 @@ function setup() {
   slider.position(100, 220);
   slider.size(220);
 
-  textFont(font);
-  textSize(72);
-  //text(frameCount, 288, 29);
+  
   
   // Create an options object.
   let options = { width: 25, height: 25 };
@@ -80,8 +81,8 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
 
-  text(frameCount, 100, 29);
-  //select('#framecount').html('<h2> ' + frameCount + ' </h2>');
+  frc = text(frameCount, 100, 29);
+  select('#framecount').html('<h2> ' + frc + ' </h2>');
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -292,8 +293,8 @@ function createElts() {
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
   let logo = createImg('images/yus143.png', 'yusdesign logotype');
   logo.parent('#header').position(72, 29);
-  //frc = createDiv('').id('framecount');
-  //frc.parent('#header').position(144, 29);
+  frc = createDiv('').id('framecount');
+  frc.parent('#header').position(144, 29);
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
