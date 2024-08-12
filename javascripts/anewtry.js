@@ -27,7 +27,7 @@ function setup() {
   
   createElts();
   
-  cnvs = createCanvas(windowWidth-220, windowHeight-220, WEBGL);
+  cnvs = createCanvas(windowWidth, windowHeight-220, WEBGL);
   //cnvs.center();
   cnvs.parent(cnt).position(0, 120).background(52);
 
@@ -79,7 +79,8 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
-  
+
+  text(frameCount, 100, 29);
   //select('#framecount').html('<h2> ' + frameCount + ' </h2>');
   
   // Update and draw the layers offscreen.
@@ -122,9 +123,6 @@ function draw() {
   
   texture(layer);
   orbitControl();
-
-  text(frameCount, 288, 29);
-  
   noStroke();
   rotateX(t);
   rotateY(t);
