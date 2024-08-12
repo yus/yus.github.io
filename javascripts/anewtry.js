@@ -1,7 +1,7 @@
 // John Conway Game of Life
 let clrtable, clr, folor, cnt, cnvs, tinges;
 let columns, rows, board, next;
-
+let frc;
 let cellSize = 25;
 let columnCount;
 let rowCount;
@@ -72,7 +72,7 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
 
-  text(frameCount,50,50);
+  frc = text(frameCount,50,50);
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -287,6 +287,8 @@ function createElts() {
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
   let logo = createImg('images/yus143.png', 'yusdesign logotype');
   logo.parent('#header').position(72, 29);
+  let fc = createDiv(frc).id('framecount');
+  fc.parent('#header').position(144, 29);
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
