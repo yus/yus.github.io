@@ -11,6 +11,7 @@ let layer, layerTorus, layerBox, checkbox;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  font = loadFont('/stylesheets/fonts/FiraCode-Light.otf');
 }
 function setup() {
   clrtable.removeColumn(0);
@@ -23,6 +24,8 @@ function setup() {
   }
   // Set simulation framerate to 10 to avoid flickering
   //frameRate(15);
+  textFont(font);
+  textSize(72);
 
   createElts();
   
@@ -71,8 +74,8 @@ function draw() {
   // Set the framerate using the radio button.
   let rv = slider.value();
   frameRate(rv);
-
-  select('#framecount').html('<h2> ' + frameCount + ' </h2>');
+  text(frameCount, 288, 29);
+  //select('#framecount').html('<h2> ' + frameCount + ' </h2>');
   
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
@@ -287,8 +290,8 @@ function createElts() {
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
   let logo = createImg('images/yus143.png', 'yusdesign logotype');
   logo.parent('#header').position(72, 29);
-  frc = createDiv('').id('framecount');
-  frc.parent('#header').position(144, 29);
+  //frc = createDiv('').id('framecount');
+  //frc.parent('#header').position(144, 29);
   let rlgh = createA(
     'https://github.com/',
     '<img src="images/ghmarkw.png" alt="github" height="29">'
