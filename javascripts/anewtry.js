@@ -49,9 +49,6 @@ function setup() {
 
 function draw() {
   // Update and draw the layers offscreen.
-  lTorus();
-  lBox();
-
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -61,16 +58,16 @@ function draw() {
       // Choose the layer to display.
       let lp;
       if (cell) {
-        lp.clear();
-        
         lp = layerBox;
-        
+        lp.begin();
+        lBox();
+        lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       } else {
-        lp.clear();
-        
         lp = layerTorus;
-
+        lp.begin();
+        lTorus();
+        lp.end();
         layer.image(lp, column * cellSize - 250, row * cellSize - 250);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
