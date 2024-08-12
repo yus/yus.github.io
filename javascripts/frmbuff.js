@@ -4,11 +4,11 @@ let torusLayer;
 let boxLayer;
 
 function setup() {
-  let cnvs = createCanvas(100, 100);
+  let cnvs = createCanvas(500, 500);
   cnvs.center();
 
   // Create a p5.Graphics object using WebGL mode.
-  pg = createGraphics(100, 100, WEBGL);
+  pg = createGraphics(500, 500, WEBGL);
 
   // Create the p5.Framebuffer objects.
   torusLayer = pg.createFramebuffer();
@@ -34,9 +34,9 @@ function draw() {
   pg.background(50);
 
   // Iterate from left to right.
-  for (let x = -50; x < 50; x += 25) {
+  for (let x = -250; x < 250; x += 25) {
     // Iterate from top to bottom.
-    for (let y = -50; y < 50; y += 25) {
+    for (let y = -250; y < 250; y += 25) {
       // Draw the layer to the p5.Graphics object
       pg.image(layer, x, y, 25, 25);
     }
