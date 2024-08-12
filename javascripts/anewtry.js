@@ -85,9 +85,9 @@ function draw() {
       // layer.image(lp, column * cellSize, row * cellSize);
     }
   }
-  let mt = image(layer, 0, 0);
+  //let mt = image(layer, 0, 0);
   
-  texture(mt);
+  texture(layer);
   rotateX(t);
   rotateY(t);
   box(500);
