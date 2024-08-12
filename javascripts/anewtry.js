@@ -60,15 +60,21 @@ function draw() {
 
       // Choose the layer to display.
       let lp;
-      if (cell) {
+      if (lp) {
         lp = layerBox;
-        layer.fill((1 - cell) * 255);
-        layer.stroke(0);
+        lp.begin();
+        fill((1 - cell) * 255);
+        noStroke();
+        square(column * cellSize, row * cellSize, cellSize);
+        lp.end();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
         lp = layerTorus;
-        layer.fill((1 - cell) * 255);
-        layer.stroke(0);
+        lp.begin();
+        fill((1 - cell) * 255);
+        noStroke();
+        square(column * cellSize, row * cellSize, cellSize);
+        lp.end();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
@@ -166,7 +172,7 @@ function lTorus() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the torus.
-  layer.stroke(0);
+  //layer.stroke(0);
 
   // Draw the torus.
   layer.torus(cellSize/8, 2.5);
@@ -191,7 +197,7 @@ function lBox() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the box.
-  layer.stroke(0);
+  //layer.stroke(0);
 
   // Draw the box.
   layer.box(cellSize/2);
