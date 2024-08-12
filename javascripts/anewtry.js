@@ -89,7 +89,7 @@ function draw() {
     }
   }
   lc.end();
-  let mt = lc.image(layer, 0, 0);
+  let mt = layer.image(lc, 0, 0);
   
   texture(mt);
   rotateX(t);
