@@ -8,7 +8,7 @@ let layer, layerTorus, layerBox, checkbox;
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
   frameRate(15);
-  let cnvs = createCanvas(500, 500);
+  let cnvs = createCanvas(500, 500, WEBGL);
   cnvs.center();
 
   checkbox = createCheckbox();
@@ -89,8 +89,9 @@ function draw() {
     }
   }
   lc.end();
+  let mt = image(layer, 0, 0);
   
-  texture(layer);
+  texture(mt);
   rotateX(t);
   rotateY(t);
   box(500);
