@@ -232,6 +232,7 @@ function lTorus() {
 
   // Style the torus.
   layer.noStroke(0);
+  layer.fill(clr);
 
   // Draw the torus.
   layer.torus(cellSize);
@@ -257,7 +258,7 @@ function lBox() {
 
   // Style the box.
   layer.noStroke();
-  layer.normalMaterial();
+  layer.fill(folor);
 
   // Draw the box.
   layer.box(cellSize);
