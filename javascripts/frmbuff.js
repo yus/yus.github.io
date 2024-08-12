@@ -97,15 +97,16 @@ function draw() {
     // Iterate from top to bottom.
     for (let y = -250; y < 250; y += 50) {
       // Draw the layer to the p5.Graphics object
-      if ((board[x][y] == 1))
-      buff.fill(clr);
-      buff.image(layer, x, y, 50, 50);
-       else
-      buff.fill(folor);
-      buff.stroke(0);
-      buff.square(i * w, j * w, w - 1);
-      // buff.image(layer, loff, toff);
-      buff.image(layer, x, y, 50, 50);
+      if (board[x][y] == 1) {
+        buff.fill(clr);
+        buff.image(layer, x, y, 50, 50);
+      } else {
+        buff.fill(folor);
+        buff.stroke(0);
+        buff.square(i * w, j * w, w - 1);
+        // buff.image(layer, loff, toff);
+        buff.image(layer, x, y, 50, 50);
+      }
     }
   }
 
