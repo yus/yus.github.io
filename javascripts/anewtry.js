@@ -62,9 +62,13 @@ function draw() {
       let lp;
       if (cell) {
         lp = layerBox;
+        lp.fill((1 - cell) * 255);
+        lp.stroke(0);
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
         lp = layerTorus;
+        lp.fill((1 - cell) * 255);
+        lp.stroke(0);
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       }
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
@@ -165,7 +169,7 @@ function lTorus() {
   layer.stroke(0);
 
   // Draw the torus.
-  layer.torus(cellSize/8);
+  layer.torus(cellSize/8, 2.5);
 
   // Start drawing to the torus p5.Framebuffer.
   layerTorus.end();
