@@ -57,7 +57,6 @@ function draw() {
     lp = layerTorus;
   }
   
-  lp.begin();
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -66,14 +65,13 @@ function draw() {
 
       
       // Convert cell value to get black (0) for alive or white (255 (white) for dead
-      fill((1 - cell) * 255);
-      stroke(0);
-      square(column * cellSize, row * cellSize, cellSize);
-      layer.image(lp, column * cellSize, row * cellSize, cellSize, cellSize);
+      layer.fill((1 - cell) * 255);
+      layer.stroke(0);
+      layer.square(column * cellSize, row * cellSize, cellSize);
+      layer.image(lp, column * cellSize, row * cellSize);
     }
   }
   image(layer, -100, -100);
-  lp.end();
 }
 
 // Reset board when mouse is pressed
