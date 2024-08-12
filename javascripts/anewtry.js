@@ -4,6 +4,7 @@ let rowCount;
 let currentCells = [];
 let nextCells = [];
 let layer, layerTorus, layerBox, checkbox; 
+let lp = layerBox;
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
@@ -59,8 +60,7 @@ function draw() {
       let cell = currentCells[column][row];
 
       // Choose the layer to display.
-      let lp;
-      if (lp) {
+      if (lp == layerTorus) {
         lp = layerBox;
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
