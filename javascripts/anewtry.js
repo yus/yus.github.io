@@ -246,7 +246,7 @@ function lTorus() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the torus.
-  layer.noStroke(0);
+  //layer.noStroke();
   layer.fill(clr);
 
   // Draw the torus.
@@ -272,7 +272,7 @@ function lBox() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the box.
-  layer.noStroke();
+  //layer.noStroke();
   layer.fill(folor);
 
   // Draw the box.
