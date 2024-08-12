@@ -50,11 +50,11 @@ function draw() {
   lBox();
 
   // Choose the layer to display.
-  let layer;
+  let lp;
   if (mouseIsPressed === true) {
-    layer = layerBox;
+    lp = layerBox;
   } else {
-    layer = layerTorus;
+    lp = layerTorus;
   }
   
   generate();
@@ -67,7 +67,7 @@ function draw() {
       fill((1 - cell) * 255);
       stroke(0);
       square(column * cellSize, row * cellSize, cellSize);
-      layer.image(layerTorus, 0, 0);
+      layer.image(lp, 0, 0);
     }
   }
   image(layer, 0, 0);
