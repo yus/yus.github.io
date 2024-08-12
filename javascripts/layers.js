@@ -81,7 +81,6 @@ function setup() {
   init();
   buff.end();
 }
-
 function draw() {
   let t = millis() * 0.001;
   // Start drawing to the framebuffer
@@ -120,7 +119,7 @@ function draw() {
   normalMaterial();
   texture(buff);
   textureMode(NORMAL);
-  box(220);
+  box(144);
 }
 function mouseClicked() {
   init();
@@ -133,6 +132,9 @@ function changeCamp() {
     setCamera(defcamp);
     isDefaultCamp = true;
   }
+}
+function fbResize() {
+  buff.resize(288, 288);
 }
 function init() {
   colors();
@@ -147,6 +149,7 @@ function init() {
       next[i][j] = 0;
     }
   }
+  fbResize();
 }
 function generate() {
   for (let x = 1; x < columns - 1; x++) {
