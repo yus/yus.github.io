@@ -102,7 +102,7 @@ function draw() {
       fill(folor);
       stroke(52);
       square(i * w, j * w, w - 1);
-      image(buff, 0, 0);
+      image(buff, -72, -72);
     }
   }
 
