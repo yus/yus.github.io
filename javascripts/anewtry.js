@@ -8,7 +8,7 @@ let lp = layerBox;
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
-  frameRate(10);
+  frameRate(25);
   let cnvs = createCanvas(400, 400);
   cnvs.center();
 
@@ -162,7 +162,7 @@ function lTorus() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the torus.
-  //layer.stroke(0);
+  layer.noStroke(0);
 
   // Draw the torus.
   layer.torus(cellSize);
@@ -187,7 +187,7 @@ function lBox() {
   layer.rotateY(frameCount * 0.01);
 
   // Style the box.
-  //layer.stroke(0);
+  layer.noStroke();
 
   // Draw the box.
   layer.box(cellSize/2);
