@@ -55,9 +55,6 @@ function draw() {
   lBox();
   lTorus();
   
-  let lc = layerCube;
-  lc.begin();
-  
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -88,8 +85,7 @@ function draw() {
       // layer.image(lp, column * cellSize, row * cellSize);
     }
   }
-  lc.end();
-  let mt = layer.image(lc, 0, 0);
+  let mt = image(layer, 0, 0);
   
   texture(mt);
   rotateX(t);
