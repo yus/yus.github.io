@@ -63,17 +63,17 @@ function draw() {
       if (lp) {
         lp = layerBox;
         lp.begin();
-        fill((1 - cell) * 255);
-        noStroke();
-        square(column * cellSize, row * cellSize, cellSize);
+        layer.fill((1 - cell) * 255);
+        layer.noStroke();
+        layer.square(column * cellSize, row * cellSize, cellSize);
         lp.end();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       } else {
         lp = layerTorus;
         lp.begin();
-        fill((1 - cell) * 255);
-        noStroke();
-        square(column * cellSize, row * cellSize, cellSize);
+        layer.fill((1 - cell) * 255);
+        layer.noStroke();
+        layer.square(column * cellSize, row * cellSize, cellSize);
         lp.end();
         layer.image(lp, column * cellSize - 200, row * cellSize - 200);
       }
