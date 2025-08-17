@@ -1,7 +1,6 @@
-// Global declarations (only once)
-const colorManager = new ColorManager();
 let isPlaying = false;
-let gameGrid;
+let gameGrid = null;
+const colorManager = new ColorManager();
 
 function setup() {
   const canvas = createCanvas(windowWidth, windowHeight - 100);
