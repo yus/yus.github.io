@@ -83,7 +83,7 @@ function setupUI() {
   createImg('https://p5js.org/assets/img/p5js.svg', 'p5.js logo').class('p5-logo').parent(p5Logo);
 
   // Footer with credits
-  const footer = select('#footer');
+  // const footer = select('#footer');
   const footerContent = createDiv('').class('footer-content').parent(footer);
   footerContent.html('Conway\'s Game of Life by YUS | Powered by p5.js');
 }
