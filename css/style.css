@@ -17,6 +17,23 @@ body {
   gap: 10px;
   align-items: center;
 }
+/* Add these new styles */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.p5-logo {
+  height: 30px;
+  width: auto;
+}
 
 #footer {
   position: fixed;
@@ -30,6 +47,18 @@ body {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  font-size: 12px;
+}
+
+#save-btn {
+  margin-left: auto;
+  background: #4CAF50;
 }
 
 button {

@@ -64,10 +64,13 @@ class Grid {
         const x = i * this.cellSize;
         const y = j * this.cellSize;
 
+        const aliveColor = colorManager.getAliveColor();
+        const deadColor = colorManager.getDeadColor();
+
         if (this.grid[i][j] === 1) {
-          fill(colorManager.getAliveColor());
+          fill(aliveColor[0], aliveColor[1], aliveColor[2]);
         } else {
-          fill(colorManager.getDeadColor());
+          fill(deadColor[0], deadColor[1], deadColor[2]);
         }
 
         rect(x, y, this.cellSize, this.cellSize);
@@ -75,6 +78,7 @@ class Grid {
     }
   }
 }
+
 
 let gameGrid;
 
