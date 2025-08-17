@@ -1,13 +1,13 @@
 // All UI controls and interactions
 // let speedSlider;
 // let isPlaying;
-let footer;
+// let footer;
 
 function setupUI() {
   // Main controls
   // Header with logo and p5.js star
   const controls = select('#controls');
-  footer = select('#footer'); // Initialize here
+  const footer = select('#footer'); // Initialize here
 
   const headerContent = createDiv('').class('header-content').parent(controls);
 
