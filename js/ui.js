@@ -1,6 +1,6 @@
 // All UI controls and interactions
-let isPlaying;
 let speedSlider;
+let isPlaying;
 let footer;
 
 function setupUI() {
