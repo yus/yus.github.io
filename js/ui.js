@@ -52,7 +52,7 @@ class UIManager {
       .class('control-btn')
       .parent(btnContainer)
       .mousePressed(() => {
-        if (!isPlaying) gameGrid.computeNextGeneration();
+        if (!isPlaying) grid.computeNextGeneration();
       });
 
     // Clear
@@ -60,7 +60,7 @@ class UIManager {
       .class('control-btn')
       .parent(btnContainer)
       .mousePressed(() => {
-        gameGrid.clear();
+        grid.clear();
         if (isPlaying) this.togglePlay();
       });
 
@@ -68,7 +68,7 @@ class UIManager {
     createButton('🎲 Random')
       .class('control-btn')
       .parent(btnContainer)
-      .mousePressed(() => gameGrid.randomize());
+      .mousePressed(() => grid.randomize());
 
     // Colors
     createButton('🎨 Colors')

@@ -2,8 +2,15 @@ delete window.DeviceOrientationEvent;
 delete window.DeviceMotionEvent;
 
 let isPlaying = true;
-let gameGrid;
+let grid;
 const colorManager = new ColorManager();
+let colorMode = 'pair'; // Can be 'pair', 'palette', or 'full'
+
+function toggleColorMode() {
+  const modes = ['pair', 'palette', 'full'];
+  colorMode = modes[(modes.indexOf(colorMode) + 1) % modes.length];
+  grid.colorStrategy = grid.createColorStrategy(colorMode);
+}
 
 function setup() {
   const canvas = createCanvas(windowWidth, windowHeight - 100);
@@ -16,8 +23,8 @@ function setup() {
   const cellSize = 50;
   const cols = floor(windowWidth / cellSize);
   const rows = floor((windowHeight - 100) / cellSize);
-  gameGrid = new Grid(cols, rows, cellSize);
-  gameGrid.randomize();
+  grid = new Grid(cols, rows, cellSize, colorMode);
+  grid.randomize();
 
   setupUI();
 }
@@ -25,9 +32,9 @@ function setup() {
 function draw() {
   background(0);
   if (isPlaying) {
-    gameGrid.computeNextGeneration();
+    grid.computeNextGeneration();
   }
-  gameGrid.draw();
+  grid.draw();
 
   // Debug check
   console.log('Frame:', frameCount, 'Playing:', isPlaying);
@@ -38,5 +45,5 @@ function windowResized() {
   const cellSize = 10;
   const cols = floor(windowWidth / cellSize);
   const rows = floor((windowHeight - 100) / cellSize);
-  gameGrid = new Grid(cols, rows, cellSize);
+  grid = new Grid(cols, rows, cellSize);
 }
