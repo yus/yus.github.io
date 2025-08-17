@@ -12,10 +12,10 @@ class Grid {
     return Array(this.cols).fill().map(() => Array(this.rows).fill(0));
   }
 
-  randomize() {
+  randomize(density = 0.3) {
     for (let i = 0; i < this.cols; i++) {
       for (let j = 0; j < this.rows; j++) {
-        this.grid[i][j] = Math.random() > 0.85 ? 1 : 0;
+        this.grid[i][j] = random() < density ? 1 : 0;
       }
     }
   }
@@ -38,6 +38,9 @@ class Grid {
   }
 
   computeNextGeneration() {
+    // Verify this method actually updates the grid
+    let newGrid = this.createEmptyGrid();
+
     for (let i = 0; i < this.cols; i++) {
       for (let j = 0; j < this.rows; j++) {
         const neighbors = this.countNeighbors(i, j);
@@ -45,17 +48,16 @@ class Grid {
 
         // Conway's rules
         if (state === 0 && neighbors === 3) {
-          this.nextGrid[i][j] = 1;
+          newGrid[i][j] = 1;
         } else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-          this.nextGrid[i][j] = 0;
+          newGrid[i][j] = 0;
         } else {
-          this.nextGrid[i][j] = state;
+          newGrid[i][j] = state;
         }
       }
     }
 
-    // Swap grids
-    [this.grid, this.nextGrid] = [this.nextGrid, this.grid];
+    this.grid = newGrid; // Critical update!
   }
 
   draw() {
