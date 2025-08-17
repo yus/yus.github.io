@@ -4,6 +4,12 @@ let isPlaying = false;
 let cellSize = 10;
 
 function setup() {
+  // Add this at the start:
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission()
+      .catch(console.error);
+  }
+  
   createCanvas(windowWidth, windowHeight - 100);
   pixelDensity(1);
   noSmooth();

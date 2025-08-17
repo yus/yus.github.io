@@ -1,4 +1,6 @@
-// Main sketch file
+const colorManager = new ColorManager();
+let gameGrid;
+
 function setup() {
   const canvas = createCanvas(windowWidth, windowHeight - 100);
   canvas.position(0, 50);
@@ -7,8 +9,13 @@ function setup() {
   noSmooth();
   frameRate(30);
 
-  initColors();
-  initGrid();
+  // Initialize grid and UI
+  const cellSize = 10;
+  const cols = floor(windowWidth / cellSize);
+  const rows = floor((windowHeight - 100) / cellSize);
+  gameGrid = new Grid(cols, rows, cellSize);
+  gameGrid.randomize();
+
   setupUI();
 }
 
@@ -24,5 +31,8 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight - 100);
-  initGrid();
+  const cellSize = 10;
+  const cols = floor(windowWidth / cellSize);
+  const rows = floor((windowHeight - 100) / cellSize);
+  gameGrid = new Grid(cols, rows, cellSize);
 }

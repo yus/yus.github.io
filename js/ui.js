@@ -1,11 +1,14 @@
 // All UI controls and interactions
 let isPlaying = false;
 let speedSlider;
+let footer;
 
 function setupUI() {
   // Main controls
   // Header with logo and p5.js star
   const controls = select('#controls');
+  footer = select('#footer'); // Initialize here
+
   const headerContent = createDiv('').class('header-content').parent(controls);
 
   // Your logo
@@ -67,9 +70,8 @@ function setupUI() {
   saveBtn.mousePressed(() => {
     saveCanvas('game-of-life-' + new Date().toISOString().slice(0, 10), 'png');
   });
-  // Footer controls
-  const footer = select('#footer');
 
+  // Footer controls
   // Speed slider
   createSpan('Speed: ').parent(footer);
   speedSlider = createSlider(1, 60, 30, 1);
