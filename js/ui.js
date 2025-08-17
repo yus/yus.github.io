@@ -1,127 +1,134 @@
-// All UI controls and interactions
-// let speedSlider;
-// let isPlaying;
-// let footer;
+// UI Manager Class (LTS Approach)
+class UIManager {
+  constructor() {
+    this.controls = null;
+    this.footer = null;
+    this.headerContent = null;
+    this.speedSlider = null;
+    this.initUI();
+  }
+
+  initUI() {
+    this.createHeader();
+    this.createControls();
+    this.createFooter();
+    this.setupEventListeners();
+  }
+
+  createHeader() {
+    // Header container
+    this.headerContent = createDiv('').class('header-content');
+
+    // Your logo
+    createImg('images/yus143.png', 'YUS Logo')
+      .class('logo')
+      .parent(this.headerContent);
+
+    // p5.js logo (inline SVG)
+    const p5Logo = createDiv('').html(`
+      <a href="https://p5js.org" target="_blank">
+        <svg viewBox="0 0 28 28" class="p5-logo">
+          <path fill="#ED225D" d="M16.9 10.3l8.5-2.6 1.7 5.2-8.5 2.9 5.3 7.5-4.4 3.2-5.6-7.3-5.6 7.3-4.3-3.3 5.3-7.2L.9 12.6l1.7-5.2 8.6 2.8V1.4h5.8v8.9z"/>
+        </svg>
+      </a>
+    `).parent(this.headerContent);
+  }
+
+  createControls() {
+    // Main controls container
+    this.controls = createDiv('').id('controls');
+    this.headerContent.parent(this.controls);
+
+    // Control buttons container
+    const btnContainer = createDiv('').class('btn-container');
+
+    // Play/Pause
+    this.playPauseBtn = createButton('⏯ Play')
+      .class('control-btn')
+      .parent(btnContainer);
+
+    // Step
+    createButton('⏭ Step')
+      .class('control-btn')
+      .parent(btnContainer)
+      .mousePressed(() => {
+        if (!isPlaying) gameGrid.computeNextGeneration();
+      });
+
+    // Clear
+    createButton('🗑 Clear')
+      .class('control-btn')
+      .parent(btnContainer)
+      .mousePressed(() => {
+        gameGrid.clear();
+        if (isPlaying) this.togglePlay();
+      });
+
+    // Randomize
+    createButton('🎲 Random')
+      .class('control-btn')
+      .parent(btnContainer)
+      .mousePressed(() => gameGrid.randomize());
+
+    // Colors
+    createButton('🎨 Colors')
+      .class('control-btn')
+      .parent(btnContainer)
+      .mousePressed(() => colorManager.nextColorPair());
+
+    btnContainer.parent(this.controls);
+
+    // Color modes
+    const colorModeDiv = createDiv('').class('color-mode');
+    createSpan('Color Mode:').parent(colorModeDiv);
+
+    ['Pair', 'Palette', 'Full'].forEach(mode => {
+      createButton(mode)
+        .class('mode-btn')
+        .parent(colorModeDiv)
+        .mousePressed(() => colorManager.randomizeColors(mode.toLowerCase()));
+    });
+
+    colorModeDiv.parent(this.controls);
+  }
+
+  createFooter() {
+    this.footer = createDiv('').id('footer');
+
+    // Speed control
+    createSpan('Speed:').parent(this.footer);
+    this.speedSlider = createSlider(1, 60, 30, 1)
+      .class('speed-slider')
+      .parent(this.footer)
+      .input(() => frameRate(this.speedSlider.value()));
+
+    // Save button
+    createButton('💾 Save')
+      .class('save-btn')
+      .parent(this.footer)
+      .mousePressed(() => {
+        saveCanvas(`game-of-life-${new Date().toISOString().slice(0,10)}`, 'png');
+      });
+
+    // Credits
+    createDiv('Conway\'s Game of Life by YUS | Powered by p5.js')
+      .class('credits')
+      .parent(this.footer);
+  }
+
+  setupEventListeners() {
+    this.playPauseBtn.mousePressed(() => this.togglePlay());
+  }
+
+  togglePlay() {
+    isPlaying = !isPlaying;
+    this.playPauseBtn.html(isPlaying ? '⏸ Pause' : '⏯ Play');
+  }
+}
+
+// Initialize UI
+let uiManager;
 
 function setupUI() {
-  // Main controls
-  // Header with logo and p5.js star
-  const controls = select('#controls');
-  const footer = select('#footer'); // Initialize here
-
-  const headerContent = createDiv('').class('header-content').parent(controls);
-
-  // Your logo
-  const logo = createImg('images/yus143.png', 'yusdesign').class('logo').parent(headerContent);
-
-  // Control buttons container
-  const controlsContainer = createDiv('').parent(headerContent);
-
-  // Play/Pause button
-  const playPauseBtn = createButton('⏯ Play');
-  playPauseBtn.parent(controls);
-  playPauseBtn.mousePressed(togglePlay);
-
-  // Step button
-  const stepBtn = createButton('⏭ Step');
-  stepBtn.parent(controls);
-  stepBtn.mousePressed(step);
-
-  // Clear button
-  const clearBtn = createButton('🗑 Clear');
-  clearBtn.parent(controls);
-  clearBtn.mousePressed(clearGrid);
-
-  // Randomize button
-  const randomBtn = createButton('🎲 Random');
-  randomBtn.parent(controls);
-  randomBtn.mousePressed(randomizeGrid);
-
-  // Color button
-  const colorBtn = createButton('🎨 Colors');
-  colorBtn.parent(controls);
-  colorBtn.mousePressed(nextColors);
-
-  // Add color mode buttons
-  const colorModeDiv = createDiv('').style('margin-left', '20px').parent(controlsContainer);
-
-  createSpan('Color Mode: ').parent(colorModeDiv);
-
-  const pairBtn = createButton('Pair').parent(colorModeDiv);
-  pairBtn.mousePressed(() => {
-    colorManager.randomizeColors('pair');
-    colorManager.nextColorPair();
-  });
-
-  const paletteBtn = createButton('Palette').parent(colorModeDiv);
-  paletteBtn.mousePressed(() => {
-    colorManager.randomizeColors('palette');
-  });
-
-  const fullBtn = createButton('Full Random').parent(colorModeDiv);
-  fullBtn.mousePressed(() => {
-    colorManager.randomizeColors('full');
-  });
-
-  // Add save button
-  const saveBtn = createButton('<i class="fas fa-camera"></i> Save')
-    .id('save-btn')
-    .parent(controlsContainer);
-  saveBtn.mousePressed(() => {
-    saveCanvas('game-of-life-' + new Date().toISOString().slice(0, 10), 'png');
-  });
-
-  // Footer controls
-  // Speed slider
-  createSpan('Speed: ').parent(footer);
-  speedSlider = createSlider(1, 60, 30, 1);
-  speedSlider.parent(footer);
-  speedSlider.input(() => frameRate(speedSlider.value()));
-
-  // p5.js logo
-  const p5Logo = createA('https://p5js.org', '', '_blank').parent(headerContent);
-  createImg('https://p5js.org/assets/img/p5js.svg', 'p5.js logo').class('p5-logo').parent(p5Logo);
-
-  // Footer with credits
-  // const footer = select('#footer');
-  const footerContent = createDiv('').class('footer-content').parent(footer);
-  footerContent.html('Conway\'s Game of Life by YUS | Powered by p5.js');
-}
-
-function togglePlay() {
-  isPlaying = !isPlaying;
-  const btn = select('#controls button:nth-of-type(1)');
-  btn.html(isPlaying ? '⏸ Pause' : '⏯ Play');
-}
-
-function step() {
-  if (!isPlaying) {
-    gameGrid.computeNextGeneration();
-  }
-}
-
-function clearGrid() {
-  gameGrid.clear();
-  if (isPlaying) togglePlay();
-}
-
-function randomizeGrid() {
-  gameGrid.randomize();
-}
-
-function nextColors() {
-  colorManager.nextColorPair();
-}
-
-// Mouse interaction
-function mouseDragged() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-    const i = floor(mouseX / gameGrid.cellSize);
-    const j = floor(mouseY / gameGrid.cellSize);
-    gameGrid.grid[i][j] = 1;
-  }
-}
-
-function saveCanvasImage() {
-  saveCanvas('game-of-life-' + new Date().toISOString(), 'png');
+  uiManager = new UIManager();
 }

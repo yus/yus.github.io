@@ -1,5 +1,8 @@
-let isPlaying = false;
-let gameGrid = null;
+delete window.DeviceOrientationEvent;
+delete window.DeviceMotionEvent;
+
+let isPlaying = true;
+let gameGrid;
 const colorManager = new ColorManager();
 
 function setup() {
@@ -22,11 +25,9 @@ function setup() {
 
 function draw() {
   background(0);
-
   if (isPlaying) {
     gameGrid.computeNextGeneration();
   }
-
   gameGrid.draw();
 }
 

@@ -80,3 +80,60 @@ canvas {
   margin-bottom: 50px;
   image-rendering: pixelated;
 }
+
+/* UI Structure */
+#controls {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.9);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+/* Buttons */
+.control-btn, .mode-btn, .save-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-btn:hover, .mode-btn:hover {
+  background: #555;
+}
+
+/* p5.js logo */
+.p5-logo {
+  height: 30px;
+  width: auto;
+}
+
+/* Footer */
+#footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.9);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.speed-slider {
+  width: 150px;
+}
