@@ -10,11 +10,10 @@ function setup() {
   canvas.position(0, 50);
 
   pixelDensity(1);
-  noSmooth();
   frameRate(30);
 
   // Initialize grid and UI
-  const cellSize = 10;
+  const cellSize = 50;
   const cols = floor(windowWidth / cellSize);
   const rows = floor((windowHeight - 100) / cellSize);
   gameGrid = new Grid(cols, rows, cellSize);
@@ -29,6 +28,9 @@ function draw() {
     gameGrid.computeNextGeneration();
   }
   gameGrid.draw();
+
+  // Debug check
+  console.log('Frame:', frameCount, 'Playing:', isPlaying);
 }
 
 function windowResized() {
