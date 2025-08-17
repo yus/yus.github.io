@@ -1,5 +1,5 @@
 // All UI controls and interactions
-let isPlaying = false;
+// let isPlaying = false;
 let speedSlider;
 let footer;
 
