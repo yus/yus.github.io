@@ -78,10 +78,7 @@ class Grid {
     }
   }
 }
-
-
-let gameGrid;
-
+// let gameGrid;
 function initGrid() {
   const cellSize = 10;
   const cols = floor(windowWidth / cellSize);
