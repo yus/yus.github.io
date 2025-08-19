@@ -1,9 +1,9 @@
 let grid = [];
 let nextGrid = [];
-let cols = 12;
-let rows = 12;
+let cols = 60;
+let rows = 60;
 let cellSize = 10;
-let gapSize = 5;
+let gapSize = 0;
 let isPlaying = true;
 let speed = 10;
 let frameCount = 0;
@@ -175,6 +175,7 @@ function setupControls() {
     document.getElementById('resetView').addEventListener('click', function() {
         gapSize = 0;
         shouldAnimate = false;
+        shouldAnimate.checked = false;
         resetCamera();
     });
 
