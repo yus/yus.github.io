@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Conway's Game of Life</title>
+    <title>Conway's Game</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/p5@2.0.4/lib/p5.min.js"></script>
 </head>
 <body>
     <div id="container">
-        <h1>3D Conway's Game of Life</h1>
+        <h1>Conway's Game of 3D Life</h1>
         <div class="control-group">
             <label for="speed">Speed:</label>
             <input type="range" id="speed" min="1" max="30" value="10">
@@ -26,6 +26,11 @@
             <button id="randomize">Randomize</button>
             <button id="save">Save Pixels</button>
             <button id="playPause">Pause</button>
+            <button id="resetView">Reset View</button>
+        </div>
+        <div class="control-group">
+            <label for="animate">Animate:</label>
+            <input type="checkbox" id="animate">
         </div>
         <div id="canvas-container"></div>
     </div>

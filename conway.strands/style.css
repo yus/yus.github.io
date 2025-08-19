@@ -38,10 +38,12 @@ button:hover {
 
 #canvas-container {
     margin: 20px 0;
-    height: 500px;
+    width: 600px;
+    height: 600px;
 }
 
 canvas {
     display: block;
     margin: 0 auto;
+    background-color: white !important;
 }
