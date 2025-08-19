@@ -1,9 +1,9 @@
 let grid = [];
 let nextGrid = [];
-let cols = 60;
-let rows = 60;
+let cols = 12;
+let rows = 12;
 let cellSize = 10;
-let gapSize = 0;
+let gapSize = 5;
 let isPlaying = true;
 let speed = 10;
 let frameCount = 0;
@@ -15,6 +15,7 @@ let cameraState = {
     center: [0, 0, 0],
     up: [0, 1, 0]
 };
+let cameraZoom = 1;
 
 // Color dataset
 const colorDataset = [
@@ -51,12 +52,18 @@ function setup() {
 
     // Set WEBGL settings
     angleMode(DEGREES);
-    strokeWeight(1);
-    stroke(0);
 }
 
 function draw() {
     background(255);
+
+    // Calculate camera zoom for hairline strokes
+    calculateCameraZoom();
+
+    // Set stroke weight based on zoom (hairline effect)
+    let strokeWeightValue = 1 / cameraZoom;
+    strokeWeight(strokeWeightValue);
+    stroke(0);
 
     // Set camera position
     if (shouldAnimate) {
@@ -119,6 +126,23 @@ function draw() {
     }
 
     frameCount++;
+}
+
+function calculateCameraZoom() {
+    // Calculate approximate camera zoom for hairline stroke adjustment
+    // This is a simplified calculation - you might need to adjust based on your exact camera setup
+    if (shouldAnimate) {
+        // When orbiting, we need to estimate the zoom level
+        // This is an approximation - you might need a more precise method
+        let camDistance = dist(0, 0, 0, cameraX, cameraY, cameraZ);
+        cameraZoom = camDistance / 800; // 800 is our default camera distance
+    } else {
+        // In orthographic mode, zoom is constant
+        cameraZoom = 1;
+    }
+
+    // Ensure minimum stroke weight
+    cameraZoom = max(cameraZoom, 0.1);
 }
 
 function initGrids() {
@@ -192,6 +216,7 @@ function resetCamera() {
     cameraState.position = [0, 0, 800];
     cameraState.center = [0, 0, 0];
     cameraState.up = [0, 1, 0];
+    cameraZoom = 1; // Reset zoom calculation
 }
 
 function updateGrid() {
