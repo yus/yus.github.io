@@ -173,11 +173,14 @@ function setupControls() {
     });
 
     document.getElementById('resetView').addEventListener('click', function() {
+        gapSize = 0;
+        shouldAnimate = false;
         resetCamera();
     });
 
     document.getElementById('animate').addEventListener('change', function() {
         shouldAnimate = this.checked;
+        gapSize = 10;
         if (!shouldAnimate) {
             resetCamera();
         }
