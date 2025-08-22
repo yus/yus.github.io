@@ -16,12 +16,6 @@ let cameraState = {
     up: [0, 1, 0]
 };
 let cameraZoom = 1;
-let hairlineShader;
-
-function preload() {
-    // Simple shader for hairline rendering
-    hairlineShader = loadShader('hairline.vert', 'hairline.frag');
-}
 
 // Color dataset
 const colorDataset = [
@@ -58,22 +52,10 @@ function setup() {
 
     // Set WEBGL settings
     angleMode(DEGREES);
-    // Create a graphics buffer for offscreen rendering
-    buffer = createGraphics(width, height, WEBGL);
 }
 
 function draw() {
-    // Render to buffer first
-    buffer.push();
-    buffer.background(255);
-
-    // Calculate and set stroke weight for buffer
-    calculateCameraZoom();
-    let strokeWeightValue = 1 / cameraZoom;
-    buffer.strokeWeight(strokeWeightValue);
-    buffer.stroke(0);
-
-    // background(255);
+    background(255);
 
     // Calculate camera zoom for hairline strokes
     calculateCameraZoom();
@@ -139,16 +121,7 @@ function draw() {
                 }
                 box(cellSize);
             }
-            // pop();
-            // ... rest of your drawing code but using buffer instead of global functions
-
-            buffer.pop();
-
-            // Render buffer to screen with shader for perfect hairlines
-            shader(hairlineShader);
-            texture(buffer);
-            rect(-width/2, -height/2, width, height);
-            //////////////////
+            pop();
         }
     }
 
