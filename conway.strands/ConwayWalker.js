@@ -34,36 +34,42 @@ function preload() {
 }
 
 function setup() {
-  createElts();
+  try {
+    createElts();
 
-  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
-  cnvs.parent(cnt).position(0, 120);
+    cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
+    cnvs.parent(cnt).position(0, 120);
 
-  slider = createSlider(1, 60, 15, 1);
-  slider.position(100, 220);
-  slider.size(220);
+    slider = createSlider(1, 60, 15, 1);
+    slider.position(100, 220);
+    slider.size(220);
 
-  columnCount = 18;
-  rowCount = 18;
+    columnCount = 18;
+    rowCount = 18;
 
-  for (let column = 0; column < columnCount; column++) {
-    currentCells[column] = [];
-    nextCells[column] = [];
-    for (let row = 0; row < rowCount; row++) {
-      currentCells[column][row] = 0;
-      nextCells[column][row] = 0;
+    // Initialize cell arrays
+    for (let column = 0; column < columnCount; column++) {
+      currentCells[column] = [];
+      nextCells[column] = [];
+      for (let row = 0; row < rowCount; row++) {
+        currentCells[column][row] = 0;
+        nextCells[column][row] = 0;
+      }
     }
+
+    randomizeBoard();
+    assignColors();
+
+    rotationX = Math.PI / 6;
+    rotationY = Math.PI / 4;
+    rotationZ = 0;
+
+    // Initialize noise walkers
+    initNoiseWalkers();
+
+  } catch (error) {
+    console.error('Setup error:', error);
   }
-
-  randomizeBoard();
-  assignColors();
-
-  rotationX = Math.PI / 6;
-  rotationY = Math.PI / 4;
-  rotationZ = 0;
-
-  // Initialize noise walkers
-  initNoiseWalkers();
 }
 
 function initNoiseWalkers() {
@@ -95,7 +101,7 @@ function createNoiseWalker(column, row) {
     noiseSpeed: random(0.02, 0.08),
     noiseSeed: random(1000),
     amplitude: random(8, 20),
-    color: color(colorsArray[colorIndex]),
+    color: colorsArray[colorIndex],
     phase: random(Math.PI * 2),
     alive: true,
     age: 0
@@ -103,23 +109,29 @@ function createNoiseWalker(column, row) {
 }
 
 function draw() {
-  time += 0.01;
-  let rv = slider.value();
-  frameRate(rv);
+  try {
+    time += 0.01;
+    let rv = slider.value();
+    frameRate(rv);
 
-  frc = frameCount;
-  select('#framecount').html('<h2> ' + frc + ' </h2>');
+    frc = frameCount;
+    if (select('#framecount')) {
+      select('#framecount').html('<h2> ' + frc + ' </h2>');
+    }
 
-  generate();
+    generate();
 
-  applyAutoRotation();
+    applyAutoRotation();
 
-  updateNoiseWalkers();
+    updateNoiseWalkers();
 
-  drawClean3DScene();
+    drawClean3DScene();
 
-  if (isDragging) {
-    handleRotation();
+    if (isDragging) {
+      handleRotation();
+    }
+  } catch (error) {
+    console.error('Draw error:', error);
   }
 }
 
@@ -149,11 +161,9 @@ function updateNoiseWalkers() {
 
       if (cell === 1) {
         if (walkerIndex < noiseWalkers.length) {
-          // Update existing walker
           noiseWalkers[walkerIndex].alive = true;
           noiseWalkers[walkerIndex].age++;
         } else {
-          // Create new walker for new alive cell
           createNoiseWalker(column, row);
         }
         walkerIndex++;
@@ -161,22 +171,21 @@ function updateNoiseWalkers() {
     }
   }
 
-  // Mark extra walkers as dead (for cells that died)
+  // Mark extra walkers as dead
   for (let i = walkerIndex; i < noiseWalkers.length; i++) {
     noiseWalkers[i].alive = false;
   }
 
-  // Remove dead walkers
+  // Remove dead walkers after fade out
   for (let i = noiseWalkers.length - 1; i >= 0; i--) {
     if (!noiseWalkers[i].alive && noiseWalkers[i].age > 60) {
       noiseWalkers.splice(i, 1);
     }
   }
 
-  // Update noise positions for all walkers
+  // Update noise positions
   for (let walker of noiseWalkers) {
     if (walker.alive) {
-      // 3D noise field for organic movement
       let noiseX = noise(
         time * walker.noiseSpeed + walker.noiseSeed,
         walker.noiseSeed * 0.5
@@ -190,7 +199,6 @@ function updateNoiseWalkers() {
         walker.noiseSeed * 2.5
       );
 
-      // Map noise from [0,1] to [-1,1] and apply amplitude
       walker.offsetX = (noiseX * 2 - 1) * walker.amplitude;
       walker.offsetY = (noiseY * 2 - 1) * walker.amplitude;
       walker.offsetZ = (noiseZ * 2 - 1) * walker.amplitude;
@@ -240,7 +248,7 @@ function drawCenteredCube() {
 
 function drawCenteredFace(pos, rot, size, spacing) {
   push();
-  translate(...pos);
+  translate(pos[0], pos[1], pos[2]);
   rotateX(rot[0]);
   rotateY(rot[1]);
   rotateZ(rot[2]);
@@ -261,9 +269,9 @@ function drawCenteredFace(pos, rot, size, spacing) {
       );
 
       if (cell === 1) {
-        fill(200, 200, 200, 30); // Very subtle base for alive cells
+        fill(200, 200, 200, 30);
       } else {
-        fill(200, 200, 200, 60); // Dead cells
+        fill(200, 200, 200, 60);
       }
 
       stroke(120, 120, 120, 80);
@@ -291,11 +299,8 @@ function drawNoiseWalkers() {
       );
 
       let alpha = walker.alive ? 200 : map(walker.age, 60, 0, 100, 0);
-      let walkerColor = walker.color;
-      walkerColor.setAlpha(alpha);
-      fill(walkerColor);
+      fill(walker.color);
 
-      // Slightly larger and glowing for the walkers
       let size = cellSize * (walker.alive ? 1.0 : 0.6);
       box(size);
 
@@ -350,7 +355,6 @@ function randomizeBoard() {
   }
 }
 
-// ... (keep the generate, countNeighbors, assignColors, createElts, updateColorPreview functions from previous version)
 function generate() {
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -388,7 +392,11 @@ function assignColors() {
   colorsArray = [];
 
   if (customColors && customColors.length >= 5) {
-    let shuffled = shuffle(customColors.slice(), true);
+    let shuffled = [...customColors];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
     colorsArray = shuffled.slice(0, 5);
   } else {
     colorsArray = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FFE66D'];
@@ -461,5 +469,3 @@ function updateColorPreview() {
     swatch.style('border-radius', '2px');
   }
 }
-// The rest of the functions (generate, countNeighbors, assignColors, createElts, updateColorPreview)
-// remain exactly the same as in the previous working version
