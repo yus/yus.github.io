@@ -7,7 +7,7 @@ let columnCount;
 let rowCount;
 let currentCells = [];
 let nextCells = [];
-let layer, layerTorus, layerBox, checkbox; 
+let layer, layerTorus, layerBox, checkbox;
 
 function preload() {
   clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
@@ -27,9 +27,9 @@ function setup() {
   textFont(font);
   textSize(72);
   //text(frameCount, 288, 29);
-  
+
   createElts();
-  
+
   cnvs = createCanvas(windowWidth, windowHeight-220, WEBGL);
   //cnvs.center();
   cnvs.parent(cnt).position(0, 120).background(52);
@@ -42,8 +42,8 @@ function setup() {
   slider.position(100, 220);
   slider.size(220);
 
-  
-  
+
+
   // Create an options object.
   let options = { width: 25, height: 25 };
 
@@ -55,7 +55,7 @@ function setup() {
   layerTorus = layer.createFramebuffer(options);
   layerBox = layer.createFramebuffer(options);
   layerCube = layer.createFramebuffer(options);
-  
+
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
   rowCount = floor(height / cellSize);
@@ -84,13 +84,13 @@ function draw() {
   frc = frameCount;
   select('#framecount').html('<h2> ' + frc + ' </h2>');
   select('#framecount').style('font-family', 'FiraCode-Light');
-  
+
   // Update and draw the layers offscreen.
   let t = millis() * 0.0001;
-  
+
   lBox();
   lTorus();
-  
+
   generate();
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -122,7 +122,7 @@ function draw() {
     }
   }
   //let mt = image(layer, 0, 0);
-  
+
   texture(layer);
   orbitControl();
   noStroke();
@@ -215,23 +215,33 @@ function generate() {
   currentCells = nextCells;
   nextCells = temp;
 }
+
+// function colors() {
+//   shuffle(tinges);
+//   let q = floor(random(tinges.length));
+//   let qf = floor(random(tinges.length));
+//   clr = tinges[q];
+//   folor = tinges[qf];
+// }
 function colors() {
-  shuffle(tinges);
+  shuffle(tinges); // Use p5.js's built-in shuffle function
   let q = floor(random(tinges.length));
   let qf = floor(random(tinges.length));
   clr = tinges[q];
   folor = tinges[qf];
 }
-function shuffle(a) {
-  let j, x, i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = floor(random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
-  }
-  return a;
-}
+
+// function shuffle(a) {
+//   let j, x, i;
+//   for (i = a.length - 1; i > 0; i--) {
+//     j = floor(random() * (i + 1));
+//     x = a[i];
+//     a[i] = a[j];
+//     a[j] = x;
+//   }
+//   return a;
+// }
+
 // Update and draw the torus layer offscreen.
 function lTorus() {
   // Start drawing to the torus p5.Framebuffer.
@@ -288,7 +298,7 @@ function createElts() {
   select('body').attribute('style', 'margin:0; overflow:hidden');
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
-    
+
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
   let ftr = createDiv('').id('footer').parent(cnt);
@@ -307,5 +317,5 @@ function createElts() {
     'https://processing.org',
     '<img src="images/processing.png" alt="processing" height="19">'
   );
-  rl5.parent('#footer').position(129, 45);  
+  rl5.parent('#footer').position(129, 45);
 }
