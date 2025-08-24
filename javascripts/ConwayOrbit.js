@@ -1,5 +1,5 @@
-// John Conway Game of Life in 3D Cube with Clean Design
-let clr, folor, cnt, cnvs, tinges = [];
+// John Conway Game of Life in 3D Cube with Multiple Colors
+let colorsArray = [], cnt, cnvs, customColors = [];
 let cellSize = 15;
 let columnCount;
 let rowCount;
@@ -15,56 +15,18 @@ let footprintTrails = [];
 let trailTexture;
 
 function preload() {
-  createDefaultColors();
-}
-
-function createDefaultColors() {
-  tinges = [
-      "#211830","#5c6e94","#87f4e2","#fffd97","#ffb594",
-      "#d5e05f","#868a61","#d19390","#ad4b45","#78b0e6",
-      "#6a78b8","#babfdb","#ededed","#dbd3ba","#b8a363",
-      "#232925","#3c5940","#f2a444","#a6351c","#732f17",
-      "#1252ff","#1a89ff","#23bcff","#2cebff","#34ffe5",
-      "#ffd01e","#b88e1a","#946f21","#664c23","#473625",
-      "#b27869","#e8b79b","#ffcf9c","#e8c587","#b5a473",
-      "#a88973","#ccc7a2","#f5ffc9","#9ed7d9","#5197b2",
-      "#194655","#326e7d","#4b8c9b","#64afc8","#7df0ff",
-      "#ff9f00","#cc6a00","#993f00","#661e00","#330900",
-      "#c61100","#ff7117","#ffb73d","#ffe073","#fff9bb",
-      "#2868a1","#6dace3","#a8d7ff","#ffe3b6","#ffb441",
-      "#9bcc00","#665b52","#332828","#544959","#00b3cc",
-      "#001454","#5276a4","#ffffff","#ffdf86","#ffa400",
-      "#2b3924","#5e923e","#c8ffad","#c4e4fd","#183b59",
-      "#692309","#857d69","#c6d4a7","#52706a","#444b69",
-      "#d3dff0","#97b2d2","#577ea5","#18608b","#004a76",
-      "#ffe7c1","#b2a687","#645d56","#b29687","#ffcdc1",
-      "#403e2f","#807c5f","#bfba8e","#e5dfaa","#fff8bd",
-      "#161a13","#2b3327","#56664d","#accc9a","#d7ffc1",
-      "#fff3c9","#ccc3a1","#999279","#666151","#333128",
-      "#113940","#39735d","#ffff94","#ffc950","#ff7400",
-      "#fff8dc","#ccaf88","#c19a6b","#8b0000","#003153",
-      "#9fc4d6","#b0d6a9","#fff1a0","#ffcf6f","#ffb050",
-      "#3c9090","#81c86f","#ffc851","#ff3737","#516fae",
-      "#000000","#404040","#808080","#ffffff","#ff9600",
-      "#ff8c24","#ffbe5b","#ffdf8e","#fff7c4","#372626",
-      "#fff69b","#e5e0a9","#bfbc9d","#807e73","#404040",
-      "#f2d97b","#84bf7e","#6e818c","#544a59","#24201f",
-      "#302733","#a08378","#f5e7b4","#698062","#273133",
-      "#3ebf00","#ffc800","#e50000","#99008f","#006099",
-      "#802c2c","#b24d2d","#cc6e1f","#e59a0f","#ffc800",
-      "#738069","#999375","#b29e84","#ccafa5","#e5bdde",
-      "#7a0000","#ff6747","#ffcfac","#e6c8c8","#4a3737",
-      "#402c24","#66463a","#8c6050","#b27a66","#d9947b",
-      "#7a0000","#ff6747","#ffcfac","#c9c9c9","#1c1c1c",
-      "#b860b4","#f48cda","#ffb8f4","#ff9382","#ae5e4f",
-      "#ffa900","#967b45","#c7a259","#e3cea4","#ffffff",
-      "#401925","#80483b","#bf8959","#e5bd77","#ffeca7",
-      "#4e4e57","#b0b0bf","#e8e9ff","#adac8f","#c9700b",
-      "#005a6e","#6496aa","#c8e1e1","#afa0a0","#643c3c",
-      "#f5f5f5","#dcdcdc","#a9a9a9","#1f1a17","#bf0000",
-      "#1e4566","#5e8268","#b2b04a","#fcda5c","#ffb029",
-      "#730202","#b53c25","#bd8d46","#ffb03b","#f6e497",
-      "#f2a4a5","#b07777","#7a5353","#4c3434","#291c1c"
+  // Extended custom color palette (50 colors)
+  customColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
+    '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B', '#4ECDC4',
+    '#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E',
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
+    '#FF9A8B', '#FF6B9D', '#C44569', '#F78FB3', '#CF6A87',
+    '#574B90', '#786FA6', '#546DE5', '#63CDDA', '#596275',
+    '#E77C7C', '#D2527F', '#B33771', '#6C5CE7', '#A29BFE',
+    '#FD7272', '#9AECDB', '#D6A2E8', '#82589F', '#2C2C54',
+    '#B8E994', '#78E08F', '#38ADA9', '#079992', '#0A3D62',
+    '#82CCDD', '#60A3BC', '#3C6382', '#0C2461', '#1E3799'
   ];
 }
 
@@ -76,7 +38,7 @@ function setup() {
 
   // Create trail texture for footprints
   trailTexture = createGraphics(width, height, WEBGL);
-  trailTexture.background(40, 5); // Dark gray with low alpha for fade
+  trailTexture.background(40, 5);
 
   slider = createSlider(1, 60, 15, 1);
   slider.position(100, 220);
@@ -96,7 +58,7 @@ function setup() {
   }
 
   randomizeBoard();
-  colors(); // Get initial color pair
+  assignColors(); // Get initial 5 random colors
 
   rotationX = PI / 6;
   rotationY = PI / 4;
@@ -121,10 +83,9 @@ function draw() {
 }
 
 function updateFootprintTrails() {
-  // Add fading trail effect
   trailTexture.push();
   trailTexture.clear();
-  trailTexture.background(40, 10); // Clean dark gray fade
+  trailTexture.background(40, 10);
   trailTexture.translate(0, 0, -500);
   trailTexture.tint(255, 20);
   trailTexture.image(cnvs, -width/2, -height/2, width, height);
@@ -132,8 +93,7 @@ function updateFootprintTrails() {
 }
 
 function drawClean3DScene() {
-  // Clean dark gray background
-  background(40); // Dark gray space
+  background(40);
 
   // Apply footprint trails as subtle background
   push();
@@ -148,33 +108,36 @@ function drawClean3DScene() {
   rotateY(rotationY);
 
   // Clean minimal lighting
-  ambientLight(80);
+  ambientLight(100);
   directionalLight(200, 200, 200, 0, 0, -1);
   directionalLight(150, 150, 150, 1, 1, 1);
 
   // Draw the compact cube
   drawCompactCube();
+
+  // Draw footprint trails
+  drawFootprintTrails();
 }
 
 function drawCompactCube() {
-  const cubeSize = 180; // Slightly more compact
+  const cubeSize = 180;
   const faceSize = cubeSize / 2;
 
   let faces = [
-    { pos: [0, 0, -faceSize], rot: [0, 0, 0] },       // Front
-    { pos: [0, 0, faceSize], rot: [0, PI, 0] },       // Back
-    { pos: [0, -faceSize, 0], rot: [-PI/2, 0, 0] },   // Top
-    { pos: [0, faceSize, 0], rot: [PI/2, 0, 0] },     // Bottom
-    { pos: [-faceSize, 0, 0], rot: [0, -PI/2, 0] },   // Left
-    { pos: [faceSize, 0, 0], rot: [0, PI/2, 0] }      // Right
+    { pos: [0, 0, -faceSize], rot: [0, 0, 0] },
+    { pos: [0, 0, faceSize], rot: [0, PI, 0] },
+    { pos: [0, -faceSize, 0], rot: [-PI/2, 0, 0] },
+    { pos: [0, faceSize, 0], rot: [PI/2, 0, 0] },
+    { pos: [-faceSize, 0, 0], rot: [0, -PI/2, 0] },
+    { pos: [faceSize, 0, 0], rot: [0, PI/2, 0] }
   ];
 
   for (let face of faces) {
-    drawCleanFace(face.pos, face.rot, cubeSize);
+    drawColorfulFace(face.pos, face.rot, cubeSize);
   }
 }
 
-function drawCleanFace(pos, rot, size) {
+function drawColorfulFace(pos, rot, size) {
   push();
   translate(...pos);
   rotateX(rot[0]);
@@ -189,23 +152,29 @@ function drawCleanFace(pos, rot, size) {
     for (let row = 0; row < rowCount; row++) {
       let cell = currentCells[column][row];
 
+      push();
+      translate(
+        startX + column * cellSize,
+        startY + row * cellSize,
+        0
+      );
+
       if (cell === 1) {
-        push();
-        translate(
-          startX + column * cellSize,
-          startY + row * cellSize,
-          0
-        );
-
-        // Clean solid colors without pulsing
-        fill(clr);
-        noStroke();
-
-        // Draw cell with clean appearance
-        box(cellSize * 0.85);
-
-        pop();
+        // Live cell - use one of the 5 assigned colors
+        let colorIndex = (column + row) % colorsArray.length;
+        fill(colorsArray[colorIndex]);
+      } else {
+        // Dead cell - transparent light gray
+        fill(200, 200, 200, 80); // Light gray with transparency
       }
+
+      // Hairline outline for all cubicles
+      stroke(100, 100, 100, 100); // Subtle gray outline
+      strokeWeight(0.5);
+
+      box(cellSize * 0.85);
+
+      pop();
     }
   }
   pop();
@@ -218,7 +187,6 @@ function handleRotation() {
     rotationY += dx * 0.01;
     rotationX += dy * 0.01;
 
-    // Add footprint trails during rotation
     addRotationFootprints();
 
     prevMouseX = mouseX;
@@ -231,12 +199,13 @@ function addRotationFootprints() {
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       if (currentCells[column][row] === 1 && random() > 0.95) {
+        let colorIndex = (column + row) % colorsArray.length;
         footprintTrails.push({
           x: map(column, 0, columnCount, -100, 100),
           y: map(row, 0, rowCount, -100, 100),
           z: 0,
           size: cellSize * 0.4,
-          color: color(clr),
+          color: color(colorsArray[colorIndex]),
           life: 30,
           rotationX: rotationX,
           rotationY: rotationY
@@ -255,7 +224,6 @@ function addRotationFootprints() {
 }
 
 function drawFootprintTrails() {
-  // Draw fading footprints
   push();
   noStroke();
   for (let footprint of footprintTrails) {
@@ -264,7 +232,7 @@ function drawFootprintTrails() {
     rotateY(footprint.rotationY);
     translate(footprint.x, footprint.y, footprint.z);
 
-    let alpha = map(footprint.life, 0, 30, 0, 100);
+    let alpha = map(footprint.life, 0, 30, 0, 150);
     let footprintColor = footprint.color;
     footprintColor.setAlpha(alpha);
     fill(footprintColor);
@@ -287,7 +255,7 @@ function mouseReleased() {
 
 function mouseClicked() {
   randomizeBoard();
-  colors(); // Get new random color pair on click
+  assignColors(); // Get 5 new random colors on click
 }
 
 function windowResized() {
@@ -338,22 +306,23 @@ function countNeighbors(column, row) {
   return count;
 }
 
-function colors() {
-  if (tinges && tinges.length > 0) {
-    // Get two distinct random colors
-    let index1 = floor(random(tinges.length));
-    let index2;
-    do {
-      index2 = floor(random(tinges.length));
-    } while (index2 === index1 && tinges.length > 1);
+function assignColors() {
+  colorsArray = [];
 
-    clr = tinges[index1];
-    folor = tinges[index2];
-  } else {
-    clr = '#FF6B6B';
-    folor = '#4ECDC4';
+  // Get 5 unique random colors from the custom palette
+  let availableIndices = [...Array(customColors.length).keys()];
+
+  for (let i = 0; i < 5; i++) {
+    if (availableIndices.length === 0) break;
+
+    let randomIndex = floor(random(availableIndices.length));
+    let colorIndex = availableIndices[randomIndex];
+
+    colorsArray.push(customColors[colorIndex]);
+    availableIndices.splice(randomIndex, 1); // Remove to avoid duplicates
   }
-  console.log('Color pair:', clr, folor);
+
+  console.log('Assigned colors:', colorsArray);
 }
 
 function createElts() {
@@ -395,4 +364,32 @@ function createElts() {
   instructions.position(windowWidth - 350, 29);
   instructions.style('color', 'white');
   instructions.style('font-family', 'monospace');
+
+  // Add color palette preview
+  let colorPreview = createDiv('').parent('#footer');
+  colorPreview.position(windowWidth - 150, 60);
+  colorPreview.style('display', 'flex');
+  colorPreview.style('gap', '5px');
+
+  // Initial color preview
+  updateColorPreview();
+}
+
+function updateColorPreview() {
+  // Remove existing preview if any
+  let existingPreview = select('#color-preview');
+  if (existingPreview) existingPreview.remove();
+
+  let colorPreview = createDiv('').id('color-preview').parent('#footer');
+  colorPreview.position(windowWidth - 150, 60);
+  colorPreview.style('display', 'flex');
+  colorPreview.style('gap', '5px');
+
+  // Create color swatches
+  for (let color of colorsArray) {
+    let swatch = createDiv('').parent('#color-preview');
+    swatch.size(15, 15);
+    swatch.style('background-color', color);
+    swatch.style('border', '1px solid #fff');
+  }
 }
