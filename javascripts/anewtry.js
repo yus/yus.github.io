@@ -1,83 +1,44 @@
 // John Conway Game of Life
-let clrtable, clr, folor, cnt, cnvs, tinges = [];
-let columns, rows, board, next;
-let frc;
+let clr, folor, cnt, cnvs, tinges = [];
 let cellSize = 25;
 let columnCount;
 let rowCount;
 let currentCells = [];
 let nextCells = [];
-let layer, layerTorus, layerBox, checkbox;
 let font;
 let slider;
-let layerCube;
+let fontLoaded = false;
 
 function preload() {
-  // Try to load the table but handle potential errors
-  try {
-    clrtable = loadTable('javascripts/colors.csv', 'csv', 'header',
-      function() {
-        console.log('Colors table loaded successfully');
-      },
-      function(err) {
-        console.error('Error loading colors table:', err);
-        // Create default colors as fallback
-        createDefaultColors();
-      }
-    );
-  } catch (e) {
-    console.error('Exception loading table:', e);
-    createDefaultColors();
-  }
+  // Load font with error handling
+  font = loadFont('stylesheets/fonts/FiraCode-Light.otf',
+    function() {
+      console.log('Font loaded successfully');
+      fontLoaded = true;
+    },
+    function(err) {
+      console.error('Error loading font:', err);
+      fontLoaded = false;
+    }
+  );
 
-  font = loadFont('stylesheets/fonts/FiraCode-Light.otf');
+  // Create default colors immediately
+  createDefaultColors();
 }
 
 function createDefaultColors() {
-  // Create a default color palette if CSV loading fails
+  // Create a default color palette
   tinges = [
     '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
     '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B', '#4ECDC4',
-    '#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E'
+    '#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E',
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B'
   ];
   console.log('Using default color palette');
 }
 
 function setup() {
-  // Check if clrtable is loaded before using it
-  if (!clrtable || !clrtable.getRowCount || clrtable.getRowCount() === 0) {
-    console.log('Using fallback colors');
-    if (tinges.length === 0) {
-      createDefaultColors();
-    }
-  } else {
-    try {
-      // Try to remove the first column if it exists
-      if (clrtable.getColumnCount() > 0) {
-        clrtable.removeColumn(0);
-      }
-      console.log('Table columns:', clrtable.getColumnCount());
-
-      for (let r = 0; r < clrtable.getRowCount(); r++) {
-        for (let c = 0; c < clrtable.getColumnCount(); c++) {
-          let colorValue = clrtable.getString(r, c);
-          if (colorValue && colorValue.trim() !== '') {
-            tinges.push(colorValue.trim());
-          }
-        }
-      }
-      console.log('Loaded', tinges.length, 'colors from CSV');
-    } catch (e) {
-      console.error('Error processing table:', e);
-      if (tinges.length === 0) {
-        createDefaultColors();
-      }
-    }
-  }
-
-  // Set simulation framerate to 10 to avoid flickering
-  textFont(font);
-  textSize(72);
+  console.log('Setup started');
 
   createElts();
 
@@ -88,17 +49,6 @@ function setup() {
   slider = createSlider(1, 60, 25, 1);
   slider.position(100, 220);
   slider.size(220);
-
-  // Create an options object.
-  let options = { width: 25, height: 25 };
-
-  // Create a p5.Graphics object using WebGL mode.
-  layer = createGraphics(500, 500, WEBGL);
-
-  // Create the p5.Framebuffer objects.
-  layerTorus = layer.createFramebuffer(options);
-  layerBox = layer.createFramebuffer(options);
-  layerCube = layer.createFramebuffer(options);
 
   // Calculate columns and rows
   columnCount = floor(width / cellSize);
@@ -116,7 +66,9 @@ function setup() {
 
   // Initialize the board with random values
   randomizeBoard();
+  colors();
 
+  console.log('Setup completed');
   // Start the draw loop
   loop();
 }
@@ -126,16 +78,16 @@ function draw() {
   let rv = slider.value();
   frameRate(rv);
 
+  // Only try to use font if it's loaded
+  if (fontLoaded) {
+    textFont(font);
+  }
+  textSize(24);
+
   frc = frameCount;
   select('#framecount').html('<h2> ' + frc + ' </h2>');
-  select('#framecount').style('font-family', 'FiraCode-Light');
 
-  // Update and draw the layers offscreen.
-  let t = millis() * 0.0001;
-
-  lBox();
-  lTorus();
-
+  // Update and draw the game
   generate();
 
   // Draw the cells
@@ -163,17 +115,43 @@ function draw() {
       pop();
     }
   }
+
+  // Draw some info text
+  push();
+  fill(255);
+  noStroke();
+  textAlign(LEFT, TOP);
+  textSize(16);
+  text('Frame Rate: ' + rv, 20, 20);
+  text('Cells: ' + columnCount + 'x' + rowCount, 20, 40);
+  text('Click to reset', 20, 60);
+  pop();
 }
 
 // Reset board when mouse is pressed
 function mousePressed() {
   randomizeBoard();
-  colors(); // Get new colors
-  loop();
+  colors();
 }
 
-function init() {
-  colors();
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight-220);
+  // Recalculate columns and rows
+  columnCount = floor(width / cellSize);
+  rowCount = floor(height / cellSize);
+
+  // Reinitialize cell arrays
+  currentCells = [];
+  nextCells = [];
+  for (let column = 0; column < columnCount; column++) {
+    currentCells[column] = [];
+    nextCells[column] = [];
+    for (let row = 0; row < rowCount; row++) {
+      currentCells[column][row] = 0;
+      nextCells[column][row] = 0;
+    }
+  }
+
   randomizeBoard();
 }
 
@@ -243,7 +221,7 @@ function generate() {
 function colors() {
   // Make sure tinges has values before shuffling
   if (tinges && tinges.length > 0) {
-    shuffle(tinges, true); // Use p5.js built-in shuffle
+    shuffle(tinges, true);
     let q = floor(random(tinges.length));
     let qf = floor(random(tinges.length));
     clr = tinges[q];
@@ -253,56 +231,47 @@ function colors() {
     clr = '#FF6B6B';
     folor = '#4ECDC4';
   }
-  console.log('Colors:', clr, folor);
-}
-
-// Update and draw the box layer offscreen.
-function lBox() {
-  layerBox.begin();
-  layerBox.clear();
-  layerBox.background(0, 0, 0, 0); // Transparent background
-  layerBox.fill(clr);
-  layerBox.noStroke();
-  layerBox.box(cellSize/2);
-  layerBox.end();
-}
-
-// Update and draw the torus layer offscreen.
-function lTorus() {
-  layerTorus.begin();
-  layerTorus.clear();
-  layerTorus.background(0, 0, 0, 0); // Transparent background
-  layerTorus.fill(folor);
-  layerTorus.noStroke();
-  layerTorus.box(cellSize/2);
-  layerTorus.end();
 }
 
 function createElts() {
-  select('body').attribute('style', 'margin:0; overflow:hidden');
+  select('body').style('margin', '0').style('overflow', 'hidden');
+
   cnt = createDiv('').size(windowWidth, windowHeight);
   cnt.style('background', '#222');
 
   let hdr = createDiv('').id('header').parent(cnt);
   select('#header').size(windowWidth, 120).position(0, 0);
+
   let ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
 
-  // Create simple text elements instead of images
-  let logo = createDiv('CONWAY\'S GAME OF LIFE').parent('#header').position(72, 29);
-  logo.style('color', 'white').style('font-size', '24px').style('font-family', 'monospace');
+  // Create simple text elements
+  let logo = createDiv('CONWAY\'S GAME OF LIFE').parent('#header');
+  logo.position(72, 29);
+  logo.style('color', 'white');
+  logo.style('font-size', '24px');
+  logo.style('font-family', 'monospace');
 
   frc = createDiv('0').id('framecount');
-  frc.parent('#header').position(288, 29);
-  frc.style('color', 'white').style('font-size', '24px').style('font-family', 'monospace');
+  frc.parent('#header');
+  frc.position(288, 29);
+  frc.style('color', 'white');
+  frc.style('font-size', '24px');
+  frc.style('font-family', 'monospace');
 
-  let rlgh = createA('https://github.com/', 'GITHUB').parent('#footer').position(72, 29);
-  rlgh.style('color', 'white').style('font-family', 'monospace');
+  let rlgh = createA('https://github.com/', 'GITHUB').parent('#footer');
+  rlgh.position(72, 29);
+  rlgh.style('color', 'white');
+  rlgh.style('font-family', 'monospace');
 
-  let rl5 = createA('https://processing.org', 'PROCESSING').parent('#footer').position(200, 29);
-  rl5.style('color', 'white').style('font-family', 'monospace');
+  let rl5 = createA('https://processing.org', 'PROCESSING').parent('#footer');
+  rl5.position(200, 29);
+  rl5.style('color', 'white');
+  rl5.style('font-family', 'monospace');
 
   // Add instructions
-  let instructions = createDiv('CLICK TO RESET').parent('#footer').position(windowWidth - 200, 29);
-  instructions.style('color', 'white').style('font-family', 'monospace');
+  let instructions = createDiv('CLICK TO RESET').parent('#footer');
+  instructions.position(windowWidth - 200, 29);
+  instructions.style('color', 'white');
+  instructions.style('font-family', 'monospace');
 }
