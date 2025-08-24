@@ -1,4 +1,4 @@
-// John Conway Game of Life in 3D Cube with Inertial Orbiting
+// John Conway Game of Life in 3D Cube with Noise Walkers
 let colorsArray = [], cnt, cnvs, customColors = [];
 let cellSize = 12;
 let columnCount;
@@ -14,9 +14,9 @@ let prevMouseY = 0;
 let isDragging = false;
 let inertiaX = 0;
 let inertiaY = 0;
-let footprintTrails = [];
-let trailTexture;
+let noiseWalkers = [];
 let autoRotation = true;
+let time = 0;
 
 function preload() {
   customColors = [
@@ -38,10 +38,6 @@ function setup() {
 
   cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
   cnvs.parent(cnt).position(0, 120);
-
-  // Initialize trail texture after canvas is created
-  trailTexture = createGraphics(width, height, WEBGL);
-  trailTexture.background(40, 5);
 
   slider = createSlider(1, 60, 15, 1);
   slider.position(100, 220);
@@ -65,9 +61,49 @@ function setup() {
   rotationX = Math.PI / 6;
   rotationY = Math.PI / 4;
   rotationZ = 0;
+
+  // Initialize noise walkers
+  initNoiseWalkers();
+}
+
+function initNoiseWalkers() {
+  noiseWalkers = [];
+  for (let column = 0; column < columnCount; column++) {
+    for (let row = 0; row < rowCount; row++) {
+      if (currentCells[column][row] === 1) {
+        createNoiseWalker(column, row);
+      }
+    }
+  }
+}
+
+function createNoiseWalker(column, row) {
+  const gridSize = (columnCount - 1) * (cellSize * 1.3);
+  const startX = -gridSize / 2;
+  const startY = -gridSize / 2;
+
+  let colorIndex = (column + row) % colorsArray.length;
+
+  noiseWalkers.push({
+    baseX: startX + column * (cellSize * 1.3),
+    baseY: startY + row * (cellSize * 1.3),
+    baseZ: 0,
+    offsetX: 0,
+    offsetY: 0,
+    offsetZ: 0,
+    noiseScale: random(0.01, 0.05),
+    noiseSpeed: random(0.02, 0.08),
+    noiseSeed: random(1000),
+    amplitude: random(8, 20),
+    color: color(colorsArray[colorIndex]),
+    phase: random(Math.PI * 2),
+    alive: true,
+    age: 0
+  });
 }
 
 function draw() {
+  time += 0.01;
   let rv = slider.value();
   frameRate(rv);
 
@@ -78,7 +114,7 @@ function draw() {
 
   applyAutoRotation();
 
-  updateFootprintTrails();
+  updateNoiseWalkers();
 
   drawClean3DScene();
 
@@ -104,29 +140,72 @@ function applyAutoRotation() {
   if (Math.abs(inertiaY) < 0.0001) inertiaY = 0;
 }
 
-function updateFootprintTrails() {
-  if (trailTexture) {
-    trailTexture.push();
-    trailTexture.clear();
-    trailTexture.background(40, 8);
-    trailTexture.translate(0, 0, -500);
-    trailTexture.tint(255, 15);
-    trailTexture.image(cnvs, -width/2, -height/2, width, height);
-    trailTexture.pop();
+function updateNoiseWalkers() {
+  // Sync walkers with current cell states
+  let walkerIndex = 0;
+  for (let column = 0; column < columnCount; column++) {
+    for (let row = 0; row < rowCount; row++) {
+      let cell = currentCells[column][row];
+
+      if (cell === 1) {
+        if (walkerIndex < noiseWalkers.length) {
+          // Update existing walker
+          noiseWalkers[walkerIndex].alive = true;
+          noiseWalkers[walkerIndex].age++;
+        } else {
+          // Create new walker for new alive cell
+          createNoiseWalker(column, row);
+        }
+        walkerIndex++;
+      }
+    }
+  }
+
+  // Mark extra walkers as dead (for cells that died)
+  for (let i = walkerIndex; i < noiseWalkers.length; i++) {
+    noiseWalkers[i].alive = false;
+  }
+
+  // Remove dead walkers
+  for (let i = noiseWalkers.length - 1; i >= 0; i--) {
+    if (!noiseWalkers[i].alive && noiseWalkers[i].age > 60) {
+      noiseWalkers.splice(i, 1);
+    }
+  }
+
+  // Update noise positions for all walkers
+  for (let walker of noiseWalkers) {
+    if (walker.alive) {
+      // 3D noise field for organic movement
+      let noiseX = noise(
+        time * walker.noiseSpeed + walker.noiseSeed,
+        walker.noiseSeed * 0.5
+      );
+      let noiseY = noise(
+        time * walker.noiseSpeed + walker.noiseSeed * 2,
+        walker.noiseSeed * 1.5
+      );
+      let noiseZ = noise(
+        time * walker.noiseSpeed + walker.noiseSeed * 3,
+        walker.noiseSeed * 2.5
+      );
+
+      // Map noise from [0,1] to [-1,1] and apply amplitude
+      walker.offsetX = (noiseX * 2 - 1) * walker.amplitude;
+      walker.offsetY = (noiseY * 2 - 1) * walker.amplitude;
+      walker.offsetZ = (noiseZ * 2 - 1) * walker.amplitude;
+    } else {
+      // Fade out dead walkers
+      walker.offsetX *= 0.9;
+      walker.offsetY *= 0.9;
+      walker.offsetZ *= 0.9;
+      walker.amplitude *= 0.95;
+    }
   }
 }
 
 function drawClean3DScene() {
   background(40);
-
-  if (trailTexture) {
-    push();
-    texture(trailTexture);
-    noStroke();
-    translate(0, 0, -800);
-    plane(width * 2.5, height * 2.5);
-    pop();
-  }
 
   rotateX(rotationX);
   rotateY(rotationY);
@@ -137,7 +216,7 @@ function drawClean3DScene() {
   directionalLight(180, 180, 180, 1, 1, 1);
 
   drawCenteredCube();
-  drawFootprintTrails();
+  drawNoiseWalkers();
 }
 
 function drawCenteredCube() {
@@ -146,20 +225,20 @@ function drawCenteredCube() {
   const spacing = cellSize * 1.3;
 
   let faces = [
-    { pos: [0, 0, -faceSize], rot: [0, 0, 0], normal: [0, 0, -1] },
-    { pos: [0, 0, faceSize], rot: [0, Math.PI, 0], normal: [0, 0, 1] },
-    { pos: [0, -faceSize, 0], rot: [-Math.PI/2, 0, 0], normal: [0, -1, 0] },
-    { pos: [0, faceSize, 0], rot: [Math.PI/2, 0, 0], normal: [0, 1, 0] },
-    { pos: [-faceSize, 0, 0], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
-    { pos: [faceSize, 0, 0], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] }
+    { pos: [0, 0, -faceSize], rot: [0, 0, 0] },
+    { pos: [0, 0, faceSize], rot: [0, Math.PI, 0] },
+    { pos: [0, -faceSize, 0], rot: [-Math.PI/2, 0, 0] },
+    { pos: [0, faceSize, 0], rot: [Math.PI/2, 0, 0] },
+    { pos: [-faceSize, 0, 0], rot: [0, -Math.PI/2, 0] },
+    { pos: [faceSize, 0, 0], rot: [0, Math.PI/2, 0] }
   ];
 
   for (let face of faces) {
-    drawCenteredFace(face.pos, face.rot, face.normal, cubeSize, spacing);
+    drawCenteredFace(face.pos, face.rot, cubeSize, spacing);
   }
 }
 
-function drawCenteredFace(pos, rot, normal, size, spacing) {
+function drawCenteredFace(pos, rot, size, spacing) {
   push();
   translate(...pos);
   rotateX(rot[0]);
@@ -182,16 +261,43 @@ function drawCenteredFace(pos, rot, normal, size, spacing) {
       );
 
       if (cell === 1) {
-        let colorIndex = (column + row) % colorsArray.length;
-        fill(colorsArray[colorIndex]);
+        fill(200, 200, 200, 30); // Very subtle base for alive cells
       } else {
-        fill(200, 200, 200, 60);
+        fill(200, 200, 200, 60); // Dead cells
       }
 
       stroke(120, 120, 120, 80);
       strokeWeight(0.4);
 
       box(cellSize * 0.8);
+
+      pop();
+    }
+  }
+  pop();
+}
+
+function drawNoiseWalkers() {
+  push();
+  noStroke();
+
+  for (let walker of noiseWalkers) {
+    if (walker.alive || walker.age > 0) {
+      push();
+      translate(
+        walker.baseX + walker.offsetX,
+        walker.baseY + walker.offsetY,
+        walker.baseZ + walker.offsetZ
+      );
+
+      let alpha = walker.alive ? 200 : map(walker.age, 60, 0, 100, 0);
+      let walkerColor = walker.color;
+      walkerColor.setAlpha(alpha);
+      fill(walkerColor);
+
+      // Slightly larger and glowing for the walkers
+      let size = cellSize * (walker.alive ? 1.0 : 0.6);
+      box(size);
 
       pop();
     }
@@ -209,65 +315,8 @@ function handleRotation() {
   rotationX += dy * 0.01;
   rotationY += dx * 0.01;
 
-  if (frameCount % 2 === 0) {
-    addRotationFootprints();
-  }
-
   prevMouseX = mouseX;
   prevMouseY = mouseY;
-}
-
-function addRotationFootprints() {
-  for (let column = 0; column < columnCount; column++) {
-    for (let row = 0; row < rowCount; row++) {
-      if (currentCells[column][row] === 1 && Math.random() > 0.7) {
-        let colorIndex = (column + row) % colorsArray.length;
-        footprintTrails.push({
-          x: map(column, 0, columnCount, -100, 100) + random(-5, 5),
-          y: map(row, 0, rowCount, -100, 100) + random(-5, 5),
-          z: random(-20, 20),
-          size: cellSize * 0.3,
-          color: color(colorsArray[colorIndex]),
-          life: random(20, 40),
-          rotationX: rotationX,
-          rotationY: rotationY,
-          rotationZ: rotationZ
-        });
-      }
-    }
-  }
-
-  for (let i = footprintTrails.length - 1; i >= 0; i--) {
-    footprintTrails[i].life--;
-    if (footprintTrails[i].life <= 0) {
-      footprintTrails.splice(i, 1);
-    }
-  }
-}
-
-function drawFootprintTrails() {
-  push();
-  noStroke();
-  blendMode(ADD);
-
-  for (let footprint of footprintTrails) {
-    push();
-    rotateX(footprint.rotationX);
-    rotateY(footprint.rotationY);
-    rotateZ(footprint.rotationZ);
-    translate(footprint.x, footprint.y, footprint.z);
-
-    let alpha = map(footprint.life, 0, 40, 0, 120);
-    let footprintColor = footprint.color;
-    footprintColor.setAlpha(alpha);
-    fill(footprintColor);
-
-    box(footprint.size);
-    pop();
-  }
-
-  blendMode(BLEND);
-  pop();
 }
 
 function mousePressed() {
@@ -279,31 +328,29 @@ function mousePressed() {
 
 function mouseReleased() {
   isDragging = false;
-  setTimeout(() => { autoRotation = true; }, 3000);
+  setTimeout(() => { autoRotation = true; }, 2000);
 }
 
 function mouseClicked() {
   randomizeBoard();
   assignColors();
+  initNoiseWalkers();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight - 220);
-  if (trailTexture) {
-    trailTexture = createGraphics(width, height, WEBGL);
-    trailTexture.background(40, 5);
-  }
 }
 
 function randomizeBoard() {
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
-      currentCells[column][row] = Math.random() > 0.5 ? 1 : 0;
+      currentCells[column][row] = Math.random() > 0.7 ? 1 : 0;
       nextCells[column][row] = 0;
     }
   }
 }
 
+// ... (keep the generate, countNeighbors, assignColors, createElts, updateColorPreview functions from previous version)
 function generate() {
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
@@ -400,7 +447,7 @@ function updateColorPreview() {
 
   if (!colorsArray || colorsArray.length === 0) return;
 
-  let colorPreview = createDiv('').id('color-preview').parent('#header');
+  let colorPreview = createDiv('').id('color-preview').parent('#footer');
   colorPreview.position(windowWidth - 150, 60);
   colorPreview.style('display', 'flex');
   colorPreview.style('gap', '8px');
@@ -414,3 +461,5 @@ function updateColorPreview() {
     swatch.style('border-radius', '2px');
   }
 }
+// The rest of the functions (generate, countNeighbors, assignColors, createElts, updateColorPreview)
+// remain exactly the same as in the previous working version
