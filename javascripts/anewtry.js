@@ -215,33 +215,23 @@ function generate() {
   currentCells = nextCells;
   nextCells = temp;
 }
-
-// function colors() {
-//   shuffle(tinges);
-//   let q = floor(random(tinges.length));
-//   let qf = floor(random(tinges.length));
-//   clr = tinges[q];
-//   folor = tinges[qf];
-// }
 function colors() {
-  shuffle(tinges); // Use p5.js's built-in shuffle function
+  customShuffle(tinges);
   let q = floor(random(tinges.length));
   let qf = floor(random(tinges.length));
   clr = tinges[q];
   folor = tinges[qf];
 }
-
-// function shuffle(a) {
-//   let j, x, i;
-//   for (i = a.length - 1; i > 0; i--) {
-//     j = floor(random() * (i + 1));
-//     x = a[i];
-//     a[i] = a[j];
-//     a[j] = x;
-//   }
-//   return a;
-// }
-
+function customShuffle(a) {
+  let j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = floor(random() * (i + 1));
+    x = a[i];
+    a[i] = a[j];
+    a[j] = x;
+  }
+  return a;
+}
 // Update and draw the torus layer offscreen.
 function lTorus() {
   // Start drawing to the torus p5.Framebuffer.
