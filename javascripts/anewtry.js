@@ -13,23 +13,64 @@ let slider;
 let layerCube;
 
 function preload() {
-  clrtable = loadTable('javascripts/colors.csv', 'csv', 'header');
+  // Try to load the table but handle potential errors
+  try {
+    clrtable = loadTable('javascripts/colors.csv', 'csv', 'header',
+      function() {
+        console.log('Colors table loaded successfully');
+      },
+      function(err) {
+        console.error('Error loading colors table:', err);
+        // Create default colors as fallback
+        createDefaultColors();
+      }
+    );
+  } catch (e) {
+    console.error('Exception loading table:', e);
+    createDefaultColors();
+  }
+
   font = loadFont('stylesheets/fonts/FiraCode-Light.otf');
+}
+
+function createDefaultColors() {
+  // Create a default color palette if CSV loading fails
+  tinges = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
+    '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B', '#4ECDC4',
+    '#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E'
+  ];
+  console.log('Using default color palette');
 }
 
 function setup() {
   // Check if clrtable is loaded before using it
-  if (!clrtable) {
-    console.error('Colors table not loaded yet');
-    // Create some default colors as fallback
-    tinges = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+  if (!clrtable || !clrtable.getRowCount || clrtable.getRowCount() === 0) {
+    console.log('Using fallback colors');
+    if (tinges.length === 0) {
+      createDefaultColors();
+    }
   } else {
-    clrtable.removeColumn(0);
-    console.log(clrtable.getColumnCount());
+    try {
+      // Try to remove the first column if it exists
+      if (clrtable.getColumnCount() > 0) {
+        clrtable.removeColumn(0);
+      }
+      console.log('Table columns:', clrtable.getColumnCount());
 
-    for (let r = 0; r < clrtable.getRowCount(); r++) {
-      for (let c = 0; c < clrtable.getColumnCount(); c++) {
-        tinges.push(clrtable.getString(r, c));
+      for (let r = 0; r < clrtable.getRowCount(); r++) {
+        for (let c = 0; c < clrtable.getColumnCount(); c++) {
+          let colorValue = clrtable.getString(r, c);
+          if (colorValue && colorValue.trim() !== '') {
+            tinges.push(colorValue.trim());
+          }
+        }
+      }
+      console.log('Loaded', tinges.length, 'colors from CSV');
+    } catch (e) {
+      console.error('Error processing table:', e);
+      if (tinges.length === 0) {
+        createDefaultColors();
       }
     }
   }
@@ -43,9 +84,6 @@ function setup() {
   cnvs = createCanvas(windowWidth, windowHeight-220, WEBGL);
   cnvs.parent(cnt).position(0, 120).background(52);
 
-  checkbox = createCheckbox();
-  checkbox.position(100, 100);
-
   // Create a slider and place it at the top of the canvas.
   slider = createSlider(1, 60, 25, 1);
   slider.position(100, 220);
@@ -58,7 +96,6 @@ function setup() {
   layer = createGraphics(500, 500, WEBGL);
 
   // Create the p5.Framebuffer objects.
-  // Use options for configuration.
   layerTorus = layer.createFramebuffer(options);
   layerBox = layer.createFramebuffer(options);
   layerCube = layer.createFramebuffer(options);
@@ -67,18 +104,18 @@ function setup() {
   columnCount = floor(width / cellSize);
   rowCount = floor(height / cellSize);
 
-  // Set each column in current cells to an empty array
+  // Initialize cell arrays
   for (let column = 0; column < columnCount; column++) {
     currentCells[column] = [];
-  }
-
-  // Repeat the same process for the next cells
-  for (let column = 0; column < columnCount; column++) {
     nextCells[column] = [];
+    for (let row = 0; row < rowCount; row++) {
+      currentCells[column][row] = 0;
+      nextCells[column][row] = 0;
+    }
   }
 
-  // Initialize the board
-  init();
+  // Initialize the board with random values
+  randomizeBoard();
 
   // Start the draw loop
   loop();
@@ -102,79 +139,42 @@ function draw() {
   generate();
 
   // Draw the cells
+  background(52);
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       // Get cell value (0 or 1)
       let cell = currentCells[column][row];
 
-      // Choose the layer to display.
-      let lp;
+      push();
+      translate(
+        column * cellSize - width/2 + cellSize/2,
+        row * cellSize - height/2 + cellSize/2,
+        0
+      );
+
       if (cell) {
-        lp = layerBox;
-        /*
-        lp.begin();
-        stroke(255);
-        lp.end();
-        layer.image(lp, column * cellSize - 250, row * cellSize - 250);
-        */
+        fill(clr);
       } else {
-        lp = layerTorus;
-        /*
-        lp.begin();
-        stroke(255);
-        lp.end();
-        layer.image(lp, column * cellSize - 250, row * cellSize - 250);
-        */
+        fill(folor);
       }
+
+      noStroke();
+      box(cellSize * 0.8);
+      pop();
     }
   }
-
-  texture(layer);
-  orbitControl();
-  noStroke();
-  rotateX(t);
-  rotateY(t);
-  box(250,250,250,10,10);
 }
 
 // Reset board when mouse is pressed
 function mousePressed() {
   randomizeBoard();
+  colors(); // Get new colors
   loop();
-}
-
-function mouseClicked() {
-  init();
 }
 
 function init() {
   colors();
-  // Initialize the board arrays if not already done
-  if (!board) {
-    board = [];
-    next = [];
-    for (let i = 0; i < columnCount; i++) {
-      board[i] = [];
-      next[i] = [];
-      for (let j = 0; j < rowCount; j++) {
-        board[i][j] = 0;
-        next[i][j] = 0;
-      }
-    }
-  }
-
-  for (let i = 0; i < columnCount; i++) {
-    for (let j = 0; j < rowCount; j++) {
-      // Lining the edges with 0s
-      if (i == 0 || j == 0 || i == columnCount - 1 || j == rowCount - 1) {
-        board[i][j] = 0;
-      } else {
-        // Filling the rest randomly
-        board[i][j] = floor(random(2));
-      }
-      next[i][j] = 0;
-    }
-  }
+  randomizeBoard();
 }
 
 // Fill board randomly
@@ -182,7 +182,13 @@ function randomizeBoard() {
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       // Randomly select value of either 0 (dead) or 1 (alive)
-      currentCells[column][row] = random([0, 1]);
+      // Keep edges dead
+      if (column === 0 || row === 0 || column === columnCount-1 || row === rowCount-1) {
+        currentCells[column][row] = 0;
+      } else {
+        currentCells[column][row] = random([0, 1]);
+      }
+      nextCells[column][row] = 0;
     }
   }
 }
@@ -192,36 +198,38 @@ function generate() {
   // Loop through every spot in our 2D array and count living neighbors
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
-      // Column left of current cell
-      let left = (column - 1 + columnCount) % columnCount;
-
-      // Column right of current cell
-      let right = (column + 1) % columnCount;
-
-      // Row above current cell
-      let above = (row - 1 + rowCount) % rowCount;
-
-      // Row below current cell
-      let below = (row + 1) % rowCount;
+      // Skip edges (keep them dead)
+      if (column === 0 || row === 0 || column === columnCount-1 || row === rowCount-1) {
+        nextCells[column][row] = 0;
+        continue;
+      }
 
       // Count living neighbors surrounding current cell
-      let neighbours =
-        currentCells[left][above] +
-        currentCells[column][above] +
-        currentCells[right][above] +
-        currentCells[left][row] +
-        currentCells[right][row] +
-        currentCells[left][below] +
-        currentCells[column][below] +
-        currentCells[right][below];
+      let neighbours = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue; // Skip the cell itself
+          let x = (column + i + columnCount) % columnCount;
+          let y = (row + j + rowCount) % rowCount;
+          neighbours += currentCells[x][y];
+        }
+      }
 
       // Rules of Life
-      if (neighbours < 2 || neighbours > 3) {
-        nextCells[column][row] = 0;
-      } else if (neighbours === 3) {
-        nextCells[column][row] = 1;
+      if (currentCells[column][row] === 1) {
+        // Cell is alive
+        if (neighbours < 2 || neighbours > 3) {
+          nextCells[column][row] = 0; // Dies
+        } else {
+          nextCells[column][row] = 1; // Lives
+        }
       } else {
-        nextCells[column][row] = currentCells[column][row];
+        // Cell is dead
+        if (neighbours === 3) {
+          nextCells[column][row] = 1; // Born
+        } else {
+          nextCells[column][row] = 0; // Stays dead
+        }
       }
     }
   }
@@ -242,59 +250,32 @@ function colors() {
     folor = tinges[qf];
   } else {
     // Fallback colors if tinges is empty
-    clr = '#ff0000';
-    folor = '#0000ff';
+    clr = '#FF6B6B';
+    folor = '#4ECDC4';
   }
-}
-
-// Update and draw the torus layer offscreen.
-function lTorus() {
-  // Start drawing to the torus p5.Framebuffer.
-  layerTorus.begin();
-
-  // Clear the drawing surface.
-  layer.clear();
-
-  // Turn on the lights.
-  layer.lights();
-
-  // Rotate the coordinate system.
-  layer.rotateX(frameCount * 0.01);
-  layer.rotateY(frameCount * 0.01);
-
-  // Style the torus.
-  layer.fill(clr);
-
-  // Draw the torus.
-  layer.box(cellSize/2);
-
-  // Start drawing to the torus p5.Framebuffer.
-  layerTorus.end();
+  console.log('Colors:', clr, folor);
 }
 
 // Update and draw the box layer offscreen.
 function lBox() {
-  // Start drawing to the box p5.Framebuffer.
   layerBox.begin();
-
-  // Clear the drawing surface.
-  layer.clear();
-
-  // Turn on the lights.
-  layer.lights();
-
-  // Rotate the coordinate system.
-  layer.rotateX(frameCount * 0.01);
-  layer.rotateY(frameCount * 0.01);
-
-  // Style the box.
-  layer.fill(folor);
-
-  // Draw the box.
-  layer.box(cellSize/2);
-
-  // Start drawing to the box p5.Framebuffer.
+  layerBox.clear();
+  layerBox.background(0, 0, 0, 0); // Transparent background
+  layerBox.fill(clr);
+  layerBox.noStroke();
+  layerBox.box(cellSize/2);
   layerBox.end();
+}
+
+// Update and draw the torus layer offscreen.
+function lTorus() {
+  layerTorus.begin();
+  layerTorus.clear();
+  layerTorus.background(0, 0, 0, 0); // Transparent background
+  layerTorus.fill(folor);
+  layerTorus.noStroke();
+  layerTorus.box(cellSize/2);
+  layerTorus.end();
 }
 
 function createElts() {
@@ -307,19 +288,21 @@ function createElts() {
   let ftr = createDiv('').id('footer').parent(cnt);
   select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
 
-  // Use placeholder images or remove if not available
-  let logo = createDiv('YUS DESIGN').parent('#header').position(72, 29);
-  logo.style('color', 'white').style('font-size', '24px');
+  // Create simple text elements instead of images
+  let logo = createDiv('CONWAY\'S GAME OF LIFE').parent('#header').position(72, 29);
+  logo.style('color', 'white').style('font-size', '24px').style('font-family', 'monospace');
 
-  frc = createDiv('').id('framecount');
+  frc = createDiv('0').id('framecount');
   frc.parent('#header').position(288, 29);
-  frc.attribute('style', 'font-family:FiraCode-Light; color: white;');
+  frc.style('color', 'white').style('font-size', '24px').style('font-family', 'monospace');
 
-  let rlgh = createA('https://github.com/', 'GitHub');
-  rlgh.parent('#footer').position(72, 29);
-  rlgh.style('color', 'white');
+  let rlgh = createA('https://github.com/', 'GITHUB').parent('#footer').position(72, 29);
+  rlgh.style('color', 'white').style('font-family', 'monospace');
 
-  let rl5 = createA('https://processing.org', 'Processing');
-  rl5.parent('#footer').position(129, 45);
-  rl5.style('color', 'white');
+  let rl5 = createA('https://processing.org', 'PROCESSING').parent('#footer').position(200, 29);
+  rl5.style('color', 'white').style('font-family', 'monospace');
+
+  // Add instructions
+  let instructions = createDiv('CLICK TO RESET').parent('#footer').position(windowWidth - 200, 29);
+  instructions.style('color', 'white').style('font-family', 'monospace');
 }
