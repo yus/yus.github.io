@@ -392,13 +392,41 @@ function assignColors() {
   colorsArray = [];
 
   if (customColors && customColors.length >= 5) {
-    let shuffled = [...customColors];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    // Create a fresh copy of customColors array
+    let tempColors = customColors.slice();
+
+    // Fisher-Yates shuffle algorithm
+    for (let i = tempColors.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      [tempColors[i], tempColors[j]] = [tempColors[j], tempColors[i]];
     }
-    colorsArray = shuffled.slice(0, 5);
+
+    // Take first 5 unique colors
+    colorsArray = tempColors.slice(0, 5);
+
+    // Ensure we don't get the same colors repeatedly
+    if (colorsArray.length === 5) {
+      // Remove the used colors from temp array to avoid repeats
+      customColors = customColors.filter(color => !colorsArray.includes(color));
+
+      // If we're running low on colors, reset the palette
+      if (customColors.length < 10) {
+        customColors = [
+          '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
+          '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B', '#4ECDC4',
+          '#FFE66D', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E',
+          '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
+          '#FF9A8B', '#FF6B9D', '#C44569', '#F78FB3', '#CF6A87',
+          '#574B90', '#786FA6', '#546DE5', '#63CDDA', '#596275',
+          '#E77C7C', '#D2527F', '#B33771', '#6C5CE7', '#A29BFE',
+          '#FD7272', '#9AECDB', '#D6A2E8', '#82589F', '#2C2C54',
+          '#B8E994', '#78E08F', '#38ADA9', '#079992', '#0A3D62',
+          '#82CCDD', '#60A3BC', '#3C6382', '#0C2461', '#1E3799'
+        ].slice(); // Fresh copy
+      }
+    }
   } else {
+    // Fallback colors
     colorsArray = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FFE66D'];
   }
 
