@@ -465,32 +465,22 @@ function countNeighbors(column, row) {
 }
 
 function assignColors() {
-  colorsArray = [];
+  // Always use these 5 distinct colors but in random order
+  const baseColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FFE66D',
+    '#FF9A8B', '#786FA6', '#63CDDA', '#B8E994', '#82CCDD',
+    '#E77C7C', '#6C5CE7', '#079992', '#FD7272', '#0C2461'
+  ];
 
-  if (customColors && customColors.length >= 5) {
-    // Create a temporary copy for shuffling
-    let tempArray = [...customColors];
-
-    // Proper shuffle with different random indices each time
-    for (let i = tempArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [tempArray[i], tempArray[j]] = [tempArray[j], tempArray[i]];
-    }
-
-    // Get 5 unique colors
-    let uniqueColors = [];
-    for (let color of tempArray) {
-      if (!uniqueColors.includes(color) && uniqueColors.length < 5) {
-        uniqueColors.push(color);
-      }
-    }
-
-    colorsArray = uniqueColors;
-
-  } else {
-    // Fallback colors
-    colorsArray = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FFE66D'];
+  // Shuffle the base colors
+  let shuffled = [...baseColors];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
+
+  // Take first 5 colors
+  colorsArray = shuffled.slice(0, 5);
 
   console.log('New color palette:', colorsArray);
   updateColorPreview();
