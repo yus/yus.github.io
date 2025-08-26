@@ -204,20 +204,20 @@ function applyAutoRotation() {
   if (Math.abs(inertiaY) < 0.0001) inertiaY = 0;
 }
 
-// Replace the updateNoiseWalkers function with this:
+// Update the updateNoiseWalkers function to fix initial positioning:
 function updateNoiseWalkers() {
-  // Sync walkers with current cell states
+  // First, ensure all existing walkers have proper base positions
+  const gridSize = (columnCount - 1) * (cellSize * 1.3);
+  const startX = -gridSize / 2;
+  const startY = -gridSize / 2;
+
   let walkerIndex = 0;
 
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       if (currentCells[column][row] === 1) {
-        const gridSize = (columnCount - 1) * (cellSize * 1.3);
-        const startX = -gridSize / 2;
-        const startY = -gridSize / 2;
-
         if (walkerIndex >= noiseWalkers.length) {
-          // Create new walker for new alive cell
+          // Create new walker at the correct grid position
           let colorIndex = (column + row) % colorsArray.length;
           noiseWalkers.push({
             baseX: startX + column * (cellSize * 1.3),
@@ -236,13 +236,13 @@ function updateNoiseWalkers() {
             age: 0
           });
         } else {
-          // Update existing walker position and keep it alive
+          // Update existing walker to current grid position
           noiseWalkers[walkerIndex].baseX = startX + column * (cellSize * 1.3);
           noiseWalkers[walkerIndex].baseY = startY + row * (cellSize * 1.3);
           noiseWalkers[walkerIndex].alive = true;
           noiseWalkers[walkerIndex].age++;
 
-          // Update color if palette changed
+          // Update color from current palette
           let colorIndex = (column + row) % colorsArray.length;
           noiseWalkers[walkerIndex].color = colorsArray[colorIndex];
         }
@@ -251,12 +251,12 @@ function updateNoiseWalkers() {
     }
   }
 
-  // Mark extra walkers as dead (for cells that died)
+  // Mark extra walkers as dead
   for (let i = walkerIndex; i < noiseWalkers.length; i++) {
     noiseWalkers[i].alive = false;
   }
 
-  // Update noise positions using custom noise function
+  // Update noise movements
   for (let walker of noiseWalkers) {
     if (walker.alive) {
       let nX = customNoise(
@@ -287,7 +287,7 @@ function updateNoiseWalkers() {
     }
   }
 
-  // Remove dead walkers after fade out
+  // Remove completely faded walkers
   for (let i = noiseWalkers.length - 1; i >= 0; i--) {
     if (!noiseWalkers[i].alive && noiseWalkers[i].age > 60) {
       noiseWalkers.splice(i, 1);
@@ -306,27 +306,65 @@ function drawClean3DScene() {
   directionalLight(220, 220, 220, 0, 0, -1);
   directionalLight(180, 180, 180, 1, 1, 1);
 
-  drawCenteredCube();
+  // Only draw the noise walkers (they represent both alive and fading cells)
   drawNoiseWalkers();
+
+  // Draw subtle footprint trails
+  drawFootprintTrails();
 }
 
-function drawCenteredCube() {
-  const cubeSize = 200;
-  const faceSize = cubeSize / 2;
-  const spacing = cellSize * 1.3;
+// Add this new function for footprint trails:
+function drawFootprintTrails() {
+  push();
+  noStroke();
+  blendMode(ADD);
 
-  let faces = [
-    { pos: [0, 0, -faceSize], rot: [0, 0, 0] },
-    { pos: [0, 0, faceSize], rot: [0, Math.PI, 0] },
-    { pos: [0, -faceSize, 0], rot: [-Math.PI/2, 0, 0] },
-    { pos: [0, faceSize, 0], rot: [Math.PI/2, 0, 0] },
-    { pos: [-faceSize, 0, 0], rot: [0, -Math.PI/2, 0] },
-    { pos: [faceSize, 0, 0], rot: [0, Math.PI/2, 0] }
-  ];
+  for (let walker of noiseWalkers) {
+    if (walker.alive) {
+      // Create fading footprints along the orbital path
+      for (let i = 0; i < 3; i++) {
+        let trailAge = walker.age - i * 5;
+        if (trailAge > 0) {
+          push();
 
-  for (let face of faces) {
-    drawGridFace(face.pos, face.rot, cubeSize, spacing);
+          // Calculate trail position based on previous noise values
+          let trailTime = time - i * 0.2;
+          let trailX = customNoise(
+            trailTime * walker.noiseSpeed + walker.noiseSeed,
+            walker.noiseSeed * 0.5,
+            walker.noiseSeed * 1.5
+          );
+          let trailY = customNoise(
+            trailTime * walker.noiseSpeed + walker.noiseSeed * 2,
+            walker.noiseSeed * 1.5,
+            walker.noiseSeed * 2.5
+          );
+          let trailZ = customNoise(
+            trailTime * walker.noiseSpeed + walker.noiseSeed * 3,
+            walker.noiseSeed * 2.5,
+            walker.noiseSeed * 3.5
+          );
+
+          translate(
+            walker.baseX + (trailX * 2 - 1) * walker.amplitude,
+            walker.baseY + (trailY * 2 - 1) * walker.amplitude,
+            walker.baseZ + (trailZ * 2 - 1) * walker.amplitude
+          );
+
+          let alpha = 100 - i * 30;
+          let trailColor = color(walker.color);
+          trailColor.setAlpha(alpha);
+          fill(trailColor);
+
+          box(cellSize * 0.4);
+          pop();
+        }
+      }
+    }
   }
+
+  blendMode(BLEND);
+  pop();
 }
 
 function drawGridFace(pos, rot, size, spacing) {
@@ -368,30 +406,33 @@ function drawGridFace(pos, rot, size, spacing) {
   pop();
 }
 
-// And update the drawNoiseWalkers function to ensure colors are applied:
+// Replace the drawNoiseWalkers function with this:
 function drawNoiseWalkers() {
   push();
   noStroke();
 
   for (let walker of noiseWalkers) {
-    if (walker.alive || walker.age > 0) {
-      push();
-      translate(
-        walker.baseX + walker.offsetX,
-        walker.baseY + walker.offsetY,
-        walker.baseZ + walker.offsetZ
-      );
+    push();
+    translate(
+      walker.baseX + walker.offsetX,
+      walker.baseY + walker.offsetY,
+      walker.baseZ + walker.offsetZ
+    );
 
-      let alpha = walker.alive ? 200 : Math.max(0, 100 - walker.age);
-
-      // Ensure the color is properly applied
+    if (walker.alive) {
+      // Alive walker - full color and size
       fill(walker.color);
-
-      let size = cellSize * (walker.alive ? 1.0 : 0.6);
-      box(size);
-
-      pop();
+      box(cellSize * 1.0);
+    } else {
+      // Fading walker - reduce size and alpha
+      let alpha = map(walker.age, 0, 60, 200, 0);
+      let fadeColor = color(walker.color);
+      fadeColor.setAlpha(alpha);
+      fill(fadeColor);
+      box(cellSize * 0.6);
     }
+
+    pop();
   }
   pop();
 }
