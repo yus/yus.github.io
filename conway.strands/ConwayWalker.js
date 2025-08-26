@@ -1,4 +1,5 @@
 // John Conway Game of Life in 3D Cube with Noise Walkers
+// John Conway Game of Life in 3D Cube with Custom Noise Walkers
 let colorsArray = [], cnt, cnvs, customColors = [];
 let cellSize = 12;
 let columnCount;
@@ -18,6 +19,49 @@ let noiseWalkers = [];
 let autoRotation = true;
 let time = 0;
 
+// Custom noise function (simplified Perlin noise alternative)
+function customNoise(x, y, z = 0) {
+  // Simple hash-based noise function
+  function fract(x) { return x - Math.floor(x); }
+  function mix(a, b, t) { return a * (1 - t) + b * t; }
+
+  let ix = Math.floor(x);
+  let iy = Math.floor(y);
+  let iz = Math.floor(z);
+
+  let fx = fract(x);
+  let fy = fract(y);
+  let fz = fract(z);
+
+  // Simple interpolation
+  let n000 = hash(ix, iy, iz);
+  let n100 = hash(ix + 1, iy, iz);
+  let n010 = hash(ix, iy + 1, iz);
+  let n110 = hash(ix + 1, iy + 1, iz);
+  let n001 = hash(ix, iy, iz + 1);
+  let n101 = hash(ix + 1, iy, iz + 1);
+  let n011 = hash(ix, iy + 1, iz + 1);
+  let n111 = hash(ix + 1, iy + 1, iz + 1);
+
+  // Tri-linear interpolation
+  let nx00 = mix(n000, n100, fx);
+  let nx10 = mix(n010, n110, fx);
+  let nx01 = mix(n001, n101, fx);
+  let nx11 = mix(n011, n111, fx);
+
+  let nxy0 = mix(nx00, nx10, fy);
+  let nxy1 = mix(nx01, nx11, fy);
+
+  return mix(nxy0, nxy1, fz);
+}
+
+function hash(x, y, z) {
+  // Simple hash function
+  let seed = x * 374761393 + y * 668265263 + z * 1103515245;
+  seed = (seed ^ (seed >> 13)) * 1274126177;
+  return (seed ^ (seed >> 16)) * 0.5 + 0.5; // Returns 0-1
+}
+
 function preload() {
   customColors = [
     '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
@@ -34,104 +78,111 @@ function preload() {
 }
 
 function setup() {
-  try {
-    createElts();
+  createElts();
 
-    cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
-    cnvs.parent(cnt).position(0, 120);
+  cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
+  cnvs.parent(cnt).position(0, 120);
 
-    slider = createSlider(1, 60, 15, 1);
-    slider.position(100, 220);
-    slider.size(220);
+  slider = createSlider(1, 60, 15, 1);
+  slider.position(100, 220);
+  slider.size(220);
 
-    columnCount = 18;
-    rowCount = 18;
+  columnCount = 18;
+  rowCount = 18;
 
-    // Initialize cell arrays
-    for (let column = 0; column < columnCount; column++) {
-      currentCells[column] = [];
-      nextCells[column] = [];
-      for (let row = 0; row < rowCount; row++) {
-        currentCells[column][row] = 0;
-        nextCells[column][row] = 0;
-      }
+  // Initialize cell arrays with proper centering
+  for (let column = 0; column < columnCount; column++) {
+    currentCells[column] = [];
+    nextCells[column] = [];
+    for (let row = 0; row < rowCount; row++) {
+      currentCells[column][row] = 0;
+      nextCells[column][row] = 0;
     }
-
-    randomizeBoard();
-    assignColors();
-
-    rotationX = Math.PI / 6;
-    rotationY = Math.PI / 4;
-    rotationZ = 0;
-
-    // Initialize noise walkers
-    initNoiseWalkers();
-
-  } catch (error) {
-    console.error('Setup error:', error);
   }
+
+  // Initialize with a proper pattern instead of random
+  initializePattern();
+  assignColors();
+
+  rotationX = Math.PI / 6;
+  rotationY = Math.PI / 4;
+  rotationZ = 0;
+
+  initNoiseWalkers();
+}
+
+function initializePattern() {
+  // Clear the board
+  for (let column = 0; column < columnCount; column++) {
+    for (let row = 0; row < rowCount; row++) {
+      currentCells[column][row] = 0;
+    }
+  }
+
+  // Create a glider pattern in the center of each face
+  const centerCol = Math.floor(columnCount / 2);
+  const centerRow = Math.floor(rowCount / 2);
+
+  // Center glider
+  currentCells[centerCol][centerRow] = 1;
+  currentCells[centerCol + 1][centerRow] = 1;
+  currentCells[centerCol + 2][centerRow] = 1;
+  currentCells[centerCol + 2][centerRow - 1] = 1;
+  currentCells[centerCol + 1][centerRow - 2] = 1;
 }
 
 function initNoiseWalkers() {
   noiseWalkers = [];
+  const gridSize = (columnCount - 1) * (cellSize * 1.3);
+  const startX = -gridSize / 2;
+  const startY = -gridSize / 2;
+
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       if (currentCells[column][row] === 1) {
-        createNoiseWalker(column, row);
+        let colorIndex = (column + row) % colorsArray.length;
+
+        noiseWalkers.push({
+          baseX: startX + column * (cellSize * 1.3),
+          baseY: startY + row * (cellSize * 1.3),
+          baseZ: 0,
+          offsetX: 0,
+          offsetY: 0,
+          offsetZ: 0,
+          noiseScale: 0.03,
+          noiseSpeed: 0.05,
+          noiseSeed: Math.random() * 1000,
+          amplitude: 15,
+          color: colorsArray[colorIndex],
+          phase: Math.random() * Math.PI * 2,
+          alive: true,
+          age: 0
+        });
       }
     }
   }
 }
 
-function createNoiseWalker(column, row) {
-  const gridSize = (columnCount - 1) * (cellSize * 1.3);
-  const startX = -gridSize / 2;
-  const startY = -gridSize / 2;
-
-  let colorIndex = (column + row) % colorsArray.length;
-
-  noiseWalkers.push({
-    baseX: startX + column * (cellSize * 1.3),
-    baseY: startY + row * (cellSize * 1.3),
-    baseZ: 0,
-    offsetX: 0,
-    offsetY: 0,
-    offsetZ: 0,
-    noiseScale: random(0.01, 0.05),
-    noiseSpeed: random(0.02, 0.08),
-    noiseSeed: random(1000),
-    amplitude: random(8, 20),
-    color: colorsArray[colorIndex],
-    phase: random(Math.PI * 2),
-    alive: true,
-    age: 0
-  });
-}
-
 function draw() {
-  try {
-    time += 0.01;
-    let rv = slider.value();
-    frameRate(rv);
+  time += 0.01;
+  let rv = slider.value();
+  frameRate(rv);
 
-    frc = frameCount;
-    if (select('#framecount')) {
-      select('#framecount').html('<h2> ' + frc + ' </h2>');
-    }
+  frc = frameCount;
+  if (select('#framecount')) {
+    select('#framecount').html('<h2> ' + frc + ' </h2>');
+  }
 
-    generate();
+  generate();
 
-    applyAutoRotation();
+  applyAutoRotation();
 
-    updateNoiseWalkers();
+  updateNoiseWalkers();
 
-    drawClean3DScene();
+  drawClean3DScene();
 
-    if (isDragging) {
-      handleRotation();
-    }
-  } catch (error) {
-    console.error('Draw error:', error);
+  if (isDragging) {
+    handleRotation();
   }
 }
 
@@ -157,57 +208,76 @@ function updateNoiseWalkers() {
   let walkerIndex = 0;
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
-      let cell = currentCells[column][row];
+      if (currentCells[column][row] === 1) {
+        if (walkerIndex >= noiseWalkers.length) {
+          // Add new walker
+          const gridSize = (columnCount - 1) * (cellSize * 1.3);
+          const startX = -gridSize / 2;
+          const startY = -gridSize / 2;
+          let colorIndex = (column + row) % colorsArray.length;
 
-      if (cell === 1) {
-        if (walkerIndex < noiseWalkers.length) {
+          noiseWalkers.push({
+            baseX: startX + column * (cellSize * 1.3),
+            baseY: startY + row * (cellSize * 1.3),
+            baseZ: 0,
+            offsetX: 0,
+            offsetY: 0,
+            offsetZ: 0,
+            noiseScale: 0.03,
+            noiseSpeed: 0.05,
+            noiseSeed: Math.random() * 1000,
+            amplitude: 15,
+            color: colorsArray[colorIndex],
+            phase: Math.random() * Math.PI * 2,
+            alive: true,
+            age: 0
+          });
+        } else {
           noiseWalkers[walkerIndex].alive = true;
           noiseWalkers[walkerIndex].age++;
-        } else {
-          createNoiseWalker(column, row);
         }
         walkerIndex++;
       }
     }
   }
 
-  // Mark extra walkers as dead
-  for (let i = walkerIndex; i < noiseWalkers.length; i++) {
-    noiseWalkers[i].alive = false;
-  }
+  // Update noise positions using custom noise function
+  for (let i = 0; i < noiseWalkers.length; i++) {
+    let walker = noiseWalkers[i];
 
-  // Remove dead walkers after fade out
-  for (let i = noiseWalkers.length - 1; i >= 0; i--) {
-    if (!noiseWalkers[i].alive && noiseWalkers[i].age > 60) {
-      noiseWalkers.splice(i, 1);
-    }
-  }
-
-  // Update noise positions
-  for (let walker of noiseWalkers) {
     if (walker.alive) {
-      let noiseX = noise(
+      let nX = customNoise(
         time * walker.noiseSpeed + walker.noiseSeed,
-        walker.noiseSeed * 0.5
-      );
-      let noiseY = noise(
-        time * walker.noiseSpeed + walker.noiseSeed * 2,
+        walker.noiseSeed * 0.5,
         walker.noiseSeed * 1.5
       );
-      let noiseZ = noise(
-        time * walker.noiseSpeed + walker.noiseSeed * 3,
+      let nY = customNoise(
+        time * walker.noiseSpeed + walker.noiseSeed * 2,
+        walker.noiseSeed * 1.5,
         walker.noiseSeed * 2.5
       );
+      let nZ = customNoise(
+        time * walker.noiseSpeed + walker.noiseSeed * 3,
+        walker.noiseSeed * 2.5,
+        walker.noiseSeed * 3.5
+      );
 
-      walker.offsetX = (noiseX * 2 - 1) * walker.amplitude;
-      walker.offsetY = (noiseY * 2 - 1) * walker.amplitude;
-      walker.offsetZ = (noiseZ * 2 - 1) * walker.amplitude;
+      walker.offsetX = (nX * 2 - 1) * walker.amplitude;
+      walker.offsetY = (nY * 2 - 1) * walker.amplitude;
+      walker.offsetZ = (nZ * 2 - 1) * walker.amplitude;
     } else {
       // Fade out dead walkers
       walker.offsetX *= 0.9;
       walker.offsetY *= 0.9;
       walker.offsetZ *= 0.9;
       walker.amplitude *= 0.95;
+    }
+  }
+
+  // Remove dead walkers after fade out
+  for (let i = noiseWalkers.length - 1; i >= 0; i--) {
+    if (!noiseWalkers[i].alive && noiseWalkers[i].age > 60) {
+      noiseWalkers.splice(i, 1);
     }
   }
 }
@@ -242,11 +312,11 @@ function drawCenteredCube() {
   ];
 
   for (let face of faces) {
-    drawCenteredFace(face.pos, face.rot, cubeSize, spacing);
+    drawGridFace(face.pos, face.rot, cubeSize, spacing);
   }
 }
 
-function drawCenteredFace(pos, rot, size, spacing) {
+function drawGridFace(pos, rot, size, spacing) {
   push();
   translate(pos[0], pos[1], pos[2]);
   rotateX(rot[0]);
@@ -298,7 +368,7 @@ function drawNoiseWalkers() {
         walker.baseZ + walker.offsetZ
       );
 
-      let alpha = walker.alive ? 200 : map(walker.age, 60, 0, 100, 0);
+      let alpha = walker.alive ? 200 : Math.max(0, 100 - walker.age);
       fill(walker.color);
 
       let size = cellSize * (walker.alive ? 1.0 : 0.6);
@@ -309,6 +379,12 @@ function drawNoiseWalkers() {
   }
   pop();
 }
+
+// ... (keep the handleRotation, mousePressed, mouseReleased, mouseClicked,
+// windowResized, randomizeBoard, generate, countNeighbors, assignColors,
+// createElts, updateColorPreview functions from previous version)
+
+// The rest of the functions remain the same as the previous working version
 
 function handleRotation() {
   let dx = mouseX - prevMouseX;
