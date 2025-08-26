@@ -367,45 +367,6 @@ function drawFootprintTrails() {
   pop();
 }
 
-function drawGridFace(pos, rot, size, spacing) {
-  push();
-  translate(pos[0], pos[1], pos[2]);
-  rotateX(rot[0]);
-  rotateY(rot[1]);
-  rotateZ(rot[2]);
-
-  const gridSize = (columnCount - 1) * spacing;
-  const startX = -gridSize / 2;
-  const startY = -gridSize / 2;
-
-  for (let column = 0; column < columnCount; column++) {
-    for (let row = 0; row < rowCount; row++) {
-      let cell = currentCells[column][row];
-
-      push();
-      translate(
-        startX + column * spacing,
-        startY + row * spacing,
-        0
-      );
-
-      if (cell === 1) {
-        fill(200, 200, 200, 30);
-      } else {
-        fill(200, 200, 200, 60);
-      }
-
-      stroke(120, 120, 120, 80);
-      strokeWeight(0.4);
-
-      box(cellSize * 0.8);
-
-      pop();
-    }
-  }
-  pop();
-}
-
 // Replace the drawNoiseWalkers function with this:
 function drawNoiseWalkers() {
   push();
