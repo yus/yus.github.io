@@ -131,6 +131,7 @@ function initializePattern() {
   currentCells[centerCol + 1][centerRow - 2] = 1;
 }
 
+// Replace the entire initNoiseWalkers function with this:
 function initNoiseWalkers() {
   noiseWalkers = [];
   const gridSize = (columnCount - 1) * (cellSize * 1.3);
@@ -203,19 +204,21 @@ function applyAutoRotation() {
   if (Math.abs(inertiaY) < 0.0001) inertiaY = 0;
 }
 
+// Replace the updateNoiseWalkers function with this:
 function updateNoiseWalkers() {
   // Sync walkers with current cell states
   let walkerIndex = 0;
+
   for (let column = 0; column < columnCount; column++) {
     for (let row = 0; row < rowCount; row++) {
       if (currentCells[column][row] === 1) {
-        if (walkerIndex >= noiseWalkers.length) {
-          // Add new walker
-          const gridSize = (columnCount - 1) * (cellSize * 1.3);
-          const startX = -gridSize / 2;
-          const startY = -gridSize / 2;
-          let colorIndex = (column + row) % colorsArray.length;
+        const gridSize = (columnCount - 1) * (cellSize * 1.3);
+        const startX = -gridSize / 2;
+        const startY = -gridSize / 2;
 
+        if (walkerIndex >= noiseWalkers.length) {
+          // Create new walker for new alive cell
+          let colorIndex = (column + row) % colorsArray.length;
           noiseWalkers.push({
             baseX: startX + column * (cellSize * 1.3),
             baseY: startY + row * (cellSize * 1.3),
@@ -233,18 +236,28 @@ function updateNoiseWalkers() {
             age: 0
           });
         } else {
+          // Update existing walker position and keep it alive
+          noiseWalkers[walkerIndex].baseX = startX + column * (cellSize * 1.3);
+          noiseWalkers[walkerIndex].baseY = startY + row * (cellSize * 1.3);
           noiseWalkers[walkerIndex].alive = true;
           noiseWalkers[walkerIndex].age++;
+
+          // Update color if palette changed
+          let colorIndex = (column + row) % colorsArray.length;
+          noiseWalkers[walkerIndex].color = colorsArray[colorIndex];
         }
         walkerIndex++;
       }
     }
   }
 
-  // Update noise positions using custom noise function
-  for (let i = 0; i < noiseWalkers.length; i++) {
-    let walker = noiseWalkers[i];
+  // Mark extra walkers as dead (for cells that died)
+  for (let i = walkerIndex; i < noiseWalkers.length; i++) {
+    noiseWalkers[i].alive = false;
+  }
 
+  // Update noise positions using custom noise function
+  for (let walker of noiseWalkers) {
     if (walker.alive) {
       let nX = customNoise(
         time * walker.noiseSpeed + walker.noiseSeed,
@@ -467,8 +480,9 @@ function countNeighbors(column, row) {
   return count;
 }
 
+// Keep the assignColors function simple and working:
 function assignColors() {
-  // Create a vibrant set of distinct colors
+  // Vibrant distinct colors
   const vibrantColors = [
     '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FFE66D',
     '#FF9A8B', '#786FA6', '#63CDDA', '#B8E994', '#82CCDD',
@@ -477,7 +491,7 @@ function assignColors() {
     '#9B59B6', '#1ABC9C', '#E74C3C', '#3498DB', '#F1C40F'
   ];
 
-  // Shuffle and pick 5 unique colors
+  // Shuffle and pick 5 colors
   let shuffled = [...vibrantColors];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -487,55 +501,6 @@ function assignColors() {
   colorsArray = shuffled.slice(0, 5);
   console.log('New color palette:', colorsArray);
   updateColorPreview();
-
-  // Immediately update all existing noise walkers with new colors
-  updateWalkerColors();
-}
-
-function updateWalkerColors() {
-  // Update colors for all existing noise walkers
-  let walkerIndex = 0;
-  for (let column = 0; column < columnCount; column++) {
-    for (let row = 0; row < rowCount; row++) {
-      if (currentCells[column][row] === 1 && walkerIndex < noiseWalkers.length) {
-        let colorIndex = (column + row) % colorsArray.length;
-        noiseWalkers[walkerIndex].color = colorsArray[colorIndex];
-        walkerIndex++;
-      }
-    }
-  }
-
-  // Also update any extra walkers that might exist
-  for (let i = walkerIndex; i < noiseWalkers.length; i++) {
-    let colorIndex = i % colorsArray.length;
-    noiseWalkers[i].color = colorsArray[colorIndex];
-  }
-}
-
-// Also need to update the createNoiseWalker function to use the current colorsArray:
-function createNoiseWalker(column, row) {
-  const gridSize = (columnCount - 1) * (cellSize * 1.3);
-  const startX = -gridSize / 2;
-  const startY = -gridSize / 2;
-
-  let colorIndex = (column + row) % colorsArray.length;
-
-  noiseWalkers.push({
-    baseX: startX + column * (cellSize * 1.3),
-    baseY: startY + row * (cellSize * 1.3),
-    baseZ: 0,
-    offsetX: 0,
-    offsetY: 0,
-    offsetZ: 0,
-    noiseScale: 0.03,
-    noiseSpeed: 0.05,
-    noiseSeed: Math.random() * 1000,
-    amplitude: 15,
-    color: colorsArray[colorIndex], // Use current color array
-    phase: Math.random() * Math.PI * 2,
-    alive: true,
-    age: 0
-  });
 }
 
 function createElts() {
