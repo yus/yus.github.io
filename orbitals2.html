@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.4/p5.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -27,31 +27,41 @@
             padding: 10px 20px;
             border-radius: 10px;
             backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+        .title {
+            position: absolute;
+            top: 20px;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.8);
         }
     </style>
 </head>
 <body>
+    <div class="title">Orbiting Cube with Force Field</div>
     <div class="controls">
         <p>Click and drag to orbit the cube</p>
-        <p>Particles emit from cell centers in reverse direction</p>
+        <p>Particles emit from cell centers like smoke trails</p>
     </div>
     <script>
         let angleX = 0;
         let angleY = 0;
         let targetAngleX = 0;
         let targetAngleY = 0;
-        let inertia = 0.03; // Reduced for longer slowing
-        let impulseStrength = 0.0005; // Increased for stronger impulse
+        let inertia = 0.05;
+        let impulseStrength = 0.01; // Increased for stronger rotation response
 
         // Trail particles
         let particles = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
+        let forceFieldRadius = 400; // Increased force field radius
 
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
-            detail = 16; // For smoother spheres
 
             // Initialize particles for each cell
             for (let face = 0; face < 6; face++) {
@@ -80,8 +90,8 @@
 
             // Add ambient light and point lights for better 3D effect
             ambientLight(40, 40, 60);
-            pointLight(200, 200, 255, 300, -300, 500);
-            pointLight(255, 150, 100, -300, 300, -500);
+            pointLight(200, 200, 255, 500, -500, 500);
+            pointLight(255, 150, 100, -500, 500, -500);
 
             // Smooth rotation with inertia
             angleX = lerp(angleX, targetAngleX, inertia);
@@ -90,12 +100,39 @@
             rotateX(angleX);
             rotateY(angleY);
 
+            // Draw the force field
+            drawForceField();
+
             // Draw the cube with 4x4 cells on each face
             drawCube();
 
             // Update and draw trails
             updateTrails();
             drawTrails();
+        }
+
+        function drawForceField() {
+            push();
+            noFill();
+            stroke(30, 100, 200, 100);
+            strokeWeight(1);
+            sphere(forceFieldRadius, 24, 16);
+
+            // Add some orbiting particles in the force field
+            for (let i = 0; i < 50; i++) {
+                let angle = frameCount * 0.01 + i * 0.2;
+                let x = cos(angle) * forceFieldRadius;
+                let y = sin(angle * 1.5) * forceFieldRadius;
+                let z = sin(angle) * cos(angle * 2) * forceFieldRadius;
+
+                push();
+                translate(x, y, z);
+                fill(100, 200, 255, 150);
+                noStroke();
+                sphere(2, 6, 6);
+                pop();
+            }
+            pop();
         }
 
         function drawCube() {
@@ -159,10 +196,6 @@
                     );
                     fill(cellColor);
 
-                    // Add specular material for shine
-                    specularMaterial(cellColor);
-                    shininess(50);
-
                     stroke(70, 90, 150);
                     strokeWeight(1.5);
                     box(cellSize - 4, cellSize - 4, 2);
@@ -170,7 +203,6 @@
                     // Draw center dot
                     fill(220, 220, 255);
                     noStroke();
-                    emissiveMaterial(220, 220, 255);
                     sphere(3, 8, 8);
 
                     pop();
@@ -183,14 +215,21 @@
             for (let p of particles) {
                 let pos = getCellPosition(p.face, p.x, p.y);
 
-                // Add new trail particle moving in reverse direction
-                let reverseDir = p5.Vector.sub(createVector(0, 0, 0), pos);
-                reverseDir.normalize();
-                reverseDir.mult(p.speed * 2);
+                // Add new trail particle moving in the direction of rotation (like smoke)
+                let dir = p5.Vector.sub(pos, createVector(0, 0, 0));
+                dir.normalize();
+
+                // Add some randomness to direction
+                dir.x += random(-0.2, 0.2);
+                dir.y += random(-0.2, 0.2);
+                dir.z += random(-0.2, 0.2);
+                dir.normalize();
+
+                dir.mult(p.speed);
 
                 p.trails.push({
                     position: pos.copy(),
-                    velocity: reverseDir,
+                    velocity: dir,
                     size: random(2, 5),
                     life: 1.0,
                     color: p.color
@@ -232,7 +271,6 @@
                     // Set color with alpha based on life
                     fill(red(t.color), green(t.color), blue(t.color), 255 * t.life);
                     noStroke();
-                    emissiveMaterial(red(t.color), green(t.color), blue(t.color));
 
                     sphere(scale, 6, 6);
                     pop();
