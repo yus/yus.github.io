@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas {
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            text-align: center;
+            background: rgba(0, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <p>Click and drag to orbit the cube</p>
+        <p>Particles emit from cell centers in reverse direction</p>
+    </div>
+    <script>
+        let angleX = 0;
+        let angleY = 0;
+        let targetAngleX = 0;
+        let targetAngleY = 0;
+        let inertia = 0.03; // Reduced for longer slowing
+        let impulseStrength = 0.0005; // Increased for stronger impulse
+
+        // Trail particles
+        let particles = [];
+        let cubeSize = 200;
+        let cellSize = cubeSize / 4;
+
+        function setup() {
+            createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
+            angleMode(RADIANS);
+            detail = 16; // For smoother spheres
+
+            // Initialize particles for each cell
+            for (let face = 0; face < 6; face++) {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        particles.push({
+                            face: face,
+                            x: i,
+                            y: j,
+                            trails: [],
+                            color: color(
+                                random(150, 255),
+                                random(150, 255),
+                                random(150, 255),
+                                200
+                            ),
+                            speed: random(0.5, 2.0)
+                        });
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            background(10, 15, 30, 200);
+
+            // Add ambient light and point lights for better 3D effect
+            ambientLight(40, 40, 60);
+            pointLight(200, 200, 255, 300, -300, 500);
+            pointLight(255, 150, 100, -300, 300, -500);
+
+            // Smooth rotation with inertia
+            angleX = lerp(angleX, targetAngleX, inertia);
+            angleY = lerp(angleY, targetAngleY, inertia);
+
+            rotateX(angleX);
+            rotateY(angleY);
+
+            // Draw the cube with 4x4 cells on each face
+            drawCube();
+
+            // Update and draw trails
+            updateTrails();
+            drawTrails();
+        }
+
+        function drawCube() {
+            // Draw each face of the cube
+            for (let face = 0; face < 6; face++) {
+                push();
+
+                // Position and rotate for each face
+                switch(face) {
+                    case 0: // Front
+                        translate(0, 0, cubeSize/2);
+                        break;
+                    case 1: // Back
+                        translate(0, 0, -cubeSize/2);
+                        rotateY(PI);
+                        break;
+                    case 2: // Right
+                        translate(cubeSize/2, 0, 0);
+                        rotateY(HALF_PI);
+                        break;
+                    case 3: // Left
+                        translate(-cubeSize/2, 0, 0);
+                        rotateY(-HALF_PI);
+                        break;
+                    case 4: // Top
+                        translate(0, -cubeSize/2, 0);
+                        rotateX(HALF_PI);
+                        break;
+                    case 5: // Bottom
+                        translate(0, cubeSize/2, 0);
+                        rotateX(-HALF_PI);
+                        break;
+                }
+
+                // Draw grid for this face
+                drawGrid(face);
+
+                pop();
+            }
+        }
+
+        function drawGrid(face) {
+            // Draw the 4x4 grid on the face
+            let halfCube = cubeSize / 2;
+            let halfCell = cellSize / 2;
+
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let x = -halfCube + (i * cellSize) + halfCell;
+                    let y = -halfCube + (j * cellSize) + halfCell;
+
+                    push();
+                    translate(x, y, 0);
+
+                    // Draw cell with gradient color based on position
+                    let cellColor = color(
+                        40 + i * 30,
+                        40 + j * 30,
+                        150,
+                        200
+                    );
+                    fill(cellColor);
+
+                    // Add specular material for shine
+                    specularMaterial(cellColor);
+                    shininess(50);
+
+                    stroke(70, 90, 150);
+                    strokeWeight(1.5);
+                    box(cellSize - 4, cellSize - 4, 2);
+
+                    // Draw center dot
+                    fill(220, 220, 255);
+                    noStroke();
+                    emissiveMaterial(220, 220, 255);
+                    sphere(3, 8, 8);
+
+                    pop();
+                }
+            }
+        }
+
+        function updateTrails() {
+            // For each particle, record its current position
+            for (let p of particles) {
+                let pos = getCellPosition(p.face, p.x, p.y);
+
+                // Add new trail particle moving in reverse direction
+                let reverseDir = p5.Vector.sub(createVector(0, 0, 0), pos);
+                reverseDir.normalize();
+                reverseDir.mult(p.speed * 2);
+
+                p.trails.push({
+                    position: pos.copy(),
+                    velocity: reverseDir,
+                    size: random(2, 5),
+                    life: 1.0,
+                    color: p.color
+                });
+
+                // Update all trails and remove dead ones
+                for (let i = p.trails.length - 1; i >= 0; i--) {
+                    let t = p.trails[i];
+                    t.position.add(t.velocity);
+                    t.life -= 0.02;
+
+                    // Remove if life is over
+                    if (t.life <= 0) {
+                        p.trails.splice(i, 1);
+                    }
+                }
+
+                // Limit trail length
+                if (p.trails.length > 30) {
+                    p.trails.shift();
+                }
+            }
+        }
+
+        function drawTrails() {
+            // Draw all trails with a glow effect
+            drawingContext.shadowBlur = 15;
+
+            for (let p of particles) {
+                for (let t of p.trails) {
+                    drawingContext.shadowColor = t.color.toString();
+
+                    push();
+                    translate(t.position.x, t.position.y, t.position.z);
+
+                    // Scale based on life
+                    let scale = t.size * t.life;
+
+                    // Set color with alpha based on life
+                    fill(red(t.color), green(t.color), blue(t.color), 255 * t.life);
+                    noStroke();
+                    emissiveMaterial(red(t.color), green(t.color), blue(t.color));
+
+                    sphere(scale, 6, 6);
+                    pop();
+                }
+            }
+
+            drawingContext.shadowBlur = 0;
+        }
+
+        function getCellPosition(face, x, y) {
+            // Calculate the world position of a cell
+            let halfCube = cubeSize / 2;
+            let cellX = -halfCube + (x * cellSize) + cellSize/2;
+            let cellY = -halfCube + (y * cellSize) + cellSize/2;
+            let cellZ = halfCube;
+
+            let pos = createVector(cellX, cellY, cellZ);
+
+            // Transform based on face
+            switch(face) {
+                case 0: // Front
+                    break;
+                case 1: // Back
+                    pos.z = -pos.z;
+                    break;
+                case 2: // Right
+                    pos = createVector(halfCube, cellY, -cellX);
+                    break;
+                case 3: // Left
+                    pos = createVector(-halfCube, cellY, cellX);
+                    break;
+                case 4: // Top
+                    pos = createVector(cellX, -halfCube, -cellY);
+                    break;
+                case 5: // Bottom
+                    pos = createVector(cellX, halfCube, cellY);
+                    break;
+            }
+
+            // Apply current rotation
+            return applyRotation(pos);
+        }
+
+        function applyRotation(pos) {
+            // Apply the current rotation to a vector
+            let rotated = pos.copy();
+
+            // Rotate around X axis
+            let y = rotated.y;
+            let z = rotated.z;
+            rotated.y = y * cos(angleX) - z * sin(angleX);
+            rotated.z = y * sin(angleX) + z * cos(angleX);
+
+            // Rotate around Y axis
+            let x = rotated.x;
+            z = rotated.z;
+            rotated.x = x * cos(angleY) + z * sin(angleY);
+            rotated.z = -x * sin(angleY) + z * cos(angleY);
+
+            return rotated;
+        }
+
+        function mouseDragged() {
+            // Update target angles based on mouse movement with stronger impulse
+            let deltaX = (pmouseY - mouseY) * impulseStrength;
+            let deltaY = (mouseX - pmouseX) * impulseStrength;
+
+            targetAngleX += deltaX;
+            targetAngleY += deltaY;
+
+            // Constrain X rotation to avoid flipping
+            targetAngleX = constrain(targetAngleX, -PI/2, PI/2);
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);
+        }
+    </script>
+</body>
+</html>
