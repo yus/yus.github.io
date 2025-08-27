@@ -216,7 +216,7 @@ function preload() {
 }
 
 function setup() {
-  createElts();
+  createElts(); // This is now defined globally
 
   cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
   cnvs.parent(cnt).position(0, 120);
@@ -263,70 +263,6 @@ function assignColors() {
     '#9B59B6', '#1ABC9C', '#E74C3C', '#3498DB', '#F1C40F'
   ];
 
-  function createElts() {
-    select('body').style('margin', '0').style('overflow', 'hidden');
-
-    cnt = createDiv('').size(windowWidth, windowHeight);
-    cnt.style('background', '#222');
-
-    let hdr = createDiv('').id('header').parent(cnt);
-    select('#header').size(windowWidth, 120).position(0, 0);
-
-    let ftr = createDiv('').id('footer').parent(cnt);
-    select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
-
-    let logo = createDiv('3D CONWAY CUBE').parent('#header');
-    logo.position(72, 29);
-    logo.style('color', 'white');
-    logo.style('font-size', '24px');
-    logo.style('font-family', 'monospace');
-
-    frc = createDiv('0').id('framecount');
-    frc.parent('#header');
-    frc.position(288, 29);
-    frc.style('color', 'white');
-    frc.style('font-size', '24px');
-    frc.style('font-family', 'monospace');
-
-    let rlgh = createA('https://github.com/', 'GITHUB').parent('#footer');
-    rlgh.position(72, 29);
-    rlgh.style('color', 'white');
-    rlgh.style('font-family', 'monospace');
-
-    let rl5 = createA('https://processing.org', 'PROCESSING').parent('#footer');
-    rl5.position(200, 29);
-    rl5.style('color', 'white');
-    rl5.style('font-family', 'monospace');
-
-    let instructions = createDiv('DRAG TO ROTATE • CLICK FOR NEW COLORS').parent('#footer');
-    instructions.position(windowWidth - 350, 29);
-    instructions.style('color', 'white');
-    instructions.style('font-family', 'monospace');
-
-    updateColorPreview();
-  }
-
-  function updateColorPreview() {
-    let existingPreview = select('#color-preview');
-    if (existingPreview) existingPreview.remove();
-
-    if (!colorsArray || colorsArray.length === 0) return;
-
-    let colorPreview = createDiv('').id('color-preview').parent('#footer');
-    colorPreview.position(windowWidth - 150, 60);
-    colorPreview.style('display', 'flex');
-    colorPreview.style('gap', '8px');
-    colorPreview.style('align-items', 'center');
-
-    for (let i = 0; i < colorsArray.length; i++) {
-      let swatch = createDiv('').parent('#color-preview');
-      swatch.size(18, 18);
-      swatch.style('background-color', colorsArray[i]);
-      swatch.style('border', '1px solid #fff');
-      swatch.style('border-radius', '2px');
-    }
-  }
-
   // Shuffle and pick 5 colors
   let shuffled = [...vibrantColors];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -337,6 +273,71 @@ function assignColors() {
   colorsArray = shuffled.slice(0, 5);
   console.log('New color palette:', colorsArray);
   updateColorPreview();
+}
+
+// Moved createElts outside of assignColors to make it globally accessible
+function createElts() {
+  select('body').style('margin', '0').style('overflow', 'hidden');
+
+  cnt = createDiv('').size(windowWidth, windowHeight);
+  cnt.style('background', '#222');
+
+  let hdr = createDiv('').id('header').parent(cnt);
+  select('#header').size(windowWidth, 120).position(0, 0);
+
+  let ftr = createDiv('').id('footer').parent(cnt);
+  select('#footer').size(windowWidth, 100).position(0, windowHeight - 100);
+
+  let logo = createDiv('3D CONWAY CUBE').parent('#header');
+  logo.position(72, 29);
+  logo.style('color', 'white');
+  logo.style('font-size', '24px');
+  logo.style('font-family', 'monospace');
+
+  frc = createDiv('0').id('framecount');
+  frc.parent('#header');
+  frc.position(288, 29);
+  frc.style('color', 'white');
+  frc.style('font-size', '24px');
+  frc.style('font-family', 'monospace');
+
+  let rlgh = createA('https://github.com/', 'GITHUB').parent('#footer');
+  rlgh.position(72, 29);
+  rlgh.style('color', 'white');
+  rlgh.style('font-family', 'monospace');
+
+  let rl5 = createA('https://processing.org', 'PROCESSING').parent('#footer');
+  rl5.position(200, 29);
+  rl5.style('color', 'white');
+  rl5.style('font-family', 'monospace');
+
+  let instructions = createDiv('DRAG TO ROTATE • CLICK FOR NEW COLORS').parent('#footer');
+  instructions.position(windowWidth - 350, 29);
+  instructions.style('color', 'white');
+  instructions.style('font-family', 'monospace');
+
+  updateColorPreview();
+}
+
+function updateColorPreview() {
+  let existingPreview = select('#color-preview');
+  if (existingPreview) existingPreview.remove();
+
+  if (!colorsArray || colorsArray.length === 0) return;
+
+  let colorPreview = createDiv('').id('color-preview').parent('#footer');
+  colorPreview.position(windowWidth - 150, 60);
+  colorPreview.style('display', 'flex');
+  colorPreview.style('gap', '8px');
+  colorPreview.style('align-items', 'center');
+
+  for (let i = 0; i < colorsArray.length; i++) {
+    let swatch = createDiv('').parent('#color-preview');
+    swatch.size(18, 18);
+    swatch.style('background-color', colorsArray[i]);
+    swatch.style('border', '1px solid #fff');
+    swatch.style('border-radius', '2px');
+  }
 }
 
 function handleRotation() {
