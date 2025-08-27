@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway's Game of Life with Fading Cells (p5.js v2.0.4)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.23/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffcc00;
+        }
+
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, #3494e6, #ec6ead);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .rules {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .rules h3 {
+            color: #ffcc00;
+            margin-top: 0;
+        }
+
+        .rules ul {
+            padding-left: 20px;
+        }
+
+        .rules li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conway's Game of Life with Fading Cells</h1>
+
+        <p class="description">
+            A visualization of the classic cellular automaton with smooth fading transitions between states.
+            Each cell's color represents its current state and age.
+        </p>
+
+        <div class="rules">
+            <h3>Rules of the Game:</h3>
+            <ul>
+                <li>Any live cell with fewer than two live neighbors dies (underpopulation)</li>
+                <li>Any live cell with two or three live neighbors lives on</li>
+                <li>Any live cell with more than three live neighbors dies (overpopulation)</li>
+                <li>Any dead cell with exactly three live neighbors becomes a live cell (reproduction)</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <button id="start-btn">Start</button>
+            <button id="pause-btn">Pause</button>
+            <button id="reset-btn">Reset</button>
+            <button id="random-btn">Randomize</button>
+            <button id="clear-btn">Clear</button>
+        </div>
+
+        <div class="slider-container">
+            <label for="speed-slider">Simulation Speed:</label>
+            <input type="range" id="speed-slider" min="1" max="30" value="10">
+        </div>
+
+        <div class="slider-container">
+            <label for="density-slider">Initial Density:</label>
+            <input type="range" id="density-slider" min="1" max="100" value="30">
+        </div>
+
+        <div id="canvas-container"></div>
+
+        <div class="footer">
+            <p>Each cell fades in and out based on its state transitions, creating a smooth visual effect.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        var grid;
+        var nextGrid;
+        var rows;
+        var cols;
+        var resolution = 15;
+        var isPlaying = false;
+        var fadeFactor = 0.1;
+        var simulationSpeed = 10;
+
+        function setup() {
+            var container = document.getElementById('canvas-container');
+            var width = container.clientWidth - 30;
+            var canvas = createCanvas(width, 500);
+            canvas.parent('canvas-container');
+
+            // Calculate rows and columns
+            cols = Math.floor(width / resolution);
+            rows = Math.floor(height / resolution);
+
+            // Create grids
+            grid = createGrid(rows, cols);
+            nextGrid = createGrid(rows, cols);
+
+            // Initialize with random state
+            randomizeGrid();
+
+            // Setup buttons
+            document.getElementById('start-btn').addEventListener('click', function() {
+                isPlaying = true;
+            });
+            document.getElementById('pause-btn').addEventListener('click', function() {
+                isPlaying = false;
+            });
+            document.getElementById('reset-btn').addEventListener('click', resetGrid);
+            document.getElementById('random-btn').addEventListener('click', randomizeGrid);
+            document.getElementById('clear-btn').addEventListener('click', clearGrid);
+
+            // Setup sliders
+            document.getElementById('speed-slider').addEventListener('input', function() {
+                simulationSpeed = parseInt(this.value);
+                frameRate(simulationSpeed);
+            });
+
+            document.getElementById('density-slider').addEventListener('input', function() {
+                var density = parseInt(this.value);
+                randomizeGrid(density);
+            });
+
+            frameRate(simulationSpeed);
+        }
+
+        function draw() {
+            background(0);
+
+            // Draw the grid
+            for (var i = 0; i < rows; i++) {
+                for (var j = 0; j < cols; j++) {
+                    var x = j * resolution;
+                    var y = i * resolution;
+
+                    // Apply fading effect
+                    if (isPlaying) {
+                        var count = countNeighbors(grid, i, j);
+
+                        // Apply Conway's rules with fading
+                        if (grid[i][j] > 0) {
+                            // Cell is alive
+                            if (count < 2 || count > 3) {
+                                // Cell dies - start fading out
+                                nextGrid[i][j] = Math.max(0, grid[i][j] - fadeFactor);
+                            } else {
+                                // Cell lives - strengthen the color
+                                nextGrid[i][j] = Math.min(1, grid[i][j] + fadeFactor);
+                            }
+                        } else {
+                            // Cell is dead
+                            if (count === 3) {
+                                // Cell is born - start fading in
+                                nextGrid[i][j] = Math.min(1, grid[i][j] + fadeFactor);
+                            } else {
+                                // Cell remains dead
+                                nextGrid[i][j] = Math.max(0, grid[i][j] - fadeFactor);
+                            }
+                        }
+                    }
+
+                    // Draw cell with color based on state
+                    drawCell(x, y, grid[i][j]);
+                }
+            }
+
+            if (isPlaying) {
+                // Swap grids
+                var temp = grid;
+                grid = nextGrid;
+                nextGrid = temp;
+            }
+        }
+
+        function createGrid(rows, cols) {
+            var arr = new Array(rows);
+            for (var i = 0; i < rows; i++) {
+                arr[i] = new Array(cols);
+                for (var j = 0; j < cols; j++) {
+                    arr[i][j] = 0;
+                }
+            }
+            return arr;
+        }
+
+        function drawCell(x, y, state) {
+            noStroke();
+
+            // Color gradient from blue (dead) to yellow (alive)
+            var r = map(state, 0, 1, 30, 255);
+            var g = map(state, 0, 1, 30, 255);
+            var b = map(state, 0, 1, 100, 30);
+
+            fill(r, g, b);
+            rect(x, y, resolution, resolution);
+        }
+
+        function countNeighbors(grid, x, y) {
+            var count = 0;
+            for (var i = -1; i <= 1; i++) {
+                for (var j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+
+                    var row = (x + i + rows) % rows;
+                    var col = (y + j + cols) % cols;
+
+                    // Consider a cell "alive" if its value is above a threshold
+                    if (grid[row][col] > 0.5) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function randomizeGrid(density) {
+            density = density || 30;
+            for (var i = 0; i < rows; i++) {
+                for (var j = 0; j < cols; j++) {
+                    // Set cells to either fully alive (1) or fully dead (0)
+                    grid[i][j] = Math.random() * 100 < density ? 1 : 0;
+                }
+            }
+        }
+
+        function resetGrid() {
+            isPlaying = false;
+            randomizeGrid(parseInt(document.getElementById('density-slider').value));
+        }
+
+        function clearGrid() {
+            isPlaying = false;
+            for (var i = 0; i < rows; i++) {
+                for (var j = 0; j < cols; j++) {
+                    grid[i][j] = 0;
+                }
+            }
+        }
+
+        // p5.js v0.4.23 doesn't have windowResized, so we'll handle it manually
+        window.onresize = function() {
+            var container = document.getElementById('canvas-container');
+            var width = container.clientWidth - 30;
+            resizeCanvas(width, 500);
+
+            // Recalculate rows and columns
+            cols = Math.floor(width / resolution);
+            rows = Math.floor(height / resolution);
+
+            // Recreate grids
+            grid = createGrid(rows, cols);
+            nextGrid = createGrid(rows, cols);
+
+            // Initialize with random state
+            randomizeGrid();
+        }
+    </script>
+</body>
+</html>
