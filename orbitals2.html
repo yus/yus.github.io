@@ -63,9 +63,26 @@
         let lastMouseX = 0;
         let lastMouseY = 0;
 
+        // Geometry objects for optimization
+        let cubeGeometry;
+        let cellGeometry;
+        let sphereGeometry;
+
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
+
+            // Create and compute geometry for the cube cells
+            cellGeometry = new p5.Geometry();
+            createCellGeometry(cellGeometry);
+            cellGeometry.computeFaces();
+            cellGeometry.computeNormals();
+
+            // Create and compute geometry for the sphere
+            sphereGeometry = new p5.Geometry();
+            createSphereGeometry(sphereGeometry, 3, 8, 8);
+            sphereGeometry.computeFaces();
+            sphereGeometry.computeNormals();
 
             // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
@@ -84,6 +101,76 @@
                             )
                         });
                     }
+                }
+            }
+        }
+
+        function createCellGeometry(geom) {
+            // Create geometry for a cell (box without top and bottom)
+            let size = cellSize - 4;
+            let halfSize = size / 2;
+
+            // Define vertices for the cell
+            let vertices = [
+                // Front face
+                createVector(-halfSize, -halfSize, halfSize),
+                createVector(halfSize, -halfSize, halfSize),
+                createVector(halfSize, halfSize, halfSize),
+                createVector(-halfSize, halfSize, halfSize),
+
+                // Back face
+                createVector(-halfSize, -halfSize, -halfSize),
+                createVector(halfSize, -halfSize, -halfSize),
+                createVector(halfSize, halfSize, -halfSize),
+                createVector(-halfSize, halfSize, -halfSize)
+            ];
+
+            // Add vertices to geometry
+            for (let v of vertices) {
+                geom.vertices.push(v);
+            }
+
+            // Define faces (quads)
+            geom.faces = [
+                // Front face
+                [0, 1, 2, 3],
+                // Back face
+                [4, 7, 6, 5],
+                // Right face
+                [1, 5, 6, 2],
+                // Left face
+                [4, 0, 3, 7],
+                // Top face
+                [3, 2, 6, 7],
+                // Bottom face
+                [4, 5, 1, 0]
+            ];
+        }
+
+        function createSphereGeometry(geom, radius, segments, rings) {
+            // Create sphere geometry
+            for (let i = 0; i <= segments; i++) {
+                let lat = map(i, 0, segments, -HALF_PI, HALF_PI);
+                for (let j = 0; j <= rings; j++) {
+                    let lon = map(j, 0, rings, -PI, PI);
+                    let x = radius * cos(lat) * cos(lon);
+                    let y = radius * cos(lat) * sin(lon);
+                    let z = radius * sin(lat);
+                    geom.vertices.push(createVector(x, y, z));
+                }
+            }
+
+            // Create faces
+            for (let i = 0; i < segments; i++) {
+                for (let j = 0; j < rings; j++) {
+                    let a = i * (rings + 1) + j;
+                    let b = a + 1;
+                    let c = (i + 1) * (rings + 1) + j;
+                    let d = c + 1;
+
+                    // Add two triangles for each quad
+                    geom.faces.push([a, b, c]);
+                    geom.faces.push([b, d, c]);
                 }
             }
         }
@@ -118,23 +205,22 @@
         }
 
         function drawGradientBackground() {
-            // Draw gradient using multiple circles
+            // In WEBGL mode, we need to use a different approach for background
+            // Push and pop are used instead of drawingContext.save/restore
             push();
             resetMatrix();
-            drawingContext.save();
             noStroke();
 
-            let centerX = width/2;
-            let centerY = height/2;
+            let centerX = 0;
+            let centerY = 0;
             let maxRadius = max(width, height) / 2;
 
+            // Draw gradient using multiple circles
             for (let r = maxRadius; r > 0; r -= 20) {
                 let alpha = map(r, 0, maxRadius, 200, 10);
                 fill(10, 15, 30, alpha);
                 ellipse(centerX, centerY, r*2, r*2);
             }
-
-            drawingContext.restore();
             pop();
         }
 
@@ -206,12 +292,14 @@
 
                     stroke(70, 90, 150);
                     strokeWeight(1.5);
-                    box(cellSize - 4, cellSize - 4, 2);
+
+                    // Use the precomputed geometry for better performance
+                    model(cellGeometry);
 
                     // Draw center dot
                     fill(220, 220, 255);
                     noStroke();
-                    sphere(3, 8, 8);
+                    model(sphereGeometry);
 
                     pop();
                 }
@@ -332,6 +420,16 @@
 
         function windowResized() {
             resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);
+        }
+
+        // Clean up geometry when sketch is removed
+        function remove() {
+            if (cellGeometry) {
+                cellGeometry.freeGeometry();
+            }
+            if (sphereGeometry) {
+                sphereGeometry.freeGeometry();
+            }
         }
     </script>
 </body>
