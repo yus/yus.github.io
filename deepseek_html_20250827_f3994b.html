@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.4/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas {
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
+        }
+        .title {
+            position: absolute;
+            top: 20px;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.8);
+            z-index: 10;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            text-align: center;
+            background: rgba(0, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Orbiting Cube with Fixed Rotation</div>
+    <div class="controls">
+        <p>Click and drag to orbit the cube</p>
+        <p>Fixed rotation and function reference issues</p>
+    </div>
+    <script>
+        let angleX = 0;
+        let angleY = 0;
+        let targetAngleX = 0.5;
+        let targetAngleY = 0.5;
+        let inertia = 0.05;
+        let impulseStrength = 0.01;
+
+        // Scene elements
+        let trails = [];
+        let cubeSize = 200;
+        let cellSize = cubeSize / 4;
+        let lastTime = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        
+        // Geometry objects for optimization
+        let cellGeometry;
+        let sphereGeometry;
+
+        function setup() {
+            createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
+            angleMode(RADIANS);
+
+            // Create and compute geometry for the cube cells
+            cellGeometry = new p5.Geometry();
+            createCellGeometry(cellGeometry);
+            cellGeometry.computeFaces();
+            cellGeometry.computeNormals();
+            
+            // Create and compute geometry for the sphere
+            sphereGeometry = new p5.Geometry();
+            createSphereGeometry(sphereGeometry, 3, 8, 8);
+            sphereGeometry.computeFaces();
+            sphereGeometry.computeNormals();
+
+            // Initialize trails for each cell
+            for (let face = 0; face < 6; face++) {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        trails.push({
+                            face: face,
+                            x: i,
+                            y: j,
+                            points: [],
+                            color: color(
+                                random(150, 255),
+                                random(150, 255),
+                                random(150, 255),
+                                200
+                            )
+                        });
+                    }
+                }
+            }
+        }
+
+        function createCellGeometry(geom) {
+            // Create geometry for a cell (box without top and bottom)
+            let size = cellSize - 4;
+            let halfSize = size / 2;
+            
+            // Define vertices for the cell
+            let vertices = [
+                // Front face
+                createVector(-halfSize, -halfSize, halfSize),
+                createVector(halfSize, -halfSize, halfSize),
+                createVector(halfSize, halfSize, halfSize),
+                createVector(-halfSize, halfSize, halfSize),
+                
+                // Back face
+                createVector(-halfSize, -halfSize, -halfSize),
+                createVector(halfSize, -halfSize, -halfSize),
+                createVector(halfSize, halfSize, -halfSize),
+                createVector(-halfSize, halfSize, -halfSize)
+            ];
+            
+            // Add vertices to geometry
+            for (let v of vertices) {
+                geom.vertices.push(v);
+            }
+            
+            // Define faces (quads)
+            geom.faces = [
+                // Front face
+                [0, 1, 2, 3],
+                // Back face
+                [4, 7, 6, 5],
+                // Right face
+                [1, 5, 6, 2],
+                // Left face
+                [4, 0, 3, 7],
+                // Top face
+                [3, 2, 6, 7],
+                // Bottom face
+                [4, 5, 1, 0]
+            ];
+        }
+
+        function createSphereGeometry(geom, radius, segments, rings) {
+            // Create sphere geometry
+            for (let i = 0; i <= segments; i++) {
+                let lat = map(i, 0, segments, -HALF_PI, HALF_PI);
+                for (let j = 0; j <= rings; j++) {
+                    let lon = map(j, 0, rings, -PI, PI);
+                    let x = radius * cos(lat) * cos(lon);
+                    let y = radius * cos(lat) * sin(lon);
+                    let z = radius * sin(lat);
+                    geom.vertices.push(createVector(x, y, z));
+                }
+            }
+            
+            // Create faces
+            for (let i = 0; i < segments; i++) {
+                for (let j = 0; j < rings; j++) {
+                    let a = i * (rings + 1) + j;
+                    let b = a + 1;
+                    let c = (i + 1) * (rings + 1) + j;
+                    let d = c + 1;
+                    
+                    // Add two triangles for each quad
+                    geom.faces.push([a, b, c]);
+                    geom.faces.push([b, d, c]);
+                }
+            }
+        }
+
+        function draw() {
+            // Clear with depth buffer
+            clear();
+            background(10, 15, 30);
+
+            // Draw radial gradient manually
+            drawGradientBackground();
+
+            // Smooth rotation with inertia
+            let now = millis();
+            let deltaTime = max(now - lastTime, 1);
+            lastTime = now;
+
+            // Frame-rate independent rotation
+            angleX = lerp(angleX, targetAngleX, inertia * (deltaTime / 16.67));
+            angleY = lerp(angleY, targetAngleY, inertia * (deltaTime / 16.67));
+
+            // Apply rotations
+            rotateX(angleX);
+            rotateY(angleY);
+
+            // Draw the cube
+            drawCube();
+
+            // Update and draw trails
+            updateTrails();
+            drawTrails();
+        }
+
+        function drawGradientBackground() {
+            // In WEBGL mode, we need to use a different approach for background
+            // Push and pop are used instead of drawingContext.save/restore
+            push();
+            resetMatrix();
+            noStroke();
+
+            let centerX = 0;
+            let centerY = 0;
+            let maxRadius = max(width, height) / 2;
+
+            // Draw gradient using multiple circles
+            for (let r = maxRadius; r > 0; r -= 20) {
+                let alpha = map(r, 0, maxRadius, 200, 10);
+                fill(10, 15, 30, alpha);
+                ellipse(centerX, centerY, r*2, r*2);
+            }
+            pop();
+        }
+
+        function drawCube() {
+            push();
+            noStroke();
+
+            // Draw each face of the cube
+            for (let face = 0; face < 6; face++) {
+                push();
+
+                // Position and rotate for each face
+                switch(face) {
+                    case 0: // Front
+                        translate(0, 0, cubeSize/2);
+                        break;
+                    case 1: // Back
+                        translate(0, 0, -cubeSize/2);
+                        rotateY(PI);
+                        break;
+                    case 2: // Right
+                        translate(cubeSize/2, 0, 0);
+                        rotateY(HALF_PI);
+                        break;
+                    case 3: // Left
+                        translate(-cubeSize/2, 0, 0);
+                        rotateY(-HALF_PI);
+                        break;
+                    case 4: // Top
+                        translate(0, -cubeSize/2, 0);
+                        rotateX(HALF_PI);
+                        break;
+                    case 5: // Bottom
+                        translate(0, cubeSize/2, 0);
+                        rotateX(-HALF_PI);
+                        break;
+                }
+
+                // Draw grid for this face
+                drawGrid(face);
+
+                pop();
+            }
+
+            pop();
+        }
+
+        function drawGrid(face) {
+            // Draw the 4x4 grid on the face
+            let halfCube = cubeSize / 2;
+            let halfCell = cellSize / 2;
+
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let x = -halfCube + (i * cellSize) + halfCell;
+                    let y = -halfCube + (j * cellSize) + halfCell;
+
+                    push();
+                    translate(x, y, 0);
+
+                    // Draw cell with gradient color based on position
+                    let cellColor = color(
+                        40 + i * 30,
+                        40 + j * 30,
+                        150,
+                        200
+                    );
+                    fill(cellColor);
+
+                    stroke(70, 90, 150);
+                    strokeWeight(1.5);
+                    
+                    // Use the precomputed geometry for better performance
+                    // Draw the shape
+                    model(cellGeometry);
+                    
+                    // Draw center dot
+                    fill(220, 220, 255);
+                    noStroke();
+                    // Draw the shape
+                    model(sphereGeometry);
+
+                    pop();
+                }
+            }
+        }
+
+        function updateTrails() {
+            // For each trail, record its current position
+            for (let t of trails) {
+                let pos = getCellPosition(t.face, t.x, t.y);
+
+                // Add new point
+                t.points.push({
+                    position: pos.copy(),
+                    life: 1.0
+                });
+
+                // Update all points and remove dead ones
+                for (let i = t.points.length - 1; i >= 0; i--) {
+                    let p = t.points[i];
+                    p.life -= 0.01;
+
+                    // Remove if life is over
+                    if (p.life <= 0) {
+                        t.points.splice(i, 1);
+                    }
+                }
+
+                // Limit trail length
+                if (t.points.length > 30) {
+                    t.points.shift();
+                }
+            }
+        }
+
+        function drawTrails() {
+            // Draw all trails as lines with proper depth testing
+            for (let t of trails) {
+                if (t.points.length > 1) {
+                    // Use LINE_STRIP for connected lines
+                    beginShape(LINE_STRIP);
+                    for (let i = 0; i < t.points.length; i++) {
+                        let p = t.points[i];
+                        let alpha = 255 * p.life;
+                        stroke(red(t.color), green(t.color), blue(t.color), alpha);
+                        strokeWeight(2 * p.life);
+                        vertex(p.position.x, p.position.y, p.position.z);
+                    }
+                    endShape();
+                }
+            }
+        }
+
+        function getCellPosition(face, x, y) {
+            // Calculate the world position of a cell
+            let halfCube = cubeSize / 2;
+            let cellX = -halfCube + (x * cellSize) + cellSize/2;
+            let cellY = -halfCube + (y * cellSize) + cellSize/2;
+            let cellZ = halfCube + 0.5; // Offset to prevent z-fighting
+
+            let pos = createVector(cellX, cellY, cellZ);
+
+            // Transform based on face
+            switch(face) {
+                case 0: // Front
+                    break;
+                case 1: // Back
+                    pos.z = -pos.z;
+                    break;
+                case 2: // Right
+                    pos = createVector(cellZ, cellY, -cellX);
+                    break;
+                case 3: // Left
+                    pos = createVector(-cellZ, cellY, cellX);
+                    break;
+                case 4: // Top
+                    pos = createVector(cellX, -cellZ, -cellY);
+                    break;
+                case 5: // Bottom
+                    pos = createVector(cellX, cellZ, cellY);
+                    break;
+            }
+
+            return pos;
+        }
+
+        function mousePressed() {
+            isDragging = true;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            return false;
+        }
+
+        function mouseReleased() {
+            isDragging = false;
+            return false;
+        }
+
+        function mouseDragged() {
+            if (isDragging) {
+                // Update target angles based on mouse movement
+                let deltaX = (lastMouseY - mouseY) * impulseStrength;
+                let deltaY = (mouseX - lastMouseX) * impulseStrength;
+
+                targetAngleX += deltaX;
+                targetAngleY += deltaY;
+
+                // Constrain X rotation to avoid flipping
+                targetAngleX = constrain(targetAngleX, -PI/2, PI/2);
+
+                lastMouseX = mouseX;
+                lastMouseY = mouseY;
+
+                // Prevent default behavior
+                return false;
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);
+        }
+        
+        // Clean up geometry when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (cellGeometry) {
+                cellGeometry.freeGeometry();
+            }
+            if (sphereGeometry) {
+                sphereGeometry.freeGeometry();
+            }
+        });
+    </script>
+</body>
+</html>
