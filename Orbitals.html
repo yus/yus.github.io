@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let angleX = 0;
+        let angleY = 0;
+        let targetAngleX = 0;
+        let targetAngleY = 0;
+        let inertia = 0.05;
+
+        // Trail particles
+        let particles = [];
+        let cubeSize = 200;
+        let cellSize = cubeSize / 4;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight, WEBGL);
+            angleMode(RADIANS);
+
+            // Initialize particles for each cell
+            for (let face = 0; face < 6; face++) {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        particles.push({
+                            face: face,
+                            x: i,
+                            y: j,
+                            trails: [],
+                            color: color(
+                                random(100, 255),
+                                random(100, 255),
+                                random(100, 255)
+                            )
+                        });
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            background(0);
+
+            // Smooth rotation with inertia
+            angleX = lerp(angleX, targetAngleX, inertia);
+            angleY = lerp(angleY, targetAngleY, inertia);
+
+            rotateX(angleX);
+            rotateY(angleY);
+
+            // Draw the cube with 4x4 cells on each face
+            drawCube();
+
+            // Update and draw trails
+            updateTrails();
+            drawTrails();
+        }
+
+        function drawCube() {
+            // Draw each face of the cube
+            for (let face = 0; face < 6; face++) {
+                push();
+
+                // Position and rotate for each face
+                switch(face) {
+                    case 0: // Front
+                        translate(0, 0, cubeSize/2);
+                        break;
+                    case 1: // Back
+                        translate(0, 0, -cubeSize/2);
+                        rotateY(PI);
+                        break;
+                    case 2: // Right
+                        translate(cubeSize/2, 0, 0);
+                        rotateY(HALF_PI);
+                        break;
+                    case 3: // Left
+                        translate(-cubeSize/2, 0, 0);
+                        rotateY(-HALF_PI);
+                        break;
+                    case 4: // Top
+                        translate(0, -cubeSize/2, 0);
+                        rotateX(HALF_PI);
+                        break;
+                    case 5: // Bottom
+                        translate(0, cubeSize/2, 0);
+                        rotateX(-HALF_PI);
+                        break;
+                }
+
+                // Draw grid for this face
+                drawGrid(face);
+
+                pop();
+            }
+        }
+
+        function drawGrid(face) {
+            // Draw the 4x4 grid on the face
+            let halfCube = cubeSize / 2;
+            let halfCell = cellSize / 2;
+
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let x = -halfCube + (i * cellSize) + halfCell;
+                    let y = -halfCube + (j * cellSize) + halfCell;
+
+                    push();
+                    translate(x, y, 0);
+
+                    // Draw cell
+                    fill(50);
+                    stroke(200);
+                    strokeWeight(1);
+                    box(cellSize - 2, cellSize - 2, 2);
+
+                    // Draw center dot
+                    fill(255);
+                    noStroke();
+                    sphere(2, 6, 6);
+
+                    pop();
+                }
+            }
+        }
+
+        function updateTrails() {
+            // For each particle, record its current position
+            for (let p of particles) {
+                let pos = getCellPosition(p.face, p.x, p.y);
+                p.trails.push({
+                    position: pos,
+                    opacity: 1.0
+                });
+
+                // Limit trail length
+                if (p.trails.length > 20) {
+                    p.trails.shift();
+                }
+            }
+
+            // Reduce opacity of all trails
+            for (let p of particles) {
+                for (let trail of p.trails) {
+                    trail.opacity *= 0.95;
+                }
+            }
+        }
+
+        function drawTrails() {
+            // Draw all trails
+            for (let p of particles) {
+                for (let i = 0; i < p.trails.length - 1; i++) {
+                    let trail = p.trails[i];
+                    let nextTrail = p.trails[i + 1];
+
+                    let alpha = map(i, 0, p.trails.length, 50, 255) * trail.opacity;
+                    stroke(red(p.color), green(p.color), blue(p.color), alpha);
+                    strokeWeight(2);
+
+                    line(
+                        trail.position.x, trail.position.y, trail.position.z,
+                        nextTrail.position.x, nextTrail.position.y, nextTrail.position.z
+                    );
+                }
+            }
+        }
+
+        function getCellPosition(face, x, y) {
+            // Calculate the world position of a cell
+            let halfCube = cubeSize / 2;
+            let cellX = -halfCube + (x * cellSize) + cellSize/2;
+            let cellY = -halfCube + (y * cellSize) + cellSize/2;
+            let cellZ = halfCube;
+
+            let pos = createVector(cellX, cellY, cellZ);
+
+            // Transform based on face
+            switch(face) {
+                case 0: // Front
+                    break;
+                case 1: // Back
+                    pos.z = -pos.z;
+                    break;
+                case 2: // Right
+                    pos = createVector(halfCube, cellY, -cellX);
+                    break;
+                case 3: // Left
+                    pos = createVector(-halfCube, cellY, cellX);
+                    break;
+                case 4: // Top
+                    pos = createVector(cellX, -halfCube, -cellY);
+                    break;
+                case 5: // Bottom
+                    pos = createVector(cellX, halfCube, cellY);
+                    break;
+            }
+
+            // Apply current rotation
+            return applyRotation(pos);
+        }
+
+        function applyRotation(pos) {
+            // Apply the current rotation to a vector
+            let rotated = pos.copy();
+
+            // Rotate around X axis
+            let y = rotated.y;
+            let z = rotated.z;
+            rotated.y = y * cos(angleX) - z * sin(angleX);
+            rotated.z = y * sin(angleX) + z * cos(angleX);
+
+            // Rotate around Y axis
+            let x = rotated.x;
+            z = rotated.z;
+            rotated.x = x * cos(angleY) + z * sin(angleY);
+            rotated.z = -x * sin(angleY) + z * cos(angleY);
+
+            return rotated;
+        }
+
+        function mouseDragged() {
+            // Update target angles based on mouse movement
+            targetX = angleX + (pmouseY - mouseY) * 0.01;
+            targetY = angleY + (mouseX - pmouseX) * 0.01;
+
+            // Constrain rotation
+            targetAngleX = constrain(targetX, -PI/2, PI/2);
+            targetAngleY = targetY;
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
