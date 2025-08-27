@@ -27,10 +27,25 @@
             text-shadow: 0 0 10px rgba(0, 150, 255, 0.8);
             z-index: 10;
         }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            text-align: center;
+            background: rgba(0, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with Gradient Trails</div>
+    <div class="title">Orbiting Cube with FreeGeometry Trails</div>
+    <div class="controls">
+        <p>Click and drag to orbit the cube</p>
+        <p>Using p5.js 2.0.4 freeGeometry() for efficient trails</p>
+    </div>
     <script>
         let angleX = 0;
         let angleY = 0;
@@ -39,8 +54,8 @@
         let inertia = 0.05;
         let impulseStrength = 0.01;
 
-        // Trail particles
-        let particles = [];
+        // Trail geometry
+        let trails = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
 
@@ -48,32 +63,37 @@
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
 
-            // Initialize particles for each cell
+            // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
                 for (let i = 0; i < 4; i++) {
                     for (let j = 0; j < 4; j++) {
-                        particles.push({
+                        trails.push({
                             face: face,
                             x: i,
                             y: j,
-                            trails: [],
+                            points: [],
                             color: color(
                                 random(150, 255),
                                 random(150, 255),
                                 random(150, 255),
                                 200
                             ),
-                            speed: random(0.5, 2.0)
+                            geometry: createGeometry()
                         });
                     }
                 }
             }
         }
 
+        function createGeometry() {
+            // Create a new geometry for trails
+            let g = new p5.Geometry();
+            return g;
+        }
+
         function draw() {
             // Create gradient background
             background(10, 15, 30);
-            frameRate(60);
 
             // Draw radial gradient manually
             drawGradientBackground();
@@ -103,7 +123,7 @@
             let centerY = height/2;
             let maxRadius = max(width, height) / 2;
 
-            for (let r = maxRadius; r > 0; r -= 10) {
+            for (let r = maxRadius; r > 0; r -= 20) {
                 let alpha = map(r, 0, maxRadius, 200, 10);
                 fill(10, 15, 30, alpha);
                 ellipse(centerX, centerY, r*2, r*2);
@@ -188,52 +208,89 @@
         }
 
         function updateTrails() {
-            // For each particle, record its current position
-            for (let p of particles) {
-                let pos = getCellPosition(p.face, p.x, p.y);
+            // For each trail, record its current position
+            for (let t of trails) {
+                let pos = getCellPosition(t.face, t.x, t.y);
 
-                // Add new trail point
-                p.trails.push({
+                // Add new point
+                t.points.push({
                     position: pos.copy(),
-                    life: 1.0,
-                    color: p.color
+                    life: 1.0
                 });
 
-                // Update all trails and remove dead ones
-                for (let i = p.trails.length - 1; i >= 0; i--) {
-                    let t = p.trails[i];
-                    t.life -= 0.01;
+                // Update all points and remove dead ones
+                for (let i = t.points.length - 1; i >= 0; i--) {
+                    let p = t.points[i];
+                    p.life -= 0.01;
 
                     // Remove if life is over
-                    if (t.life <= 0) {
-                        p.trails.splice(i, 1);
+                    if (p.life <= 0) {
+                        t.points.splice(i, 1);
                     }
                 }
 
                 // Limit trail length
-                if (p.trails.length > 40) {
-                    p.trails.shift();
+                if (t.points.length > 40) {
+                    t.points.shift();
                 }
+
+                // Update geometry with current points
+                updateTrailGeometry(t);
             }
         }
 
+        function updateTrailGeometry(trail) {
+            // Clear the geometry
+            trail.geometry = new p5.Geometry();
+
+            // Add vertices to the geometry
+            for (let i = 0; i < trail.points.length; i++) {
+                let p = trail.points[i];
+                trail.geometry.vertices.push(
+                    new p5.Vector(
+                        p.position.x,
+                        p.position.y,
+                        p.position.z
+                    )
+                );
+
+                // Add colors with alpha based on life
+                let alpha = 255 * p.life;
+                trail.geometry.vertexColors.push(
+                    color(
+                        red(trail.color),
+                        green(trail.color),
+                        blue(trail.color),
+                        alpha
+                    )
+                );
+            }
+
+            // Free the geometry for performance
+            freeGeometry(trail.geometry);
+        }
+
         function drawTrails() {
-            // Draw all trails as gradient lines
-            for (let p of particles) {
-                for (let i = 0; i < p.trails.length - 1; i++) {
-                    let t = p.trails[i];
-                    let nextT = p.trails[i + 1];
+            // Draw all trails as lines
+            for (let t of trails) {
+                if (t.points.length > 1) {
+                    push();
+                    noFill();
 
-                    // Calculate alpha based on life and position in trail
-                    let alpha = 255 * t.life * (i / p.trails.length);
+                    // Draw the trail geometry
+                    beginShape();
+                    for (let i = 0; i < t.geometry.vertices.length; i++) {
+                        stroke(t.geometry.vertexColors[i]);
+                        strokeWeight(2 * (t.points[i].life));
+                        vertex(
+                            t.geometry.vertices[i].x,
+                            t.geometry.vertices[i].y,
+                            t.geometry.vertices[i].z
+                        );
+                    }
+                    endShape();
 
-                    stroke(red(t.color), green(t.color), blue(t.color), alpha);
-                    strokeWeight(2 * t.life);
-
-                    line(
-                        t.position.x, t.position.y, t.position.z,
-                        nextT.position.x, nextT.position.y, nextT.position.z
-                    );
+                    pop();
                 }
             }
         }
