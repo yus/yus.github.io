@@ -72,6 +72,9 @@
 
         function draw() {
             // Create gradient background
+            background(10, 15, 30);
+
+            // Draw radial gradient manually
             drawGradientBackground();
 
             // Smooth rotation with inertia
@@ -90,29 +93,22 @@
         }
 
         function drawGradientBackground() {
-            // Switch to 2D rendering for background
+            // Draw gradient using multiple circles
             push();
             resetMatrix();
-            drawingContext.save();
+            noStroke();
 
-            // Create gradient
-            let gradient = drawingContext.createRadialGradient(
-                width/2, height/2, 0,
-                width/2, height/2, max(width, height)/2
-            );
+            let centerX = width/2;
+            let centerY = height/2;
+            let maxRadius = max(width, height) / 2;
 
-            gradient.addColorStop(0, 'rgba(10, 15, 30, 0.8)');
-            gradient.addColorStop(0.5, 'rgba(5, 10, 20, 0.8)');
-            gradient.addColorStop(1, 'rgba(0, 5, 10, 0.8)');
+            for (let r = maxRadius; r > 0; r -= 10) {
+                let alpha = map(r, 0, maxRadius, 200, 10);
+                fill(10, 15, 30, alpha);
+                ellipse(centerX, centerY, r*2, r*2);
+            }
 
-            drawingContext.fillStyle = gradient;
-            drawingContext.fillRect(0, 0, width, height);
-
-            drawingContext.restore();
             pop();
-
-            // Return to 3D rendering
-            translate(0, 0, 0);
         }
 
         function drawCube() {
@@ -230,10 +226,6 @@
                     // Calculate alpha based on life and position in trail
                     let alpha = 255 * t.life * (i / p.trails.length);
 
-                    // Draw gradient line between points
-                    drawingContext.shadowBlur = 10 * t.life;
-                    drawingContext.shadowColor = t.color.toString();
-
                     stroke(red(t.color), green(t.color), blue(t.color), alpha);
                     strokeWeight(2 * t.life);
 
@@ -243,8 +235,6 @@
                     );
                 }
             }
-
-            drawingContext.shadowBlur = 0;
         }
 
         function getCellPosition(face, x, y) {
