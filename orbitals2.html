@@ -16,18 +16,7 @@
         }
         canvas {
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
-        }
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            color: white;
-            text-align: center;
-            background: rgba(0, 30, 60, 0.7);
-            padding: 10px 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            z-index: 10;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
         }
         .title {
             position: absolute;
@@ -36,28 +25,24 @@
             text-align: center;
             font-size: 24px;
             text-shadow: 0 0 10px rgba(0, 150, 255, 0.8);
+            z-index: 10;
         }
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with Force Field</div>
-    <div class="controls">
-        <p>Click and drag to orbit the cube</p>
-        <p>Particles emit from cell centers like smoke trails</p>
-    </div>
+    <div class="title">Orbiting Cube with Gradient Trails</div>
     <script>
         let angleX = 0;
         let angleY = 0;
         let targetAngleX = 0;
         let targetAngleY = 0;
         let inertia = 0.05;
-        let impulseStrength = 0.01; // Increased for stronger rotation response
+        let impulseStrength = 0.01;
 
         // Trail particles
         let particles = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
-        let forceFieldRadius = 400; // Increased force field radius
 
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
@@ -86,12 +71,8 @@
         }
 
         function draw() {
-            background(10, 15, 30, 200);
-
-            // Add ambient light and point lights for better 3D effect
-            ambientLight(40, 40, 60);
-            pointLight(200, 200, 255, 500, -500, 500);
-            pointLight(255, 150, 100, -500, 500, -500);
+            // Create gradient background
+            drawGradientBackground();
 
             // Smooth rotation with inertia
             angleX = lerp(angleX, targetAngleX, inertia);
@@ -99,9 +80,6 @@
 
             rotateX(angleX);
             rotateY(angleY);
-
-            // Draw the force field
-            drawForceField();
 
             // Draw the cube with 4x4 cells on each face
             drawCube();
@@ -111,28 +89,30 @@
             drawTrails();
         }
 
-        function drawForceField() {
+        function drawGradientBackground() {
+            // Switch to 2D rendering for background
             push();
-            noFill();
-            stroke(30, 100, 200, 100);
-            strokeWeight(1);
-            sphere(forceFieldRadius, 24, 16);
+            resetMatrix();
+            drawingContext.save();
 
-            // Add some orbiting particles in the force field
-            for (let i = 0; i < 50; i++) {
-                let angle = frameCount * 0.01 + i * 0.2;
-                let x = cos(angle) * forceFieldRadius;
-                let y = sin(angle * 1.5) * forceFieldRadius;
-                let z = sin(angle) * cos(angle * 2) * forceFieldRadius;
+            // Create gradient
+            let gradient = drawingContext.createRadialGradient(
+                width/2, height/2, 0,
+                width/2, height/2, max(width, height)/2
+            );
 
-                push();
-                translate(x, y, z);
-                fill(100, 200, 255, 150);
-                noStroke();
-                sphere(2, 6, 6);
-                pop();
-            }
+            gradient.addColorStop(0, 'rgba(10, 15, 30, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(5, 10, 20, 0.8)');
+            gradient.addColorStop(1, 'rgba(0, 5, 10, 0.8)');
+
+            drawingContext.fillStyle = gradient;
+            drawingContext.fillRect(0, 0, width, height);
+
+            drawingContext.restore();
             pop();
+
+            // Return to 3D rendering
+            translate(0, 0, 0);
         }
 
         function drawCube() {
@@ -215,22 +195,9 @@
             for (let p of particles) {
                 let pos = getCellPosition(p.face, p.x, p.y);
 
-                // Add new trail particle moving in the direction of rotation (like smoke)
-                let dir = p5.Vector.sub(pos, createVector(0, 0, 0));
-                dir.normalize();
-
-                // Add some randomness to direction
-                dir.x += random(-0.2, 0.2);
-                dir.y += random(-0.2, 0.2);
-                dir.z += random(-0.2, 0.2);
-                dir.normalize();
-
-                dir.mult(p.speed);
-
+                // Add new trail point
                 p.trails.push({
                     position: pos.copy(),
-                    velocity: dir,
-                    size: random(2, 5),
                     life: 1.0,
                     color: p.color
                 });
@@ -238,8 +205,7 @@
                 // Update all trails and remove dead ones
                 for (let i = p.trails.length - 1; i >= 0; i--) {
                     let t = p.trails[i];
-                    t.position.add(t.velocity);
-                    t.life -= 0.02;
+                    t.life -= 0.01;
 
                     // Remove if life is over
                     if (t.life <= 0) {
@@ -248,32 +214,33 @@
                 }
 
                 // Limit trail length
-                if (p.trails.length > 30) {
+                if (p.trails.length > 40) {
                     p.trails.shift();
                 }
             }
         }
 
         function drawTrails() {
-            // Draw all trails with a glow effect
-            drawingContext.shadowBlur = 15;
-
+            // Draw all trails as gradient lines
             for (let p of particles) {
-                for (let t of p.trails) {
+                for (let i = 0; i < p.trails.length - 1; i++) {
+                    let t = p.trails[i];
+                    let nextT = p.trails[i + 1];
+
+                    // Calculate alpha based on life and position in trail
+                    let alpha = 255 * t.life * (i / p.trails.length);
+
+                    // Draw gradient line between points
+                    drawingContext.shadowBlur = 10 * t.life;
                     drawingContext.shadowColor = t.color.toString();
 
-                    push();
-                    translate(t.position.x, t.position.y, t.position.z);
+                    stroke(red(t.color), green(t.color), blue(t.color), alpha);
+                    strokeWeight(2 * t.life);
 
-                    // Scale based on life
-                    let scale = t.size * t.life;
-
-                    // Set color with alpha based on life
-                    fill(red(t.color), green(t.color), blue(t.color), 255 * t.life);
-                    noStroke();
-
-                    sphere(scale, 6, 6);
-                    pop();
+                    line(
+                        t.position.x, t.position.y, t.position.z,
+                        nextT.position.x, nextT.position.y, nextT.position.z
+                    );
                 }
             }
 
