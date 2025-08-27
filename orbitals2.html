@@ -41,10 +41,10 @@
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with Full FreeGeometry Implementation</div>
+    <div class="title">Orbiting Cube with Fixed GPU Visual Issues</div>
     <div class="controls">
         <p>Click and drag to orbit the cube</p>
-        <p>Entire scene uses freeGeometry() for optimal performance</p>
+        <p>Fixed face orientation and z-fighting issues</p>
     </div>
     <script>
         let angleX = 0;
@@ -55,17 +55,23 @@
         let impulseStrength = 0.01;
 
         // Scene geometry
-        let cubeGeometry;
+        let cubeGeometries = [];
         let trails = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
+        let lastTime = 0;
 
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
 
-            // Create cube geometry
-            cubeGeometry = createCubeGeometry();
+            // Enable depth testing to fix rendering order issues
+            _renderer.GL.enable(_renderer.GL.DEPTH_TEST);
+
+            // Create cube geometries for each face (to avoid z-fighting)
+            for (let face = 0; face < 6; face++) {
+                cubeGeometries.push(createFaceGeometry(face));
+            }
 
             // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
@@ -81,53 +87,112 @@
                                 random(150, 255),
                                 random(150, 255),
                                 200
-                            ),
-                            geometry: createGeometry()
+                            )
                         });
                     }
                 }
             }
+
+            // Set initial angles for better starting view
+            targetAngleX = 0.5;
+            targetAngleY = 0.5;
         }
 
-        function createCubeGeometry() {
+        function createFaceGeometry(face) {
             let g = new p5.Geometry();
             let halfSize = cubeSize / 2;
             let halfCell = cellSize / 2;
+            let offset = 0.5; // Small offset to prevent z-fighting
 
-            // Create vertices for all faces
-            for (let face = 0; face < 6; face++) {
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 4; j++) {
-                        let x = -halfSize + (i * cellSize) + halfCell;
-                        let y = -halfSize + (j * cellSize) + halfCell;
-                        let z = halfSize;
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let x = -halfSize + (i * cellSize) + halfCell;
+                    let y = -halfSize + (j * cellSize) + halfCell;
+                    let z = halfSize + offset;
 
-                        // Transform based on face
-                        let pos;
-                        switch(face) {
-                            case 0: // Front
-                                pos = createVector(x, y, z);
-                                break;
-                            case 1: // Back
-                                pos = createVector(x, y, -z);
-                                break;
-                            case 2: // Right
-                                pos = createVector(z, y, -x);
-                                break;
-                            case 3: // Left
-                                pos = createVector(-z, y, x);
-                                break;
-                            case 4: // Top
-                                pos = createVector(x, -z, -y);
-                                break;
-                            case 5: // Bottom
-                                pos = createVector(x, z, y);
-                                break;
-                        }
+                    // Define cell color based on position
+                    let cellColor = color(
+                        40 + i * 30,
+                        40 + j * 30,
+                        150,
+                        200
+                    );
 
-                        // Add vertices for the cell
-                        addCellGeometry(g, pos, face, i, j);
+                    let dotColor = color(220, 220, 255);
+
+                    // Transform based on face with proper orientation
+                    let positions = [];
+                    switch(face) {
+                        case 0: // Front
+                            positions = [
+                                createVector(x - halfCell, y - halfCell, z),
+                                createVector(x + halfCell, y - halfCell, z),
+                                createVector(x + halfCell, y + halfCell, z),
+                                createVector(x - halfCell, y + halfCell, z),
+                                createVector(x, y, z + 0.5) // Center dot
+                            ];
+                            break;
+                        case 1: // Back
+                            positions = [
+                                createVector(x - halfCell, y - halfCell, -z),
+                                createVector(x + halfCell, y - halfCell, -z),
+                                createVector(x + halfCell, y + halfCell, -z),
+                                createVector(x - halfCell, y + halfCell, -z),
+                                createVector(x, y, -z - 0.5) // Center dot
+                            ];
+                            break;
+                        case 2: // Right
+                            positions = [
+                                createVector(z, y - halfCell, x - halfCell),
+                                createVector(z, y - halfCell, x + halfCell),
+                                createVector(z, y + halfCell, x + halfCell),
+                                createVector(z, y + halfCell, x - halfCell),
+                                createVector(z + 0.5, y, x) // Center dot
+                            ];
+                            break;
+                        case 3: // Left
+                            positions = [
+                                createVector(-z, y - halfCell, x - halfCell),
+                                createVector(-z, y - halfCell, x + halfCell),
+                                createVector(-z, y + halfCell, x + halfCell),
+                                createVector(-z, y + halfCell, x - halfCell),
+                                createVector(-z - 0.5, y, x) // Center dot
+                            ];
+                            break;
+                        case 4: // Top
+                            positions = [
+                                createVector(x - halfCell, -z, y - halfCell),
+                                createVector(x + halfCell, -z, y - halfCell),
+                                createVector(x + halfCell, -z, y + halfCell),
+                                createVector(x - halfCell, -z, y + halfCell),
+                                createVector(x, -z - 0.5, y) // Center dot
+                            ];
+                            break;
+                        case 5: // Bottom
+                            positions = [
+                                createVector(x - halfCell, z, y - halfCell),
+                                createVector(x + halfCell, z, y - halfCell),
+                                createVector(x + halfCell, z, y + halfCell),
+                                createVector(x - halfCell, z, y + halfCell),
+                                createVector(x, z + 0.5, y) // Center dot
+                            ];
+                            break;
                     }
+
+                    // Add vertices for the cell
+                    for (let k = 0; k < 4; k++) {
+                        g.vertices.push(positions[k]);
+                        g.vertexColors.push(cellColor);
+                    }
+
+                    // Add center dot
+                    g.vertices.push(positions[4]);
+                    g.vertexColors.push(dotColor);
+
+                    // Add faces (two triangles per cell)
+                    let baseIndex = (i * 4 + j) * 5;
+                    g.faces.push([baseIndex, baseIndex + 1, baseIndex + 2]);
+                    g.faces.push([baseIndex, baseIndex + 2, baseIndex + 3]);
                 }
             }
 
@@ -135,56 +200,27 @@
             return g;
         }
 
-        function addCellGeometry(geometry, position, face, i, j) {
-            let halfCell = (cellSize - 4) / 2;
-
-            // Define cell color based on position
-            let cellColor = color(
-                40 + i * 30,
-                40 + j * 30,
-                150,
-                200
-            );
-
-            // Add vertices for the cell box
-            let vertices = [
-                createVector(position.x - halfCell, position.y - halfCell, position.z),
-                createVector(position.x + halfCell, position.y - halfCell, position.z),
-                createVector(position.x + halfCell, position.y + halfCell, position.z),
-                createVector(position.x - halfCell, position.y + halfCell, position.z)
-            ];
-
-            // Add faces with appropriate normals
-            for (let v of vertices) {
-                geometry.vertices.push(v);
-                geometry.vertexColors.push(cellColor);
-            }
-
-            // Add center dot
-            let dotColor = color(220, 220, 255);
-            geometry.vertices.push(position);
-            geometry.vertexColors.push(dotColor);
-        }
-
-        function createGeometry() {
-            return new p5.Geometry();
-        }
-
         function draw() {
-            // Create gradient background
+            // Clear with depth buffer
+            clear();
             background(10, 15, 30);
 
             // Draw radial gradient manually
             drawGradientBackground();
 
             // Smooth rotation with inertia
-            angleX = lerp(angleX, targetAngleX, inertia);
-            angleY = lerp(angleY, targetAngleY, inertia);
+            let now = millis();
+            let deltaTime = now - lastTime;
+            lastTime = now;
+
+            // Frame-rate independent rotation
+            angleX = lerp(angleX, targetAngleX, inertia * (deltaTime / 16.67));
+            angleY = lerp(angleY, targetAngleY, inertia * (deltaTime / 16.67));
 
             rotateX(angleX);
             rotateY(angleY);
 
-            // Draw the cube using freeGeometry
+            // Draw the cube using separate geometries for each face
             drawCube();
 
             // Update and draw trails
@@ -215,31 +251,30 @@
             push();
             noStroke();
 
-            // Draw the cube geometry
-            beginShape(QUADS);
-            for (let i = 0; i < cubeGeometry.vertices.length; i++) {
-                fill(cubeGeometry.vertexColors[i]);
-                vertex(
-                    cubeGeometry.vertices[i].x,
-                    cubeGeometry.vertices[i].y,
-                    cubeGeometry.vertices[i].z
-                );
-            }
-            endShape();
+            // Draw each face with its own geometry
+            for (let face = 0; face < 6; face++) {
+                let g = cubeGeometries[face];
 
-            // Draw center dots
-            beginShape(POINTS);
-            for (let i = 0; i < cubeGeometry.vertices.length; i++) {
-                if (i % 5 === 4) { // Every 5th vertex is a center dot
-                    fill(cubeGeometry.vertexColors[i]);
-                    vertex(
-                        cubeGeometry.vertices[i].x,
-                        cubeGeometry.vertices[i].y,
-                        cubeGeometry.vertices[i].z
-                    );
+                // Draw cells
+                beginShape(TRIANGLES);
+                for (let i = 0; i < g.faces.length; i++) {
+                    let faceIndices = g.faces[i];
+                    for (let j = 0; j < 3; j++) {
+                        let idx = faceIndices[j];
+                        fill(g.vertexColors[idx]);
+                        vertex(g.vertices[idx].x, g.vertices[idx].y, g.vertices[idx].z);
+                    }
                 }
+                endShape();
+
+                // Draw center dots
+                beginShape(POINTS);
+                for (let i = 4; i < g.vertices.length; i += 5) {
+                    fill(g.vertexColors[i]);
+                    vertex(g.vertices[i].x, g.vertices[i].y, g.vertices[i].z);
+                }
+                endShape();
             }
-            endShape();
 
             pop();
         }
@@ -267,67 +302,26 @@
                 }
 
                 // Limit trail length
-                if (t.points.length > 40) {
+                if (t.points.length > 30) {
                     t.points.shift();
                 }
-
-                // Update geometry with current points
-                updateTrailGeometry(t);
             }
-        }
-
-        function updateTrailGeometry(trail) {
-            // Clear the geometry
-            trail.geometry = new p5.Geometry();
-
-            // Add vertices to the geometry
-            for (let i = 0; i < trail.points.length; i++) {
-                let p = trail.points[i];
-                trail.geometry.vertices.push(
-                    new p5.Vector(
-                        p.position.x,
-                        p.position.y,
-                        p.position.z
-                    )
-                );
-
-                // Add colors with alpha based on life
-                let alpha = 255 * p.life;
-                trail.geometry.vertexColors.push(
-                    color(
-                        red(trail.color),
-                        green(trail.color),
-                        blue(trail.color),
-                        alpha
-                    )
-                );
-            }
-
-            // Free the geometry for performance
-            freeGeometry(trail.geometry);
         }
 
         function drawTrails() {
-            // Draw all trails as lines
+            // Draw all trails as lines with proper depth testing
             for (let t of trails) {
                 if (t.points.length > 1) {
-                    push();
-                    noFill();
-
-                    // Draw the trail geometry
-                    beginShape();
-                    for (let i = 0; i < t.geometry.vertices.length; i++) {
-                        stroke(t.geometry.vertexColors[i]);
-                        strokeWeight(2 * (t.points[i].life));
-                        vertex(
-                            t.geometry.vertices[i].x,
-                            t.geometry.vertices[i].y,
-                            t.geometry.vertices[i].z
-                        );
+                    // Use LINE_STRIP for connected lines
+                    beginShape(LINE_STRIP);
+                    for (let i = 0; i < t.points.length; i++) {
+                        let p = t.points[i];
+                        let alpha = 255 * p.life;
+                        stroke(red(t.color), green(t.color), blue(t.color), alpha);
+                        strokeWeight(2 * p.life);
+                        vertex(p.position.x, p.position.y, p.position.z);
                     }
                     endShape();
-
-                    pop();
                 }
             }
         }
@@ -337,7 +331,7 @@
             let halfCube = cubeSize / 2;
             let cellX = -halfCube + (x * cellSize) + cellSize/2;
             let cellY = -halfCube + (y * cellSize) + cellSize/2;
-            let cellZ = halfCube;
+            let cellZ = halfCube + 0.5; // Offset to prevent z-fighting
 
             let pos = createVector(cellX, cellY, cellZ);
 
@@ -349,16 +343,16 @@
                     pos.z = -pos.z;
                     break;
                 case 2: // Right
-                    pos = createVector(halfCube, cellY, -cellX);
+                    pos = createVector(cellZ, cellY, -cellX);
                     break;
                 case 3: // Left
-                    pos = createVector(-halfCube, cellY, cellX);
+                    pos = createVector(-cellZ, cellY, cellX);
                     break;
                 case 4: // Top
-                    pos = createVector(cellX, -halfCube, -cellY);
+                    pos = createVector(cellX, -cellZ, -cellY);
                     break;
                 case 5: // Bottom
-                    pos = createVector(cellX, halfCube, cellY);
+                    pos = createVector(cellX, cellZ, cellY);
                     break;
             }
 
