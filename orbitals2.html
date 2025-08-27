@@ -41,10 +41,10 @@
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with Fixed GPU Rendering</div>
+    <div class="title">Orbiting Cube with Fixed Rotation</div>
     <div class="controls">
         <p>Click and drag to orbit the cube</p>
-        <p>Fixed renderer reference and depth testing</p>
+        <p>Fixed rotation and function reference issues</p>
     </div>
     <script>
         let angleX = 0;
@@ -54,24 +54,21 @@
         let inertia = 0.05;
         let impulseStrength = 0.01;
 
-        // Scene geometry
-        let cubeGeometries = [];
+        // Scene elements
         let trails = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
         let lastTime = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
 
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
 
-            // Enable depth testing using the correct p5.js method
+            // Enable depth testing
             setAttributes('depth', true);
-
-            // Create cube geometries for each face (to avoid z-fighting)
-            for (let face = 0; face < 6; face++) {
-                cubeGeometries.push(createFaceGeometry(face));
-            }
 
             // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
@@ -98,108 +95,6 @@
             targetAngleY = 0.5;
         }
 
-        function createFaceGeometry(face) {
-            let g = new p5.Geometry();
-            let halfSize = cubeSize / 2;
-            let halfCell = cellSize / 2;
-            let offset = 0.5; // Small offset to prevent z-fighting
-
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    let x = -halfSize + (i * cellSize) + halfCell;
-                    let y = -halfSize + (j * cellSize) + halfCell;
-                    let z = halfSize + offset;
-
-                    // Define cell color based on position
-                    let cellColor = color(
-                        40 + i * 30,
-                        40 + j * 30,
-                        150,
-                        200
-                    );
-
-                    let dotColor = color(220, 220, 255);
-
-                    // Transform based on face with proper orientation
-                    let positions = [];
-                    switch(face) {
-                        case 0: // Front
-                            positions = [
-                                createVector(x - halfCell, y - halfCell, z),
-                                createVector(x + halfCell, y - halfCell, z),
-                                createVector(x + halfCell, y + halfCell, z),
-                                createVector(x - halfCell, y + halfCell, z),
-                                createVector(x, y, z + 0.5) // Center dot
-                            ];
-                            break;
-                        case 1: // Back
-                            positions = [
-                                createVector(x - halfCell, y - halfCell, -z),
-                                createVector(x + halfCell, y - halfCell, -z),
-                                createVector(x + halfCell, y + halfCell, -z),
-                                createVector(x - halfCell, y + halfCell, -z),
-                                createVector(x, y, -z - 0.5) // Center dot
-                            ];
-                            break;
-                        case 2: // Right
-                            positions = [
-                                createVector(z, y - halfCell, x - halfCell),
-                                createVector(z, y - halfCell, x + halfCell),
-                                createVector(z, y + halfCell, x + halfCell),
-                                createVector(z, y + halfCell, x - halfCell),
-                                createVector(z + 0.5, y, x) // Center dot
-                            ];
-                            break;
-                        case 3: // Left
-                            positions = [
-                                createVector(-z, y - halfCell, x - halfCell),
-                                createVector(-z, y - halfCell, x + halfCell),
-                                createVector(-z, y + halfCell, x + halfCell),
-                                createVector(-z, y + halfCell, x - halfCell),
-                                createVector(-z - 0.5, y, x) // Center dot
-                            ];
-                            break;
-                        case 4: // Top
-                            positions = [
-                                createVector(x - halfCell, -z, y - halfCell),
-                                createVector(x + halfCell, -z, y - halfCell),
-                                createVector(x + halfCell, -z, y + halfCell),
-                                createVector(x - halfCell, -z, y + halfCell),
-                                createVector(x, -z - 0.5, y) // Center dot
-                            ];
-                            break;
-                        case 5: // Bottom
-                            positions = [
-                                createVector(x - halfCell, z, y - halfCell),
-                                createVector(x + halfCell, z, y - halfCell),
-                                createVector(x + halfCell, z, y + halfCell),
-                                createVector(x - halfCell, z, y + halfCell),
-                                createVector(x, z + 0.5, y) // Center dot
-                            ];
-                            break;
-                    }
-
-                    // Add vertices for the cell
-                    for (let k = 0; k < 4; k++) {
-                        g.vertices.push(positions[k]);
-                        g.vertexColors.push(cellColor);
-                    }
-
-                    // Add center dot
-                    g.vertices.push(positions[4]);
-                    g.vertexColors.push(dotColor);
-
-                    // Add faces (two triangles per cell)
-                    let baseIndex = (i * 4 + j) * 5;
-                    g.faces.push([baseIndex, baseIndex + 1, baseIndex + 2]);
-                    g.faces.push([baseIndex, baseIndex + 2, baseIndex + 3]);
-                }
-            }
-
-            freeGeometry(g);
-            return g;
-        }
-
         function draw() {
             // Clear with depth buffer
             clear();
@@ -217,10 +112,11 @@
             angleX = lerp(angleX, targetAngleX, inertia * (deltaTime / 16.67));
             angleY = lerp(angleY, targetAngleY, inertia * (deltaTime / 16.67));
 
+            // Apply rotations
             rotateX(angleX);
             rotateY(angleY);
 
-            // Draw the cube using separate geometries for each face
+            // Draw the cube
             drawCube();
 
             // Update and draw trails
@@ -251,33 +147,80 @@
             push();
             noStroke();
 
-            // Draw each face with its own geometry
+            // Draw each face of the cube
             for (let face = 0; face < 6; face++) {
-                let g = cubeGeometries[face];
+                push();
 
-                // Draw cells
-                beginShape(TRIANGLES);
-                for (let i = 0; i < g.faces.length; i++) {
-                    let faceIndices = g.faces[i];
-                    for (let j = 0; j < 3; j++) {
-                        let idx = faceIndices[j];
-                        fill(g.vertexColors[idx]);
-                        vertex(g.vertices[idx].x, g.vertices[idx].y, g.vertices[idx].z);
-                    }
+                // Position and rotate for each face
+                switch(face) {
+                    case 0: // Front
+                        translate(0, 0, cubeSize/2);
+                        break;
+                    case 1: // Back
+                        translate(0, 0, -cubeSize/2);
+                        rotateY(PI);
+                        break;
+                    case 2: // Right
+                        translate(cubeSize/2, 0, 0);
+                        rotateY(HALF_PI);
+                        break;
+                    case 3: // Left
+                        translate(-cubeSize/2, 0, 0);
+                        rotateY(-HALF_PI);
+                        break;
+                    case 4: // Top
+                        translate(0, -cubeSize/2, 0);
+                        rotateX(HALF_PI);
+                        break;
+                    case 5: // Bottom
+                        translate(0, cubeSize/2, 0);
+                        rotateX(-HALF_PI);
+                        break;
                 }
-                endShape();
 
-                // Draw center dots
-                beginShape(POINTS);
-                strokeWeight(3);
-                for (let i = 4; i < g.vertices.length; i += 5) {
-                    stroke(g.vertexColors[i]);
-                    vertex(g.vertices[i].x, g.vertices[i].y, g.vertices[i].z);
-                }
-                endShape();
+                // Draw grid for this face
+                drawGrid(face);
+
+                pop();
             }
 
             pop();
+        }
+
+        function drawGrid(face) {
+            // Draw the 4x4 grid on the face
+            let halfCube = cubeSize / 2;
+            let halfCell = cellSize / 2;
+
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let x = -halfCube + (i * cellSize) + halfCell;
+                    let y = -halfCube + (j * cellSize) + halfCell;
+
+                    push();
+                    translate(x, y, 0);
+
+                    // Draw cell with gradient color based on position
+                    let cellColor = color(
+                        40 + i * 30,
+                        40 + j * 30,
+                        150,
+                        200
+                    );
+                    fill(cellColor);
+
+                    stroke(70, 90, 150);
+                    strokeWeight(1.5);
+                    box(cellSize - 4, cellSize - 4, 2);
+
+                    // Draw center dot
+                    fill(220, 220, 255);
+                    noStroke();
+                    sphere(3, 8, 8);
+
+                    pop();
+                }
+            }
         }
 
         function updateTrails() {
@@ -357,39 +300,37 @@
                     break;
             }
 
-            // Apply current rotation
-            return applyRotation(pos);
+            return pos;
         }
 
-        function applyRotation(pos) {
-            // Apply the current rotation to a vector
-            let rotated = pos.copy();
+        function mousePressed() {
+            isDragging = true;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            return false;
+        }
 
-            // Rotate around X axis
-            let y = rotated.y;
-            let z = rotated.z;
-            rotated.y = y * cos(angleX) - z * sin(angleX);
-            rotated.z = y * sin(angleX) + z * cos(angleX);
-
-            // Rotate around Y axis
-            let x = rotated.x;
-            z = rotated.z;
-            rotated.x = x * cos(angleY) + z * sin(angleY);
-            rotated.z = -x * sin(angleY) + z * cos(angleY);
-
-            return rotated;
+        function mouseReleased() {
+            isDragging = false;
+            return false;
         }
 
         function mouseDragged() {
-            // Update target angles based on mouse movement with stronger impulse
-            let deltaX = (pmouseY - mouseY) * impulseStrength;
-            let deltaY = (mouseX - pmouseX) * impulseStrength;
+            if (isDragging) {
+                // Update target angles based on mouse movement
+                let deltaX = (lastMouseY - mouseY) * impulseStrength;
+                let deltaY = (mouseX - lastMouseX) * impulseStrength;
 
-            targetAngleX += deltaX;
-            targetAngleY += deltaY;
+                targetAngleX += deltaX;
+                targetAngleY += deltaY;
 
-            // Constrain X rotation to avoid flipping
-            targetAngleX = constrain(targetAngleX, -PI/2, PI/2);
+                // Constrain X rotation to avoid flipping
+                targetAngleX = constrain(targetAngleX, -PI/2, PI/2);
+
+                lastMouseX = mouseX;
+                lastMouseY = mouseY;
+            }
+            return false;
         }
 
         function windowResized() {
