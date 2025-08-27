@@ -41,10 +41,10 @@
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with Fixed GPU Visual Issues</div>
+    <div class="title">Orbiting Cube with Fixed GPU Rendering</div>
     <div class="controls">
         <p>Click and drag to orbit the cube</p>
-        <p>Fixed face orientation and z-fighting issues</p>
+        <p>Fixed renderer reference and depth testing</p>
     </div>
     <script>
         let angleX = 0;
@@ -65,8 +65,8 @@
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
 
-            // Enable depth testing to fix rendering order issues
-            _renderer.GL.enable(_renderer.GL.DEPTH_TEST);
+            // Enable depth testing using the correct p5.js method
+            setAttributes('depth', true);
 
             // Create cube geometries for each face (to avoid z-fighting)
             for (let face = 0; face < 6; face++) {
@@ -269,8 +269,9 @@
 
                 // Draw center dots
                 beginShape(POINTS);
+                strokeWeight(3);
                 for (let i = 4; i < g.vertices.length; i += 5) {
-                    fill(g.vertexColors[i]);
+                    stroke(g.vertexColors[i]);
                     vertex(g.vertices[i].x, g.vertices[i].y, g.vertices[i].z);
                 }
                 endShape();
