@@ -49,8 +49,8 @@
     <script>
         let angleX = 0;
         let angleY = 0;
-        let targetAngleX = 0;
-        let targetAngleY = 0;
+        let targetAngleX = 0.5;
+        let targetAngleY = 0.5;
         let inertia = 0.05;
         let impulseStrength = 0.01;
 
@@ -66,9 +66,6 @@
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
-
-            // Enable depth testing
-            setAttributes('depth', true);
 
             // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
@@ -89,10 +86,6 @@
                     }
                 }
             }
-
-            // Set initial angles for better starting view
-            targetAngleX = 0.5;
-            targetAngleY = 0.5;
         }
 
         function draw() {
@@ -105,7 +98,7 @@
 
             // Smooth rotation with inertia
             let now = millis();
-            let deltaTime = now - lastTime;
+            let deltaTime = max(now - lastTime, 1);
             lastTime = now;
 
             // Frame-rate independent rotation
@@ -128,6 +121,7 @@
             // Draw gradient using multiple circles
             push();
             resetMatrix();
+            drawingContext.save();
             noStroke();
 
             let centerX = width/2;
@@ -140,6 +134,7 @@
                 ellipse(centerX, centerY, r*2, r*2);
             }
 
+            drawingContext.restore();
             pop();
         }
 
@@ -329,8 +324,10 @@
 
                 lastMouseX = mouseX;
                 lastMouseY = mouseY;
+
+                // Prevent default behavior
+                return false;
             }
-            return false;
         }
 
         function windowResized() {
