@@ -41,10 +41,10 @@
     </style>
 </head>
 <body>
-    <div class="title">Orbiting Cube with FreeGeometry Trails</div>
+    <div class="title">Orbiting Cube with Full FreeGeometry Implementation</div>
     <div class="controls">
         <p>Click and drag to orbit the cube</p>
-        <p>Using p5.js 2.0.4 freeGeometry() for efficient trails</p>
+        <p>Entire scene uses freeGeometry() for optimal performance</p>
     </div>
     <script>
         let angleX = 0;
@@ -54,7 +54,8 @@
         let inertia = 0.05;
         let impulseStrength = 0.01;
 
-        // Trail geometry
+        // Scene geometry
+        let cubeGeometry;
         let trails = [];
         let cubeSize = 200;
         let cellSize = cubeSize / 4;
@@ -62,6 +63,9 @@
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
             angleMode(RADIANS);
+
+            // Create cube geometry
+            cubeGeometry = createCubeGeometry();
 
             // Initialize trails for each cell
             for (let face = 0; face < 6; face++) {
@@ -85,10 +89,85 @@
             }
         }
 
-        function createGeometry() {
-            // Create a new geometry for trails
+        function createCubeGeometry() {
             let g = new p5.Geometry();
+            let halfSize = cubeSize / 2;
+            let halfCell = cellSize / 2;
+
+            // Create vertices for all faces
+            for (let face = 0; face < 6; face++) {
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        let x = -halfSize + (i * cellSize) + halfCell;
+                        let y = -halfSize + (j * cellSize) + halfCell;
+                        let z = halfSize;
+
+                        // Transform based on face
+                        let pos;
+                        switch(face) {
+                            case 0: // Front
+                                pos = createVector(x, y, z);
+                                break;
+                            case 1: // Back
+                                pos = createVector(x, y, -z);
+                                break;
+                            case 2: // Right
+                                pos = createVector(z, y, -x);
+                                break;
+                            case 3: // Left
+                                pos = createVector(-z, y, x);
+                                break;
+                            case 4: // Top
+                                pos = createVector(x, -z, -y);
+                                break;
+                            case 5: // Bottom
+                                pos = createVector(x, z, y);
+                                break;
+                        }
+
+                        // Add vertices for the cell
+                        addCellGeometry(g, pos, face, i, j);
+                    }
+                }
+            }
+
+            freeGeometry(g);
             return g;
+        }
+
+        function addCellGeometry(geometry, position, face, i, j) {
+            let halfCell = (cellSize - 4) / 2;
+
+            // Define cell color based on position
+            let cellColor = color(
+                40 + i * 30,
+                40 + j * 30,
+                150,
+                200
+            );
+
+            // Add vertices for the cell box
+            let vertices = [
+                createVector(position.x - halfCell, position.y - halfCell, position.z),
+                createVector(position.x + halfCell, position.y - halfCell, position.z),
+                createVector(position.x + halfCell, position.y + halfCell, position.z),
+                createVector(position.x - halfCell, position.y + halfCell, position.z)
+            ];
+
+            // Add faces with appropriate normals
+            for (let v of vertices) {
+                geometry.vertices.push(v);
+                geometry.vertexColors.push(cellColor);
+            }
+
+            // Add center dot
+            let dotColor = color(220, 220, 255);
+            geometry.vertices.push(position);
+            geometry.vertexColors.push(dotColor);
+        }
+
+        function createGeometry() {
+            return new p5.Geometry();
         }
 
         function draw() {
@@ -105,7 +184,7 @@
             rotateX(angleX);
             rotateY(angleY);
 
-            // Draw the cube with 4x4 cells on each face
+            // Draw the cube using freeGeometry
             drawCube();
 
             // Update and draw trails
@@ -133,78 +212,36 @@
         }
 
         function drawCube() {
-            // Draw each face of the cube
-            for (let face = 0; face < 6; face++) {
-                push();
+            push();
+            noStroke();
 
-                // Position and rotate for each face
-                switch(face) {
-                    case 0: // Front
-                        translate(0, 0, cubeSize/2);
-                        break;
-                    case 1: // Back
-                        translate(0, 0, -cubeSize/2);
-                        rotateY(PI);
-                        break;
-                    case 2: // Right
-                        translate(cubeSize/2, 0, 0);
-                        rotateY(HALF_PI);
-                        break;
-                    case 3: // Left
-                        translate(-cubeSize/2, 0, 0);
-                        rotateY(-HALF_PI);
-                        break;
-                    case 4: // Top
-                        translate(0, -cubeSize/2, 0);
-                        rotateX(HALF_PI);
-                        break;
-                    case 5: // Bottom
-                        translate(0, cubeSize/2, 0);
-                        rotateX(-HALF_PI);
-                        break;
-                }
-
-                // Draw grid for this face
-                drawGrid(face);
-
-                pop();
+            // Draw the cube geometry
+            beginShape(QUADS);
+            for (let i = 0; i < cubeGeometry.vertices.length; i++) {
+                fill(cubeGeometry.vertexColors[i]);
+                vertex(
+                    cubeGeometry.vertices[i].x,
+                    cubeGeometry.vertices[i].y,
+                    cubeGeometry.vertices[i].z
+                );
             }
-        }
+            endShape();
 
-        function drawGrid(face) {
-            // Draw the 4x4 grid on the face
-            let halfCube = cubeSize / 2;
-            let halfCell = cellSize / 2;
-
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    let x = -halfCube + (i * cellSize) + halfCell;
-                    let y = -halfCube + (j * cellSize) + halfCell;
-
-                    push();
-                    translate(x, y, 0);
-
-                    // Draw cell with gradient color based on position
-                    let cellColor = color(
-                        40 + i * 30,
-                        40 + j * 30,
-                        150,
-                        200
+            // Draw center dots
+            beginShape(POINTS);
+            for (let i = 0; i < cubeGeometry.vertices.length; i++) {
+                if (i % 5 === 4) { // Every 5th vertex is a center dot
+                    fill(cubeGeometry.vertexColors[i]);
+                    vertex(
+                        cubeGeometry.vertices[i].x,
+                        cubeGeometry.vertices[i].y,
+                        cubeGeometry.vertices[i].z
                     );
-                    fill(cellColor);
-
-                    stroke(70, 90, 150);
-                    strokeWeight(1.5);
-                    box(cellSize - 4, cellSize - 4, 2);
-
-                    // Draw center dot
-                    fill(220, 220, 255);
-                    noStroke();
-                    sphere(3, 8, 8);
-
-                    pop();
                 }
             }
+            endShape();
+
+            pop();
         }
 
         function updateTrails() {
