@@ -276,7 +276,7 @@ function draw() {
   }
 
   // Display frame rate (not Conway speed)
-  select('#framecount').html('<h2> ' + frameRate().toFixed(1) + ' FPS </h2>');
+  select('#framecount').html('<h2> ' + frameRate(60).toFixed(1) + ' FPS </h2>');
 }
 
 function initializeConwayGrid() {
