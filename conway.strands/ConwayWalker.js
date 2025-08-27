@@ -1,7 +1,7 @@
 // John Conway Game of Life in 3D Cube with Barnes-Hut Gravitational Trails
 
 let colorsArray = [], cnt, cnvs;
-let cellSize = 12;
+let cellSize = 24; // Increased cell size for larger cube
 let gridSize = 12; // Size of the Conway grid (gridSize x gridSize x gridSize)
 let currentCells = [], nextCells = [];
 let slider;
@@ -14,7 +14,7 @@ let autoRotation = true;
 let theta = 0.5; // Barnes-Hut parameter
 let time = 0;
 
-// Barnes-Hut Octree classes (unchanged from your original)
+// Barnes-Hut Octree classes
 class Octree {
   constructor(boundary, capacity = 8) {
     this.boundary = boundary;
@@ -145,16 +145,17 @@ class Particle {
   constructor(x, y, z, mass, color) {
     this.position = {x, y, z};
     this.velocity = {
-      x: (Math.random() - 0.5) * 2,
-      y: (Math.random() - 0.5) * 2,
-      z: (Math.random() - 0.5) * 2
+      x: (Math.random() - 0.5) * 0.5, // Reduced initial velocity
+      y: (Math.random() - 0.5) * 0.5,
+      z: (Math.random() - 0.5) * 0.5
     };
     this.acceleration = {x: 0, y: 0, z: 0};
     this.mass = mass;
     this.color = color;
-    this.maxSpeed = 4;
+    this.maxSpeed = 2; // Reduced max speed
     this.trail = [];
-    this.trailLength = 20;
+    this.trailLength = 15; // Reduced trail length
+    this.size = cellSize * 0.6; // Particle size matches cell size
   }
 
   update() {
@@ -202,6 +203,7 @@ class Cell {
     this.nextState = state;
     this.color = '#FFFFFF';
     this.age = 0;
+    this.isOnFace = false; // Track if cell is on cube face
   }
 
   setColorFromPalette(colors) {
@@ -238,6 +240,10 @@ function setup() {
   slider = createSlider(1, 60, 30, 1);
   slider.position(100, 220);
   slider.size(220);
+  slider.input(() => {
+    // Only control Conway simulation speed
+    // No need to change frameRate here as it's handled in draw()
+  });
 
   // Initialize 3D Conway grid
   initializeConwayGrid();
@@ -250,14 +256,10 @@ function setup() {
 
 function draw() {
   time++;
-  let rv = slider.value();
-  frameRate(rv);
+  let conwaySpeed = slider.value();
 
-  frc = frameCount;
-  select('#framecount').html('<h2> ' + frc + ' </h2>');
-
-  // Update Conway simulation every 10 frames
-  if (frameCount % 10 === 0) {
+  // Update Conway simulation based on slider value
+  if (frameCount % Math.max(1, Math.floor(60 / conwaySpeed)) === 0) {
     updateConway();
     createParticlesFromAliveCells();
   }
@@ -272,6 +274,9 @@ function draw() {
   if (isDragging) {
     handleRotation();
   }
+
+  // Display frame rate (not Conway speed)
+  select('#framecount').html('<h2> ' + frameRate().toFixed(1) + ' FPS </h2>');
 }
 
 function initializeConwayGrid() {
@@ -283,14 +288,25 @@ function initializeConwayGrid() {
     for (let y = 0; y < gridSize; y++) {
       currentCells[x][y] = [];
       for (let z = 0; z < gridSize; z++) {
-        // Create a random initial state
-        const state = Math.random() > 0.85;
-        currentCells[x][y][z] = new Cell(
+        // Only create cells on the faces of the cube
+        const isOnFace = (
+          x === 0 || x === gridSize - 1 ||
+          y === 0 || y === gridSize - 1 ||
+          z === 0 || z === gridSize - 1
+        );
+
+        // Create a random initial state only for face cells
+        const state = isOnFace && Math.random() > 0.7;
+
+        const cell = new Cell(
           x * cellSize - gridOffset,
           y * cellSize - gridOffset,
           z * cellSize - gridOffset,
           state
         );
+
+        cell.isOnFace = isOnFace;
+        currentCells[x][y][z] = cell;
       }
     }
   }
@@ -307,6 +323,18 @@ function updateConway() {
       nextCells[x][y] = [];
       for (let z = 0; z < gridSize; z++) {
         const currentCell = currentCells[x][y][z];
+
+        // Only update cells on the faces
+        if (!currentCell.isOnFace) {
+          nextCells[x][y][z] = new Cell(
+            x * cellSize - gridOffset,
+            y * cellSize - gridOffset,
+            z * cellSize - gridOffset,
+            false
+          );
+          continue;
+        }
+
         const neighbors = countNeighbors(x, y, z);
         let nextState = false;
 
@@ -318,18 +346,21 @@ function updateConway() {
           nextState = true; // Birth
         }
 
-        nextCells[x][y][z] = new Cell(
+        const nextCell = new Cell(
           x * cellSize - gridOffset,
           y * cellSize - gridOffset,
           z * cellSize - gridOffset,
           nextState
         );
 
+        nextCell.isOnFace = true;
+
         if (nextState) {
-          nextCells[x][y][z].age = currentCell.state ? currentCell.age + 1 : 0;
+          nextCell.age = currentCell.state ? currentCell.age + 1 : 0;
         }
 
-        nextCells[x][y][z].setColorFromPalette(colorsArray);
+        nextCell.setColorFromPalette(colorsArray);
+        nextCells[x][y][z] = nextCell;
       }
     }
   }
@@ -350,7 +381,7 @@ function countNeighbors(x, y, z) {
         const nz = (z + dz + gridSize) % gridSize;
 
         if (currentCells[nx] && currentCells[nx][ny] && currentCells[nx][ny][nz]) {
-          if (currentCells[nx][ny][nz].state) {
+          if (currentCells[nx][ny][nz].state && currentCells[nx][ny][nz].isOnFace) {
             count++;
           }
         }
@@ -362,19 +393,19 @@ function countNeighbors(x, y, z) {
 
 function createParticlesFromAliveCells() {
   // Only add new particles occasionally to prevent overcrowding
-  if (frameCount % 5 !== 0) return;
+  if (frameCount % 10 !== 0) return;
 
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
       for (let z = 0; z < gridSize; z++) {
         const cell = currentCells[x][y][z];
-        if (cell.state && Math.random() > 0.7) {
+        if (cell.state && cell.isOnFace && Math.random() > 0.8) {
           const colorIndex = cell.age % colorsArray.length;
-          const mass = 5 + Math.random() * 10;
+          const mass = 8 + Math.random() * 8;
           particles.push(new Particle(
-            cell.x + (Math.random() - 0.5) * 5,
-            cell.y + (Math.random() - 0.5) * 5,
-            cell.z + (Math.random() - 0.5) * 5,
+            cell.x,
+            cell.y,
+            cell.z,
             mass,
             colorsArray[colorIndex]
           ));
@@ -384,8 +415,8 @@ function createParticlesFromAliveCells() {
   }
 
   // Limit total particles to prevent performance issues
-  if (particles.length > 200) {
-    particles = particles.slice(particles.length - 200);
+  if (particles.length > 150) {
+    particles = particles.slice(particles.length - 150);
   }
 }
 
@@ -460,6 +491,11 @@ function createElts() {
   instructions.position(windowWidth - 350, 29);
   instructions.style('color', 'white');
   instructions.style('font-family', 'monospace');
+
+  let conwayLabel = createDiv('CONWAY SPEED:').parent('#footer');
+  conwayLabel.position(100, 60);
+  conwayLabel.style('color', 'white');
+  conwayLabel.style('font-family', 'monospace');
 
   updateColorPreview();
 }
@@ -538,7 +574,7 @@ function applyAutoRotation() {
 
 function updatePhysics() {
   // Create Octree for Barnes-Hut
-  const boundary = new Boundary(0, 0, 0, 300, 300, 300);
+  const boundary = new Boundary(0, 0, 0, 600, 600, 600); // Larger boundary for bigger cube
   const octree = new Octree(boundary);
 
   // Insert all particles into Octree
@@ -583,7 +619,7 @@ function drawConwayCells() {
     for (let y = 0; y < gridSize; y++) {
       for (let z = 0; z < gridSize; z++) {
         const cell = currentCells[x][y][z];
-        if (cell.state) {
+        if (cell.state && cell.isOnFace) {
           push();
           translate(cell.x, cell.y, cell.z);
           fill(cell.color);
@@ -608,27 +644,26 @@ function drawCubeFramework() {
 
 function drawParticlesWithTrails() {
   for (let particle of particles) {
-    // Draw trail
+    // Draw trail with fading effect
     push();
     noFill();
-    stroke(particle.color);
-    strokeWeight(1);
     beginShape();
     for (let i = 0; i < particle.trail.length; i++) {
       let point = particle.trail[i];
       let alpha = map(i, 0, particle.trail.length, 50, 200);
-      stroke(particle.color);
+      stroke(red(particle.color), green(particle.color), blue(particle.color), alpha);
+      strokeWeight(map(i, 0, particle.trail.length, 1, 3));
       vertex(point.x, point.y, point.z);
     }
     endShape();
     pop();
 
-    // Draw particle
+    // Draw particle as a cube (same as alive cells)
     push();
     translate(particle.position.x, particle.position.y, particle.position.z);
     fill(particle.color);
     noStroke();
-    sphere(particle.mass / 5);
+    box(particle.size);
     pop();
   }
 }
