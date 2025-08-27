@@ -1,10 +1,8 @@
-// John Conway Game of Life in 3D Cube with Noise Walkers
-// John Conway Game of Life in 3D Cube with Custom Noise Walkers
+// John Conway Game of Life in 3D Cube with Barnes-Hut Gravitational Trails
 
-// 3D Barnes-Hut Gravitational Cube
 let colorsArray = [], cnt, cnvs;
 let cellSize = 12;
-let columnCount, rowCount;
+let gridSize = 12; // Size of the Conway grid (gridSize x gridSize x gridSize)
 let currentCells = [], nextCells = [];
 let slider;
 let rotationX = Math.PI / 6, rotationY = Math.PI / 4, rotationZ = 0;
@@ -14,16 +12,17 @@ let inertiaX = 0, inertiaY = 0;
 let particles = [];
 let autoRotation = true;
 let theta = 0.5; // Barnes-Hut parameter
+let time = 0;
 
-// Barnes-Hut QuadTree for 3D (Octree)
+// Barnes-Hut Octree classes (unchanged from your original)
 class Octree {
   constructor(boundary, capacity = 8) {
-    this.boundary = boundary; // {x, y, z, w, h, d}
+    this.boundary = boundary;
     this.capacity = capacity;
     this.particles = [];
     this.divided = false;
     this.mass = 0;
-    this.com = {x: 0, y: 0, z: 0}; // Center of mass
+    this.com = {x: 0, y: 0, z: 0};
   }
 
   insert(particle) {
@@ -57,7 +56,6 @@ class Octree {
     const h = this.boundary.h / 2;
     const d = this.boundary.d / 2;
 
-    // Create 8 octants
     const nef = new Boundary(x + w/2, y - h/2, z - d/2, w, h, d);
     const nwf = new Boundary(x - w/2, y - h/2, z - d/2, w, h, d);
     const sef = new Boundary(x + w/2, y + h/2, z - d/2, w, h, d);
@@ -78,7 +76,6 @@ class Octree {
 
     this.divided = true;
 
-    // Move existing particles to appropriate children
     for (let p of this.particles) {
       this.insert(p);
     }
@@ -99,9 +96,8 @@ class Octree {
     const dx = this.com.x - particle.position.x;
     const dy = this.com.y - particle.position.y;
     const dz = this.com.z - particle.position.z;
-    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 1; // Avoid division by zero
+    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 1;
 
-    // If node is far enough or is a leaf node, use approximation
     const s = Math.max(this.boundary.w, this.boundary.h, this.boundary.d);
     if (s / dist < theta || !this.divided) {
       if (dist > 0) {
@@ -115,7 +111,6 @@ class Octree {
       return {x: 0, y: 0, z: 0};
     }
 
-    // Otherwise, traverse children
     let force = {x: 0, y: 0, z: 0};
     if (this.divided) {
       force = this.northeastFront.calculateForce(particle, G);
@@ -167,7 +162,6 @@ class Particle {
     this.velocity.y += this.acceleration.y;
     this.velocity.z += this.acceleration.z;
 
-    // Limit velocity
     const speed = Math.sqrt(
       this.velocity.x*this.velocity.x +
       this.velocity.y*this.velocity.y +
@@ -183,13 +177,11 @@ class Particle {
     this.position.y += this.velocity.y;
     this.position.z += this.velocity.z;
 
-    // Add to trail
     this.trail.push({...this.position});
     if (this.trail.length > this.trailLength) {
       this.trail.shift();
     }
 
-    // Reset acceleration
     this.acceleration = {x: 0, y: 0, z: 0};
   }
 
@@ -200,7 +192,29 @@ class Particle {
   }
 }
 
+// Conway Cell Class
+class Cell {
+  constructor(x, y, z, state = false) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.state = state;
+    this.nextState = state;
+    this.color = '#FFFFFF';
+    this.age = 0;
+  }
+
+  setColorFromPalette(colors) {
+    if (this.state && colors.length > 0) {
+      this.color = colors[this.age % colors.length];
+    } else {
+      this.color = '#FFFFFF';
+    }
+  }
+}
+
 function preload() {
+  // Color palette initialization
   customColors = [
     '#FF6B6B', '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B',
     '#4ECDC4', '#45B7D1', '#F9C80E', '#FF6B6B', '#4ECDC4',
@@ -216,7 +230,7 @@ function preload() {
 }
 
 function setup() {
-  createElts(); // This is now defined globally
+  createElts();
 
   cnvs = createCanvas(windowWidth, windowHeight - 220, WEBGL);
   cnvs.parent(cnt).position(0, 120);
@@ -225,20 +239,28 @@ function setup() {
   slider.position(100, 220);
   slider.size(220);
 
-  columnCount = 12;
-  rowCount = 12;
+  // Initialize 3D Conway grid
+  initializeConwayGrid();
 
-  // Create initial particles on cube faces
-  createParticlesOnCube();
+  // Create initial particles from alive cells
+  createParticlesFromAliveCells();
+
   assignColors();
 }
 
 function draw() {
+  time++;
   let rv = slider.value();
   frameRate(rv);
 
   frc = frameCount;
   select('#framecount').html('<h2> ' + frc + ' </h2>');
+
+  // Update Conway simulation every 10 frames
+  if (frameCount % 10 === 0) {
+    updateConway();
+    createParticlesFromAliveCells();
+  }
 
   // Update physics
   updatePhysics();
@@ -252,7 +274,121 @@ function draw() {
   }
 }
 
-// Keep the assignColors function simple and working:
+function initializeConwayGrid() {
+  currentCells = [];
+  const gridOffset = (gridSize - 1) * cellSize / 2;
+
+  for (let x = 0; x < gridSize; x++) {
+    currentCells[x] = [];
+    for (let y = 0; y < gridSize; y++) {
+      currentCells[x][y] = [];
+      for (let z = 0; z < gridSize; z++) {
+        // Create a random initial state
+        const state = Math.random() > 0.85;
+        currentCells[x][y][z] = new Cell(
+          x * cellSize - gridOffset,
+          y * cellSize - gridOffset,
+          z * cellSize - gridOffset,
+          state
+        );
+      }
+    }
+  }
+}
+
+function updateConway() {
+  // Create next generation
+  nextCells = [];
+  const gridOffset = (gridSize - 1) * cellSize / 2;
+
+  for (let x = 0; x < gridSize; x++) {
+    nextCells[x] = [];
+    for (let y = 0; y < gridSize; y++) {
+      nextCells[x][y] = [];
+      for (let z = 0; z < gridSize; z++) {
+        const currentCell = currentCells[x][y][z];
+        const neighbors = countNeighbors(x, y, z);
+        let nextState = false;
+
+        // Conway's Game of Life rules
+        if (currentCell.state && (neighbors === 2 || neighbors === 3)) {
+          nextState = true; // Survival
+          currentCell.age++;
+        } else if (!currentCell.state && neighbors === 3) {
+          nextState = true; // Birth
+        }
+
+        nextCells[x][y][z] = new Cell(
+          x * cellSize - gridOffset,
+          y * cellSize - gridOffset,
+          z * cellSize - gridOffset,
+          nextState
+        );
+
+        if (nextState) {
+          nextCells[x][y][z].age = currentCell.state ? currentCell.age + 1 : 0;
+        }
+
+        nextCells[x][y][z].setColorFromPalette(colorsArray);
+      }
+    }
+  }
+
+  // Replace current generation with next generation
+  currentCells = nextCells;
+}
+
+function countNeighbors(x, y, z) {
+  let count = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        if (dx === 0 && dy === 0 && dz === 0) continue;
+
+        const nx = (x + dx + gridSize) % gridSize;
+        const ny = (y + dy + gridSize) % gridSize;
+        const nz = (z + dz + gridSize) % gridSize;
+
+        if (currentCells[nx] && currentCells[nx][ny] && currentCells[nx][ny][nz]) {
+          if (currentCells[nx][ny][nz].state) {
+            count++;
+          }
+        }
+      }
+    }
+  }
+  return count;
+}
+
+function createParticlesFromAliveCells() {
+  // Only add new particles occasionally to prevent overcrowding
+  if (frameCount % 5 !== 0) return;
+
+  for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let z = 0; z < gridSize; z++) {
+        const cell = currentCells[x][y][z];
+        if (cell.state && Math.random() > 0.7) {
+          const colorIndex = cell.age % colorsArray.length;
+          const mass = 5 + Math.random() * 10;
+          particles.push(new Particle(
+            cell.x + (Math.random() - 0.5) * 5,
+            cell.y + (Math.random() - 0.5) * 5,
+            cell.z + (Math.random() - 0.5) * 5,
+            mass,
+            colorsArray[colorIndex]
+          ));
+        }
+      }
+    }
+  }
+
+  // Limit total particles to prevent performance issues
+  if (particles.length > 200) {
+    particles = particles.slice(particles.length - 200);
+  }
+}
+
 function assignColors() {
   // Vibrant distinct colors
   const vibrantColors = [
@@ -272,10 +408,19 @@ function assignColors() {
 
   colorsArray = shuffled.slice(0, 5);
   console.log('New color palette:', colorsArray);
+
+  // Update cell colors with new palette
+  for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let z = 0; z < gridSize; z++) {
+        currentCells[x][y][z].setColorFromPalette(colorsArray);
+      }
+    }
+  }
+
   updateColorPreview();
 }
 
-// Moved createElts outside of assignColors to make it globally accessible
 function createElts() {
   select('body').style('margin', '0').style('overflow', 'hidden');
 
@@ -368,7 +513,6 @@ function mouseReleased() {
 
 function mouseClicked() {
   assignColors();
-  initNoiseWalkers();
 }
 
 function windowResized() {
@@ -390,42 +534,6 @@ function applyAutoRotation() {
 
   if (Math.abs(inertiaX) < 0.0001) inertiaX = 0;
   if (Math.abs(inertiaY) < 0.0001) inertiaY = 0;
-}
-
-function createParticlesOnCube() {
-  particles = [];
-  const cubeSize = 150;
-  const spacing = cubeSize / 10;
-
-  // Create particles on all 6 faces of the cube
-  const faces = [
-    { normal: [1, 0, 0], offset: cubeSize/2 },   // Right
-    { normal: [-1, 0, 0], offset: -cubeSize/2 }, // Left
-    { normal: [0, 1, 0], offset: cubeSize/2 },   // Top
-    { normal: [0, -1, 0], offset: -cubeSize/2 }, // Bottom
-    { normal: [0, 0, 1], offset: cubeSize/2 },   // Front
-    { normal: [0, 0, -1], offset: -cubeSize/2 }  // Back
-  ];
-
-  for (let face of faces) {
-    for (let i = -5; i <= 5; i++) {
-      for (let j = -5; j <= 5; j++) {
-        if (Math.random() > 0.7) {
-          let x = i * spacing;
-          let y = j * spacing;
-          let z = face.offset;
-
-          // Adjust based on face normal
-          if (face.normal[0] !== 0) [x, y, z] = [face.offset, y, x];
-          if (face.normal[1] !== 0) [x, y, z] = [x, face.offset, y];
-
-          let colorIndex = Math.floor(Math.random() * colorsArray.length);
-          let mass = 10 + Math.random() * 20;
-          particles.push(new Particle(x, y, z, mass, colorsArray[colorIndex]));
-        }
-      }
-    }
-  }
 }
 
 function updatePhysics() {
@@ -457,11 +565,36 @@ function drawScene() {
   directionalLight(255, 255, 255, 0, -1, 0);
   directionalLight(200, 200, 200, 0, 1, 0);
 
-  // Draw cube framework
-  drawCubeFramework();
+  // Draw Conway cells
+  drawConwayCells();
 
   // Draw particles with trails
   drawParticlesWithTrails();
+
+  // Draw cube framework
+  drawCubeFramework();
+}
+
+function drawConwayCells() {
+  push();
+  noStroke();
+
+  for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let z = 0; z < gridSize; z++) {
+        const cell = currentCells[x][y][z];
+        if (cell.state) {
+          push();
+          translate(cell.x, cell.y, cell.z);
+          fill(cell.color);
+          box(cellSize * 0.8);
+          pop();
+        }
+      }
+    }
+  }
+
+  pop();
 }
 
 function drawCubeFramework() {
@@ -469,7 +602,7 @@ function drawCubeFramework() {
   stroke(100, 100, 100, 100);
   strokeWeight(1);
   noFill();
-  box(300, 300, 300);
+  box(gridSize * cellSize + 10);
   pop();
 }
 
@@ -498,101 +631,4 @@ function drawParticlesWithTrails() {
     sphere(particle.mass / 5);
     pop();
   }
-}
-
-// Custom noise function (simplified Perlin noise alternative)
-function customNoise(x, y, z = 0) {
-  // Simple hash-based noise function
-  function fract(x) { return x - Math.floor(x); }
-  function mix(a, b, t) { return a * (1 - t) + b * t; }
-
-  let ix = Math.floor(x);
-  let iy = Math.floor(y);
-  let iz = Math.floor(z);
-
-  let fx = fract(x);
-  let fy = fract(y);
-  let fz = fract(z);
-
-  // Simple interpolation
-  let n000 = hash(ix, iy, iz);
-  let n100 = hash(ix + 1, iy, iz);
-  let n010 = hash(ix, iy + 1, iz);
-  let n110 = hash(ix + 1, iy + 1, iz);
-  let n001 = hash(ix, iy, iz + 1);
-  let n101 = hash(ix + 1, iy, iz + 1);
-  let n011 = hash(ix, iy + 1, iz + 1);
-  let n111 = hash(ix + 1, iy + 1, iz + 1);
-
-  // Tri-linear interpolation
-  let nx00 = mix(n000, n100, fx);
-  let nx10 = mix(n010, n110, fx);
-  let nx01 = mix(n001, n101, fx);
-  let nx11 = mix(n011, n111, fx);
-
-  let nxy0 = mix(nx00, nx10, fy);
-  let nxy1 = mix(nx01, nx11, fy);
-
-  return mix(nxy0, nxy1, fz);
-}
-
-function hash(x, y, z) {
-  // Simple hash function
-  let seed = x * 374761393 + y * 668265263 + z * 1103515245;
-  seed = (seed ^ (seed >> 13)) * 1274126177;
-  return (seed ^ (seed >> 16)) * 0.5 + 0.5; // Returns 0-1
-}
-
-// Add this new function for footprint trails:
-function drawFootprintTrails() {
-  push();
-  noStroke();
-  blendMode(ADD);
-
-  for (let walker of noiseWalkers) {
-    if (walker.alive) {
-      // Create fading footprints along the orbital path
-      for (let i = 0; i < 3; i++) {
-        let trailAge = walker.age - i * 5;
-        if (trailAge > 0) {
-          push();
-
-          // Calculate trail position based on previous noise values
-          let trailTime = time - i * 0.2;
-          let trailX = customNoise(
-            trailTime * walker.noiseSpeed + walker.noiseSeed,
-            walker.noiseSeed * 0.5,
-            walker.noiseSeed * 1.5
-          );
-          let trailY = customNoise(
-            trailTime * walker.noiseSpeed + walker.noiseSeed * 2,
-            walker.noiseSeed * 1.5,
-            walker.noiseSeed * 2.5
-          );
-          let trailZ = customNoise(
-            trailTime * walker.noiseSpeed + walker.noiseSeed * 3,
-            walker.noiseSeed * 2.5,
-            walker.noiseSeed * 3.5
-          );
-
-          translate(
-            walker.baseX + (trailX * 2 - 1) * walker.amplitude,
-            walker.baseY + (trailY * 2 - 1) * walker.amplitude,
-            walker.baseZ + (trailZ * 2 - 1) * walker.amplitude
-          );
-
-          let alpha = 100 - i * 30;
-          let trailColor = color(walker.color);
-          trailColor.setAlpha(alpha);
-          fill(trailColor);
-
-          box(cellSize * 0.4);
-          pop();
-        }
-      }
-    }
-  }
-
-  blendMode(BLEND);
-  pop();
 }
