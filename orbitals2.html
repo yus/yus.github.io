@@ -64,9 +64,9 @@
         let lastMouseY = 0;
 
         // Geometry objects for optimization
-        let cubeGeometry;
         let cellGeometry;
         let sphereGeometry;
+        let shouldFreeGeometry = false;
 
         function setup() {
             createCanvas(windowWidth * 0.9, windowHeight * 0.9, WEBGL);
@@ -202,6 +202,14 @@
             // Update and draw trails
             updateTrails();
             drawTrails();
+
+            // Free geometry if needed (for demonstration)
+            if (shouldFreeGeometry) {
+                freeGeometry(cellGeometry);
+                freeGeometry(sphereGeometry);
+                shouldFreeGeometry = false;
+                console.log("Geometry freed from GPU memory");
+            }
         }
 
         function drawGradientBackground() {
@@ -294,11 +302,13 @@
                     strokeWeight(1.5);
 
                     // Use the precomputed geometry for better performance
+                    // Draw the shape
                     model(cellGeometry);
 
                     // Draw center dot
                     fill(220, 220, 255);
                     noStroke();
+                    // Draw the shape
                     model(sphereGeometry);
 
                     pop();
@@ -418,19 +428,23 @@
             }
         }
 
+        function keyPressed() {
+            // Press 'f' to free geometry (for demonstration)
+            if (key === 'f' || key === 'F') {
+                shouldFreeGeometry = true;
+                return false;
+            }
+        }
+
         function windowResized() {
             resizeCanvas(windowWidth * 0.9, windowHeight * 0.9);
         }
 
-        // Clean up geometry when sketch is removed
-        function remove() {
-            if (cellGeometry) {
-                cellGeometry.freeGeometry();
-            }
-            if (sphereGeometry) {
-                sphereGeometry.freeGeometry();
-            }
-        }
+        // Clean up geometry when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            freeGeometry(cellGeometry);
+            freeGeometry(sphereGeometry);
+        });
     </script>
 </body>
 </html>
