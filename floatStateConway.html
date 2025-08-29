@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conway's Game of Life with Floating States</title>
+    <title>Conway's Game of Life with Patterns</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.4/p5.min.js"></script>
     <style>
         body {
@@ -18,7 +18,7 @@
             font-family: 'Arial', sans-serif;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             text-align: center;
         }
         h1 {
@@ -53,6 +53,39 @@
         }
         button:hover {
             background-color: #3a56d4;
+        }
+        .pattern-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .pattern-btn {
+            width: 80px;
+            height: 80px;
+            background-color: #2a2a4a;
+            border: 2px solid #4cc9f0;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .pattern-btn:hover {
+            transform: scale(1.05);
+            background-color: #3a3a5a;
+        }
+        .pattern-btn img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        .pattern-btn span {
+            margin-top: 5px;
+            font-size: 12px;
         }
         .slider-container {
             margin: 10px 0;
@@ -99,6 +132,84 @@
             <button id="next-btn">Next</button>
         </div>
 
+        <div class="pattern-buttons">
+            <div class="pattern-btn" id="glider-btn">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="50" width="20" height="20" fill="#4cc9f0" />
+                </svg>
+                <span>Glider</span>
+            </div>
+            <div class="pattern-btn" id="blinker-btn">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
+                </svg>
+                <span>Blinker</span>
+            </div>
+            <div class="pattern-btn" id="beacon-btn">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <rect x="10" y="10" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="50" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="70" y="50" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="70" width="20" height="20" fill="#4cc9f0" />
+                </svg>
+                <span>Beacon</span>
+            </div>
+            <div class="pattern-btn" id="pulsar-btn">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <!-- Vertical bars -->
+                    <rect x="20" y="10" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="20" y="30" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="20" y="40" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="20" y="60" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="20" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="20" y="90" width="10" height="10" fill="#4cc9f0" />
+
+                    <rect x="70" y="10" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="30" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="40" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="60" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="90" width="10" height="10" fill="#4cc9f0" />
+
+                    <!-- Horizontal bars -->
+                    <rect x="10" y="20" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="30" y="20" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="40" y="20" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="60" y="20" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="20" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="90" y="20" width="10" height="10" fill="#4cc9f0" />
+
+                    <rect x="10" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="30" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="40" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="60" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="70" y="70" width="10" height="10" fill="#4cc9f0" />
+                    <rect x="90" y="70" width="10" height="10" fill="#4cc9f0" />
+                </svg>
+                <span>Pulsar</span>
+            </div>
+            <div class="pattern-btn" id="lwss-btn">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <rect x="10" y="20" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="10" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="50" y="40" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="30" y="40" width="20" height="20" fill="#4cc9f0" />
+                    <rect x="10" y="40" width="20" height="20" fill="#4cc9f0" />
+                </svg>
+                <span>Lightweight Spaceship</span>
+            </div>
+        </div>
+
         <div class="slider-container">
             <label for="speed-slider">Speed:</label>
             <input type="range" id="speed-slider" min="1" max="20" value="10">
@@ -123,14 +234,15 @@
     <script>
         let grid;
         let nextGrid;
-        const rows = 15;
-        const cols = 15;
+        const rows = 30;
+        const cols = 30;
         let cellSize;
         let isPaused = true;
         let currentPaletteIndex = 0;
         let lastInteractionTime = 0;
         let paletteAge = 0;
         let frameRateValue = 10;
+        let selectedPattern = null;
 
         // Define color palettes
         const palettes = [
@@ -141,9 +253,48 @@
             { name: "Sunshine", colors: ['#ff9e00', '#ffd000', '#f6ff00', '#c8ff00', '#93ff00'] }
         ];
 
+        // Pattern definitions
+        const patterns = {
+            glider: [
+                [0, 1, 0],
+                [0, 0, 1],
+                [1, 1, 1]
+            ],
+            blinker: [
+                [1, 1, 1]
+            ],
+            beacon: [
+                [1, 1, 0, 0],
+                [1, 1, 0, 0],
+                [0, 0, 1, 1],
+                [0, 0, 1, 1]
+            ],
+            pulsar: [
+                [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+            ],
+            lwss: [
+                [0, 1, 1, 1, 1],
+                [1, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [1, 0, 0, 1, 0]
+            ]
+        };
+
         function setup() {
             const canvasContainer = document.getElementById('canvas-container');
-            const canvas = createCanvas(400, 400);
+            const canvas = createCanvas(600, 600);
             canvas.parent('canvas-container');
 
             cellSize = width / cols;
@@ -156,6 +307,13 @@
             document.getElementById('random-btn').addEventListener('click', randomizeGrid);
             document.getElementById('pause-btn').addEventListener('click', togglePause);
             document.getElementById('next-btn').addEventListener('click', nextGeneration);
+
+            // Setup pattern buttons
+            document.getElementById('glider-btn').addEventListener('click', () => { selectedPattern = 'glider'; });
+            document.getElementById('blinker-btn').addEventListener('click', () => { selectedPattern = 'blinker'; });
+            document.getElementById('beacon-btn').addEventListener('click', () => { selectedPattern = 'beacon'; });
+            document.getElementById('pulsar-btn').addEventListener('click', () => { selectedPattern = 'pulsar'; });
+            document.getElementById('lwss-btn').addEventListener('click', () => { selectedPattern = 'lwss'; });
 
             // Setup speed slider
             const speedSlider = document.getElementById('speed-slider');
@@ -180,6 +338,7 @@
 
             lastInteractionTime = millis();
             paletteAge = 0;
+            selectedPattern = null;
             updatePaletteDisplay();
         }
 
@@ -299,17 +458,46 @@
                 let i = floor(mouseX / cellSize);
                 let j = floor(mouseY / cellSize);
 
-                // Set the clicked cell to the next state
-                let currentState = grid[i][j];
-                grid[i][j] = (currentState + 0.25) % 1.25;
-                if (grid[i][j] === 0.25) {
+                if (selectedPattern) {
+                    // Place the selected pattern
+                    placePattern(selectedPattern, i, j);
                     // Change palette for new cells
                     currentPaletteIndex = (currentPaletteIndex + 1) % palettes.length;
                     updatePaletteDisplay();
+                } else {
+                    // Set the clicked cell to the next state
+                    let currentState = grid[i][j];
+                    grid[i][j] = (currentState + 0.25) % 1.25;
+                    if (grid[i][j] === 0.25) {
+                        // Change palette for new cells
+                        currentPaletteIndex = (currentPaletteIndex + 1) % palettes.length;
+                        updatePaletteDisplay();
+                    }
                 }
 
                 // Update interaction time
                 lastInteractionTime = millis();
+            }
+        }
+
+        function placePattern(patternName, x, y) {
+            const pattern = patterns[patternName];
+            const patternHeight = pattern.length;
+            const patternWidth = pattern[0].length;
+
+            // Center the pattern on the click position
+            const startX = x - floor(patternWidth / 2);
+            const startY = y - floor(patternHeight / 2);
+
+            for (let i = 0; i < patternHeight; i++) {
+                for (let j = 0; j < patternWidth; j++) {
+                    const cellX = (startX + j + cols) % cols;
+                    const cellY = (startY + i + rows) % rows;
+
+                    if (pattern[i][j] === 1) {
+                        grid[cellX][cellY] = 0.25; // Newborn state
+                    }
+                }
             }
         }
 
@@ -339,6 +527,10 @@
                 initializeGrid();
             } else if (key === 'n') {
                 nextGeneration();
+            } else if (key === 'g') {
+                selectedPattern = 'glider';
+            } else if (key === 'b') {
+                selectedPattern = 'blinker';
             }
         }
     </script>
