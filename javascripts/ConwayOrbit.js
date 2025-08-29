@@ -117,7 +117,7 @@ function updateFootprintTrails() {
 }
 
 function drawClean3DScene() {
-  background(40);
+  background(40, 50);
 
   if (trailTexture) {
     push();
