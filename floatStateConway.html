@@ -96,12 +96,12 @@
             <button id="reset-btn">Reset</button>
             <button id="random-btn">Randomize</button>
             <button id="pause-btn">Pause</button>
-            <button id="step-btn">Step</button>
+            <button id="next-btn">Next</button>
         </div>
 
         <div class="slider-container">
             <label for="speed-slider">Speed:</label>
-            <input type="range" id="speed-slider" min="1" max="60" value="30">
+            <input type="range" id="speed-slider" min="1" max="20" value="10">
             <span id="speed-value">10 FPS</span>
         </div>
 
@@ -130,7 +130,7 @@
         let currentPaletteIndex = 0;
         let lastInteractionTime = 0;
         let paletteAge = 0;
-        let frameRateValue = 30;
+        let frameRateValue = 10;
 
         // Define color palettes
         const palettes = [
@@ -155,7 +155,7 @@
             document.getElementById('reset-btn').addEventListener('click', initializeGrid);
             document.getElementById('random-btn').addEventListener('click', randomizeGrid);
             document.getElementById('pause-btn').addEventListener('click', togglePause);
-            document.getElementById('step-btn').addEventListener('click', step);
+            document.getElementById('next-btn').addEventListener('click', nextGeneration);
 
             // Setup speed slider
             const speedSlider = document.getElementById('speed-slider');
@@ -326,7 +326,7 @@
             document.getElementById('pause-btn').textContent = isPaused ? 'Resume' : 'Pause';
         }
 
-        function step() {
+        function nextGeneration() {
             if (isPaused) {
                 computeNextGeneration();
             }
@@ -337,8 +337,8 @@
                 togglePause();
             } else if (key === 'r') {
                 initializeGrid();
-            } else if (key === 's') {
-                step();
+            } else if (key === 'n') {
+                nextGeneration();
             }
         }
     </script>
