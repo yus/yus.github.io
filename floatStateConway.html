@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating-State Cellular Automaton</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 10px;
+            color: #4cc9f0;
+        }
+        p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        canvas {
+            border: 2px solid #4cc9f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .controls {
+            margin: 15px 0;
+        }
+        button {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3a56d4;
+        }
+        .info {
+            background-color: #162447;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Floating-State Cellular Automaton</h1>
+        <p>Click on the grid to create new cells. Each click changes the color palette for new cells.</p>
+        <div id="canvas-container"></div>
+        <div class="controls">
+            <button id="reset-btn">Reset</button>
+            <button id="random-btn">Randomize</button>
+            <button id="pause-btn">Pause/Resume</button>
+        </div>
+        <div class="info">
+            <p><strong>How it works:</strong> This is a modified elementary cellular automaton with 5 states (0, 0.25, 0.5, 0.75, 1). Each state is represented by a color from the current palette. The rules determine the next state based on the current cell and its neighbors.</p>
+            <p><strong>Current Palette:</strong> <span id="palette-name">Default</span></p>
+        </div>
+    </div>
+
+    <script>
+        let grid;
+        let nextGrid;
+        const rows = 15;
+        const cols = 15;
+        let cellSize;
+        let isPaused = false;
+        let currentPaletteIndex = 0;
+        let lastInteractionTime = 0;
+        let paletteAge = 0;
+
+        // Define color palettes
+        const palettes = [
+            { name: "Sunset", colors: ['#03071e', '#370617', '#6a040f', '#9d0208', '#d00000'] },
+            { name: "Ocean", colors: ['#012a4a', '#013a63', '#01497c', '#014f86', '#2a6f97'] },
+            { name: "Forest", colors: ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#74c69d'] },
+            { name: "Purple", colors: ['#240046', '#3c096c', '#5a189a', '#7b2cbf', '#9d4edd'] },
+            { name: "Sunshine", colors: ['#ff9e00', '#ffd000', '#f6ff00', '#c8ff00', '#93ff00'] }
+        ];
+
+        function setup() {
+            const canvasContainer = document.getElementById('canvas-container');
+            const canvas = createCanvas(400, 400);
+            canvas.parent('canvas-container');
+
+            cellSize = width / cols;
+
+            initializeGrid();
+            lastInteractionTime = millis();
+
+            // Setup buttons
+            document.getElementById('reset-btn').addEventListener('click', initializeGrid);
+            document.getElementById('random-btn').addEventListener('click', randomizeGrid);
+            document.getElementById('pause-btn').addEventListener('click', () => isPaused = !isPaused);
+        }
+
+        function initializeGrid() {
+            grid = new Array(cols);
+            for (let i = 0; i < cols; i++) {
+                grid[i] = new Array(rows);
+                for (let j = 0; j < rows; j++) {
+                    grid[i][j] = 0; // All cells start at state 0
+                }
+            }
+
+            // Set center cell to a middle state to start the automaton
+            grid[Math.floor(cols/2)][Math.floor(rows/2)] = 0.5;
+
+            lastInteractionTime = millis();
+            paletteAge = 0;
+        }
+
+        function randomizeGrid() {
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    // Randomly assign one of the five states
+                    const rand = floor(random(5));
+                    grid[i][j] = rand * 0.25;
+                }
+            }
+        }
+
+        function draw() {
+            background(40);
+
+            if (!isPaused) {
+                computeNextGeneration();
+            }
+
+            drawGrid();
+
+            // Update palette age
+            paletteAge = millis() - lastInteractionTime;
+            document.getElementById('palette-name').textContent =
+                `${palettes[currentPaletteIndex].name} (Age: ${floor(paletteAge/1000)}s)`;
+        }
+
+        function computeNextGeneration() {
+            nextGrid = new Array(cols);
+            for (let i = 0; i < cols; i++) {
+                nextGrid[i] = new Array(rows);
+                for (let j = 0; j < rows; j++) {
+                    // Apply modified elementary CA rules
+                    let newState = applyRules(i, j);
+                    nextGrid[i][j] = newState;
+                }
+            }
+
+            grid = nextGrid;
+        }
+
+        function applyRules(x, y) {
+            // Get the current state of the cell and its neighbors
+            // Using toroidal (wrapping) boundaries
+            let left = grid[(x-1+cols) % cols][y];
+            let center = grid[x][y];
+            let right = grid[(x+1) % cols][y];
+
+            // Convert float states to "discrete" values for rule application
+            let leftState = floatToDiscreteState(left);
+            let centerState = floatToDiscreteState(center);
+            let rightState = floatToDiscreteState(right);
+
+            // Apply a modified rule based on the elementary CA rule 30
+            // but adapted for 5 states instead of binary
+            let newState;
+
+            // Rule 30: new cell = (left XOR (center OR right))
+            // Adapted for multiple states
+            if (leftState === 0) {
+                newState = (centerState || rightState) % 5;
+            } else {
+                newState = (1 - (centerState || rightState)) % 5;
+            }
+
+            // Convert back to float state
+            return newState * 0.25;
+        }
+
+        function floatToDiscreteState(value) {
+            // Convert float state to discrete value (0-4)
+            return Math.round(value * 4);
+        }
+
+        function drawGrid() {
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    let state = grid[i][j];
+                    let color = getColorForState(state);
+
+                    fill(color);
+                    stroke(50);
+                    rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+
+        function getColorForState(state) {
+            // Map the float state to a color from the current palette
+            let index = floatToDiscreteState(state);
+            return palettes[currentPaletteIndex].colors[index];
+        }
+
+        function mousePressed() {
+            if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+                let i = floor(mouseX / cellSize);
+                let j = floor(mouseY / cellSize);
+
+                // Set the clicked cell to a new state (cycling through states)
+                let currentState = grid[i][j];
+                grid[i][j] = (currentState + 0.25) % 1;
+
+                // Change palette for new cells
+                currentPaletteIndex = (currentPaletteIndex + 1) % palettes.length;
+
+                // Update interaction time
+                lastInteractionTime = millis();
+            }
+        }
+
+        function keyPressed() {
+            if (key === ' ') {
+                isPaused = !isPaused;
+            } else if (key === 'r') {
+                initializeGrid();
+            }
+        }
+    </script>
+</body>
+</html>
