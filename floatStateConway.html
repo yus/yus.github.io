@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conway's Game of Life with Patterns</title>
+    <title>Flow Field Conway's Game of Life with Boids</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.4/p5.min.js"></script>
     <style>
         body {
@@ -117,12 +117,26 @@
             border: 1px solid #333;
             border-radius: 4px;
         }
+        .toggle-container {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .toggle-btn {
+            background-color: #2a2a4a;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background-color: #4361ee;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Conway's Game of Life with Floating States</h1>
-        <p>Click on cells to toggle them between states. Each click changes the color palette for new cells.</p>
+        <h1>Flow Field Conway's Game of Life with Boids</h1>
+        <p>Conway's Game of Life creates a flow field that influences the movement of boids. Boids can also interact with the cellular automaton.</p>
         <div id="canvas-container"></div>
 
         <div class="controls">
@@ -130,6 +144,12 @@
             <button id="random-btn">Randomize</button>
             <button id="pause-btn">Pause</button>
             <button id="next-btn">Next</button>
+        </div>
+
+        <div class="toggle-container">
+            <div class="toggle-btn active" id="show-flow-btn">Show Flow Field</div>
+            <div class="toggle-btn active" id="show-boids-btn">Show Boids</div>
+            <div class="toggle-btn active" id="show-grid-btn">Show Grid</div>
         </div>
 
         <div class="pattern-buttons">
@@ -216,6 +236,12 @@
             <span id="speed-value">10 FPS</span>
         </div>
 
+        <div class="slider-container">
+            <label for="boid-slider">Boids:</label>
+            <input type="range" id="boid-slider" min="10" max="1000" value="200">
+            <span id="boid-value">200</span>
+        </div>
+
         <div class="palette-display">
             <div class="color-box" style="background-color: #03071e;"></div>
             <div class="color-box" style="background-color: #370617;"></div>
@@ -225,7 +251,7 @@
         </div>
 
         <div class="info">
-            <p><strong>How it works:</strong> This is a modified Conway's Game of Life with 5 states (0, 0.25, 0.5, 0.75, 1). Each state is represented by a color from the current palette. Clicking on a cell cycles its state and changes the palette for new cells.</p>
+            <p><strong>How it works:</strong> Conway's Game of Life creates a flow field that influences boid movement. Boids are represented as triangles that follow the flow field. Boids can also interact with the cellular automaton by changing cell states when they pass over them.</p>
             <p><strong>Current Palette:</strong> <span id="palette-name">Sunset</span></p>
             <p><strong>Rules:</strong> Cells with 2-3 live neighbors survive, cells with exactly 3 neighbors become alive, others die. "Live" means state > 0.</p>
         </div>
@@ -244,53 +270,23 @@
         let frameRateValue = 10;
         let selectedPattern = null;
 
+        // Flow field vectors
+        let flowField;
+
+        // Boids
+        let boids = [];
+        let boidCount = 200;
+        let showFlowField = true;
+        let showBoids = true;
+        let showGrid = true;
+
         // Define color palettes
         const palettes = [
             {"name": "AdelardOfBath", "colors": ["#211830", "#5c6e94", "#87f4e2", "#fffd97", "#ffb594"]},
-            {"name": "AdobeHut", "colors": ["#d5e05f", "#868a61", "#d19390", "#ad4b45", "#78b0e6"]},
-            {"name": "AiryTilt", "colors": ["#6a78b8", "#babfdb", "#ededed", "#dbd3ba", "#b8a363"]},
-            {"name": "ArdentGaze", "colors": ["#232925", "#3c5940", "#f2a444", "#a6351c", "#732f17"]},
-            {"name": "Ceramo", "colors": ["#1252ff", "#1a89ff", "#23bcff", "#2cebff", "#34ffe5"]},
-            {"name": "ClayGolem", "colors": ["#ffd01e", "#b88e1a", "#946f21", "#664c23", "#473625"]},
-            {"name": "DualDream", "colors": ["#b27869", "#e8b79b", "#ffcf9c", "#e8c587", "#b5a473"]},
-            {"name": "EasyLight", "colors": ["#a88973", "#ccc7a2", "#f5ffc9", "#9ed7d9", "#5197b2"]},
-            {"name": "ElectricSteel", "colors": ["#194655", "#326e7d", "#4b8c9b", "#64afc8", "#7df0ff"]},
-            {"name": "FiddleWear", "colors": ["#ff9f00", "#cc6a00", "#993f00", "#661e00", "#330900"]},
             {"name": "FireGlow", "colors": ["#c61100", "#ff7117", "#ffb73d", "#ffe073", "#fff9bb"]},
             {"name": "GoodDay", "colors": ["#2868a1", "#6dace3", "#a8d7ff", "#ffe3b6", "#ffb441"]},
-            {"name": "HypeReverse", "colors": ["#9bcc00", "#665b52", "#332828", "#544959", "#00b3cc"]},
-            {"name": "Indioptry", "colors": ["#001454", "#5276a4", "#ffffff", "#ffdf86", "#ffa400"]},
-            {"name": "KhakiChrome", "colors": ["#2b3924", "#5e923e", "#c8ffad", "#c4e4fd", "#183b59"]},
-            {"name": "LoftWools", "colors": ["#692309", "#857d69", "#c6d4a7", "#52706a", "#444b69"]},
-            {"name": "MonoTag", "colors": ["#d3dff0", "#97b2d2", "#577ea5", "#18608b", "#004a76"]},
-            {"name": "MorningConcrete", "colors": ["#ffe7c1", "#b2a687", "#645d56", "#b29687", "#ffcdc1"]},
-            {"name": "MossPhase2", "colors": ["#403e2f", "#807c5f", "#bfba8e", "#e5dfaa", "#fff8bd"]},
-            {"name": "MossPhase", "colors": ["#161a13", "#2b3327", "#56664d", "#accc9a", "#d7ffc1"]},
-            {"name": "MossShades", "colors": ["#fff3c9", "#ccc3a1", "#999279", "#666151", "#333128"]},
             {"name": "NauticaRusso", "colors": ["#113940", "#39735d", "#ffff94", "#ffc950", "#ff7400"]},
-            {"name": "NavigatorLog", "colors": ["#fff8dc", "#ccaf88", "#c19a6b", "#8b0000", "#003153"]},
-            {"name": "NiftyApt", "colors": ["#9fc4d6", "#b0d6a9", "#fff1a0", "#ffcf6f", "#ffb050"]},
-            {"name": "OldCubes", "colors": ["#3c9090", "#81c86f", "#ffc851", "#ff3737", "#516fae"]},
-            {"name": "OrangePip", "colors": ["#000000", "#404040", "#808080", "#ffffff", "#ff9600"]},
-            {"name": "OvenZDoor", "colors": ["#ff8c24", "#ffbe5b", "#ffdf8e", "#fff7c4", "#372626"]},
-            {"name": "ParadoxLustre", "colors": ["#fff69b", "#e5e0a9", "#bfbc9d", "#807e73", "#404040"]},
-            {"name": "PentaCycle", "colors": ["#f2d97b", "#84bf7e", "#6e818c", "#544a59", "#24201f"]},
-            {"name": "PentacularMeasure", "colors": ["#302733", "#a08378", "#f5e7b4", "#698062", "#273133"]},
-            {"name": "PythagorasNude", "colors": ["#3ebf00", "#ffc800", "#e50000", "#99008f", "#006099"]},
-            {"name": "QuarterCanon", "colors": ["#802c2c", "#b24d2d", "#cc6e1f", "#e59a0f", "#ffc800"]},
-            {"name": "RadioMoss", "colors": ["#738069", "#999375", "#b29e84", "#ccafa5", "#e5bdde"]},
-            {"name": "RedDust", "colors": ["#7a0000", "#ff6747", "#ffcfac", "#e6c8c8", "#4a3737"]},
-            {"name": "RedClay", "colors": ["#402c24", "#66463a", "#8c6050", "#b27a66", "#d9947b"]},
-            {"name": "RedGray", "colors": ["#7a0000", "#ff6747", "#ffcfac", "#c9c9c9", "#1c1c1c"]},
-            {"name": "SakuraPastel", "colors": ["#b860b4", "#f48cda", "#ffb8f4", "#ff9382", "#ae5e4f"]},
-            {"name": "Sandbox", "colors": ["#ffa900", "#967b45", "#c7a259", "#e3cea4", "#ffffff"]},
-            {"name": "SheSunset", "colors": ["#401925", "#80483b", "#bf8959", "#e5bd77", "#ffeca7"]},
-            {"name": "SmokerAttic", "colors": ["#4e4e57", "#b0b0bf", "#e8e9ff", "#adac8f", "#c9700b"]},
-            {"name": "SmokerJeans", "colors": ["#005a6e", "#6496aa", "#c8e1e1", "#afa0a0", "#643c3c"]},
-            {"name": "StarmarCinnabari", "colors": ["#f5f5f5", "#dcdcdc", "#a9a9a9", "#1f1a17", "#bf0000"]},
-            {"name": "TriangleBisectors", "colors": ["#1e4566", "#5e8268", "#b2b04a", "#fcda5c", "#ffb029"]},
-            {"name": "VitalityHerbarium", "colors": ["#730202", "#b53c25", "#bd8d46", "#ffb03b", "#f6e497"]},
-            {"name": "WewakShade", "colors": ["#f2a4a5", "#b07777", "#7a5353", "#4c3434", "#291c1c"]}
+            {"name": "ElectricSteel", "colors": ["#194655", "#326e7d", "#4b8c9b", "#64afc8", "#7df0ff"]}
         ];
 
         // Pattern definitions
@@ -332,6 +328,76 @@
             ]
         };
 
+        // Boid class
+        class Boid {
+            constructor() {
+                this.position = createVector(random(width), random(height));
+                this.velocity = p5.Vector.random2D();
+                this.velocity.setMag(random(1, 3));
+                this.acceleration = createVector();
+                this.maxForce = 0.2;
+                this.maxSpeed = 4;
+                this.size = 4;
+                this.color = color(255, 255, 255);
+            }
+
+            // Apply forces to boid
+            applyForce(force) {
+                this.acceleration.add(force);
+            }
+
+            // Update boid position
+            update() {
+                this.velocity.add(this.acceleration);
+                this.velocity.limit(this.maxSpeed);
+                this.position.add(this.velocity);
+                this.acceleration.mult(0);
+
+                // Wrap around edges
+                if (this.position.x > width) this.position.x = 0;
+                if (this.position.x < 0) this.position.x = width;
+                if (this.position.y > height) this.position.y = 0;
+                if (this.position.y < 0) this.position.y = height;
+            }
+
+            // Follow the flow field
+            followFlowField() {
+                const x = floor(this.position.x / cellSize);
+                const y = floor(this.position.y / cellSize);
+
+                if (x >= 0 && x < cols && y >= 0 && y < rows) {
+                    const force = flowField[x][y].copy();
+                    force.setMag(0.5);
+                    this.applyForce(force);
+
+                    // Interaction with grid: boids can activate cells they pass over
+                    if (random() < 0.01 && grid[x][y] === 0) {
+                        grid[x][y] = 0.25;
+                    }
+                }
+            }
+
+            // Display boid as a triangle
+            show() {
+                push();
+                translate(this.position.x, this.position.y);
+                rotate(this.velocity.heading() + PI/2);
+
+                // Color based on speed
+                const speedColor = map(this.velocity.mag(), 0, this.maxSpeed, 0, 255);
+                fill(200, speedColor, 255 - speedColor);
+                stroke(50);
+
+                // Draw triangle
+                triangle(
+                    0, -this.size * 2,
+                    -this.size, this.size,
+                    this.size, this.size
+                );
+                pop();
+            }
+        }
+
         function setup() {
             const canvasContainer = document.getElementById('canvas-container');
             const canvas = createCanvas(600, 600);
@@ -340,10 +406,16 @@
             cellSize = width / cols;
 
             initializeGrid();
+            initializeFlowField();
+            initializeBoids();
             lastInteractionTime = millis();
 
             // Setup buttons
-            document.getElementById('reset-btn').addEventListener('click', initializeGrid);
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                initializeGrid();
+                initializeFlowField();
+                initializeBoids();
+            });
             document.getElementById('random-btn').addEventListener('click', randomizeGrid);
             document.getElementById('pause-btn').addEventListener('click', togglePause);
             document.getElementById('next-btn').addEventListener('click', nextGeneration);
@@ -364,6 +436,31 @@
                 frameRate(frameRateValue);
             });
 
+            // Setup boid count slider
+            const boidSlider = document.getElementById('boid-slider');
+            const boidValue = document.getElementById('boid-value');
+            boidSlider.addEventListener('input', function() {
+                boidCount = parseInt(this.value);
+                boidValue.textContent = `${boidCount}`;
+                initializeBoids();
+            });
+
+            // Setup toggle buttons
+            document.getElementById('show-flow-btn').addEventListener('click', function() {
+                showFlowField = !showFlowField;
+                this.classList.toggle('active');
+            });
+
+            document.getElementById('show-boids-btn').addEventListener('click', function() {
+                showBoids = !showBoids;
+                this.classList.toggle('active');
+            });
+
+            document.getElementById('show-grid-btn').addEventListener('click', function() {
+                showGrid = !showGrid;
+                this.classList.toggle('active');
+            });
+
             frameRate(frameRateValue);
         }
 
@@ -382,6 +479,25 @@
             updatePaletteDisplay();
         }
 
+        function initializeFlowField() {
+            flowField = new Array(cols);
+            for (let i = 0; i < cols; i++) {
+                flowField[i] = new Array(rows);
+                for (let j = 0; j < rows; j++) {
+                    // Initialize with random vectors
+                    flowField[i][j] = p5.Vector.random2D();
+                    flowField[i][j].setMag(0.1);
+                }
+            }
+        }
+
+        function initializeBoids() {
+            boids = [];
+            for (let i = 0; i < boidCount; i++) {
+                boids.push(new Boid());
+            }
+        }
+
         function randomizeGrid() {
             for (let i = 0; i < cols; i++) {
                 for (let j = 0; j < rows; j++) {
@@ -394,6 +510,7 @@
                     }
                 }
             }
+            updateFlowField();
         }
 
         function draw() {
@@ -401,9 +518,25 @@
 
             if (!isPaused) {
                 computeNextGeneration();
+                updateFlowField();
             }
 
-            drawGrid();
+            if (showGrid) {
+                drawGrid();
+            }
+
+            if (showFlowField) {
+                drawFlowField();
+            }
+
+            // Update and draw boids
+            if (showBoids) {
+                for (let boid of boids) {
+                    boid.followFlowField();
+                    boid.update();
+                    boid.show();
+                }
+            }
 
             // Update palette age
             paletteAge = millis() - lastInteractionTime;
@@ -422,6 +555,28 @@
             }
 
             grid = nextGrid;
+        }
+
+        function updateFlowField() {
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    // Flow field vectors are influenced by cell states and their neighbors
+                    let angle = 0;
+
+                    if (grid[i][j] > 0) {
+                        // Live cells create more organized flow
+                        angle = noise(i * 0.1, j * 0.1, frameCount * 0.01) * TWO_PI * 2;
+                    } else {
+                        // Dead cells create more random flow
+                        angle = noise(i * 0.2, j * 0.2, frameCount * 0.02) * TWO_PI * 4;
+                    }
+
+                    // Magnitude based on cell state
+                    const mag = map(grid[i][j], 0, 1, 0.05, 0.5);
+
+                    flowField[i][j] = p5.Vector.fromAngle(angle, mag);
+                }
+            }
         }
 
         function applyRules(x, y) {
@@ -481,27 +636,33 @@
             }
         }
 
+        function drawFlowField() {
+            stroke(255, 50);
+            for (let i = 0; i < cols; i += 2) {
+                for (let j = 0; j < rows; j += 2) {
+                    const x = i * cellSize + cellSize / 2;
+                    const y = j * cellSize + cellSize / 2;
+
+                    push();
+                    translate(x, y);
+                    rotate(flowField[i][j].heading());
+                    const len = cellSize * 0.8 * flowField[i][j].mag() * 5;
+                    line(0, 0, len, 0);
+                    pop();
+                }
+            }
+        }
+
         function getColorForState(state) {
-            // Map the float state to a color based on lightness from the current palette
+            // Map the float state to a color from the current palette
             if (state === 0) return palettes[currentPaletteIndex].colors[0];
 
-            // Calculate the lightness value based on the state
-            let lightness = state; // state is between 0.25 and 1
+            let index = 1;
+            if (state >= 0.25) index = 2;
+            if (state >= 0.5) index = 3;
+            if (state >= 0.75) index = 4;
 
-            // Get the base color from the palette (using the last color as the base)
-            let baseColor = color(palettes[currentPaletteIndex].colors[4]);
-
-            // Extract RGB components
-            let r = red(baseColor);
-            let g = green(baseColor);
-            let b = blue(baseColor);
-
-            // Adjust lightness by scaling RGB values
-            r = constrain(r * lightness, 0, 255);
-            g = constrain(g * lightness, 0, 255);
-            b = constrain(b * lightness, 0, 255);
-
-            return color(r, g, b);
+            return palettes[currentPaletteIndex].colors[index];
         }
 
         function mousePressed() {
@@ -525,6 +686,9 @@
                         updatePaletteDisplay();
                     }
                 }
+
+                // Update flow field
+                updateFlowField();
 
                 // Update interaction time
                 lastInteractionTime = millis();
@@ -568,6 +732,7 @@
         function nextGeneration() {
             if (isPaused) {
                 computeNextGeneration();
+                updateFlowField();
             }
         }
 
@@ -576,12 +741,16 @@
                 togglePause();
             } else if (key === 'r') {
                 initializeGrid();
+                initializeFlowField();
             } else if (key === 'n') {
                 nextGeneration();
             } else if (key === 'g') {
                 selectedPattern = 'glider';
             } else if (key === 'b') {
                 selectedPattern = 'blinker';
+            } else if (key === 'f') {
+                showFlowField = !showFlowField;
+                document.getElementById('show-flow-btn').classList.toggle('active');
             }
         }
     </script>
