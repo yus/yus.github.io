@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway Flow Field Flocking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-style: italic;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .canvas-container {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 200px;
+        }
+
+        .control-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background: #4a54e1;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+            margin: 5px;
+            width: calc(100% - 10px);
+        }
+
+        button:hover {
+            background: #5d67f0;
+        }
+
+        .slider-container {
+            margin: 10px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .pattern-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 800px;
+            margin-top: 10px;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conway's Flow Field Flocking</h1>
+        <p class="subtitle">Conway's Game of Life meets flow field boid simulation</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-title">Simulation Controls</div>
+                <button id="startBtn">Start</button>
+                <button id="pauseBtn">Pause</button>
+                <button id="resetBtn">Reset Grid</button>
+                <button id="clearBtn">Clear Boids</button>
+            </div>
+
+            <div class="control-group">
+                <div class="control-title">Boid Controls</div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Boid Count:</span>
+                        <span id="boidCountValue">50</span>
+                    </div>
+                    <input type="range" id="boidCount" min="10" max="200" value="50">
+                </div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Max Speed:</span>
+                        <span id="speedValue">3</span>
+                    </div>
+                    <input type="range" id="maxSpeed" min="1" max="6" step="0.5" value="3">
+                </div>
+                <button id="addBoidsBtn">Add Boids</button>
+            </div>
+
+            <div class="control-group">
+                <div class="control-title">Conway Patterns</div>
+                <div class="pattern-buttons">
+                    <button id="gliderBtn">Add Glider</button>
+                    <button id="pulsarBtn">Add Pulsar</button>
+                    <button id="gliderGunBtn">Add Glider Gun</button>
+                    <button id="randomBtn">Random Pattern</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-title">Flow Field</div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Flow Strength:</span>
+                        <span id="flowValue">0.7</span>
+                    </div>
+                    <input type="range" id="flowStrength" min="0.1" max="1.5" step="0.1" value="0.7">
+                </div>
+                <button id="radialFlowBtn">Add Radial Flow</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <!-- Canvas will be created here by p5.js -->
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions</h3>
+            <ul>
+                <li><strong>Click</strong> on the grid to toggle cells between five states (0, 0.25, 0.5, 0.75, 1)</li>
+                <li>Each state creates a different flow direction affecting boid movement</li>
+                <li><strong>Add patterns</strong> from the Conway's Game of Life to influence the flow field</li>
+                <li><strong>Add radial flow</strong> points to create circular flow patterns</li>
+                <li>Boids will follow the flow field while avoiding obstacles and aligning with neighbors</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Grid and cell parameters
+        let rows, cols;
+        let cellSize = 20;
+        let grid = [];
+        let nextGrid = [];
+
+        // Flow field vectors
+        let flowField = [];
+
+        // Boids parameters
+        let boids = [];
+        let boidCount = 50;
+        let maxSpeed = 3;
+
+        // Simulation state
+        let isRunning = false;
+        let flowStrength = 0.7;
+
+        // Radial flow points
+        let radialPoints = [];
+
+        // Color palette for cells based on state
+        const stateColors = [
+            [0, 0, 0],        // 0 - Black
+            [30, 30, 100],    // 0.25 - Dark Blue
+            [100, 30, 100],   // 0.5 - Purple
+            [100, 100, 30],   // 0.75 - Olive
+            [200, 200, 200]   // 1 - Light Gray
+        ];
+
+        // Color palette for boids
+        const boidColors = [
+            [255, 100, 100],  // Red
+            [100, 255, 100],  // Green
+            [100, 100, 255],  // Blue
+            [255, 255, 100],  // Yellow
+            [255, 100, 255],  // Magenta
+            [100, 255, 255]   // Cyan
+        ];
+
+        function setup() {
+            // Create canvas
+            const canvas = createCanvas(800, 600);
+            canvas.parent(document.querySelector('.canvas-container'));
+
+            // Calculate grid dimensions
+            cols = floor(width / cellSize);
+            rows = floor(height / cellSize);
+
+            // Initialize grids and flow field
+            initializeGrids();
+
+            // Create initial boids
+            createBoids(boidCount);
+
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        function draw() {
+            background(20, 20, 40);
+
+            // Update simulation if running
+            if (isRunning) {
+                updateConway();
+            }
+
+            // Update flow field
+            updateFlowField();
+
+            // Update and draw boids
+            updateBoids();
+            drawBoids();
+
+            // Draw grid and flow field
+            drawGrid();
+            drawFlowField();
+
+            // Draw radial flow points
+            drawRadialPoints();
+        }
+
+        function initializeGrids() {
+            // Initialize grids with zeros
+            for (let i = 0; i < rows; i++) {
+                grid[i] = [];
+                nextGrid[i] = [];
+                flowField[i] = [];
+
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = 0;
+                    nextGrid[i][j] = 0;
+                    flowField[i][j] = createVector(0, 0);
+                }
+            }
+        }
+
+        function createBoids(count) {
+            for (let i = 0; i < count; i++) {
+                let x = random(width);
+                let y = random(height);
+                let colorIdx = floor(random(boidColors.length));
+
+                boids.push({
+                    position: createVector(x, y),
+                    velocity: p5.Vector.random2D().mult(random(0.5, 1.5)),
+                    acceleration: createVector(0, 0),
+                    maxSpeed: maxSpeed,
+                    color: boidColors[colorIdx],
+                    size: random(3, 6)
+                });
+            }
+        }
+
+        function updateConway() {
+            // Apply Conway's Game of Life rules
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let state = grid[i][j];
+                    let neighbors = countNeighbors(i, j);
+
+                    // Conway rules with five states
+                    if (state > 0) {
+                        // Cell is alive
+                        if (neighbors < 2 || neighbors > 3) {
+                            // Die of loneliness or overpopulation
+                            nextGrid[i][j] = max(0, state - 0.25);
+                        } else {
+                            // Stay alive
+                            nextGrid[i][j] = state;
+                        }
+                    } else {
+                        // Cell is dead
+                        if (neighbors === 3) {
+                            // Come to life
+                            nextGrid[i][j] = 1;
+                        } else {
+                            // Stay dead
+                            nextGrid[i][j] = 0;
+                        }
+                    }
+                }
+            }
+
+            // Swap grids
+            let temp = grid;
+            grid = nextGrid;
+            nextGrid = temp;
+        }
+
+        function countNeighbors(x, y) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+
+                    let row = (x + i + rows) % rows;
+                    let col = (y + j + cols) % cols;
+
+                    // Count if state is greater than 0
+                    if (grid[row][col] > 0) {
+                        count += 1;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function updateFlowField() {
+            // Update flow field based on cell states
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let state = grid[i][j];
+
+                    // Calculate angle based on state
+                    let angle = state * TWO_PI;
+
+                    // Create flow vector
+                    let force = p5.Vector.fromAngle(angle);
+                    force.mult(flowStrength * state);
+
+                    // Add influence from radial points
+                    for (let point of radialPoints) {
+                        let d = dist(j * cellSize, i * cellSize, point.x, point.y);
+                        if (d < point.radius) {
+                            let angleToCenter = atan2(i * cellSize - point.y, j * cellSize - point.x);
+                            let radialForce = p5.Vector.fromAngle(angleToCenter + HALF_PI);
+                            radialForce.mult(point.strength * (1 - d / point.radius));
+                            force.add(radialForce);
+                        }
+                    }
+
+                    flowField[i][j] = force;
+                }
+            }
+        }
+
+        function updateBoids() {
+            for (let boid of boids) {
+                // Apply flow field force
+                let gridX = constrain(floor(boid.position.x / cellSize), 0, cols - 1);
+                let gridY = constrain(floor(boid.position.y / cellSize), 0, rows - 1);
+
+                let force = flowField[gridY][gridX].copy();
+                boid.acceleration.add(force);
+
+                // Update physics
+                boid.velocity.add(boid.acceleration);
+                boid.velocity.limit(boid.maxSpeed);
+                boid.position.add(boid.velocity);
+                boid.acceleration.mult(0);
+
+                // Wrap around edges
+                if (boid.position.x > width) boid.position.x = 0;
+                if (boid.position.x < 0) boid.position.x = width;
+                if (boid.position.y > height) boid.position.y = 0;
+                if (boid.position.y < 0) boid.position.y = height;
+            }
+        }
+
+        function drawGrid() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let state = grid[i][j];
+                    let color = stateColors[floor(state * 4)];
+
+                    fill(color[0], color[1], color[2], 100);
+                    noStroke();
+                    rect(j * cellSize, i * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+
+        function drawFlowField() {
+            // Draw flow field vectors
+            stroke(200, 100);
+            strokeWeight(1);
+
+            for (let i = 0; i < rows; i += 2) {
+                for (let j = 0; j < cols; j += 2) {
+                    let x = j * cellSize + cellSize / 2;
+                    let y = i * cellSize + cellSize / 2;
+
+                    let vec = flowField[i][j];
+                    let len = vec.mag() * 10;
+
+                    if (len > 0.5) {
+                        push();
+                        translate(x, y);
+                        rotate(vec.heading());
+                        line(0, 0, len, 0);
+                        line(len, 0, len - 5, -5);
+                        line(len, 0, len - 5, 5);
+                        pop();
+                    }
+                }
+            }
+        }
+
+        function drawBoids() {
+            for (let boid of boids) {
+                // Draw boid
+                fill(boid.color[0], boid.color[1], boid.color[2]);
+                noStroke();
+
+                push();
+                translate(boid.position.x, boid.position.y);
+                rotate(boid.velocity.heading());
+                triangle(
+                    boid.size * 2, 0,
+                    -boid.size * 2, -boid.size,
+                    -boid.size * 2, boid.size
+                );
+                pop();
+            }
+        }
+
+        function drawRadialPoints() {
+            for (let point of radialPoints) {
+                noFill();
+                stroke(255, 200, 0, 100);
+                strokeWeight(1);
+                ellipse(point.x, point.y, point.radius * 2);
+
+                fill(255, 200, 0);
+                noStroke();
+                ellipse(point.x, point.y, 6);
+            }
+        }
+
+        function mousePressed() {
+            if (mouseX < 0 || mouseX >= width || mouseY < 0 || mouseY >= height) return;
+
+            // Toggle cell state on click
+            let col = floor(mouseX / cellSize);
+            let row = floor(mouseY / cellSize);
+
+            if (col >= 0 && col < cols && row >= 0 && row < rows) {
+                grid[row][col] = (grid[row][col] + 0.25) % 1.25;
+                if (grid[row][col] === 0) grid[row][col] = 0.25;
+            }
+        }
+
+        function addRadialFlow() {
+            radialPoints.push({
+                x: mouseX,
+                y: mouseY,
+                radius: random(50, 150),
+                strength: random(0.5, 1.5)
+            });
+        }
+
+        function addGlider(x, y) {
+            let cx = x || cols / 2;
+            let cy = y || rows / 2;
+
+            grid[cy][cx+1] = 1;
+            grid[cy+1][cx+2] = 1;
+            grid[cy+2][cx] = 1;
+            grid[cy+2][cx+1] = 1;
+            grid[cy+2][cx+2] = 1;
+        }
+
+        function addPulsar(x, y) {
+            let cx = x || cols / 2;
+            let cy = y || rows / 2;
+
+            // Pulsar pattern
+            let pattern = [
+                [0, 2], [0, 3], [0, 4], [0, 8], [0, 9], [0, 10],
+                [2, 0], [3, 0], [4, 0], [8, 0], [9, 0], [10, 0],
+                [2, 5], [3, 5], [4, 5], [8, 5], [9, 5], [10, 5],
+                [5, 2], [5, 3], [5, 4], [5, 8], [5, 9], [5, 10],
+                [7, 2], [7, 3], [7, 4], [7, 8], [7, 9], [7, 10],
+                [2, 7], [3, 7], [4, 7], [8, 7], [9, 7], [10, 7],
+                [12, 2], [12, 3], [12, 4], [12, 8], [12, 9], [12, 10],
+                [2, 12], [3, 12], [4, 12], [8, 12], [9, 12], [10, 12]
+            ];
+
+            for (let [dx, dy] of pattern) {
+                if (cy+dy < rows && cx+dx < cols) {
+                    grid[cy+dy][cx+dx] = 1;
+                }
+            }
+        }
+
+        function addGliderGun(x, y) {
+            let cx = x || cols / 2;
+            let cy = y || rows / 2;
+
+            // Gosper glider gun pattern
+            let pattern = [
+                [0, 4], [0, 5], [1, 4], [1, 5],
+                [10, 4], [10, 5], [10, 6], [11, 3], [11, 7], [12, 2], [12, 8],
+                [13, 2], [13, 8], [14, 5], [15, 3], [15, 7], [16, 4], [16, 5], [16, 6],
+                [17, 5], [20, 2], [20, 3], [20, 4], [21, 2], [21, 3], [21, 4],
+                [22, 1], [22, 5], [24, 0], [24, 1], [24, 5], [24, 6],
+                [34, 2], [34, 3], [35, 2], [35, 3]
+            ];
+
+            for (let [dx, dy] of pattern) {
+                if (cy+dy < rows && cx+dx < cols) {
+                    grid[cy+dy][cx+dx] = 1;
+                }
+            }
+        }
+
+        function addRandomPattern() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (random() < 0.2) {
+                        grid[i][j] = floor(random(1, 5)) * 0.25;
+                    }
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            // Simulation controls
+            document.getElementById('startBtn').addEventListener('click', () => isRunning = true);
+            document.getElementById('pauseBtn').addEventListener('click', () => isRunning = false);
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                initializeGrids();
+                radialPoints = [];
+            });
+            document.getElementById('clearBtn').addEventListener('click', () => boids = []);
+
+            // Boid controls
+            document.getElementById('boidCount').addEventListener('input', function() {
+                boidCount = this.value;
+                document.getElementById('boidCountValue').textContent = boidCount;
+            });
+
+            document.getElementById('maxSpeed').addEventListener('input', function() {
+                maxSpeed = parseFloat(this.value);
+                document.getElementById('speedValue').textContent = maxSpeed;
+
+                for (let boid of boids) {
+                    boid.maxSpeed = maxSpeed;
+                }
+            });
+
+            document.getElementById('addBoidsBtn').addEventListener('click', () => createBoids(boidCount));
+
+            // Flow field controls
+            document.getElementById('flowStrength').addEventListener('input', function() {
+                flowStrength = parseFloat(this.value);
+                document.getElementById('flowValue').textContent = flowStrength;
+            });
+
+            document.getElementById('radialFlowBtn').addEventListener('click', addRadialFlow);
+
+            // Pattern controls
+            document.getElementById('gliderBtn').addEventListener('click', () => addGlider());
+            document.getElementById('pulsarBtn').addEventListener('click', () => addPulsar());
+            document.getElementById('gliderGunBtn').addEventListener('click', () => addGliderGun());
+            document.getElementById('randomBtn').addEventListener('click', addRandomPattern);
+        }
+    </script>
+</body>
+</html>
