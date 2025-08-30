@@ -3,257 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flow Field Conway's Game of Life with Boids</title>
+    <title>Flow Field Conway with Flyers</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.4/p5.min.js"></script>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #1a1a2e;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e6e6e6;
-            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            padding: 15px;
+            overflow-x: hidden;
         }
         .container {
             max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+        }
+        header {
             text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4cc9f0;
         }
         h1 {
-            margin-bottom: 10px;
+            font-size: 28px;
             color: #4cc9f0;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
         p {
-            margin-bottom: 20px;
-            line-height: 1.5;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
         }
         canvas {
             border: 2px solid #4cc9f0;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
         }
-        .controls {
-            margin: 15px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .control-group {
+            background: rgba(22, 36, 71, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h3 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            font-size: 18px;
+            border-bottom: 1px solid #4cc9f0;
+            padding-bottom: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
         button {
-            background-color: #4361ee;
+            background: linear-gradient(to bottom, #4361ee, #3a56d4);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
+            font-size: 14px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         button:hover {
-            background-color: #3a56d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
         }
         .pattern-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
         .pattern-btn {
-            width: 80px;
-            height: 80px;
-            background-color: #2a2a4a;
-            border: 2px solid #4cc9f0;
-            border-radius: 5px;
+            background: rgba(42, 42, 74, 0.8);
+            border: 1px solid #4cc9f0;
+            border-radius: 6px;
+            padding: 8px;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            text-align: center;
         }
         .pattern-btn:hover {
+            background: rgba(58, 58, 90, 0.8);
             transform: scale(1.05);
-            background-color: #3a3a5a;
-        }
-        .pattern-btn img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
         }
         .pattern-btn span {
-            margin-top: 5px;
             font-size: 12px;
+            display: block;
+            margin-top: 5px;
         }
         .slider-container {
             margin: 10px 0;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
         input[type="range"] {
-            width: 200px;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #2a2a4a;
+            outline: none;
+            -webkit-appearance: none;
         }
-        .info {
-            background-color: #162447;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            text-align: left;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #4cc9f0;
+            cursor: pointer;
+        }
+        .value-display {
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .toggle-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .toggle-btn {
+            background: rgba(42, 42, 74, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid #4cc9f0;
+        }
+        .toggle-btn.active {
+            background: #4361ee;
+            box-shadow: 0 0 10px rgba(67, 97, 238, 0.5);
         }
         .palette-display {
             display: flex;
             justify-content: center;
             margin: 10px 0;
+            gap: 5px;
         }
         .color-box {
-            width: 30px;
-            height: 30px;
-            margin: 0 5px;
-            border: 1px solid #333;
+            width: 25px;
+            height: 25px;
             border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        .toggle-container {
+        .info {
+            background: rgba(22, 36, 71, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .info p {
+            margin-bottom: 10px;
+        }
+        .keyboard-shortcuts {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #4cc9f0;
+        }
+        .shortcut {
             display: flex;
-            gap: 10px;
-            margin: 10px 0;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
-        .toggle-btn {
-            background-color: #2a2a4a;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .toggle-btn.active {
-            background-color: #4361ee;
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Flow Field Conway's Game of Life with Boids</h1>
-        <p>Conway's Game of Life creates a flow field that influences the movement of boids. Boids can also interact with the cellular automaton.</p>
-        <div id="canvas-container"></div>
+        <header>
+            <h1>Flow Field Conway with Flyers</h1>
+            <p>Conway's Game of Life creates a flow field that influences flyer movement. Click cells to toggle states or add patterns.</p>
+        </header>
 
-        <div class="controls">
-            <button id="reset-btn">Reset</button>
-            <button id="random-btn">Randomize</button>
-            <button id="pause-btn">Pause</button>
-            <button id="next-btn">Next</button>
+        <div class="canvas-container">
+            <div id="canvas"></div>
         </div>
 
-        <div class="toggle-container">
-            <div class="toggle-btn active" id="show-flow-btn">Show Flow Field</div>
-            <div class="toggle-btn active" id="show-boids-btn">Show Boids</div>
-            <div class="toggle-btn active" id="show-grid-btn">Show Grid</div>
-        </div>
-
-        <div class="pattern-buttons">
-            <div class="pattern-btn" id="glider-btn">
-                <svg viewBox="0 0 100 100" width="40" height="40">
-                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="50" width="20" height="20" fill="#4cc9f0" />
-                </svg>
-                <span>Glider</span>
+        <div class="controls-grid">
+            <div class="control-group">
+                <h3>Simulation Controls</h3>
+                <div class="buttons">
+                    <button id="reset-btn">Reset</button>
+                    <button id="random-btn">Randomize</button>
+                    <button id="pause-btn">Pause</button>
+                    <button id="next-btn">Next Frame</button>
+                </div>
+                <div class="slider-container">
+                    <label for="speed-slider">Simulation Speed:</label>
+                    <input type="range" id="speed-slider" min="1" max="30" value="10">
+                    <div class="value-display" id="speed-value">10 FPS</div>
+                </div>
             </div>
-            <div class="pattern-btn" id="blinker-btn">
-                <svg viewBox="0 0 100 100" width="40" height="40">
-                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
-                </svg>
-                <span>Blinker</span>
-            </div>
-            <div class="pattern-btn" id="beacon-btn">
-                <svg viewBox="0 0 100 100" width="40" height="40">
-                    <rect x="10" y="10" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="50" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="70" y="50" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="70" width="20" height="20" fill="#4cc9f0" />
-                </svg>
-                <span>Beacon</span>
-            </div>
-            <div class="pattern-btn" id="pulsar-btn">
-                <svg viewBox="0 0 100 100" width="40" height="40">
-                    <!-- Vertical bars -->
-                    <rect x="20" y="10" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="20" y="30" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="20" y="40" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="20" y="60" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="20" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="20" y="90" width="10" height="10" fill="#4cc9f0" />
 
-                    <rect x="70" y="10" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="30" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="40" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="60" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="90" width="10" height="10" fill="#4cc9f0" />
-
-                    <!-- Horizontal bars -->
-                    <rect x="10" y="20" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="30" y="20" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="40" y="20" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="60" y="20" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="20" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="90" y="20" width="10" height="10" fill="#4cc9f0" />
-
-                    <rect x="10" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="30" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="40" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="60" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="70" y="70" width="10" height="10" fill="#4cc9f0" />
-                    <rect x="90" y="70" width="10" height="10" fill="#4cc9f0" />
-                </svg>
-                <span>Pulsar</span>
+            <div class="control-group">
+                <h3>Flyer Controls</h3>
+                <div class="slider-container">
+                    <label for="flyer-slider">Number of Flyers:</label>
+                    <input type="range" id="flyer-slider" min="10" max="500" value="100">
+                    <div class="value-display" id="flyer-value">100 Flyers</div>
+                </div>
+                <div class="slider-container">
+                    <label for="force-slider">Flow Force:</label>
+                    <input type="range" id="force-slider" min="1" max="100" value="50">
+                    <div class="value-display" id="force-value">50%</div>
+                </div>
             </div>
-            <div class="pattern-btn" id="lwss-btn">
-                <svg viewBox="0 0 100 100" width="40" height="40">
-                    <rect x="10" y="20" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="10" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="50" y="40" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="30" y="40" width="20" height="20" fill="#4cc9f0" />
-                    <rect x="10" y="40" width="20" height="20" fill="#4cc9f0" />
-                </svg>
-                <span>Lightweight Spaceship</span>
+
+            <div class="control-group">
+                <h3>Patterns</h3>
+                <div class="pattern-buttons">
+                    <div class="pattern-btn" id="glider-btn">
+                        <svg viewBox="0 0 100 100" width="30" height="30">
+                            <rect x="30" y="10" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="30" y="50" width="20" height="20" fill="#4cc9f0" />
+                        </svg>
+                        <span>Glider</span>
+                    </div>
+                    <div class="pattern-btn" id="blinker-btn">
+                        <svg viewBox="0 0 100 100" width="30" height="30">
+                            <rect x="10" y="30" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="30" y="30" width="20" height="20" fill="#4cc9f0" />
+                            <rect x="50" y="30" width="20" height="20" fill="#4cc9f0" />
+                        </svg>
+                        <span>Blinker</span>
+                    </div>
+                    <div class="pattern-btn" id="pulsar-btn">
+                        <svg viewBox="0 0 100 100" width="30" height="30">
+                            <!-- Simplified Pulsar -->
+                            <rect x="20" y="10" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="20" y="30" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="20" y="40" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="20" y="60" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="20" y="70" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="20" y="90" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="10" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="30" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="40" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="60" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="70" width="10" height="10" fill="#4cc9f0" />
+                            <rect x="70" y="90" width="10" height="10" fill="#4cc9f0" />
+                        </svg>
+                        <span>Pulsar</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="slider-container">
-            <label for="speed-slider">Speed:</label>
-            <input type="range" id="speed-slider" min="1" max="20" value="10">
-            <span id="speed-value">10 FPS</span>
-        </div>
-
-        <div class="slider-container">
-            <label for="boid-slider">Boids:</label>
-            <input type="range" id="boid-slider" min="10" max="1000" value="200">
-            <span id="boid-value">200</span>
-        </div>
-
-        <div class="palette-display">
-            <div class="color-box" style="background-color: #03071e;"></div>
-            <div class="color-box" style="background-color: #370617;"></div>
-            <div class="color-box" style="background-color: #6a040f;"></div>
-            <div class="color-box" style="background-color: #9d0208;"></div>
-            <div class="color-box" style="background-color: #d00000;"></div>
+        <div class="control-group">
+            <h3>Display Options</h3>
+            <div class="toggle-container">
+                <div class="toggle-btn active" id="show-flow-btn">Flow Field</div>
+                <div class="toggle-btn active" id="show-flyers-btn">Flyers</div>
+                <div class="toggle-btn active" id="show-grid-btn">Grid</div>
+                <div class="toggle-btn" id="show-trails-btn">Trails</div>
+            </div>
+            <div class="palette-display">
+                <div class="color-box" style="background-color: #03071e;"></div>
+                <div class="color-box" style="background-color: #370617;"></div>
+                <div class="color-box" style="background-color: #6a040f;"></div>
+                <div class="color-box" style="background-color: #9d0208;"></div>
+                <div class="color-box" style="background-color: #d00000;"></div>
+            </div>
+            <div class="value-display">Current Palette: <span id="palette-name">FireGlow</span></div>
         </div>
 
         <div class="info">
-            <p><strong>How it works:</strong> Conway's Game of Life creates a flow field that influences boid movement. Boids are represented as triangles that follow the flow field. Boids can also interact with the cellular automaton by changing cell states when they pass over them.</p>
-            <p><strong>Current Palette:</strong> <span id="palette-name">Sunset</span></p>
+            <p><strong>How it works:</strong> Conway's Game of Life creates a flow field that influences flyer movement. Each cell state affects the flow direction and strength. Flyers (triangles) follow the flow field and change color based on their speed.</p>
             <p><strong>Rules:</strong> Cells with 2-3 live neighbors survive, cells with exactly 3 neighbors become alive, others die. "Live" means state > 0.</p>
+
+            <div class="keyboard-shortcuts">
+                <h3>Keyboard Shortcuts</h3>
+                <div class="shortcut"><span>Space</span><span>Pause/Resume</span></div>
+                <div class="shortcut"><span>R</span><span>Reset Simulation</span></div>
+                <div class="shortcut"><span>N</span><span>Next Frame</span></div>
+                <div class="shortcut"><span>G</span><span>Place Glider</span></div>
+                <div class="shortcut"><span>F</span><span>Toggle Flow Field</span></div>
+            </div>
         </div>
     </div>
 
@@ -265,28 +335,28 @@
         let cellSize;
         let isPaused = true;
         let currentPaletteIndex = 0;
-        let lastInteractionTime = 0;
-        let paletteAge = 0;
         let frameRateValue = 10;
         let selectedPattern = null;
 
         // Flow field vectors
         let flowField;
 
-        // Boids
-        let boids = [];
-        let boidCount = 200;
+        // Flyers (previously called boids)
+        let flyers = [];
+        let flyerCount = 100;
+        let flowForce = 0.5;
         let showFlowField = true;
-        let showBoids = true;
+        let showFlyers = true;
         let showGrid = true;
+        let showTrails = false;
 
         // Define color palettes
         const palettes = [
-            {"name": "AdelardOfBath", "colors": ["#211830", "#5c6e94", "#87f4e2", "#fffd97", "#ffb594"]},
             {"name": "FireGlow", "colors": ["#c61100", "#ff7117", "#ffb73d", "#ffe073", "#fff9bb"]},
-            {"name": "GoodDay", "colors": ["#2868a1", "#6dace3", "#a8d7ff", "#ffe3b6", "#ffb441"]},
-            {"name": "NauticaRusso", "colors": ["#113940", "#39735d", "#ffff94", "#ffc950", "#ff7400"]},
-            {"name": "ElectricSteel", "colors": ["#194655", "#326e7d", "#4b8c9b", "#64afc8", "#7df0ff"]}
+            {"name": "Oceanic", "colors": ["#006466", "#065a60", "#0b525b", "#144552", "#1b3a4b"]},
+            {"name": "Electric", "colors": ["#ff0a54", "#ff477e", "#ff5c8a", "#ff7096", "#ff85a1"]},
+            {"name": "Forest", "colors": ["#386641", "#6a994e", "#a7c957", "#f2e8cf", "#bc4749"]},
+            {"name": "Sunset", "colors": ["#03071e", "#370617", "#6a040f", "#9d0208", "#d00000"]}
         ];
 
         // Pattern definitions
@@ -298,12 +368,6 @@
             ],
             blinker: [
                 [1, 1, 1]
-            ],
-            beacon: [
-                [1, 1, 0, 0],
-                [1, 1, 0, 0],
-                [0, 0, 1, 1],
-                [0, 0, 1, 1]
             ],
             pulsar: [
                 [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0],
@@ -319,34 +383,28 @@
                 [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]
-            ],
-            lwss: [
-                [0, 1, 1, 1, 1],
-                [1, 0, 0, 0, 1],
-                [0, 0, 0, 0, 1],
-                [1, 0, 0, 1, 0]
             ]
         };
 
-        // Boid class
-        class Boid {
+        // Flyer class
+        class Flyer {
             constructor() {
                 this.position = createVector(random(width), random(height));
                 this.velocity = p5.Vector.random2D();
                 this.velocity.setMag(random(1, 3));
                 this.acceleration = createVector();
-                this.maxForce = 0.2;
+                this.maxForce = 0.3;
                 this.maxSpeed = 4;
                 this.size = 4;
                 this.color = color(255, 255, 255);
             }
 
-            // Apply forces to boid
+            // Apply forces to flyer
             applyForce(force) {
                 this.acceleration.add(force);
             }
 
-            // Update boid position
+            // Update flyer position
             update() {
                 this.velocity.add(this.acceleration);
                 this.velocity.limit(this.maxSpeed);
@@ -366,18 +424,17 @@
                 const y = floor(this.position.y / cellSize);
 
                 if (x >= 0 && x < cols && y >= 0 && y < rows) {
+                    // Get force from flow field
                     const force = flowField[x][y].copy();
-                    force.setMag(0.5);
-                    this.applyForce(force);
 
-                    // Interaction with grid: boids can activate cells they pass over
-                    if (random() < 0.01 && grid[x][y] === 0) {
-                        grid[x][y] = 0.25;
-                    }
+                    // Scale force by flowForce setting
+                    force.mult(flowForce);
+
+                    this.applyForce(force);
                 }
             }
 
-            // Display boid as a triangle
+            // Display flyer as a triangle
             show() {
                 push();
                 translate(this.position.x, this.position.y);
@@ -385,8 +442,9 @@
 
                 // Color based on speed
                 const speedColor = map(this.velocity.mag(), 0, this.maxSpeed, 0, 255);
-                fill(200, speedColor, 255 - speedColor);
-                stroke(50);
+                fill(200, speedColor, 255 - speedColor, 200);
+                stroke(50, 200);
+                strokeWeight(1);
 
                 // Draw triangle
                 triangle(
@@ -399,33 +457,36 @@
         }
 
         function setup() {
-            const canvasContainer = document.getElementById('canvas-container');
             const canvas = createCanvas(600, 600);
-            canvas.parent('canvas-container');
+            canvas.parent('canvas');
 
             cellSize = width / cols;
 
             initializeGrid();
             initializeFlowField();
-            initializeBoids();
-            lastInteractionTime = millis();
+            initializeFlyers();
 
             // Setup buttons
             document.getElementById('reset-btn').addEventListener('click', () => {
                 initializeGrid();
                 initializeFlowField();
-                initializeBoids();
+                initializeFlyers();
+                document.getElementById('pause-btn').textContent = 'Pause';
+                isPaused = true;
             });
-            document.getElementById('random-btn').addEventListener('click', randomizeGrid);
+
+            document.getElementById('random-btn').addEventListener('click', () => {
+                randomizeGrid();
+                updateFlowField();
+            });
+
             document.getElementById('pause-btn').addEventListener('click', togglePause);
             document.getElementById('next-btn').addEventListener('click', nextGeneration);
 
             // Setup pattern buttons
             document.getElementById('glider-btn').addEventListener('click', () => { selectedPattern = 'glider'; });
             document.getElementById('blinker-btn').addEventListener('click', () => { selectedPattern = 'blinker'; });
-            document.getElementById('beacon-btn').addEventListener('click', () => { selectedPattern = 'beacon'; });
             document.getElementById('pulsar-btn').addEventListener('click', () => { selectedPattern = 'pulsar'; });
-            document.getElementById('lwss-btn').addEventListener('click', () => { selectedPattern = 'lwss'; });
 
             // Setup speed slider
             const speedSlider = document.getElementById('speed-slider');
@@ -436,13 +497,21 @@
                 frameRate(frameRateValue);
             });
 
-            // Setup boid count slider
-            const boidSlider = document.getElementById('boid-slider');
-            const boidValue = document.getElementById('boid-value');
-            boidSlider.addEventListener('input', function() {
-                boidCount = parseInt(this.value);
-                boidValue.textContent = `${boidCount}`;
-                initializeBoids();
+            // Setup flyer count slider
+            const flyerSlider = document.getElementById('flyer-slider');
+            const flyerValue = document.getElementById('flyer-value');
+            flyerSlider.addEventListener('input', function() {
+                flyerCount = parseInt(this.value);
+                flyerValue.textContent = `${flyerCount} Flyers`;
+                initializeFlyers();
+            });
+
+            // Setup force slider
+            const forceSlider = document.getElementById('force-slider');
+            const forceValue = document.getElementById('force-value');
+            forceSlider.addEventListener('input', function() {
+                flowForce = parseInt(this.value) / 100;
+                forceValue.textContent = `${parseInt(this.value)}%`;
             });
 
             // Setup toggle buttons
@@ -451,13 +520,18 @@
                 this.classList.toggle('active');
             });
 
-            document.getElementById('show-boids-btn').addEventListener('click', function() {
-                showBoids = !showBoids;
+            document.getElementById('show-flyers-btn').addEventListener('click', function() {
+                showFlyers = !showFlyers;
                 this.classList.toggle('active');
             });
 
             document.getElementById('show-grid-btn').addEventListener('click', function() {
                 showGrid = !showGrid;
+                this.classList.toggle('active');
+            });
+
+            document.getElementById('show-trails-btn').addEventListener('click', function() {
+                showTrails = !showTrails;
                 this.classList.toggle('active');
             });
 
@@ -473,8 +547,6 @@
                 }
             }
 
-            lastInteractionTime = millis();
-            paletteAge = 0;
             selectedPattern = null;
             updatePaletteDisplay();
         }
@@ -491,10 +563,10 @@
             }
         }
 
-        function initializeBoids() {
-            boids = [];
-            for (let i = 0; i < boidCount; i++) {
-                boids.push(new Boid());
+        function initializeFlyers() {
+            flyers = [];
+            for (let i = 0; i < flyerCount; i++) {
+                flyers.push(new Flyer());
             }
         }
 
@@ -514,7 +586,13 @@
         }
 
         function draw() {
-            background(40);
+            // Handle trails effect
+            if (showTrails) {
+                fill(0, 0, 0, 25);
+                rect(0, 0, width, height);
+            } else {
+                background(40);
+            }
 
             if (!isPaused) {
                 computeNextGeneration();
@@ -529,19 +607,14 @@
                 drawFlowField();
             }
 
-            // Update and draw boids
-            if (showBoids) {
-                for (let boid of boids) {
-                    boid.followFlowField();
-                    boid.update();
-                    boid.show();
+            // Update and draw flyers
+            if (showFlyers) {
+                for (let flyer of flyers) {
+                    flyer.followFlowField();
+                    flyer.update();
+                    flyer.show();
                 }
             }
-
-            // Update palette age
-            paletteAge = millis() - lastInteractionTime;
-            document.getElementById('palette-name').textContent =
-                `${palettes[currentPaletteIndex].name} (Age: ${floor(paletteAge/1000)}s)`;
         }
 
         function computeNextGeneration() {
@@ -564,8 +637,8 @@
                     let angle = 0;
 
                     if (grid[i][j] > 0) {
-                        // Live cells create more organized flow
-                        angle = noise(i * 0.1, j * 0.1, frameCount * 0.01) * TWO_PI * 2;
+                        // Live cells create more organized flow based on state
+                        angle = (grid[i][j] * TWO_PI * 2) + (noise(i * 0.1, j * 0.1, frameCount * 0.01) * PI/4);
                     } else {
                         // Dead cells create more random flow
                         angle = noise(i * 0.2, j * 0.2, frameCount * 0.02) * TWO_PI * 4;
@@ -630,14 +703,14 @@
                     let color = getColorForState(state);
 
                     fill(color);
-                    stroke(50);
+                    noStroke();
                     rect(i * cellSize, j * cellSize, cellSize, cellSize);
                 }
             }
         }
 
         function drawFlowField() {
-            stroke(255, 50);
+            stroke(255, 100);
             for (let i = 0; i < cols; i += 2) {
                 for (let j = 0; j < rows; j += 2) {
                     const x = i * cellSize + cellSize / 2;
@@ -655,14 +728,14 @@
 
         function getColorForState(state) {
             // Map the float state to a color from the current palette
-            if (state === 0) return palettes[currentPaletteIndex].colors[0];
+            if (state === 0) return color(palettes[currentPaletteIndex].colors[0]);
 
             let index = 1;
             if (state >= 0.25) index = 2;
             if (state >= 0.5) index = 3;
             if (state >= 0.75) index = 4;
 
-            return palettes[currentPaletteIndex].colors[index];
+            return color(palettes[currentPaletteIndex].colors[index]);
         }
 
         function mousePressed() {
@@ -689,9 +762,6 @@
 
                 // Update flow field
                 updateFlowField();
-
-                // Update interaction time
-                lastInteractionTime = millis();
             }
         }
 
@@ -739,16 +809,18 @@
         function keyPressed() {
             if (key === ' ') {
                 togglePause();
-            } else if (key === 'r') {
+                return false; // Prevent default behavior
+            } else if (key === 'r' || key === 'R') {
                 initializeGrid();
                 initializeFlowField();
-            } else if (key === 'n') {
+                initializeFlyers();
+                document.getElementById('pause-btn').textContent = 'Pause';
+                isPaused = true;
+            } else if (key === 'n' || key === 'N') {
                 nextGeneration();
-            } else if (key === 'g') {
+            } else if (key === 'g' || key === 'G') {
                 selectedPattern = 'glider';
-            } else if (key === 'b') {
-                selectedPattern = 'blinker';
-            } else if (key === 'f') {
+            } else if (key === 'f' || key === 'F') {
                 showFlowField = !showFlowField;
                 document.getElementById('show-flow-btn').classList.toggle('active');
             }
