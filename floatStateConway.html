@@ -482,15 +482,26 @@
         }
 
         function getColorForState(state) {
-            // Map the float state to a color from the current palette
+            // Map the float state to a color based on lightness from the current palette
             if (state === 0) return palettes[currentPaletteIndex].colors[0];
 
-            let index = 1;
-            if (state >= 0.25) index = 2;
-            if (state >= 0.5) index = 3;
-            if (state >= 0.75) index = 4;
+            // Calculate the lightness value based on the state
+            let lightness = state; // state is between 0.25 and 1
 
-            return palettes[currentPaletteIndex].colors[index];
+            // Get the base color from the palette (using the last color as the base)
+            let baseColor = color(palettes[currentPaletteIndex].colors[4]);
+
+            // Extract RGB components
+            let r = red(baseColor);
+            let g = green(baseColor);
+            let b = blue(baseColor);
+
+            // Adjust lightness by scaling RGB values
+            r = constrain(r * lightness, 0, 255);
+            g = constrain(g * lightness, 0, 255);
+            b = constrain(b * lightness, 0, 255);
+
+            return color(r, g, b);
         }
 
         function mousePressed() {
