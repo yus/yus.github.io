@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEC Hypercolor Space - Удельный Эфир Сети</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --text-primary: #f0f6fc;
+            --card-bg: #161b22;
+            --accent: #58a6ff;
+            --i-color: #ff3750;
+            --e-color: #7ee787;
+            --c-color: #58a6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1f2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--i-color), var(--e-color), var(--c-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Основной layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 4D Гиперкуб */
+        .hypercube-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .hypercube-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            perspective: 2000px;
+        }
+
+        .scene {
+            width: 300px;
+            height: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-style: preserve-3d;
+            transform: translate(-50%, -50%) rotateX(60deg) rotateY(45deg);
+            transition: transform 0.8s ease;
+        }
+
+        .vertex {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+
+        .edge {
+            position: absolute;
+            height: 2px;
+            background: rgba(88, 166, 255, 0.3);
+            transform-origin: 0 0;
+            transform-style: preserve-3d;
+        }
+
+        .current-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff3750;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px #ff3750;
+        }
+
+        .gizmo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .axis {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .axis-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        /* Hissing Effect */
+        .hissing-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .hiss-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: hiss 3s infinite linear;
+        }
+
+        @keyframes hiss {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+
+        /* Controls */
+        .controls-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .slider-container {
+            margin: 1.5rem 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .slider-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .channel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .i-dot { background: var(--i-color); }
+        .e-dot { background: var(--e-color); }
+        .c-dot { background: var(--c-color); }
+
+        .slider-value {
+            font-family: 'Fira Code', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #30363d;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .i-channel::-webkit-slider-thumb { background: var(--i-color); }
+        .e-channel::-webkit-slider-thumb { background: var(--e-color); }
+        .c-channel::-webkit-slider-thumb { background: var(--c-color); }
+
+        .w-controls {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 2px solid #30363d;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-info {
+            text-align: center;
+        }
+
+        .hex-value {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            background: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+
+        /* Пресеты */
+        .presets-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .preset-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .preset-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .preset-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .preset-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+
+        .theory-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .math-formula {
+            font-family: 'Fira Code', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧊 IEC Hypercolor Space</h1>
+            <p class="subtitle">4D гиперкуб для визуализации метрики "Удельный Эфир Сети"</p>
+        </header>
+
+        <div class="main-content">
+            <section class="hypercube-section">
+                <h2>🎲 4D Гиперкуб IEC-пространства</h2>
+                <div class="hypercube-container">
+                    <div class="scene" id="hypercubeScene">
+                        <!-- Вершины и рёбра гиперкуба будут созданы скриптом -->
+                    </div>
+                    <div class="gizmo">
+                        <div class="axis"><div class="axis-dot" style="background: var(--i-color);"></div>I (Information)</div>
+                        <div class="axis"><div class="axis-dot" style="background: var(--e-color);"></div>E (Emotion)</div>
+                        <div class="axis"><div class="axis-dot" style="background: var(--c-color);"></div>C (Connectivity)</div>
+                        <div class="axis"><div class="axis-dot" style="background: #a891f7;"></div>W (4D Rotation)</div>
+                    </div>
+                    <div class="hissing-effect" id="hissingEffect"></div>
+                </div>
+            </section>
+
+            <section class="controls-section">
+                <h2>🎛️ Управление гиперпространством</h2>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span class="slider-name">
+                            <span class="channel-dot i-dot"></span>
+                            Information (I)
+                        </span>
+                        <span class="slider-value" id="iValue">127</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="127" class="i-channel" id="iSlider">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span class="slider-name">
+                            <span class="channel-dot e-dot"></span>
+                            Emotion (E)
+                        </span>
+                        <span class="slider-value" id="eValue">127</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="127" class="e-channel" id="eSlider">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span class="slider-name">
+                            <span class="channel-dot c-dot"></span>
+                            Connectivity (C)
+                        </span>
+                        <span class="slider-value" id="cValue">127</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="127" class="c-channel" id="cSlider">
+                </div>
+
+                <div class="w-controls">
+                    <div class="slider-label">
+                        <span class="slider-name">
+                            <span class="channel-dot" style="background: #a891f7;"></span>
+                            4D Rotation (W)
+                        </span>
+                        <span class="slider-value" id="wValue">0°</span>
+                    </div>
+                    <input type="range" min="0" max="360" value="0" class="i-channel" id="wSlider">
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">
+                        Вращение в 4-м измерении (аналог Jenn 3D)
+                    </div>
+                </div>
+
+                <div class="color-preview" id="colorPreview">
+                    <div style="position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.8); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">
+                        IEC: <span id="currentIEC">127,127,127</span>
+                    </div>
+                </div>
+                
+                <div class="color-info">
+                    <div class="hex-value" id="hexValue">#7F7F7F</div>
+                    <div class="color-description" id="colorDescription">⚖️ Сбалансированное цифровое состояние</div>
+                </div>
+            </section>
+        </div>
+
+        <section class="theory-section">
+            <h2>📐 Математика гиперкуба</h2>
+            <div class="math-formula">
+                // 4D → 3D проекция (аналог Jenn 3D)<br>
+                x' = x / (w + d)<br>
+                y' = y / (w + d)<br>
+                z' = z / (w + d)<br>
+                где w = cos(θ), d = 2.5
+            </div>
+            <p>Гиперкуб вращается в 4-м измерении, что изменяет проекцию вершин в нашем 3D пространстве.</p>
+        </section>
+
+        <section class="presets-section">
+            <h2>🌐 Цифровые среды в 4D</h2>
+            <div class="preset-grid" id="presetGrid">
+                <!-- Пресеты будут добавлены скриптом -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        class Hypercube4D {
+            constructor(container) {
+                this.container = container;
+                this.vertices = [];
+                this.edges = [];
+                this.currentPoint = null;
+                this.wRotation = 0;
+                
+                this.initHypercube();
+                this.createHissingEffect();
+            }
+
+            initHypercube() {
+                // 16 вершин 4D гиперкуба (±1, ±1, ±1, ±1)
+                for (let i = 0; i < 16; i++) {
+                    const x = (i & 1) ? 1 : -1;
+                    const y = (i & 2) ? 1 : -1;
+                    const z = (i & 4) ? 1 : -1;
+                    const w = (i & 8) ? 1 : -1;
+                    
+                    this.vertices.push({x, y, z, w});
+                }
+
+                // Создаём рёбра гиперкуба
+                this.createEdges();
+                this.render();
+            }
+
+            createEdges() {
+                this.edges = [];
+                // Соединяем вершины, отличающиеся на 1 бит (соседние в 4D)
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        const diff = i ^ j;
+                        if ((diff & (diff - 1)) === 0) { // Только одна координата отличается
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+            }
+
+            project4Dto3D(x, y, z, w) {
+                // 4D → 3D проекция с вращением в W-плоскости
+                const angle = this.wRotation * Math.PI / 180;
+                const cosW = Math.cos(angle);
+                const sinW = Math.sin(angle);
+                
+                // Вращение в XW-плоскости (аналог Jenn 3D)
+                const xRot = x * cosW - w * sinW;
+                const wRot = x * sinW + w * cosW;
+                
+                // Перспективная проекция
+                const d = 2.5;
+                const scale = 100;
+                const factor = d / (wRot + d);
+                
+                return {
+                    x: xRot * factor * scale,
+                    y: y * factor * scale,
+                    z: z * factor * scale
+                };
+            }
+
+            updateRotation(angle) {
+                this.wRotation = angle;
+                this.render();
+            }
+
+            updateCurrentPoint(i, e, c) {
+                // Нормализуем значения IEC к диапазону [-1, 1]
+                const x = (i / 255) * 2 - 1;
+                const y = (e / 255) * 2 - 1;
+                const z = (c / 255) * 2 - 1;
+                const w = 0; // Точка в 3D подпространстве
+                
+                this.currentPoint = {x, y, z, w};
+                this.render();
+            }
+
+            render() {
+                const scene = this.container;
+                scene.innerHTML = '';
+
+                // Рендерим рёбра
+                this.edges.forEach(([startIdx, endIdx]) => {
+                    const start = this.vertices[startIdx];
+                    const end = this.vertices[endIdx];
+                    
+                    const start3D = this.project4Dto3D(start.x, start.y, start.z, start.w);
+                    const end3D = this.project4Dto3D(end.x, end.y, end.z, end.w);
+                    
+                    const edge = document.createElement('div');
+                    edge.className = 'edge';
+                    
+                    const length = Math.sqrt(
+                        Math.pow(end3D.x - start3D.x, 2) +
+                        Math.pow(end3D.y - start3D.y, 2) +
+                        Math.pow(end3D.z - start3D.z, 2)
+                    );
+                    
+                    const angle = Math.atan2(end3D.y - start3D.y, end3D.x - start3D.x) * 180 / Math.PI;
+                    const tilt = Math.asin((end3D.z - start3D.z) / length) * 180 / Math.PI;
+                    
+                    edge.style.width = `${length}px`;
+                    edge.style.transform = `
+                        translate(${start3D.x}px, ${start3D.y}px)
+                        rotate(${angle}deg)
+                        rotateX(${tilt}deg)
+                        translateZ(${start3D.z}px)
+                    `;
+                    
+                    scene.appendChild(edge);
+                });
+
+                // Рендерим вершины
+                this.vertices.forEach(vertex => {
+                    const pos3D = this.project4Dto3D(vertex.x, vertex.y, vertex.z, vertex.w);
+                    
+                    const vertexEl = document.createElement('div');
+                    vertexEl.className = 'vertex';
+                    vertexEl.style.transform = `translate3d(${pos3D.x}px, ${pos3D.y}px, ${pos3D.z}px)`;
+                    
+                    scene.appendChild(vertexEl);
+                });
+
+                // Рендерим текущую точку
+                if (this.currentPoint) {
+                    const pos3D = this.project4Dto3D(
+                        this.currentPoint.x, 
+                        this.currentPoint.y, 
+                        this.currentPoint.z, 
+                        this.currentPoint.w
+                    );
+                    
+                    const pointEl = document.createElement('div');
+                    pointEl.className = 'current-point';
+                    pointEl.style.transform = `translate3d(${pos3D.x}px, ${pos3D.y}px, ${pos3D.z}px)`;
+                    
+                    scene.appendChild(pointEl);
+                }
+            }
+
+            createHissingEffect() {
+                const effect = document.getElementById('hissingEffect');
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'hiss-particle';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.animationDelay = `${Math.random() * 3}s`;
+                    effect.appendChild(particle);
+                }
+            }
+        }
+
+        // Инициализация
+        const hypercube = new Hypercube4D(document.getElementById('hypercubeScene'));
+        const iSlider = document.getElementById('iSlider');
+        const eSlider = document.getElementById('eSlider');
+        const cSlider = document.getElementById('cSlider');
+        const wSlider = document.getElementById('wSlider');
+
+        function iecToHex(i, e, c) {
+            const r = Math.round(i);
+            const g = Math.round(e);
+            const b = Math.round(c);
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            const i = parseInt(iSlider.value);
+            const e = parseInt(eSlider.value);
+            const c = parseInt(cSlider.value);
+            const w = parseInt(wSlider.value);
+
+            document.getElementById('iValue').textContent = i;
+            document.getElementById('eValue').textContent = e;
+            document.getElementById('cValue').textContent = c;
+            document.getElementById('wValue').textContent = `${w}°`;
+
+            const hex = iecToHex(i, e, c);
+            document.getElementById('colorPreview').style.backgroundColor = hex;
+            document.getElementById('hexValue').textContent = hex;
+            document.getElementById('currentIEC').textContent = `${i},${e},${c}`;
+
+            hypercube.updateRotation(w);
+            hypercube.updateCurrentPoint(i, e, c);
+        }
+
+        // Инициализация событий
+        [iSlider, eSlider, cSlider, wSlider].forEach(slider => {
+            slider.addEventListener('input', updateDisplay);
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
