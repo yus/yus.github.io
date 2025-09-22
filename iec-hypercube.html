@@ -100,8 +100,8 @@
 
         .vertex {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: var(--accent);
             border-radius: 50%;
             transform-style: preserve-3d;
@@ -110,21 +110,22 @@
 
         .edge {
             position: absolute;
-            height: 2px;
-            background: rgba(88, 166, 255, 0.3);
+            height: 1px;
+            background: rgba(88, 166, 255, 0.4);
             transform-origin: 0 0;
             transform-style: preserve-3d;
         }
 
         .current-point {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: #ff3750;
             border-radius: 50%;
             transform-style: preserve-3d;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px #ff3750;
+            box-shadow: 0 0 15px #ff3750;
+            z-index: 10;
         }
 
         .gizmo {
@@ -135,6 +136,7 @@
             padding: 1rem;
             border-radius: 8px;
             border: 1px solid #30363d;
+            z-index: 5;
         }
 
         .axis {
@@ -150,30 +152,6 @@
             height: 10px;
             border-radius: 50%;
             margin-right: 0.5rem;
-        }
-
-        /* Hissing Effect */
-        .hissing-effect {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0.1;
-        }
-
-        .hiss-particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: hiss 3s infinite linear;
-        }
-
-        @keyframes hiss {
-            0% { transform: translateY(0) scale(1); opacity: 0; }
-            50% { opacity: 0.3; }
-            100% { transform: translateY(-100px) scale(0); opacity: 0; }
         }
 
         /* Controls */
@@ -273,6 +251,12 @@
             font-weight: bold;
         }
 
+        .color-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            min-height: 3rem;
+        }
+
         /* Пресеты */
         .presets-section {
             background: var(--card-bg);
@@ -316,6 +300,12 @@
             border: 1px solid #30363d;
         }
 
+        .preset-values {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
         .theory-section {
             background: var(--card-bg);
             border-radius: 16px;
@@ -330,6 +320,14 @@
             border-radius: 8px;
             margin: 1rem 0;
             border-left: 4px solid var(--accent);
+        }
+
+        .hissing-demo {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px dashed #58a6ff;
         }
     </style>
 </head>
@@ -353,7 +351,6 @@
                         <div class="axis"><div class="axis-dot" style="background: var(--c-color);"></div>C (Connectivity)</div>
                         <div class="axis"><div class="axis-dot" style="background: #a891f7;"></div>W (4D Rotation)</div>
                     </div>
-                    <div class="hissing-effect" id="hissingEffect"></div>
                 </div>
             </section>
 
@@ -430,6 +427,17 @@
                 где w = cos(θ), d = 2.5
             </div>
             <p>Гиперкуб вращается в 4-м измерении, что изменяет проекцию вершин в нашем 3D пространстве.</p>
+            
+            <div class="hissing-demo">
+                <h3>🎭 Hissing Effect (пример визуализации)</h3>
+                <p>В контексте Jenn 3D, hissing effect может представлять собой:</p>
+                <ul>
+                    <li>Квантовые флуктуации в цифровом пространстве</li>
+                    <li>Динамическое изменение связности сети</li>
+                    <li>Эмоциональный резонанс в реальном времени</li>
+                </ul>
+                <p><em>Визуально: анимированные частицы, исходящие от текущей точки в гиперкубе</em></p>
+            </div>
         </section>
 
         <section class="presets-section">
@@ -450,32 +458,47 @@
                 this.wRotation = 0;
                 
                 this.initHypercube();
-                this.createHissingEffect();
             }
 
             initHypercube() {
-                // 16 вершин 4D гиперкуба (±1, ±1, ±1, ±1)
-                for (let i = 0; i < 16; i++) {
-                    const x = (i & 1) ? 1 : -1;
-                    const y = (i & 2) ? 1 : -1;
-                    const z = (i & 4) ? 1 : -1;
-                    const w = (i & 8) ? 1 : -1;
-                    
-                    this.vertices.push({x, y, z, w});
+                // Создаем вершины 4D гиперкуба (более компактная структура)
+                const size = 80; // Уменьшенный размер для лучшей визуализации
+                for (let w = -1; w <= 1; w += 2) {
+                    for (let z = -1; z <= 1; z += 2) {
+                        for (let y = -1; y <= 1; y += 2) {
+                            for (let x = -1; x <= 1; x += 2) {
+                                this.vertices.push({
+                                    x: x * size,
+                                    y: y * size, 
+                                    z: z * size,
+                                    w: w * size
+                                });
+                            }
+                        }
+                    }
                 }
 
-                // Создаём рёбра гиперкуба
+                // Создаем рёбра между соседними вершинами
                 this.createEdges();
                 this.render();
             }
 
             createEdges() {
                 this.edges = [];
-                // Соединяем вершины, отличающиеся на 1 бит (соседние в 4D)
-                for (let i = 0; i < 16; i++) {
-                    for (let j = i + 1; j < 16; j++) {
-                        const diff = i ^ j;
-                        if ((diff & (diff - 1)) === 0) { // Только одна координата отличается
+                // Соединяем вершины, отличающиеся на одну координату
+                for (let i = 0; i < this.vertices.length; i++) {
+                    for (let j = i + 1; j < this.vertices.length; j++) {
+                        const v1 = this.vertices[i];
+                        const v2 = this.vertices[j];
+                        
+                        // Проверяем, отличаются ли вершины только по одной координате
+                        let diffCount = 0;
+                        if (Math.abs(v1.x - v2.x) > 0) diffCount++;
+                        if (Math.abs(v1.y - v2.y) > 0) diffCount++;
+                        if (Math.abs(v1.z - v2.z) > 0) diffCount++;
+                        if (Math.abs(v1.w - v2.w) > 0) diffCount++;
+                        
+                        if (diffCount === 1) {
                             this.edges.push([i, j]);
                         }
                     }
@@ -483,24 +506,22 @@
             }
 
             project4Dto3D(x, y, z, w) {
-                // 4D → 3D проекция с вращением в W-плоскости
                 const angle = this.wRotation * Math.PI / 180;
                 const cosW = Math.cos(angle);
                 const sinW = Math.sin(angle);
                 
-                // Вращение в XW-плоскости (аналог Jenn 3D)
+                // Вращение в XW-плоскости
                 const xRot = x * cosW - w * sinW;
                 const wRot = x * sinW + w * cosW;
                 
                 // Перспективная проекция
-                const d = 2.5;
-                const scale = 100;
+                const d = 300; // Расстояние до камеры
                 const factor = d / (wRot + d);
                 
                 return {
-                    x: xRot * factor * scale,
-                    y: y * factor * scale,
-                    z: z * factor * scale
+                    x: xRot * factor,
+                    y: y * factor, 
+                    z: z * factor
                 };
             }
 
@@ -510,11 +531,11 @@
             }
 
             updateCurrentPoint(i, e, c) {
-                // Нормализуем значения IEC к диапазону [-1, 1]
-                const x = (i / 255) * 2 - 1;
-                const y = (e / 255) * 2 - 1;
-                const z = (c / 255) * 2 - 1;
-                const w = 0; // Точка в 3D подпространстве
+                // Нормализуем к диапазону [-80, 80] для соответствия размеру гиперкуба
+                const x = (i / 255) * 160 - 80;
+                const y = (e / 255) * 160 - 80;
+                const z = (c / 255) * 160 - 80;
+                const w = 0;
                 
                 this.currentPoint = {x, y, z, w};
                 this.render();
@@ -532,24 +553,25 @@
                     const start3D = this.project4Dto3D(start.x, start.y, start.z, start.w);
                     const end3D = this.project4Dto3D(end.x, end.y, end.z, end.w);
                     
+                    // Пропускаем рёбра, которые находятся за камерой
+                    if (start3D.z < -200 || end3D.z < -200) return;
+                    
                     const edge = document.createElement('div');
                     edge.className = 'edge';
                     
-                    const length = Math.sqrt(
-                        Math.pow(end3D.x - start3D.x, 2) +
-                        Math.pow(end3D.y - start3D.y, 2) +
-                        Math.pow(end3D.z - start3D.z, 2)
-                    );
+                    const dx = end3D.x - start3D.x;
+                    const dy = end3D.y - start3D.y;
+                    const dz = end3D.z - start3D.z;
                     
-                    const angle = Math.atan2(end3D.y - start3D.y, end3D.x - start3D.x) * 180 / Math.PI;
-                    const tilt = Math.asin((end3D.z - start3D.z) / length) * 180 / Math.PI;
+                    const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    const tilt = Math.asin(dz / length) * 180 / Math.PI;
                     
                     edge.style.width = `${length}px`;
                     edge.style.transform = `
-                        translate(${start3D.x}px, ${start3D.y}px)
+                        translate3d(${start3D.x}px, ${start3D.y}px, ${start3D.z}px)
                         rotate(${angle}deg)
-                        rotateX(${tilt}deg)
-                        translateZ(${start3D.z}px)
+                        rotateZ(${tilt}deg)
                     `;
                     
                     scene.appendChild(edge);
@@ -558,6 +580,7 @@
                 // Рендерим вершины
                 this.vertices.forEach(vertex => {
                     const pos3D = this.project4Dto3D(vertex.x, vertex.y, vertex.z, vertex.w);
+                    if (pos3D.z < -200) return; // Пропускаем вершины за камерой
                     
                     const vertexEl = document.createElement('div');
                     vertexEl.className = 'vertex';
@@ -575,39 +598,85 @@
                         this.currentPoint.w
                     );
                     
-                    const pointEl = document.createElement('div');
-                    pointEl.className = 'current-point';
-                    pointEl.style.transform = `translate3d(${pos3D.x}px, ${pos3D.y}px, ${pos3D.z}px)`;
-                    
-                    scene.appendChild(pointEl);
-                }
-            }
-
-            createHissingEffect() {
-                const effect = document.getElementById('hissingEffect');
-                for (let i = 0; i < 20; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'hiss-particle';
-                    particle.style.left = `${Math.random() * 100}%`;
-                    particle.style.animationDelay = `${Math.random() * 3}s`;
-                    effect.appendChild(particle);
+                    if (pos3D.z > -200) { // Только если точка перед камерой
+                        const pointEl = document.createElement('div');
+                        pointEl.className = 'current-point';
+                        pointEl.style.transform = `translate3d(${pos3D.x}px, ${pos3D.y}px, ${pos3D.z}px)`;
+                        scene.appendChild(pointEl);
+                    }
                 }
             }
         }
 
-        // Инициализация
-        const hypercube = new Hypercube4D(document.getElementById('hypercubeScene'));
-        const iSlider = document.getElementById('iSlider');
-        const eSlider = document.getElementById('eSlider');
-        const cSlider = document.getElementById('cSlider');
-        const wSlider = document.getElementById('wSlider');
+        // Пресеты цифровых сред
+        const presets = [
+            { name: "Инфовакуум", i: 20, e: 20, c: 20, desc: "Цифровая пустота", icon: "⚫" },
+            { name: "Научный архив", i: 240, e: 40, c: 80, desc: "Чистое знание", icon: "📚" },
+            { name: "Мемная буря", i: 100, e: 240, c: 200, desc: "Виральность", icon: "🌪️" },
+            { name: "Соцсеть", i: 150, e: 180, c: 220, desc: "Общение", icon: "💬" },
+            { name: "Форум", i: 180, e: 120, c: 190, desc: "Дискуссии", icon: "👥" },
+            { name: "Токсичный чат", i: 60, e: 255, c: 90, desc: "Агрессия", icon: "💢" },
+            { name: "База знаний", i: 220, e: 80, c: 180, desc: "Структура", icon: "🏛️" },
+            { name: "Игровой чат", i: 90, e: 200, c: 150, desc: "Развлечения", icon: "🎮" }
+        ];
 
+        // Функция создания пресетов
+        function createPresets() {
+            const presetGrid = document.getElementById('presetGrid');
+            presets.forEach(preset => {
+                const presetColor = iecToHex(preset.i, preset.e, preset.c);
+                
+                const card = document.createElement('div');
+                card.className = 'preset-card';
+                card.innerHTML = `
+                    <div class="preset-header">
+                        <div class="preset-preview" style="background-color: ${presetColor}"></div>
+                        <div>
+                            <strong>${preset.icon} ${preset.name}</strong>
+                            <div class="preset-values">I:${preset.i} E:${preset.e} C:${preset.c}</div>
+                        </div>
+                    </div>
+                    <div>${preset.desc}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    iSlider.value = preset.i;
+                    eSlider.value = preset.e;
+                    cSlider.value = preset.c;
+                    wSlider.value = 0;
+                    updateDisplay();
+                });
+                
+                presetGrid.appendChild(card);
+            });
+        }
+
+        // Функция преобразования IEC в HEX
         function iecToHex(i, e, c) {
             const r = Math.round(i);
             const g = Math.round(e);
             const b = Math.round(c);
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
+
+        // Функция описания цвета
+        function getColorDescription(i, e, c) {
+            if (i > 200 && e < 50 && c < 50) return "📚 Информационный кристалл - чистое знание";
+            if (e > 200 && i < 100 && c > 150) return "🔥 Эмоциональная буря - виральный контент";
+            if (c > 200 && i > 150 && e > 150) return "🌐 Сетевая сверхпроводимость - идеальная связность";
+            if (i < 30 && e < 30 && c < 30) return "⚫ Информационный вакуум - цифровая пустота";
+            if (i > 180 && e > 180 && c > 180) return "💎 Плодородное поле - сбалансированная среда";
+            if (e > 180 && i < 80 && c < 80) return "💢 Токсичный выброс - чистая эмоция";
+            if (i > 180 && c > 180 && e < 80) return "🔗 Структурированная сеть - информация + связи";
+            return "⚖️ Сбалансированное цифровое состояние";
+        }
+
+        // Инициализация элементов управления
+        const hypercube = new Hypercube4D(document.getElementById('hypercubeScene'));
+        const iSlider = document.getElementById('iSlider');
+        const eSlider = document.getElementById('eSlider');
+        const cSlider = document.getElementById('cSlider');
+        const wSlider = document.getElementById('wSlider');
 
         function updateDisplay() {
             const i = parseInt(iSlider.value);
@@ -624,6 +693,7 @@
             document.getElementById('colorPreview').style.backgroundColor = hex;
             document.getElementById('hexValue').textContent = hex;
             document.getElementById('currentIEC').textContent = `${i},${e},${c}`;
+            document.getElementById('colorDescription').textContent = getColorDescription(i, e, c);
 
             hypercube.updateRotation(w);
             hypercube.updateCurrentPoint(i, e, c);
@@ -634,6 +704,8 @@
             slider.addEventListener('input', updateDisplay);
         });
 
+        // Создаем пресеты и инициализируем отображение
+        createPresets();
         updateDisplay();
     </script>
 </body>
