@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Палитра "Удельный Эфир Сети"</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --text-primary: #f0f6fc;
+            --card-bg: #161b22;
+            --accent: #58a6ff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a891f7, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .color-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-preview {
+            height: 120px;
+            width: 100%;
+        }
+
+        .color-info {
+            padding: 1rem;
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-hex {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .color-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Палитра "Удельный Эфир Сети"</h1>
+            <p class="subtitle">Визуальное представление концепции информационной плотности и культурного слоя цифрового пространства. Нажмите на цвет, чтобы скопировать его HEX-код.</p>
+        </header>
+
+        <div class="color-grid" id="colorGrid">
+            <!-- Цвета будут добавлены скриптом -->
+        </div>
+    </div>
+
+    <div class="copy-notification" id="copyNotification">HEX-код скопирован!</div>
+
+    <script>
+        const colors = [
+            {
+                name: "Информационный вакуум",
+                hex: "#0d1117",
+                desc: "Низкая плотность информации, минимальная активность. Базовый фон цифрового пространства."
+            },
+            {
+                name: "Густой информационный туман",
+                hex: "#161b22",
+                desc: "Присутствует информация, но она рассеяна и слабо структурирована. Фон для элементов интерфейса."
+            },
+            {
+                name: "Энергия виральности",
+                hex: "#ff6b6b",
+                desc: "Высокая эмоциональная энтропия. Цвет хейта, скандалов, но также и вирусного креатива."
+            },
+            {
+                name: "Плодородное информационное поле",
+                hex: "#58a6ff",
+                desc: "Баланс информации и связей. Цвет качественных дискуссий, конструктивных идей и полезных ссылок."
+            },
+            {
+                name: "Кристалл знания",
+                hex: "#a891f7",
+                hex: "#a891f7",
+                desc: "Высокая плотность информации (I) при низкой эмоциональной энтропии (E). Научные ресурсы, техническая документация."
+            },
+            {
+                name: "Эмоциональный резонанс",
+                hex: "#ff9c5f",
+                desc: "Высокая эмоциональная энтропия (E) и средняя связность (C). Сообщества с тёплой атмосферой, поддержки."
+            },
+            {
+                name: "Информационная буря",
+                hex: "#ff3750",
+                desc: "Пиковые значения эмоциональной энтропии (E) и связности (C). Места бурных холиваров и сенсаций."
+            },
+            {
+                name: "Сигнал когнитивного покоя",
+                hex: "#7ee787",
+                desc: "Умиротворяющий оттенок для цифровой гигиены. Низкая E, средняя I. Спокойные, рефлексирующие сообщества."
+            },
+            {
+                name: "Глубинный смысл",
+                hex: "#3fb950",
+                desc: "Цвет насыщенной, структурированной информации. Высокая I, средняя C. Энциклопедии, архивы."
+            },
+            {
+                name: "Токсичный выброс",
+                hex: "#f85149",
+                desc: "Высокая концентрация негатива и агрессии. Максимальная E при низкой I. Троллинг, флейм."
+            },
+            {
+                name: "Золотое сечение данных",
+                hex: "#e3b341",
+                desc: "Идеальный баланс между информативностью и доступностью. Высокие I, E, C. Популярные образовательные каналы."
+            },
+            {
+                name: "Тишина заброшенного форума",
+                hex: "#8d96a0",
+                desc: "Нулевые значения I, E, C. Цвет цифрового запустения и забытых уголков сети."
+            }
+        ];
+
+        const colorGrid = document.getElementById('colorGrid');
+        const copyNotification = document.getElementById('copyNotification');
+
+        colors.forEach(color => {
+            const card = document.createElement('div');
+            card.className = 'color-card';
+            card.innerHTML = `
+                <div class="color-preview" style="background-color: ${color.hex};"></div>
+                <div class="color-info">
+                    <div class="color-name">${color.name}</div>
+                    <div class="color-hex">${color.hex}</div>
+                    <div class="color-desc">${color.desc}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                navigator.clipboard.writeText(color.hex).then(() => {
+                    copyNotification.textContent = `Скопирован: ${color.hex}`;
+                    copyNotification.classList.add('show');
+                    setTimeout(() => {
+                        copyNotification.classList.remove('show');
+                    }, 2000);
+                });
+            });
+
+            colorGrid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
