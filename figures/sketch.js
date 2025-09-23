@@ -157,37 +157,37 @@ function drawSelectedVertexHighlight() {
 }
 
 // Mobile touch handlers
-function touchMoveHandler(event) {
-    if (touches.length === 1) {
-        // Rotation
-        if (lastTouchX && lastTouchY) {
-            rotationY += (touchX - lastTouchX) * 0.01;
-            rotationX += (touchY - lastTouchY) * 0.01;
-        }
-        lastTouchX = touchX;
-        lastTouchY = touchY;
-    } else if (touches.length === 2) {
-        // Pinch to zoom
-        let touch1 = touches[0];
-        let touch2 = touches[1];
-        let currentDist = dist(touch1.x, touch1.y, touch2.x, touch2.y);
-        
-        if (lastTouchDist) {
-            zoom *= currentDist / lastTouchDist;
-            zoom = constrain(zoom, 0.3, 3.0);
-        }
-        lastTouchDist = currentDist;
-    }
-    return false; // Prevent scrolling
-}
+let touchStartZoom = 1;
+let initialDist = 0;
 
 function touchStarted() {
-    // Simple vertex selection by tapping near dots
-    let closestVertex = findClosestVertex(touchX - width/2, touchY - height/2);
-    if (closestVertex !== -1) {
-        selectedVertex = closestVertex;
-    }
-    return false;
+  // Code for when a touch starts (e.g., selecting a vertex)
+  // Use the touches[] array to get touch positions [citation:6]
+  return false; // Prevents default browser behavior like scrolling
+}
+
+function touchMoved() {
+  // Handle one-finger drag for rotation
+  if (touches.length === 1) {
+    rotationY += touches[0].x - pmouseX;
+    rotationX += touches[0].y - pmouseY;
+  }
+  // Handle two-finger pinch for zoom
+  if (touches.length >= 2) {
+    let currentDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+    if (initialDist === 0) initialDist = currentDist; // Set initial distance on first pinch
+    let zoomFactor = currentDist / initialDist;
+    zoom = constrain(touchStartZoom * zoomFactor, 0.3, 3.0); // Limit zoom range
+  }
+  return false; // Prevents default browser behavior
+}
+
+function touchEnded() {
+  // Reset initial distance when pinch ends
+  if (touches.length < 2) {
+    initialDist = 0;
+    touchStartZoom = zoom; // Remember the new zoom level
+  }
 }
 
 function findClosestVertex(screenX, screenY) {
