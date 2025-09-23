@@ -3,51 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4D Hypercube Visualization</title>
+    <title>4D Hypercube with Advanced Shading</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background: #000;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            color: white;
         }
         
-        #sketch-container {
-            margin: 20px 0;
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .canvas-container {
+            flex: 1;
         }
         
         .controls {
+            width: 300px;
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
-            margin: 20px;
-            max-width: 600px;
         }
         
         h1 {
             text-align: center;
-            color: #fff;
             margin-bottom: 10px;
+            color: #4fc3f7;
         }
         
-        .instructions {
-            text-align: center;
-            margin-bottom: 20px;
-            opacity: 0.8;
+        .shader-selector {
+            margin: 15px 0;
         }
         
         button {
-            background: #4CAF50;
+            background: #2196f3;
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 16px;
             margin: 5px;
             border-radius: 5px;
             cursor: pointer;
@@ -55,7 +57,11 @@
         }
         
         button:hover {
-            background: #45a049;
+            background: #1976d2;
+        }
+        
+        button.active {
+            background: #ff9800;
         }
         
         .slider-container {
@@ -68,109 +74,379 @@
         }
         
         input[type="range"] {
-            width: 200px;
+            width: 100%;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>4D Hypercube (Tesseract) Visualization</h1>
+    <h1>4D Hypercube Shading Experiments</h1>
     
-    <div class="instructions">
-        <p>Drag to rotate in 3D • Use controls below to manipulate the 4D rotation</p>
-    </div>
-    
-    <div id="sketch-container"></div>
-    
-    <div class="controls">
-        <div class="slider-container">
-            <label for="speed">Rotation Speed: <span id="speed-value">0.02</span></label>
-            <input type="range" id="speed" min="0" max="0.1" step="0.001" value="0.02">
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
         </div>
         
-        <div class="slider-container">
-            <label for="size">Hypercube Size: <span id="size-value">100</span></label>
-            <input type="range" id="size" min="50" max="200" step="10" value="100">
-        </div>
-        
-        <div>
-            <button id="toggle-rotation">Pause Rotation</button>
-            <button id="reset-view">Reset View</button>
-            <button id="toggle-vertices">Hide Vertices</button>
-            <button id="toggle-wireframe">Wireframe Mode</button>
-        </div>
-        
-        <div style="margin-top: 15px;">
-            <p><strong>What you're seeing:</strong> This is a 3D projection of a 4-dimensional hypercube (tesseract). 
-            The complex folding pattern represents how a 4D object would appear in our 3D space.</p>
+        <div class="controls">
+            <div class="shader-selector">
+                <h3>Shading Mode</h3>
+                <button id="mode-wireframe" class="active">Wireframe</button>
+                <button id="mode-vertex-color">Vertex Colors</button>
+                <button id="mode-depth-shading">Depth Shading</button>
+                <button id="mode-4d-lighting">4D Lighting</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="rotation-speed">Rotation Speed: <span id="speed-value">0.02</span></label>
+                <input type="range" id="rotation-speed" min="0" max="0.1" step="0.001" value="0.02">
+            </div>
+            
+            <div class="slider-container">
+                <label for="cube-size">Hypercube Size: <span id="size-value">100</span></label>
+                <input type="range" id="cube-size" min="50" max="200" step="10" value="100">
+            </div>
+            
+            <div class="slider-container">
+                <label for="light-position">Light Position (W): <span id="light-value">400</span></label>
+                <input type="range" id="light-position" min="100" max="800" step="50" value="400">
+            </div>
+            
+            <div>
+                <button id="toggle-rotation">Pause Rotation</button>
+                <button id="reset-view">Reset View</button>
+            </div>
+            
+            <div class="info-panel">
+                <h3>Current Mode: <span id="current-mode">Wireframe</span></h3>
+                <p id="mode-description">Classic wireframe visualization showing the 32 edges of the hypercube.</p>
+            </div>
         </div>
     </div>
 
     <script>
-        let vertices = [];
-let faces = []; // Now we need faces, not just edges
-let light4D = [0, 0, 0, 400]; // 4D light position
+        // ===== HYPERCUBE SHADER LIBRARY =====
+        class HyperShader {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.mode = 'wireframe';
+                this.cubeSize = 100;
+                this.rotationSpeed = 0.02;
+                this.lightPos = [0, 0, 0, 400];
+            }
+            
+            createHypercube() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                
+                // Create 16 vertices
+                for (let i = 0; i < 16; i++) {
+                    this.vertices.push({
+                        pos: [
+                            (i & 1) ? this.cubeSize : -this.cubeSize,
+                            (i & 2) ? this.cubeSize : -this.cubeSize,
+                            (i & 4) ? this.cubeSize : -this.cubeSize,
+                            (i & 8) ? this.cubeSize : -this.cubeSize
+                        ],
+                        color: color(
+                            (i & 1) ? 255 : 100,
+                            (i & 2) ? 255 : 100,  
+                            (i & 4) ? 255 : 100
+                        )
+                    });
+                }
+                
+                // Create 32 edges
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        if (this.countDifferences(i, j) === 1) {
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+                
+                // Create 24 square faces (simplified)
+                this.createFaces();
+            }
+            
+            createFaces() {
+                // Simplified face creation - each face is a square in 4D
+                for (let fixedCoord = 0; fixedCoord < 4; fixedCoord++) {
+                    for (let fixedVal = 0; fixedVal < 2; fixedVal++) {
+                        let faceVertices = [];
+                        for (let i = 0; i < 16; i++) {
+                            if (((i >> fixedCoord) & 1) === fixedVal) {
+                                // Check if this vertex belongs to a square face
+                                let count = 0;
+                                for (let j = 0; j < 4; j++) {
+                                    if (j !== fixedCoord) count += (i >> j) & 1;
+                                }
+                                if (count <= 2) faceVertices.push(i);
+                            }
+                        }
+                        if (faceVertices.length === 8) {
+                            this.faces.push(faceVertices);
+                        }
+                    }
+                }
+            }
+            
+            countDifferences(a, b) {
+                let diff = 0;
+                for (let k = 0; k < 4; k++) {
+                    if (((a >> k) & 1) !== ((b >> k) & 1)) diff++;
+                }
+                return diff;
+            }
+            
+            project4D(v, angleW) {
+                let [x, y, z, w] = v;
+                let newX = x * cos(angleW) - w * sin(angleW);
+                let newW = x * sin(angleW) + w * cos(angleW);
+                let scale = 300 / (400 - newW);
+                return [newX * scale, y * scale, z * scale];
+            }
+            
+            calculate4DNormal(faceVertices) {
+                if (faceVertices.length < 3) return [0, 0, 0, 1];
+                
+                // Simplified 4D normal calculation
+                let v0 = this.vertices[faceVertices[0]].pos;
+                let v1 = this.vertices[faceVertices[1]].pos;
+                let v2 = this.vertices[faceVertices[2]].pos;
+                
+                let u = v1.map((val, i) => val - v0[i]);
+                let v = v2.map((val, i) => val - v0[i]);
+                
+                // 4D "normal" approximation
+                let normal = [
+                    u[1]*v[2] - u[2]*v[1],
+                    u[2]*v[0] - u[0]*v[2],
+                    u[0]*v[1] - u[1]*v[0],
+                    u[3]*v[0] - u[0]*v[3]
+                ];
+                
+                return this.normalize4D(normal);
+            }
+            
+            normalize4D(v) {
+                let length = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + v[3]*v[3]);
+                if (length === 0) return [0, 0, 0, 0];
+                return v.map(val => val / length);
+            }
+            
+            calculate4DLighting(faceVertices, lightPos) {
+                let faceCenter = [0, 0, 0, 0];
+                for (let idx of faceVertices) {
+                    let v = this.vertices[idx].pos;
+                    for (let i = 0; i < 4; i++) faceCenter[i] += v[i];
+                }
+                for (let i = 0; i < 4; i++) faceCenter[i] /= faceVertices.length;
+                
+                let normal = this.calculate4DNormal(faceVertices);
+                let lightDir = lightPos.map((val, i) => val - faceCenter[i]);
+                lightDir = this.normalize4D(lightDir);
+                
+                let dot = normal.reduce((sum, val, i) => sum + val * lightDir[i], 0);
+                return map(dot, -1, 1, 50, 255);
+            }
+            
+            renderWireframe(angleW) {
+                stroke(255);
+                strokeWeight(2);
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].pos, angleW);
+                    let v2 = this.project4D(this.vertices[j].pos, angleW);
+                    
+                    let depth = (v1[2] + v2[2]) / 2;
+                    let brightness = map(depth, -200, 200, 100, 255);
+                    stroke(255, brightness);
+                    
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            renderVertexColors(angleW) {
+                strokeWeight(4);
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].pos, angleW);
+                    let v2 = this.project4D(this.vertices[j].pos, angleW);
+                    
+                    let depth = (v1[2] + v2[2]) / 2;
+                    let lerpAmt = map(depth, -200, 200, 0, 1);
+                    let edgeColor = lerpColor(this.vertices[i].color, this.vertices[j].color, 0.5);
+                    
+                    let brightness = map(depth, -200, 200, 100, 255);
+                    edgeColor = color(
+                        red(edgeColor) * brightness/255,
+                        green(edgeColor) * brightness/255,
+                        blue(edgeColor) * brightness/255
+                    );
+                    
+                    stroke(edgeColor);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            renderDepthShading(angleW) {
+                strokeWeight(3);
+                noFill();
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].pos, angleW);
+                    let v2 = this.project4D(this.vertices[j].pos, angleW);
+                    
+                    let depth = (v1[2] + v2[2]) / 2;
+                    let hue = map(depth, -200, 200, 0, 255);
+                    let brightness = map(abs(depth), 0, 200, 150, 255);
+                    
+                    stroke(hue, 200, brightness);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            render4DLighting(angleW) {
+                strokeWeight(2);
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].pos, angleW);
+                    let v2 = this.project4D(this.vertices[j].pos, angleW);
+                    
+                    // Use adjacent faces to approximate lighting
+                    let faceLight = 150; // Default
+                    if (this.faces.length > 0) {
+                        // Find a face containing this edge
+                        for (let face of this.faces) {
+                            if (face.includes(i) && face.includes(j)) {
+                                faceLight = this.calculate4DLighting(face, this.lightPos);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    stroke(faceLight, faceLight * 0.8, faceLight * 1.2);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+        }
 
-function setup() {
-  createCanvas(800, 800, WEBGL);
-  createHypercubeFaces();
-}
+        // ===== MAIN SKETCH =====
+        let hyperShader;
+        let angleW = 0;
+        let rotate4D = true;
+        let currentMode = 'wireframe';
 
-function createHypercubeFaces() {
-  // Create 16 vertices (same as before)
-  for (let i = 0; i < 16; i++) {
-    vertices.push([
-      (i & 1) ? 100 : -100,
-      (i & 2) ? 100 : -100, 
-      (i & 4) ? 100 : -100,
-      (i & 8) ? 100 : -100
-    ]);
-  }
-  
-  // Create 8 cubic "faces" (each is a 3D cube in 4D)
-  // Each face has 8 vertices that differ only in the 4th coordinate
-  for (let wFixed = 0; wFixed < 2; wFixed++) {
-    for (let coordinate = 0; coordinate < 4; coordinate++) {
-      let faceVertices = [];
-      for (let i = 0; i < 8; i++) {
-        let index = 0;
-        // ... complex indexing to get correct face
-        faceVertices.push(vertices[index]);
-      }
-      faces.push(faceVertices);
-    }
-  }
-}
+        function setup() {
+            let canvas = createCanvas(700, 700, WEBGL);
+            canvas.parent('sketch-holder');
+            
+            hyperShader = new HyperShader();
+            hyperShader.createHypercube();
+            
+            setupControls();
+        }
 
-function calculate4DNormal(faceVertices) {
-  // Calculate normal in 4D space
-  let v1 = faceVertices[1].map((val, i) => val - faceVertices[0][i]);
-  let v2 = faceVertices[2].map((val, i) => val - faceVertices[0][i]);
-  let v3 = faceVertices[3].map((val, i) => val - faceVertices[0][i]);
-  
-  // 4D cross product (determinant method)
-  let normal = [
-    v1[1]*(v2[2]*v3[3] - v2[3]*v3[2]) - v1[2]*(v2[1]*v3[3] - v2[3]*v3[1]) + v1[3]*(v2[1]*v3[2] - v2[2]*v3[1]),
-    // ... continues for all 4 components
-  ];
-  
-  return normalize4D(normal);
-}
+        function draw() {
+            background(0);
+            orbitControl();
+            
+            if (rotate4D) {
+                angleW += hyperShader.rotationSpeed;
+            }
+            
+            // Apply current rendering mode
+            switch(currentMode) {
+                case 'wireframe':
+                    hyperShader.renderWireframe(angleW);
+                    break;
+                case 'vertex-color':
+                    hyperShader.renderVertexColors(angleW);
+                    break;
+                case 'depth-shading':
+                    hyperShader.renderDepthShading(angleW);
+                    break;
+                case '4d-lighting':
+                    hyperShader.render4DLighting(angleW);
+                    break;
+            }
+        }
 
-function calculate4DLighting(face, lightPos) {
-  let faceCenter = [0, 0, 0, 0];
-  for (let vertex of face) {
-    for (let i = 0; i < 4; i++) faceCenter[i] += vertex[i];
-  }
-  for (let i = 0; i < 4; i++) faceCenter[i] /= face.length;
-  
-  let normal = calculate4DNormal(face);
-  let lightDir = lightPos.map((val, i) => val - faceCenter[i]);
-  lightDir = normalize4D(lightDir);
-  
-  // 4D dot product
-  let dot = normal.reduce((sum, val, i) => sum + val * lightDir[i], 0);
-  return map(dot, -1, 1, 0, 255);
-}
+        function setupControls() {
+            // Mode buttons
+            document.getElementById('mode-wireframe').addEventListener('click', () => setMode('wireframe'));
+            document.getElementById('mode-vertex-color').addEventListener('click', () => setMode('vertex-color'));
+            document.getElementById('mode-depth-shading').addEventListener('click', () => setMode('depth-shading'));
+            document.getElementById('mode-4d-lighting').addEventListener('click', () => setMode('4d-lighting'));
+            
+            // Sliders
+            document.getElementById('rotation-speed').addEventListener('input', function(e) {
+                hyperShader.rotationSpeed = parseFloat(e.target.value);
+                document.getElementById('speed-value').textContent = hyperShader.rotationSpeed.toFixed(3);
+            });
+            
+            document.getElementById('cube-size').addEventListener('input', function(e) {
+                hyperShader.cubeSize = parseInt(e.target.value);
+                document.getElementById('size-value').textContent = hyperShader.cubeSize;
+                hyperShader.createHypercube();
+            });
+            
+            document.getElementById('light-position').addEventListener('input', function(e) {
+                hyperShader.lightPos[3] = parseInt(e.target.value);
+                document.getElementById('light-value').textContent = hyperShader.lightPos[3];
+            });
+            
+            // Toggle buttons
+            document.getElementById('toggle-rotation').addEventListener('click', function() {
+                rotate4D = !rotate4D;
+                this.textContent = rotate4D ? 'Pause Rotation' : 'Resume Rotation';
+            });
+            
+            document.getElementById('reset-view').addEventListener('click', function() {
+                angleW = 0;
+            });
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update active button
+            document.querySelectorAll('.shader-selector button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`mode-${mode}`).classList.add('active');
+            
+            // Update info panel
+            document.getElementById('current-mode').textContent = 
+                mode.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+            updateModeDescription(mode);
+        }
+
+        function updateModeDescription(mode) {
+            const descriptions = {
+                'wireframe': 'Classic wireframe visualization showing the 32 edges of the hypercube with depth-based brightness.',
+                'vertex-color': 'Each vertex has a unique RGB color based on its 4D coordinates. Edges interpolate between vertex colors.',
+                'depth-shading': 'Depth-based coloring using HSV color space. Warmer colors indicate closer proximity in 3D projection.',
+                '4d-lighting': 'Experimental 4D lighting calculation. Attempts to simulate light interaction in 4D space.'
+            };
+            
+            document.getElementById('mode-description').textContent = descriptions[mode];
+        }
+
+        function windowResized() {
+            resizeCanvas(700, 700);
+        }
     </script>
 </body>
 </html>
