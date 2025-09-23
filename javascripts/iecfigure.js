@@ -1,10 +1,26 @@
-// IEC Color Scheme from yus.github.io/iec.html with dynamic generation
+// IEC Hypercube Visualization - Complete Sketch.js
 const IEC_COLORS = generateIECColors();
-const VERTEX_DIAMETER = 5; // 3x smaller than 15 as requested
+const VERTEX_DIAMETER = 5;
+
+// IEC Naming System
+const IEC_NAMING_SYSTEM = {
+    categories: {
+        energy: ['Quantum', 'Kinetic', 'Potential', 'Thermal', 'Radiant', 'Chemical', 'Electrical', 'Nuclear'],
+        complexity: ['Simple', 'Compound', 'Composite', 'Integrated', 'Fractal', 'Chaotic', 'Harmonic', 'Resonant'],
+        stability: ['Volatile', 'Dynamic', 'Balanced', 'Stable', 'Robust', 'Inert', 'Crystalline', 'Absolute'],
+        dimension: ['Point', 'Linear', 'Planar', 'Volumetric', 'Temporal', 'Spatial', 'Dimensional', 'Hyper']
+    },
+    modifiers: {
+        intensity: ['Faint', 'Subtle', 'Moderate', 'Strong', 'Intense', 'Brilliant', 'Radiant', 'Absolute'],
+        phase: ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'],
+        quality: ['Pure', 'Mixed', 'Graded', 'Layered', 'Textured', 'Patterned', 'Structured', 'Organized']
+    }
+};
+
+const IEC_COLOR_SAMPLES = generateColorSamples();
 
 function generateIECColors() {
-    // Dynamic color generation similar to yus.github.io/colors.html
-    const baseHue = 200; // Blue base
+    const baseHue = 200;
     return {
         primary: `hsl(${baseHue}, 80%, 60%)`,
         secondary: `hsl(${baseHue + 20}, 70%, 50%)`,
@@ -17,31 +33,97 @@ function generateIECColors() {
     };
 }
 
-// Vertex coloring formulas from IEC metrics
+function generateColorSamples() {
+    const samples = [];
+    const hues = [0, 30, 60, 120, 180, 240, 300, 330];
+    const saturations = [60, 70, 80, 90];
+    const lightnesses = [40, 50, 60, 70];
+    
+    let index = 0;
+    for (let h = 0; h < hues.length; h++) {
+        for (let s = 0; s < saturations.length; s++) {
+            for (let l = 0; l < lightnesses.length; l++) {
+                if (index < 256) {
+                    samples.push({
+                        hue: hues[h],
+                        saturation: saturations[s],
+                        lightness: lightnesses[l],
+                        hex: hslToHex(hues[h], saturations[s], lightnesses[l]),
+                        name: generateColorName(h, s, l, index)
+                    });
+                    index++;
+                }
+            }
+        }
+    }
+    return samples;
+}
+
+function generateColorName(hIndex, sIndex, lIndex, globalIndex) {
+    const cat = IEC_NAMING_SYSTEM.categories;
+    const mod = IEC_NAMING_SYSTEM.modifiers;
+    
+    const energy = cat.energy[hIndex % cat.energy.length];
+    const complexity = cat.complexity[sIndex % cat.complexity.length];
+    const stability = cat.stability[lIndex % cat.stability.length];
+    const dimension = cat.dimension[globalIndex % 8];
+    
+    const intensity = mod.intensity[sIndex];
+    const phase = mod.phase[lIndex % mod.phase.length];
+    const quality = mod.quality[hIndex % mod.quality.length];
+    
+    const nameStyles = [
+        `${energy} ${complexity}`,
+        `${stability} ${dimension}`,
+        `${intensity} ${phase}`,
+        `${quality} ${energy}`,
+        `${complexity} ${stability}`,
+        `${dimension} ${phase}`,
+        `${energy}-${phase} ${quality}`,
+        `${stability} ${complexity} ${dimension}`
+    ];
+    
+    return nameStyles[globalIndex % nameStyles.length];
+}
+
+function hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 function getVertexColor(vertex, index) {
-    const [x, y, z, w] = vertex;
-    
-    // IEC metric formulas for vertex coloring
-    const energy = (Math.sin(x * 2 * Math.PI) + 1) * 50;
-    const complexity = (Math.cos(y * 3 * Math.PI) + 1) * 40;
-    const stability = (Math.sin(z * 4 * Math.PI) + 1) * 60;
-    
-    // Combine metrics for color generation
-    const hue = (energy + complexity) % 360;
-    const saturation = 70 + stability * 0.3;
-    const lightness = 50 + energy * 0.2;
-    
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    const colorSample = IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length];
+    return `hsl(${colorSample.hue}, ${colorSample.saturation}%, ${colorSample.lightness}%)`;
+}
+
+function getVertexName(vertex, index) {
+    return IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length].name;
+}
+
+function getVertexSample(vertex, index) {
+    return IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length];
 }
 
 function calculateIECMetrics(vertex, index) {
     const [x, y, z, w] = vertex;
+    const colorSample = getVertexSample(vertex, index);
     
     return {
-        energy: Math.abs(x * y * 100).toFixed(1),
-        complexity: Math.abs((x + y + z) * 50).toFixed(1),
-        stability: Math.abs(w * 75).toFixed(1),
-        coherence: Math.abs((x * y * z * w) * 200).toFixed(1)
+        energy: (Math.sin(x * Math.PI) * 50 + 50).toFixed(1),
+        complexity: (Math.cos(y * Math.PI * 2) * 30 + 50).toFixed(1),
+        stability: (Math.sin(z * Math.PI * 3) * 20 + 60).toFixed(1),
+        coherence: (Math.cos(w * Math.PI * 4) * 40 + 50).toFixed(1),
+        hue: colorSample.hue,
+        saturation: colorSample.saturation,
+        lightness: colorSample.lightness,
+        hex: colorSample.hex,
+        name: colorSample.name
     };
 }
 
@@ -81,7 +163,6 @@ class Tesseract {
             }
         }
 
-        // Create edges
         this.edges = [];
         for (let i = 0; i < this.vertices.length; i++) {
             const coords = this.getGridCoordinates(i, subdivisions);
@@ -115,33 +196,26 @@ class Tesseract {
     projectVertex(vertex) {
         let [x, y, z, w] = vertex;
         
-        // Apply 4D rotations with proper matrix math
         const rx = rotation.x * Math.PI / 180;
         const ry = rotation.y * Math.PI / 180;
         const rz = rotation.z * Math.PI / 180;
         const rw = rotation.w * Math.PI / 180;
         
-        // XY rotation
         let x1 = x * Math.cos(rw) - y * Math.sin(rw);
         let y1 = x * Math.sin(rw) + y * Math.cos(rw);
         
-        // XZ rotation
         let x2 = x1 * Math.cos(rz) - z * Math.sin(rz);
         let z1 = x1 * Math.sin(rz) + z * Math.cos(rz);
         
-        // XW rotation
         let x3 = x2 * Math.cos(rw) - w * Math.sin(rw);
         let w1 = x2 * Math.sin(rw) + w * Math.cos(rw);
         
-        // YZ rotation
         let y2 = y1 * Math.cos(rx) - z1 * Math.sin(rx);
         let z2 = y1 * Math.sin(rx) + z1 * Math.cos(rx);
         
-        // YW rotation
         let y3 = y2 * Math.cos(ry) - w1 * Math.sin(ry);
         let w2 = y2 * Math.sin(ry) + w1 * Math.cos(ry);
         
-        // Perspective projection
         const depth = perspective;
         const factor = depth / (depth - w2);
         x3 *= factor;
@@ -167,35 +241,28 @@ function setup() {
     setupEventListeners();
     
     strokeWeight(0.5);
-    noLoop(); // Start paused until we need animation
+    noLoop();
+    createColorSampleElement();
 }
 
 function draw() {
     background(IEC_COLORS.background);
     
     if (autoRotate) {
-        // Complete wave motion centered around 180° with margins
         const phase = frameCount * 0.02;
-        const amplitude = 80; // Reduced range for better visibility
+        const amplitude = 80;
         const center = 180;
         
-        rotation.x = center + Math.sin(phase) * amplitude;
-        rotation.y = center + Math.sin(phase * 1.3 + 1) * amplitude;
-        rotation.z = center + Math.sin(phase * 0.7 + 2) * amplitude;
-        rotation.w = center + Math.sin(phase * 1.1 + 3) * amplitude;
-        
-        // Round to integers to prevent layout issues
-        rotation.x = Math.round(rotation.x);
-        rotation.y = Math.round(rotation.y);
-        rotation.z = Math.round(rotation.z);
-        rotation.w = Math.round(rotation.w);
+        rotation.x = Math.round(center + Math.sin(phase) * amplitude);
+        rotation.y = Math.round(center + Math.sin(phase * 1.3 + 1) * amplitude);
+        rotation.z = Math.round(center + Math.sin(phase * 0.7 + 2) * amplitude);
+        rotation.w = Math.round(center + Math.sin(phase * 1.1 + 3) * amplitude);
         
         updateSliderValues();
     }
     
     const projected = tesseract.vertices.map(v => tesseract.projectVertex(v));
     
-    // Draw edges
     stroke(IEC_COLORS.primary);
     tesseract.edges.forEach(edge => {
         const v1 = projected[edge[0]];
@@ -203,22 +270,19 @@ function draw() {
         line(v1.x, v1.y, v2.x, v2.y);
     });
     
-    // Draw vertices with IEC coloring
     if (showVertices) {
         noStroke();
         projected.forEach((vertex, index) => {
             if (index === selectedVertex) {
                 fill(IEC_COLORS.selected);
+                drawGlow(vertex.x, vertex.y, VERTEX_DIAMETER * 2);
             } else {
                 fill(getVertexColor(tesseract.vertices[index], index));
             }
             circle(vertex.x, vertex.y, VERTEX_DIAMETER);
             
-            if (showLabels && index === selectedVertex) {
-                fill(IEC_COLORS.text);
-                textSize(10);
-                textAlign(CENTER, CENTER);
-                text(index, vertex.x, vertex.y - 10);
+            if ((showLabels && index === selectedVertex) || (showLabels && index % 16 === 0)) {
+                drawVertexLabel(vertex, index);
             }
         });
     }
@@ -226,30 +290,89 @@ function draw() {
     updateMetrics();
 }
 
-function updateMetrics() {
-    // Update main metrics
-    document.getElementById('vertex-count').textContent = tesseract.vertices.length;
-    document.getElementById('edge-count').textContent = tesseract.edges.length;
+function drawGlow(x, y, size) {
+    drawingContext.shadowBlur = 15;
+    drawingContext.shadowColor = IEC_COLORS.selected;
+    circle(x, y, size);
+    drawingContext.shadowBlur = 0;
+}
+
+function drawVertexLabel(vertex, index) {
+    const name = getVertexName(tesseract.vertices[index], index);
+    fill(255, 255, 255, 200);
+    textSize(9);
+    textAlign(CENTER, CENTER);
+    text(name, vertex.x, vertex.y - 12);
     
-    // Update selected vertex metrics
+    fill(getVertexColor(tesseract.vertices[index], index));
+    rect(vertex.x - 8, vertex.y - 25, 16, 4);
+}
+
+function updateMetrics() {
     if (selectedVertex !== null) {
         const metrics = calculateIECMetrics(tesseract.vertices[selectedVertex], selectedVertex);
-        document.getElementById('face-count').textContent = metrics.energy;
-        document.getElementById('cell-count').textContent = metrics.complexity;
-        document.getElementById('hypervolume').textContent = metrics.stability;
         
-        // Show vertex info
+        document.getElementById('vertex-count').textContent = `#${selectedVertex}`;
+        document.getElementById('edge-count').textContent = metrics.name;
+        document.getElementById('face-count').textContent = `${metrics.energy} Energy`;
+        document.getElementById('cell-count').textContent = `${metrics.complexity} Complexity`;
+        document.getElementById('hypervolume').textContent = `${metrics.stability} Stability`;
+        
+        updateColorSample(metrics);
         showVertexInfo(selectedVertex, metrics);
     } else {
-        document.getElementById('face-count').textContent = '864';
-        document.getElementById('cell-count').textContent = '216';
-        document.getElementById('hypervolume').textContent = '1.00';
+        document.getElementById('vertex-count').textContent = '256';
+        document.getElementById('edge-count').textContent = '768 Edges';
+        document.getElementById('face-count').textContent = '864 Faces';
+        document.getElementById('cell-count').textContent = '216 Cells';
+        document.getElementById('hypervolume').textContent = '1.00 Hypervolume';
+        document.getElementById('color-sample').style.display = 'none';
         document.getElementById('vertex-info').style.display = 'none';
     }
 }
 
+function updateColorSample(metrics) {
+    const sample = document.getElementById('color-sample');
+    sample.innerHTML = `
+        <div class="color-display" style="background: ${metrics.hex}"></div>
+        <div class="color-info">
+            <div class="color-name">${metrics.name}</div>
+            <div class="color-values">HSL(${metrics.hue}, ${metrics.saturation}%, ${metrics.lightness}%)</div>
+            <div class="color-hex">${metrics.hex}</div>
+        </div>
+    `;
+    sample.style.display = 'block';
+}
+
+function createColorSampleElement() {
+    const metricsPanel = document.querySelector('.metrics-panel');
+    const colorSample = document.createElement('div');
+    colorSample.id = 'color-sample';
+    colorSample.style.cssText = `
+        display: none;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    `;
+    
+    colorSample.innerHTML = `
+        <div class="color-display" style="width: 60px; height: 60px; border-radius: 6px; border: 2px solid #333;"></div>
+        <div class="color-info">
+            <div class="color-name" style="color: #4fc3f7; font-weight: bold; margin-bottom: 5px;"></div>
+            <div class="color-values" style="color: #90a4ae; font-size: 0.8rem; margin-bottom: 3px;"></div>
+            <div class="color-hex" style="color: #b0b0b0; font-family: monospace; font-size: 0.9rem;"></div>
+        </div>
+    `;
+    
+    metricsPanel.appendChild(colorSample);
+}
+
 function setupEventListeners() {
-    // Rotation sliders with integer values only
     ['x', 'y', 'z', 'w'].forEach(axis => {
         const slider = document.getElementById(`rotation-${axis}`);
         const display = document.getElementById(`rotation-${axis}-value`);
@@ -330,10 +453,10 @@ function toggleAutoRotate() {
     button.classList.toggle('active', autoRotate);
     
     if (autoRotate) {
-        loop(); // Start animation
+        loop();
     } else {
-        noLoop(); // Stop animation
-        redraw(); // Draw one frame
+        noLoop();
+        redraw();
     }
 }
 
