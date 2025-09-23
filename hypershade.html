@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Hypercube Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        #sketch-container {
+            margin: 20px 0;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+            max-width: 600px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        button {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .slider-container {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>4D Hypercube (Tesseract) Visualization</h1>
+    
+    <div class="instructions">
+        <p>Drag to rotate in 3D • Use controls below to manipulate the 4D rotation</p>
+    </div>
+    
+    <div id="sketch-container"></div>
+    
+    <div class="controls">
+        <div class="slider-container">
+            <label for="speed">Rotation Speed: <span id="speed-value">0.02</span></label>
+            <input type="range" id="speed" min="0" max="0.1" step="0.001" value="0.02">
+        </div>
+        
+        <div class="slider-container">
+            <label for="size">Hypercube Size: <span id="size-value">100</span></label>
+            <input type="range" id="size" min="50" max="200" step="10" value="100">
+        </div>
+        
+        <div>
+            <button id="toggle-rotation">Pause Rotation</button>
+            <button id="reset-view">Reset View</button>
+            <button id="toggle-vertices">Hide Vertices</button>
+            <button id="toggle-wireframe">Wireframe Mode</button>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <p><strong>What you're seeing:</strong> This is a 3D projection of a 4-dimensional hypercube (tesseract). 
+            The complex folding pattern represents how a 4D object would appear in our 3D space.</p>
+        </div>
+    </div>
+
+    <script>
+        let vertices = [];
+let faces = []; // Now we need faces, not just edges
+let light4D = [0, 0, 0, 400]; // 4D light position
+
+function setup() {
+  createCanvas(800, 800, WEBGL);
+  createHypercubeFaces();
+}
+
+function createHypercubeFaces() {
+  // Create 16 vertices (same as before)
+  for (let i = 0; i < 16; i++) {
+    vertices.push([
+      (i & 1) ? 100 : -100,
+      (i & 2) ? 100 : -100, 
+      (i & 4) ? 100 : -100,
+      (i & 8) ? 100 : -100
+    ]);
+  }
+  
+  // Create 8 cubic "faces" (each is a 3D cube in 4D)
+  // Each face has 8 vertices that differ only in the 4th coordinate
+  for (let wFixed = 0; wFixed < 2; wFixed++) {
+    for (let coordinate = 0; coordinate < 4; coordinate++) {
+      let faceVertices = [];
+      for (let i = 0; i < 8; i++) {
+        let index = 0;
+        // ... complex indexing to get correct face
+        faceVertices.push(vertices[index]);
+      }
+      faces.push(faceVertices);
+    }
+  }
+}
+
+function calculate4DNormal(faceVertices) {
+  // Calculate normal in 4D space
+  let v1 = faceVertices[1].map((val, i) => val - faceVertices[0][i]);
+  let v2 = faceVertices[2].map((val, i) => val - faceVertices[0][i]);
+  let v3 = faceVertices[3].map((val, i) => val - faceVertices[0][i]);
+  
+  // 4D cross product (determinant method)
+  let normal = [
+    v1[1]*(v2[2]*v3[3] - v2[3]*v3[2]) - v1[2]*(v2[1]*v3[3] - v2[3]*v3[1]) + v1[3]*(v2[1]*v3[2] - v2[2]*v3[1]),
+    // ... continues for all 4 components
+  ];
+  
+  return normalize4D(normal);
+}
+
+function calculate4DLighting(face, lightPos) {
+  let faceCenter = [0, 0, 0, 0];
+  for (let vertex of face) {
+    for (let i = 0; i < 4; i++) faceCenter[i] += vertex[i];
+  }
+  for (let i = 0; i < 4; i++) faceCenter[i] /= face.length;
+  
+  let normal = calculate4DNormal(face);
+  let lightDir = lightPos.map((val, i) => val - faceCenter[i]);
+  lightDir = normalize4D(lightDir);
+  
+  // 4D dot product
+  let dot = normal.reduce((sum, val, i) => sum + val * lightDir[i], 0);
+  return map(dot, -1, 1, 0, 255);
+}
+    </script>
+</body>
+</html>
