@@ -89,10 +89,11 @@ function draw() {
     let s = vertices[selected];
     push();
     translate(s.x, s.y, s.z);
-    noFill();
-    stroke(255,255,0);
-    strokeWeight(3);
-    circle(0,0,5);
+    //noFill();
+    fill(0,0,0);
+    stroke(220,220,0);
+    strokeWeight(1);
+    circle(0,0,8);
     pop();
     
     // Update UI
