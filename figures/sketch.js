@@ -78,7 +78,7 @@ function draw() {
     }
     
     // Vertices
-    strokeWeight(12);
+    strokeWeight(2);
     for (let i = 0; i < vertices.length; i++) {
         let c = colors[i];
         stroke(c[0], c[1], c[2]);
@@ -92,7 +92,7 @@ function draw() {
     noFill();
     stroke(255,255,0);
     strokeWeight(3);
-    circle(0,0,25);
+    circle(0,0,5);
     pop();
     
     // Update UI
