@@ -225,10 +225,11 @@ function draw() {
     rotateY(rotationY);
     
     // Draw geometry (even if edges are disabled, vertices should show)
-    // drawEdges(); // You can comment this out but keep vertices visible
+    drawEdges(); // You can comment this out but keep vertices visible
     drawVertices();
     drawSelectedVertex();
     
+    drawControlHelp();
     // Visual feedback overlay
     drawGestureFeedback();
     
@@ -349,6 +350,18 @@ function drawSelectedVertex() {
     noStroke();
     circle(0, 0, 8);
     
+    pop();
+}
+
+function drawControlHelp() {
+    push();
+    resetMatrix();
+    fill(255, 255, 255, 100);
+    noStroke();
+    textAlign(LEFT, TOP);
+    textSize(14);
+    text('Rotation: ' + nf(rotationX, 1, 2) + ', ' + nf(rotationY, 1, 2) + 
+         '\nZoom: ' + nf(zoom, 1, 2), 20, 120);
     pop();
 }
 
