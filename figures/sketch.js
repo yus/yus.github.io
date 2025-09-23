@@ -69,7 +69,7 @@ function draw() {
     rotateY(rotY);
     
     // Edges
-    strokeWeight(1);
+    strokeWeight(.5);
     for (let [i,j] of edges) {
         let c1 = colors[i], c2 = colors[j];
         stroke((c1[0]+c2[0])/2, (c1[1]+c2[1])/2, (c1[2]+c2[2])/2);
@@ -78,7 +78,7 @@ function draw() {
     }
     
     // Vertices
-    strokeWeight(2);
+    strokeWeight(5);
     for (let i = 0; i < vertices.length; i++) {
         let c = colors[i];
         stroke(c[0], c[1], c[2]);
@@ -92,8 +92,8 @@ function draw() {
     //noFill();
     fill(0,0,0);
     stroke(220,220,0);
-    strokeWeight(1);
-    circle(0,0,8);
+    strokeWeight(2);
+    circle(0,0,15);
     pop();
     
     // Update UI
