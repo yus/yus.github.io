@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IEC Hypercube</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="sketch.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 1fr;
+            gap: 1vmin;
+            padding: 2vmin;
+        }
+
+        .header {
+            text-align: center;
+            padding: 1vmin 0;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 300;
+            color: #4fc3f7;
+            margin-bottom: 0.5vmin;
+        }
+
+        .subtitle {
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
+            color: #90a4ae;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr minmax(300px, 25%);
+            gap: 2vmin;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+        }
+
+        #sketch-container {
+            background: #000;
+            border-radius: 1vmin;
+            overflow: hidden;
+            position: relative;
+            min-height: 50vh;
+        }
+
+        .controls-panel {
+            background: #1a1a1a;
+            border-radius: 1vmin;
+            padding: 2vmin;
+            display: flex;
+            flex-direction: column;
+            gap: 2vmin;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            margin-bottom: 0;
+        }
+
+        .control-group h3 {
+            color: #4fc3f7;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            margin-bottom: 1vmin;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slider-container {
+            display: grid;
+            grid-template-columns: minmax(100px, 1fr) minmax(150px, 2fr) auto;
+            align-items: center;
+            gap: 1vmin;
+            margin-bottom: 1vmin;
+        }
+
+        .slider-container label {
+            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+            color: #b0b0b0;
+            white-space: nowrap;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 0.5vmin;
+            background: #333;
+            border-radius: 0.25vmin;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: clamp(12px, 2vw, 16px);
+            height: clamp(12px, 2vw, 16px);
+            background: #4fc3f7;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+            color: #4fc3f7;
+            font-family: 'Monaco', 'Consolas', monospace;
+            min-width: 4ch;
+            text-align: center;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1vmin;
+            margin-top: auto;
+        }
+
+        button {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: clamp(8px, 1.5vmin, 12px);
+            border-radius: 0.5vmin;
+            cursor: pointer;
+            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #333;
+            border-color: #4fc3f7;
+        }
+
+        button.active {
+            background: #4fc3f7;
+            color: #000;
+            border-color: #4fc3f7;
+        }
+
+        .metrics-panel {
+            background: #1a1a1a;
+            border-radius: 1vmin;
+            padding: 2vmin;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 2vmin;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5vmin;
+        }
+
+        .metric-item {
+            background: #252525;
+            padding: clamp(10px, 2vmin, 15px);
+            border-radius: 0.8vmin;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-item:hover {
+            transform: translateY(-0.3vmin);
+            border-color: #4fc3f7;
+        }
+
+        .metric-value {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            color: #4fc3f7;
+            margin-bottom: 0.5vmin;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .metric-label {
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            color: #90a4ae;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .color-sample {
+            background: #252525;
+            border-radius: 0.8vmin;
+            padding: 1.5vmin;
+            display: flex;
+            align-items: center;
+            gap: 2vmin;
+            border: 1px solid #333;
+        }
+
+        .color-display {
+            width: clamp(40px, 8vmin, 60px);
+            height: clamp(40px, 8vmin, 60px);
+            border-radius: 0.6vmin;
+            border: 2px solid #333;
+            flex-shrink: 0;
+        }
+
+        .color-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .color-name {
+            color: #4fc3f7;
+            font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+            font-weight: 600;
+            margin-bottom: 0.5vmin;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .color-values {
+            color: #90a4ae;
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+            margin-bottom: 0.3vmin;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .color-hex {
+            color: #b0b0b0;
+            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .vertex-info {
+            position: absolute;
+            top: 1vmin;
+            left: 1vmin;
+            background: rgba(26, 26, 26, 0.95);
+            padding: 1.5vmin;
+            border-radius: 0.8vmin;
+            font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+            border-left: 3px solid #4fc3f7;
+            display: none;
+            max-width: min(300px, 30vw);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1vmin 0;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+        }
+
+        /* Scrollbar styling */
+        .controls-panel::-webkit-scrollbar {
+            width: 0.5vmin;
+        }
+
+        .controls-panel::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: #4fc3f7;
+            border-radius: 0.25vmin;
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            button {
+                padding: 2vmin;
+                min-height: 44px; /* Apple touch guideline */
+            }
+            
+            input[type="range"] {
+                height: 1vmin;
+            }
+            
+            input[type="range"]::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .vertex-info {
+                border-left-width: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>IEC HYPERCUBE VISUALIZATION</h1>
+            <div class="subtitle">4D Tesseract with IEC Metric Integration</div>
+        </header>
+
+        <main class="main-content">
+            <div id="sketch-container">
+                <div class="vertex-info" id="vertex-info"></div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h3>Rotation Controls</h3>
+                    <div class="slider-container">
+                        <label for="rotation-x">X Rotation</label>
+                        <input type="range" id="rotation-x" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-x-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-y">Y Rotation</label>
+                        <input type="range" id="rotation-y" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-y-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-z">Z Rotation</label>
+                        <input type="range" id="rotation-z" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-z-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-w">W Rotation</label>
+                        <input type="range" id="rotation-w" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-w-value">0°</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Visualization Settings</h3>
+                    <div class="slider-container">
+                        <label for="scale">Scale</label>
+                        <input type="range" id="scale" min="50" max="200" value="100">
+                        <span class="value-display" id="scale-value">100%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="perspective">Perspective</label>
+                        <input type="range" id="perspective" min="1" max="10" value="4" step="0.1">
+                        <span class="value-display" id="perspective-value">4.0</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="reset-view">Reset View</button>
+                    <button id="auto-rotate">Auto Rotate</button>
+                    <button id="toggle-vertices">Show Vertices</button>
+                    <button id="toggle-labels">Hide Labels</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="metrics-panel">
+            <h3 style="color: #4fc3f7; font-size: clamp(0.9rem, 1.5vw, 1rem); margin-bottom: 1vmin;">IEC Metrics & Color System</h3>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value" id="vertex-count">256</div>
+                    <div class="metric-label">Vertices</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="edge-count">768</div>
+                    <div class="metric-label">Edges</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="face-count">864</div>
+                    <div class="metric-label">Faces</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="cell-count">216</div>
+                    <div class="metric-label">3D Cells</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="hypervolume">1.00</div>
+                    <div class="metric-label">Hypervolume</div>
+                </div>
+            </div>
+            
+            <div id="color-sample" class="color-sample" style="display: none;">
+                <div class="color-display"></div>
+                <div class="color-info">
+                    <div class="color-name"></div>
+                    <div class="color-values"></div>
+                    <div class="color-hex"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            IEC Hypercube Visualization • 4D Tesseract Implementation
+        </footer>
+    </div>
+</body>
+</html>
