@@ -1,14 +1,49 @@
-// IEC Color Scheme from yus.github.io/iec.html
-const IEC_COLORS = {
-    primary: '#4fc3f7',      // Light blue
-    secondary: '#29b6f6',    // Medium blue  
-    accent: '#01579b',       // Dark blue
-    background: '#000011',    // Dark blue-black
-    grid: '#1a237e',         // Grid blue
-    vertex: '#e3f2fd',       // Light blue-white
-    selected: '#ff5252',     // Red for selection
-    text: '#e0e0e0'          // Light gray
-};
+// IEC Color Scheme from yus.github.io/iec.html with dynamic generation
+const IEC_COLORS = generateIECColors();
+const VERTEX_DIAMETER = 5; // 3x smaller than 15 as requested
+
+function generateIECColors() {
+    // Dynamic color generation similar to yus.github.io/colors.html
+    const baseHue = 200; // Blue base
+    return {
+        primary: `hsl(${baseHue}, 80%, 60%)`,
+        secondary: `hsl(${baseHue + 20}, 70%, 50%)`,
+        accent: `hsl(${baseHue - 20}, 90%, 40%)`,
+        background: '#000011',
+        grid: `hsl(${baseHue}, 60%, 20%)`,
+        vertex: `hsl(${baseHue}, 30%, 85%)`,
+        selected: '#ff5252',
+        text: '#e0e0e0'
+    };
+}
+
+// Vertex coloring formulas from IEC metrics
+function getVertexColor(vertex, index) {
+    const [x, y, z, w] = vertex;
+    
+    // IEC metric formulas for vertex coloring
+    const energy = (Math.sin(x * 2 * Math.PI) + 1) * 50;
+    const complexity = (Math.cos(y * 3 * Math.PI) + 1) * 40;
+    const stability = (Math.sin(z * 4 * Math.PI) + 1) * 60;
+    
+    // Combine metrics for color generation
+    const hue = (energy + complexity) % 360;
+    const saturation = 70 + stability * 0.3;
+    const lightness = 50 + energy * 0.2;
+    
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+function calculateIECMetrics(vertex, index) {
+    const [x, y, z, w] = vertex;
+    
+    return {
+        energy: Math.abs(x * y * 100).toFixed(1),
+        complexity: Math.abs((x + y + z) * 50).toFixed(1),
+        stability: Math.abs(w * 75).toFixed(1),
+        coherence: Math.abs((x * y * z * w) * 200).toFixed(1)
+    };
+}
 
 let tesseract;
 let canvas;
@@ -28,8 +63,8 @@ class Tesseract {
     }
 
     initialize256VertexTesseract() {
-        // Create 4x4x4x4 grid (256 vertices)
         const subdivisions = 4;
+        this.vertices = [];
         
         for (let w = 0; w < subdivisions; w++) {
             for (let z = 0; z < subdivisions; z++) {
@@ -46,11 +81,11 @@ class Tesseract {
             }
         }
 
-        // Create edges for 4D grid
+        // Create edges
+        this.edges = [];
         for (let i = 0; i < this.vertices.length; i++) {
             const coords = this.getGridCoordinates(i, subdivisions);
             
-            // Check neighbors in 4 dimensions
             for (let dim = 0; dim < 4; dim++) {
                 if (coords[dim] < subdivisions - 1) {
                     const neighborCoords = [...coords];
@@ -74,61 +109,52 @@ class Tesseract {
 
     getGridIndex(coords, subdivisions) {
         const [x, y, z, w] = coords;
-        return w * Math.pow(subdivisions, 3) + 
-               z * Math.pow(subdivisions, 2) + 
-               y * subdivisions + 
-               x;
+        return w * Math.pow(subdivisions, 3) + z * Math.pow(subdivisions, 2) + y * subdivisions + x;
     }
 
-    projectVertex(vertex, canvasWidth, canvasHeight) {
+    projectVertex(vertex) {
         let [x, y, z, w] = vertex;
         
-        // Apply 4D rotations
-        this.rotate4D([x, y, z, w], rotation);
-        
-        // Perspective projection from 4D to 3D
-        const depth = perspective;
-        const factor = depth / (depth - w);
-        x *= factor;
-        y *= factor;
-        z *= factor;
-        
-        // Scale to canvas
-        const scale = Math.min(canvasWidth, canvasHeight) * 0.15 * scaleFactor;
-        return {
-            x: x * scale + canvasWidth / 2,
-            y: y * scale + canvasHeight / 2,
-            z: z * scale,
-            w: w
-        };
-    }
-
-    rotate4D(vertex, angles) {
-        let [x, y, z, w] = vertex;
-        
-        // Convert degrees to radians
-        const rx = angles.x * Math.PI / 180;
-        const ry = angles.y * Math.PI / 180;
-        const rz = angles.z * Math.PI / 180;
-        const rw = angles.w * Math.PI / 180;
+        // Apply 4D rotations with proper matrix math
+        const rx = rotation.x * Math.PI / 180;
+        const ry = rotation.y * Math.PI / 180;
+        const rz = rotation.z * Math.PI / 180;
+        const rw = rotation.w * Math.PI / 180;
         
         // XY rotation
-        const xy = [x * Math.cos(rw) - y * Math.sin(rw), 
-                   x * Math.sin(rw) + y * Math.cos(rw), z, w];
+        let x1 = x * Math.cos(rw) - y * Math.sin(rw);
+        let y1 = x * Math.sin(rw) + y * Math.cos(rw);
         
-        // XZ rotation  
-        const xz = [xy[0] * Math.cos(rz) - xy[2] * Math.sin(rz),
-                   xy[1], xy[0] * Math.sin(rz) + xy[2] * Math.cos(rz), xy[3]];
+        // XZ rotation
+        let x2 = x1 * Math.cos(rz) - z * Math.sin(rz);
+        let z1 = x1 * Math.sin(rz) + z * Math.cos(rz);
         
         // XW rotation
-        const xw = [xz[0] * Math.cos(rw) - xz[3] * Math.sin(rw),
-                   xz[1], xz[2], xz[0] * Math.sin(rw) + xz[3] * Math.cos(rw)];
+        let x3 = x2 * Math.cos(rw) - w * Math.sin(rw);
+        let w1 = x2 * Math.sin(rw) + w * Math.cos(rw);
         
         // YZ rotation
-        const yz = [xw[0], xw[1] * Math.cos(rx) - xw[2] * Math.sin(rx),
-                   xw[1] * Math.sin(rx) + xw[2] * Math.cos(rx), xw[3]];
+        let y2 = y1 * Math.cos(rx) - z1 * Math.sin(rx);
+        let z2 = y1 * Math.sin(rx) + z1 * Math.cos(rx);
         
-        return yz;
+        // YW rotation
+        let y3 = y2 * Math.cos(ry) - w1 * Math.sin(ry);
+        let w2 = y2 * Math.sin(ry) + w1 * Math.cos(ry);
+        
+        // Perspective projection
+        const depth = perspective;
+        const factor = depth / (depth - w2);
+        x3 *= factor;
+        y3 *= factor;
+        z2 *= factor;
+        
+        const scale = Math.min(width, height) * 0.2 * scaleFactor;
+        return {
+            x: x3 * scale + width / 2,
+            y: y3 * scale + height / 2,
+            z: z2 * scale,
+            w: w2
+        };
     }
 }
 
@@ -140,30 +166,36 @@ function setup() {
     tesseract = new Tesseract();
     setupEventListeners();
     
-    // Set IEC color scheme
-    strokeWeight(0.5); // Edges stroke weight as requested
+    strokeWeight(0.5);
+    noLoop(); // Start paused until we need animation
 }
 
 function draw() {
     background(IEC_COLORS.background);
     
     if (autoRotate) {
-        // Wave-like pendulum motion for all axes
-        const phase = frameCount * 0.01;
-        rotation.x = sin(phase) * 25;
-        rotation.y = sin(phase * 1.3 + 1) * 20;
-        rotation.z = sin(phase * 0.7 + 2) * 15;
-        rotation.w = sin(phase * 1.1 + 3) * 30;
+        // Complete wave motion centered around 180° with margins
+        const phase = frameCount * 0.02;
+        const amplitude = 80; // Reduced range for better visibility
+        const center = 180;
+        
+        rotation.x = center + Math.sin(phase) * amplitude;
+        rotation.y = center + Math.sin(phase * 1.3 + 1) * amplitude;
+        rotation.z = center + Math.sin(phase * 0.7 + 2) * amplitude;
+        rotation.w = center + Math.sin(phase * 1.1 + 3) * amplitude;
+        
+        // Round to integers to prevent layout issues
+        rotation.x = Math.round(rotation.x);
+        rotation.y = Math.round(rotation.y);
+        rotation.z = Math.round(rotation.z);
+        rotation.w = Math.round(rotation.w);
         
         updateSliderValues();
     }
     
-    // Project all vertices
-    const projected = tesseract.vertices.map(v => 
-        tesseract.projectVertex(v, width, height)
-    );
+    const projected = tesseract.vertices.map(v => tesseract.projectVertex(v));
     
-    // Draw edges with IEC primary color
+    // Draw edges
     stroke(IEC_COLORS.primary);
     tesseract.edges.forEach(edge => {
         const v1 = projected[edge[0]];
@@ -171,94 +203,113 @@ function draw() {
         line(v1.x, v1.y, v2.x, v2.y);
     });
     
-    // Draw vertices with diameter 15 as requested
+    // Draw vertices with IEC coloring
     if (showVertices) {
         noStroke();
         projected.forEach((vertex, index) => {
             if (index === selectedVertex) {
                 fill(IEC_COLORS.selected);
             } else {
-                fill(IEC_COLORS.vertex);
+                fill(getVertexColor(tesseract.vertices[index], index));
             }
-            circle(vertex.x, vertex.y, 15); // Diameter 15 as requested
+            circle(vertex.x, vertex.y, VERTEX_DIAMETER);
             
-            if (showLabels) {
+            if (showLabels && index === selectedVertex) {
                 fill(IEC_COLORS.text);
                 textSize(10);
                 textAlign(CENTER, CENTER);
-                text(index, vertex.x, vertex.y);
+                text(index, vertex.x, vertex.y - 10);
             }
         });
     }
     
-    // Show vertex info if selected
+    updateMetrics();
+}
+
+function updateMetrics() {
+    // Update main metrics
+    document.getElementById('vertex-count').textContent = tesseract.vertices.length;
+    document.getElementById('edge-count').textContent = tesseract.edges.length;
+    
+    // Update selected vertex metrics
     if (selectedVertex !== null) {
-        showVertexInfo(selectedVertex);
+        const metrics = calculateIECMetrics(tesseract.vertices[selectedVertex], selectedVertex);
+        document.getElementById('face-count').textContent = metrics.energy;
+        document.getElementById('cell-count').textContent = metrics.complexity;
+        document.getElementById('hypervolume').textContent = metrics.stability;
+        
+        // Show vertex info
+        showVertexInfo(selectedVertex, metrics);
+    } else {
+        document.getElementById('face-count').textContent = '864';
+        document.getElementById('cell-count').textContent = '216';
+        document.getElementById('hypervolume').textContent = '1.00';
+        document.getElementById('vertex-info').style.display = 'none';
     }
 }
 
 function setupEventListeners() {
-    // Rotation sliders
+    // Rotation sliders with integer values only
     ['x', 'y', 'z', 'w'].forEach(axis => {
         const slider = document.getElementById(`rotation-${axis}`);
+        const display = document.getElementById(`rotation-${axis}-value`);
+        
         slider.addEventListener('input', (e) => {
             rotation[axis] = parseInt(e.target.value);
-            document.getElementById(`rotation-${axis}-value`).textContent = `${rotation[axis]}°`;
+            display.textContent = `${rotation[axis]}°`;
+            redraw();
         });
     });
     
-    // Scale slider
     document.getElementById('scale').addEventListener('input', (e) => {
         scaleFactor = parseInt(e.target.value) / 100;
         document.getElementById('scale-value').textContent = `${e.target.value}%`;
+        redraw();
     });
     
-    // Perspective slider  
     document.getElementById('perspective').addEventListener('input', (e) => {
         perspective = parseFloat(e.target.value);
         document.getElementById('perspective-value').textContent = perspective.toFixed(1);
+        redraw();
     });
     
-    // Buttons
     document.getElementById('reset-view').addEventListener('click', resetView);
     document.getElementById('auto-rotate').addEventListener('click', toggleAutoRotate);
     document.getElementById('toggle-vertices').addEventListener('click', toggleVertices);
     document.getElementById('toggle-labels').addEventListener('click', toggleLabels);
     
-    // Canvas click for vertex selection
     canvas.mousePressed(handleCanvasClick);
 }
 
 function handleCanvasClick() {
-    const projected = tesseract.vertices.map(v => 
-        tesseract.projectVertex(v, width, height)
-    );
+    const projected = tesseract.vertices.map(v => tesseract.projectVertex(v));
     
-    let minDist = 25; // Click radius for diameter 15 circles
+    let minDist = 20;
     let closest = null;
     
     projected.forEach((vertex, index) => {
-        const dist = dist(mouseX, mouseY, vertex.x, vertex.y);
-        if (dist < minDist) {
-            minDist = dist;
+        const d = dist(mouseX, mouseY, vertex.x, vertex.y);
+        if (d < minDist) {
+            minDist = d;
             closest = index;
         }
     });
     
     selectedVertex = closest;
+    redraw();
 }
 
-function showVertexInfo(vertexIndex) {
+function showVertexInfo(vertexIndex, metrics) {
     const info = document.getElementById('vertex-info');
-    if (vertexIndex === null) {
-        info.style.display = 'none';
-        return;
-    }
-    
     const vertex = tesseract.vertices[vertexIndex];
+    
     info.innerHTML = `
         <strong>Vertex ${vertexIndex}</strong><br>
-        Coordinates: (${vertex.map(v => v.toFixed(2)).join(', ')})
+        Coordinates: (${vertex.map(v => v.toFixed(2)).join(', ')})<br>
+        Energy: ${metrics.energy}<br>
+        Complexity: ${metrics.complexity}<br>
+        Stability: ${metrics.stability}<br>
+        Coherence: ${metrics.coherence}
     `;
     info.style.display = 'block';
 }
@@ -269,6 +320,7 @@ function resetView() {
     perspective = 4.0;
     selectedVertex = null;
     updateSliderValues();
+    redraw();
 }
 
 function toggleAutoRotate() {
@@ -276,6 +328,13 @@ function toggleAutoRotate() {
     const button = document.getElementById('auto-rotate');
     button.textContent = autoRotate ? 'Stop Rotation' : 'Auto Rotate';
     button.classList.toggle('active', autoRotate);
+    
+    if (autoRotate) {
+        loop(); // Start animation
+    } else {
+        noLoop(); // Stop animation
+        redraw(); // Draw one frame
+    }
 }
 
 function toggleVertices() {
@@ -283,6 +342,7 @@ function toggleVertices() {
     const button = document.getElementById('toggle-vertices');
     button.textContent = showVertices ? 'Hide Vertices' : 'Show Vertices';
     button.classList.toggle('active', showVertices);
+    redraw();
 }
 
 function toggleLabels() {
@@ -290,12 +350,15 @@ function toggleLabels() {
     const button = document.getElementById('toggle-labels');
     button.textContent = showLabels ? 'Hide Labels' : 'Show Labels';
     button.classList.toggle('active', showLabels);
+    redraw();
 }
 
 function updateSliderValues() {
     ['x', 'y', 'z', 'w'].forEach(axis => {
-        document.getElementById(`rotation-${axis}`).value = rotation[axis];
-        document.getElementById(`rotation-${axis}-value`).textContent = `${rotation[axis]}°`;
+        const slider = document.getElementById(`rotation-${axis}`);
+        const display = document.getElementById(`rotation-${axis}-value`);
+        slider.value = rotation[axis];
+        display.textContent = `${rotation[axis]}°`;
     });
     
     document.getElementById('scale').value = scaleFactor * 100;
@@ -308,4 +371,5 @@ function updateSliderValues() {
 function windowResized() {
     const container = document.getElementById('sketch-container');
     resizeCanvas(container.offsetWidth, 600);
+    redraw();
 }
