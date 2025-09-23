@@ -97,19 +97,22 @@ function generate8DHypercube() {
 }
 
 function iec4DToRGB(color4D) {
-    // Your IEC 4D to RGB conversion - placeholder implementation
     let [c1, c2, c3, c4] = color4D;
     
-    // Enhanced color mapping for better visual distinction
-    let r = Math.sin(c1 * Math.PI * 2) * 127 + 128;
-    let g = Math.sin(c2 * Math.PI * 2 + Math.PI * 2/3) * 127 + 128;
-    let b = Math.sin(c3 * Math.PI * 2 + Math.PI * 4/3) * 127 + 128;
+    // Much brighter and more saturated colors
+    let r = (Math.sin(c1 * Math.PI * 2) * 0.7 + 0.3) * 255;
+    let g = (Math.sin(c2 * Math.PI * 2 + Math.PI * 2/3) * 0.7 + 0.3) * 255;
+    let b = (Math.sin(c3 * Math.PI * 2 + Math.PI * 4/3) * 0.7 + 0.3) * 255;
     
-    // Apply brightness from 4th dimension
-    let brightness = 0.3 + c4 * 0.7;
-    r *= brightness;
-    g *= brightness;
-    b *= brightness;
+    // Boost saturation and brightness
+    r = Math.pow(r / 255, 0.7) * 255;
+    g = Math.pow(g / 255, 0.7) * 255;
+    b = Math.pow(b / 255, 0.7) * 255;
+    
+    // Ensure minimum brightness
+    r = Math.max(r, 60);
+    g = Math.max(g, 60);
+    b = Math.max(b, 60);
     
     return [
         constrain(Math.floor(r), 0, 255),
@@ -150,7 +153,24 @@ function precomputeGeometry() {
     }
 }
 
+function drawGradientBackground() {
+    push();
+    resetMatrix();
+    noStroke();
+    
+    // Dark blue to black gradient
+    for (let y = 0; y <= height; y++) {
+        let inter = map(y, 0, height, 0, 1);
+        let c = lerpColor(color(10, 15, 40), color(0, 0, 5), inter);
+        stroke(c);
+        line(0, y, width, y);
+    }
+    pop();
+}
+
 function draw() {
+    // Gradient background instead of pure black
+    drawGradientBackground();
     // Frame rate limiting for mobile performance
     let currentTime = millis();
     if (currentTime - lastFrameTime < FRAME_INTERVAL) {
@@ -180,30 +200,44 @@ function draw() {
 }
 
 function drawVertices() {
-    // Simple dots for mobile performance
-    strokeWeight(10);
+    // Larger, glowing vertices
     for (let point of vertexPoints) {
-        stroke(point.color[0], point.color[1], point.color[2]);
+        let size = 15;
+        
+        // Outer glow
+        strokeWeight(size + 8);
+        stroke(point.color[0], point.color[1], point.color[2], 100);
+        point(point.pos.x, point.pos.y, point.pos.z);
+        
+        // Core vertex
+        strokeWeight(size);
+        stroke(point.color[0], point.color[1], point.color[2], 255);
         point(point.pos.x, point.pos.y, point.pos.z);
     }
 }
 
 function drawEdges() {
-    strokeWeight(1);
+    // Draw edges with glow effect
     for (let [i, j] of edges) {
         let v1 = vertices3D[i];
         let v2 = vertices3D[j];
         
-        // Edge coloring based on vertex colors
         let c1 = vertexColorsRGB[i];
         let c2 = vertexColorsRGB[j];
+        
+        // Thick colored core
+        strokeWeight(3);
         stroke(
             (c1[0] + c2[0]) / 2,
             (c1[1] + c2[1]) / 2,
             (c1[2] + c2[2]) / 2,
-            150
+            200
         );
+        line(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
         
+        // Thin white glow
+        strokeWeight(1);
+        stroke(255, 255, 255, 80);
         line(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
     }
 }
@@ -215,16 +249,24 @@ function drawSelectedVertex() {
     push();
     translate(selected.x, selected.y, selected.z);
     
-    // Empty circled dot as requested
+    // Pulsing glow effect
+    let pulseSize = sin(millis() * 0.01) * 3 + 30;
+    
+    // Outer glow
     noFill();
+    stroke(255, 255, 100, 150);
+    strokeWeight(6);
+    circle(0, 0, pulseSize);
+    
+    // Inner circle
     stroke(255, 255, 0);
     strokeWeight(3);
     circle(0, 0, 25);
     
-    // Inner highlight
-    stroke(255, 200, 0, 100);
-    strokeWeight(1);
-    circle(0, 0, 28);
+    // Bright core
+    fill(255, 255, 200);
+    noStroke();
+    circle(0, 0, 8);
     
     pop();
 }
