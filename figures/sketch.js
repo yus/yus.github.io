@@ -15,6 +15,10 @@ let hammerManager;
 let isDragging = false;
 let lastPanPosition = { x: 0, y: 0 };
 
+// Gesture feedback
+let gestureFeedback = { active: false, type: '', x: 0, y: 0, scale: 1 };
+let lastRenderTime = 0;
+
 // Performance optimization
 let vertexPoints = [];
 let lastFrameTime = 0;
@@ -44,10 +48,8 @@ function setup() {
 }
 
 function initHammerJS() {
-    // Get the actual canvas DOM element
     let canvasElement = document.querySelector('canvas');
     
-    // Create Hammer manager with custom options
     hammerManager = new Hammer.Manager(canvasElement, {
         touchAction: 'none',
         recognizers: [
@@ -57,18 +59,71 @@ function initHammerJS() {
         ]
     });
     
-    // Enable simultaneous recognition of pan and pinch
+    // Enable simultaneous recognition
     hammerManager.get('pinch').recognizeWith('pan');
     hammerManager.get('pan').recognizeWith('pinch');
     
-    // Set up event listeners
-    hammerManager.on('panstart', handlePanStart);
-    hammerManager.on('panmove', handlePanMove);
-    hammerManager.on('panend', handlePanEnd);
-    hammerManager.on('pinchstart', handlePinchStart);
-    hammerManager.on('pinchmove', handlePinchMove);
-    hammerManager.on('pinchend', handlePinchEnd);
+    // Set up event listeners with feedback
+    hammerManager.on('panstart pinchstart', (event) => {
+        gestureFeedback.active = true;
+        gestureFeedback.type = event.type;
+        gestureFeedback.x = event.center.x;
+        gestureFeedback.y = event.center.y;
+    });
+    
+    hammerManager.on('panmove', (event) => {
+        if (!isDragging) return;
+        
+        let deltaX = event.center.x - lastPanPosition.x;
+        let deltaY = event.center.y - lastPanPosition.y;
+        
+        rotationY += deltaX * 0.01;
+        rotationX += deltaY * 0.01;
+        
+        lastPanPosition.x = event.center.x;
+        lastPanPosition.y = event.center.y;
+        
+        // Update feedback
+        gestureFeedback.x = event.center.x;
+        gestureFeedback.y = event.center.y;
+    });
+    
+    hammerManager.on('pinchmove', (event) => {
+        targetZoom *= event.scale;
+        targetZoom = constrain(targetZoom, 0.3, 3.0);
+        gestureFeedback.scale = event.scale;
+    });
+    
+    hammerManager.on('panend pinchend', (event) => {
+        gestureFeedback.active = false;
+        isDragging = false;
+    });
+    
     hammerManager.on('tap', handleTap);
+    
+    // CRITICAL: Prevent event propagation issues
+    canvasElement.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+}
+
+function handlePanStart(event) {
+    isDragging = true;
+    lastPanPosition.x = event.center.x;
+    lastPanPosition.y = event.center.y;
+    gestureFeedback.active = true;
+    gestureFeedback.type = 'pan';
+}
+
+function handlePinchMove(event) {
+    targetZoom *= event.scale;
+    targetZoom = constrain(targetZoom, 0.3, 3.0);
+    gestureFeedback.active = true;
+    gestureFeedback.type = 'pinch';
+    gestureFeedback.scale = event.scale;
+    
+    // Reset scale to prevent exponential growth
+    event.srcEvent.preventDefault();
 }
 
 function generate8DHypercube() {
@@ -153,6 +208,57 @@ function precomputeGeometry() {
     }
 }
 
+function draw() {
+    // ALWAYS render when gestures are active, otherwise limit to 30 FPS
+    let currentTime = millis();
+    if (!gestureFeedback.active && currentTime - lastRenderTime < FRAME_INTERVAL) {
+        return;
+    }
+    lastRenderTime = currentTime;
+    
+    drawGradientBackground();
+    
+    // Apply camera transformations
+    let scaleFactor = min(width, height) * 0.0008 * zoom;
+    scale(scaleFactor);
+    rotateX(rotationX);
+    rotateY(rotationY);
+    
+    // Draw geometry (even if edges are disabled, vertices should show)
+    // drawEdges(); // You can comment this out but keep vertices visible
+    drawVertices();
+    drawSelectedVertex();
+    
+    // Visual feedback overlay
+    drawGestureFeedback();
+    
+    updateUI();
+}
+
+function drawGestureFeedback() {
+    if (!gestureFeedback.active) return;
+    
+    push();
+    resetMatrix();
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    
+    if (gestureFeedback.type === 'pan') {
+        fill(255, 255, 0, 150);
+        text('🔄 Dragging', width/2, height - 100);
+    } else if (gestureFeedback.type === 'pinch') {
+        fill(0, 255, 255, 150);
+        text('🔍 Zooming: ' + nf(zoom, 1, 2), width/2, height - 100);
+    }
+    
+    // Draw touch point indicators
+    fill(255, 0, 0, 100);
+    circle(gestureFeedback.x, gestureFeedback.y, 30);
+    
+    pop();
+}
+
 function drawGradientBackground() {
     push();
     resetMatrix();
@@ -168,50 +274,25 @@ function drawGradientBackground() {
     pop();
 }
 
-function draw() {
-    // Gradient background instead of pure black
-    drawGradientBackground();
-    // Frame rate limiting for mobile performance
-    let currentTime = millis();
-    if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-        return;
-    }
-    lastFrameTime = currentTime;
-    
-    background(0);
-    
-    // Smooth zoom interpolation
-    zoom = lerp(zoom, targetZoom, 0.1);
-    
-    // Apply camera transformations
-    let scaleFactor = min(width, height) * 0.0008 * zoom;
-    scale(scaleFactor);
-    
-    rotateX(rotationX);
-    rotateY(rotationY);
-    
-    // Draw geometry
-    // drawEdges();
-    drawVertices();
-    drawSelectedVertex();
-    
-    // Update UI
-    updateUI();
-}
-
 function drawVertices() {
-    // Larger, glowing vertices
+    // Make vertices larger and brighter when edges are hidden
+    let vertexSize = 18; // Increased from 15
+    let glowSize = 12;   // Increased glow
+    
     for (let point of vertexPoints) {
-        let size = 15;
-        
-        // Outer glow
-        strokeWeight(size + 8);
-        stroke(point.color[0], point.color[1], point.color[2], 100);
+        // Enhanced glow effect
+        strokeWeight(vertexSize + glowSize);
+        stroke(point.color[0], point.color[1], point.color[2], 150);
         point(point.pos.x, point.pos.y, point.pos.z);
         
-        // Core vertex
-        strokeWeight(size);
-        stroke(point.color[0], point.color[1], point.color[2], 255);
+        // Bright core
+        strokeWeight(vertexSize);
+        stroke(
+            min(point.color[0] + 50, 255),
+            min(point.color[1] + 50, 255), 
+            min(point.color[2] + 50, 255),
+            255
+        );
         point(point.pos.x, point.pos.y, point.pos.z);
     }
 }
