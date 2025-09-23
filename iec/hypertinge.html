@@ -32,6 +32,50 @@
             gap: 1vmin;
             padding: 2vmin;
         }
+        /* Fix for controls panel overflow */
+        #app {
+            max-height: 100vh;
+            overflow: hidden;
+        }
+
+        .controls-panel {
+            max-height: 60vh; /* Limit height */
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            min-height: 0; /* Allow content to shrink */
+        }
+
+        /* Better mobile layout */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-rows: 1fr auto;
+                max-height: 70vh;
+            }
+    
+            .controls-panel {
+                max-height: 40vh;
+                padding: 3vmin;
+            }
+    
+            .button-group {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1vmin;
+            }
+    
+            button {
+                padding: 1.5vmin;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Ensure canvas container doesn't overflow */
+        #sketch-container {
+            min-height: 300px; /* Minimum height */
+            height: 100%;
+        }
 
         .header {
             text-align: center;
