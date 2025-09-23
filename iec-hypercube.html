@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEC Hypercube Visualization</title>
+    <title>IEC Hypercube</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="sketch.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,183 +15,187 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a1a;
-            color: #ffffff;
-            line-height: 1.6;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.4;
             overflow-x: hidden;
         }
 
         .container {
-            max-width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
+        header {
             text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #90a4ae;
+            opacity: 0.8;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
             margin-bottom: 30px;
         }
 
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            color: #64b5f6;
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .header p {
-            color: #b0b0b0;
-            font-size: 1.1rem;
-        }
-
-        .visualization-container {
-            position: relative;
-            width: 100%;
-            height: 60vh;
-            min-height: 400px;
-            background: #000000;
-            border-radius: 12px;
+        #sketch-container {
+            background: #000;
+            border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid #333;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        #hypercube-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .controls {
-            background: #2a2a2a;
+        .controls-panel {
+            background: #1a1a1a;
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .control-group {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
 
         .control-group h3 {
-            color: #64b5f6;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            color: #4fc3f7;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .slider-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            margin-bottom: 12px;
         }
 
         .slider-container label {
-            min-width: 120px;
-            color: #ccc;
+            width: 120px;
+            font-size: 0.85rem;
+            color: #b0b0b0;
         }
 
         input[type="range"] {
             flex: 1;
-            height: 6px;
-            background: #444;
-            border-radius: 3px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
             outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4fc3f7;
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         .value-display {
-            min-width: 40px;
-            text-align: center;
-            color: #64b5f6;
-            font-weight: bold;
+            width: 50px;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #4fc3f7;
+            font-family: 'Monaco', 'Consolas', monospace;
         }
 
-        .info-panel {
-            background: #2a2a2a;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .metric-display {
+        .button-group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #333;
+            border-color: #4fc3f7;
+        }
+
+        button.active {
+            background: #4fc3f7;
+            color: #000;
+            border-color: #4fc3f7;
+        }
+
+        .metrics-panel {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
-            margin-top: 15px;
         }
 
         .metric-item {
-            background: #333;
-            padding: 15px;
-            border-radius: 8px;
             text-align: center;
+            padding: 15px;
+            background: #252525;
+            border-radius: 6px;
         }
 
         .metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #64b5f6;
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: #4fc3f7;
             margin-bottom: 5px;
         }
 
         .metric-label {
-            color: #ccc;
+            font-size: 0.75rem;
+            color: #90a4ae;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #333;
+            color: #666;
             font-size: 0.9rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        button {
-            background: #64b5f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: #42a5f5;
-        }
-
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.5rem;
-            }
-
-            .visualization-container {
-                height: 50vh;
-                min-height: 300px;
-            }
-
-            .metric-display {
-                grid-template-columns: 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-        }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #64b5f6;
-            font-size: 1.2rem;
         }
 
         .vertex-info {
@@ -197,356 +203,105 @@
             top: 10px;
             left: 10px;
             background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 6px;
-            font-size: 0.9rem;
-            max-width: 200px;
+            font-size: 0.8rem;
+            border-left: 3px solid #4fc3f7;
             display: none;
+            max-width: 250px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>IEC Hypercube Visualization</h1>
-            <p>Interactive 4D hypercube with metric analysis</p>
-        </div>
+        <header>
+            <h1>IEC HYPERCUBE VISUALIZATION</h1>
+            <div class="subtitle">4D Tesseract with IEC Metric Integration</div>
+        </header>
 
-        <div class="visualization-container">
-            <canvas id="hypercube-canvas"></canvas>
-            <div class="loading">Loading visualization...</div>
-            <div class="vertex-info" id="vertex-info"></div>
-        </div>
-
-        <div class="controls">
-            <div class="control-group">
-                <h3>Rotation Controls</h3>
-                <div class="slider-container">
-                    <label for="rotation-x">X-Axis Rotation:</label>
-                    <input type="range" id="rotation-x" min="0" max="360" value="0">
-                    <span class="value-display" id="rotation-x-value">0°</span>
-                </div>
-                <div class="slider-container">
-                    <label for="rotation-y">Y-Axis Rotation:</label>
-                    <input type="range" id="rotation-y" min="0" max="360" value="0">
-                    <span class="value-display" id="rotation-y-value">0°</span>
-                </div>
-                <div class="slider-container">
-                    <label for="rotation-z">Z-Axis Rotation:</label>
-                    <input type="range" id="rotation-z" min="0" max="360" value="0">
-                    <span class="value-display" id="rotation-z-value">0°</span>
-                </div>
-                <div class="slider-container">
-                    <label for="rotation-w">W-Axis Rotation:</label>
-                    <input type="range" id="rotation-w" min="0" max="360" value="0">
-                    <span class="value-display" id="rotation-w-value">0°</span>
-                </div>
+        <div class="content">
+            <div id="sketch-container">
+                <!-- p5.js sketch will be inserted here -->
+                <div class="vertex-info" id="vertex-info"></div>
             </div>
 
-            <div class="control-group">
-                <h3>Visualization Settings</h3>
-                <div class="slider-container">
-                    <label for="scale">Scale:</label>
-                    <input type="range" id="scale" min="50" max="200" value="100">
-                    <span class="value-display" id="scale-value">100%</span>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h3>Rotation Controls</h3>
+                    <div class="slider-container">
+                        <label for="rotation-x">X Rotation</label>
+                        <input type="range" id="rotation-x" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-x-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-y">Y Rotation</label>
+                        <input type="range" id="rotation-y" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-y-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-z">Z Rotation</label>
+                        <input type="range" id="rotation-z" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-z-value">0°</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="rotation-w">W Rotation</label>
+                        <input type="range" id="rotation-w" min="0" max="360" value="0">
+                        <span class="value-display" id="rotation-w-value">0°</span>
+                    </div>
                 </div>
-                <div class="slider-container">
-                    <label for="perspective">Perspective:</label>
-                    <input type="range" id="perspective" min="1" max="10" value="4" step="0.1">
-                    <span class="value-display" id="perspective-value">4.0</span>
-                </div>
-            </div>
 
-            <div class="button-group">
-                <button id="reset-view">Reset View</button>
-                <button id="auto-rotate">Auto Rotate</button>
-                <button id="toggle-vertices">Show Vertices</button>
-                <button id="toggle-labels">Show Labels</button>
+                <div class="control-group">
+                    <h3>Visualization Settings</h3>
+                    <div class="slider-container">
+                        <label for="scale">Scale</label>
+                        <input type="range" id="scale" min="50" max="200" value="100">
+                        <span class="value-display" id="scale-value">100%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="perspective">Perspective</label>
+                        <input type="range" id="perspective" min="1" max="10" value="4" step="0.1">
+                        <span class="value-display" id="perspective-value">4.0</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="reset-view">Reset View</button>
+                    <button id="auto-rotate">Auto Rotate</button>
+                    <button id="toggle-vertices">Show Vertices</button>
+                    <button id="toggle-labels">Hide Labels</button>
+                </div>
             </div>
         </div>
 
-        <div class="info-panel">
-            <h3>Metric Analysis</h3>
-            <div class="metric-display">
+        <div class="metrics-panel">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">IEC Metrics</h3>
+            <div class="metrics-grid">
                 <div class="metric-item">
-                    <div class="metric-value" id="vertex-count">16</div>
+                    <div class="metric-value" id="vertex-count">256</div>
                     <div class="metric-label">Vertices</div>
                 </div>
                 <div class="metric-item">
-                    <div class="metric-value" id="edge-count">32</div>
+                    <div class="metric-value" id="edge-count">768</div>
                     <div class="metric-label">Edges</div>
                 </div>
                 <div class="metric-item">
-                    <div class="metric-value" id="face-count">24</div>
+                    <div class="metric-value" id="face-count">864</div>
                     <div class="metric-label">Faces</div>
                 </div>
                 <div class="metric-item">
-                    <div class="metric-value" id="cell-count">8</div>
+                    <div class="metric-value" id="cell-count">216</div>
                     <div class="metric-label">3D Cells</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="hypervolume">1.00</div>
+                    <div class="metric-label">Hypervolume</div>
                 </div>
             </div>
         </div>
+
+        <footer>
+            IEC Hypercube Visualization • 4D Tesseract Implementation
+        </footer>
     </div>
-
-    <script>
-        class HypercubeVisualizer {
-            constructor(canvasId) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                this.vertices = [];
-                this.edges = [];
-                this.projectedVertices = [];
-                this.selectedVertex = null;
-                
-                // Rotation angles for each axis (in degrees)
-                this.rotation = { x: 0, y: 0, z: 0, w: 0 };
-                this.scale = 1.0;
-                this.perspective = 4.0;
-                this.autoRotate = false;
-                this.showVertices = true;
-                this.showLabels = false;
-                
-                this.setupEventListeners();
-                this.initializeHypercube();
-                this.resizeCanvas();
-                this.animate();
-            }
-
-            initializeHypercube() {
-                // Define 16 vertices of a 4D hypercube
-                for (let i = 0; i < 16; i++) {
-                    this.vertices.push([
-                        (i & 1) ? 0.5 : -0.5,
-                        (i & 2) ? 0.5 : -0.5,
-                        (i & 4) ? 0.5 : -0.5,
-                        (i & 8) ? 0.5 : -0.5
-                    ]);
-                }
-
-                // Define 32 edges of the hypercube
-                for (let i = 0; i < 16; i++) {
-                    for (let j = i + 1; j < 16; j++) {
-                        let diff = 0;
-                        for (let k = 0; k < 4; k++) {
-                            if (Math.abs(this.vertices[i][k] - this.vertices[j][k]) > 0.1) {
-                                diff++;
-                            }
-                        }
-                        if (diff === 1) {
-                            this.edges.push([i, j]);
-                        }
-                    }
-                }
-            }
-
-            setupEventListeners() {
-                // Rotation sliders
-                ['x', 'y', 'z', 'w'].forEach(axis => {
-                    const slider = document.getElementById(`rotation-${axis}`);
-                    const display = document.getElementById(`rotation-${axis}-value`);
-                    
-                    slider.addEventListener('input', (e) => {
-                        this.rotation[axis] = parseInt(e.target.value);
-                        display.textContent = `${this.rotation[axis]}°`;
-                    });
-                });
-
-                // Scale slider
-                document.getElementById('scale').addEventListener('input', (e) => {
-                    this.scale = parseInt(e.target.value) / 100;
-                    document.getElementById('scale-value').textContent = `${e.target.value}%`;
-                });
-
-                // Perspective slider
-                document.getElementById('perspective').addEventListener('input', (e) => {
-                    this.perspective = parseFloat(e.target.value);
-                    document.getElementById('perspective-value').textContent = this.perspective.toFixed(1);
-                });
-
-                // Buttons
-                document.getElementById('reset-view').addEventListener('click', () => {
-                    this.resetView();
-                });
-
-                document.getElementById('auto-rotate').addEventListener('click', () => {
-                    this.autoRotate = !this.autoRotate;
-                    document.getElementById('auto-rotate').textContent = 
-                        this.autoRotate ? 'Stop Rotation' : 'Auto Rotate';
-                });
-
-                document.getElementById('toggle-vertices').addEventListener('click', () => {
-                    this.showVertices = !this.showVertices;
-                    document.getElementById('toggle-vertices').textContent = 
-                        this.showVertices ? 'Hide Vertices' : 'Show Vertices';
-                });
-
-                document.getElementById('toggle-labels').addEventListener('click', () => {
-                    this.showLabels = !this.showLabels;
-                    document.getElementById('toggle-labels').textContent = 
-                        this.showLabels ? 'Hide Labels' : 'Show Labels';
-                });
-
-                // Canvas interaction
-                this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
-                this.canvas.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
-
-                // Window resize
-                window.addEventListener('resize', () => this.resizeCanvas());
-            }
-
-            resizeCanvas() {
-                const container = this.canvas.parentElement;
-                this.canvas.width = container.clientWidth;
-                this.canvas.height = container.clientHeight;
-            }
-
-            projectVertex(vertex) {
-                // Convert degrees to radians
-                const rx = this.rotation.x * Math.PI / 180;
-                const ry = this.rotation.y * Math.PI / 180;
-                const rz = this.rotation.z * Math.PI / 180;
-                const rw = this.rotation.w * Math.PI / 180;
-
-                // Apply 4D rotations (simplified)
-                let [x, y, z, w] = vertex;
-
-                // Apply perspective projection from 4D to 3D
-                const distance = this.perspective;
-                const factor = distance / (distance - w);
-                x *= factor;
-                y *= factor;
-                z *= factor;
-
-                // Scale and center
-                const scale = Math.min(this.canvas.width, this.canvas.height) * 0.2 * this.scale;
-                return {
-                    x: x * scale + this.canvas.width / 2,
-                    y: y * scale + this.canvas.height / 2,
-                    z: z * scale
-                };
-            }
-
-            animate() {
-                if (this.autoRotate) {
-                    this.rotation.y += 0.5;
-                    this.rotation.w += 0.3;
-                    this.updateSliderValues();
-                }
-
-                this.draw();
-                requestAnimationFrame(() => this.animate());
-            }
-
-            draw() {
-                // Clear canvas
-                this.ctx.fillStyle = '#000000';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                // Project all vertices
-                this.projectedVertices = this.vertices.map(vertex => this.projectVertex(vertex));
-
-                // Draw edges
-                this.ctx.strokeStyle = '#64b5f6';
-                this.ctx.lineWidth = 2;
-                
-                this.edges.forEach(edge => {
-                    const v1 = this.projectedVertices[edge[0]];
-                    const v2 = this.projectedVertices[edge[1]];
-                    
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(v1.x, v1.y);
-                    this.ctx.lineTo(v2.x, v2.y);
-                    this.ctx.stroke();
-                });
-
-                // Draw vertices
-                if (this.showVertices) {
-                    this.projectedVertices.forEach((vertex, index) => {
-                        this.ctx.fillStyle = index === this.selectedVertex ? '#ff5252' : '#ffffff';
-                        this.ctx.beginPath();
-                        this.ctx.arc(vertex.x, vertex.y, 6, 0, 2 * Math.PI);
-                        this.ctx.fill();
-
-                        if (this.showLabels) {
-                            this.ctx.fillStyle = '#ccc';
-                            this.ctx.font = '12px Arial';
-                            this.ctx.fillText(index.toString(), vertex.x + 8, vertex.y - 8);
-                        }
-                    });
-                }
-            }
-
-            handleCanvasClick(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                // Find closest vertex
-                let minDist = 50; // Click radius
-                let closestVertex = null;
-
-                this.projectedVertices.forEach((vertex, index) => {
-                    const dist = Math.sqrt((vertex.x - x) ** 2 + (vertex.y - y) ** 2);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closestVertex = index;
-                    }
-                });
-
-                this.selectedVertex = closestVertex;
-                this.showVertexInfo(closestVertex);
-            }
-
-            showVertexInfo(vertexIndex) {
-                const info = document.getElementById('vertex-info');
-                if (vertexIndex === null) {
-                    info.style.display = 'none';
-                    return;
-                }
-
-                const vertex = this.vertices[vertexIndex];
-                info.innerHTML = `
-                    <strong>Vertex ${vertexIndex}</strong><br>
-                    Coordinates: (${vertex.map(v => v.toFixed(2)).join(', ')})
-                `;
-                info.style.display = 'block';
-            }
-
-            handleWheel(e) {
-                e.preventDefault();
-                this.scale += e.deltaY * -0.01;
-                this.scale = Math.max(0.1, Math.min(3, this.scale));
-                
-                document.getElementById('scale').value = this.scale * 100;
-                document.getElementById('scale-value').textContent = `${Math.round(this.scale * 100)}%`;
-            }
-
-            resetView() {
-                this.rotation = { x: 0, y: 0, z: 0, w: 0 };
-                this.scale = 1.0;
-                this.perspective = 4.0;
-                this.updateSliderValues();
-            }
-
-            updateSliderValues() {
-                ['x', 'y', 'z', 'w'].forEach(axis => {
-                    document.getElementById(`rotation-${axis}`).value = this.rotation[axis];
-                    document.getElementById(`rotation-${axis}-value`).textContent = `${this.rotation[axis]}°`;
-                });
-                
-                document.getElementById('scale').value = this.scale * 100;
-                document.getElementById('scale-value').textContent = `${Math.round(this.scale * 100)}%`;
-                
-                document.getElementById('perspective').value = this.perspective;
-                document.getElementById('perspective-value').textContent = this.perspective.toFixed(1);
-            }
-        }
-
-        // Initialize the visualization when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            const visualizer = new HypercubeVisualizer('hypercube-canvas');
-            document.querySelector('.loading').style.display = 'none';
-        });
-    </script>
 </body>
 </html>
