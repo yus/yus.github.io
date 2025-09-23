@@ -191,7 +191,7 @@ function draw() {
     rotateY(rotationY);
     
     // Draw geometry
-    drawEdges();
+    // drawEdges();
     drawVertices();
     drawSelectedVertex();
     
