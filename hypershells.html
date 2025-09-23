@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Hypercube - Volume Rendering</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        
+        .canvas-container {
+            flex: 2;
+        }
+        
+        .controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        
+        button {
+            background: #2196f3;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        button.active {
+            background: #ff9800;
+        }
+        
+        .theory {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>4D Hypercube - Proper Volume Rendering</h1>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
+        </div>
+        
+        <div class="controls">
+            <h3>Rendering Method</h3>
+            <button id="method-shells">4D Shells</button>
+            <button id="method-slices" class="active">4D Slices</button>
+            <button id="method-rays">Ray Marching</button>
+            
+            <h3>4D Structure</h3>
+            <button id="view-cells">8 Cubic Cells</button>
+            <button id="view-faces">24 Square Faces</button>
+            <button id="view-edges">32 Edges</button>
+            
+            <h3>Projection</h3>
+            <button id="proj-perspective">Perspective</button>
+            <button id="proj-orthographic">Orthographic</button>
+            <button id="proj-stereographic">Stereographic</button>
+            
+            <div class="theory">
+                <strong>The Problem:</strong> In 4D, "faces" are actually 3D volumes. 
+                When we project to 3D, these volumes intersect in complex ways.
+                <br><br>
+                <strong>Solution:</strong> Render the 8 cubic cells that make up the 
+                4D hypercube, not the 24 square faces. Each cell is a proper 3D volume 
+                in 4D space.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== PROPER 4D HYPERCUBE VOLUME RENDERER =====
+        class HypercubeVolumeRenderer {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.cells = []; // The 8 cubic cells in 4D
+                this.cubeSize = 100;
+                this.renderMethod = 'slices';
+                this.viewMode = 'cells';
+                this.projection = 'perspective';
+            }
+            
+            createHypercube() {
+                this.vertices = [];
+                this.edges = [];
+                this.cells = [];
+                
+                // Create 16 vertices
+                for (let i = 0; i < 16; i++) {
+                    this.vertices.push([
+                        (i & 1) ? this.cubeSize : -this.cubeSize,
+                        (i & 2) ? this.cubeSize : -this.cubeSize,
+                        (i & 4) ? this.cubeSize : -this.cubeSize,
+                        (i & 8) ? this.cubeSize : -this.cubeSize
+                    ]);
+                }
+                
+                // Create edges
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        if (this.countDifferences(i, j) === 1) {
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+                
+                // Create the 8 cubic cells (3D volumes in 4D)
+                this.createCells();
+            }
+            
+            createCells() {
+                // Each cell is defined by fixing one 4D coordinate
+                for (let fixedDim = 0; fixedDim < 4; fixedDim++) {
+                    for (let fixedVal = 0; fixedVal < 2; fixedVal++) {
+                        let cellVertices = [];
+                        for (let i = 0; i < 16; i++) {
+                            if (((i >> fixedDim) & 1) === fixedVal) {
+                                cellVertices.push(i);
+                            }
+                        }
+                        
+                        this.cells.push({
+                            vertices: cellVertices,
+                            fixedDim: fixedDim,
+                            fixedVal: fixedVal,
+                            // Each cell gets a unique color based on its 4D position
+                            color: this.getCellColor(fixedDim, fixedVal)
+                        });
+                    }
+                }
+            }
+            
+            getCellColor(fixedDim, fixedVal) {
+                // Color based on which dimension is fixed and its value
+                const hue = fixedDim * 60; // 0°, 60°, 120°, 180°
+                const saturation = 80;
+                const brightness = fixedVal ? 70 : 30; // Darker for negative, lighter for positive
+                return color(hue, saturation, brightness);
+            }
+            
+            project4D(point, angleW) {
+                let [x, y, z, w] = point;
+                
+                // Rotate in XW plane
+                let newX = x * cos(angleW) - w * sin(angleW);
+                let newW = x * sin(angleW) + w * cos(angleW);
+                
+                // Apply projection
+                switch(this.projection) {
+                    case 'perspective':
+                        let scale = 400 / (500 - newW);
+                        return [newX * scale, y * scale, z * scale];
+                    
+                    case 'orthographic':
+                        return [newX, y, z]; // Simple drop W coordinate
+                    
+                    case 'stereographic':
+                        let denom = (500 - newW);
+                        if (abs(denom) < 0.1) denom = 0.1;
+                        return [newX * 400 / denom, y * 400 / denom, z * 400 / denom];
+                }
+            }
+            
+            renderShells(angleW) {
+                // Render concentric shells of the hypercube
+                noFill();
+                strokeWeight(1);
+                
+                // Render outer shell (W = ±cubeSize)
+                stroke(255, 100, 100, 150);
+                this.renderCellShell(angleW, 3, 1); // W positive
+                this.renderCellShell(angleW, 3, 0); // W negative
+                
+                // Render inner structure
+                stroke(100, 255, 100, 100);
+                for (let dim = 0; dim < 3; dim++) {
+                    for (let val = 0; val < 2; val++) {
+                        this.renderCellShell(angleW, dim, val);
+                    }
+                }
+            }
+            
+            renderCellShell(angleW, fixedDim, fixedVal) {
+                // Render one cubic cell as a wireframe
+                let cell = this.cells.find(c => c.fixedDim === fixedDim && c.fixedVal === fixedVal);
+                if (!cell) return;
+                
+                // Find the 12 edges that belong to this cell
+                let cellEdges = [];
+                for (let edge of this.edges) {
+                    if (cell.vertices.includes(edge[0]) && cell.vertices.includes(edge[1])) {
+                        cellEdges.push(edge);
+                    }
+                }
+                
+                // Render edges of this cell
+                for (let [i, j] of cellEdges) {
+                    let v1 = this.project4D(this.vertices[i], angleW);
+                    let v2 = this.project4D(this.vertices[j], angleW);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            renderSlices(angleW) {
+                // Render the hypercube by taking 3D slices at different W positions
+                let slices = 8;
+                let wStep = (2 * this.cubeSize) / slices;
+                
+                for (let s = 0; s < slices; s++) {
+                    let w = -this.cubeSize + s * wStep;
+                    
+                    // Find vertices close to this W slice
+                    let sliceVertices = [];
+                    for (let i = 0; i < 16; i++) {
+                        let vertexW = this.vertices[i][3];
+                        if (abs(vertexW - w) < wStep * 0.6) {
+                            sliceVertices.push(i);
+                        }
+                    }
+                    
+                    // Render edges within this slice
+                    stroke(100, 150, 255, map(s, 0, slices, 50, 200));
+                    strokeWeight(2);
+                    
+                    for (let [i, j] of this.edges) {
+                        if (sliceVertices.includes(i) && sliceVertices.includes(j)) {
+                            let v1 = this.project4D(this.vertices[i], angleW);
+                            let v2 = this.project4D(this.vertices[j], angleW);
+                            line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                        }
+                    }
+                }
+            }
+            
+            renderCellsTransparent(angleW) {
+                // Render each cubic cell with transparency, ordered by 4D depth
+                let cellsToRender = [];
+                
+                for (let cell of this.cells) {
+                    // Calculate average W coordinate for depth sorting
+                    let avgW = 0;
+                    for (let vertIdx of cell.vertices) {
+                        avgW += this.vertices[vertIdx][3];
+                    }
+                    avgW /= cell.vertices.length;
+                    
+                    cellsToRender.push({cell, depth: avgW});
+                }
+                
+                // Sort by W depth (4D depth ordering)
+                cellsToRender.sort((a, b) => b.depth - a.depth);
+                
+                for (let {cell, depth} of cellsToRender) {
+                    // Render this cell's faces
+                    this.renderCellFaces(cell, angleW, depth);
+                }
+            }
+            
+            renderCellFaces(cell, angleW, depth) {
+                // A cubic cell in 4D has 6 faces, each being a square in 4D
+                // We need to find which faces are "outer" faces of this cell
+                
+                let faceColor = cell.color;
+                let alpha = map(abs(depth), 0, this.cubeSize, 100, 50);
+                
+                fill(red(faceColor), green(faceColor), blue(faceColor), alpha);
+                stroke(255, 30);
+                strokeWeight(1);
+                
+                // For each cell, find its square faces
+                let cellFaces = this.findCellFaces(cell);
+                
+                for (let face of cellFaces) {
+                    let projected = face.map(idx => this.project4D(this.vertices[idx], angleW));
+                    
+                    // Simple visibility test (skip if face is too edge-on)
+                    if (this.isFaceVisible(projected)) {
+                        beginShape();
+                        for (let p of projected) {
+                            vertex(p[0], p[1], p[2]);
+                        }
+                        endShape(CLOSE);
+                    }
+                }
+            }
+            
+            findCellFaces(cell) {
+                // Find the 6 square faces that make up this cubic cell
+                let faces = [];
+                
+                // A face is defined by fixing one additional coordinate within the cell
+                for (let faceDim = 0; faceDim < 4; faceDim++) {
+                    if (faceDim === cell.fixedDim) continue; // Skip the cell's fixed dimension
+                    
+                    for (let faceVal = 0; faceVal < 2; faceVal++) {
+                        let faceVertices = [];
+                        for (let vertIdx of cell.vertices) {
+                            if (((vertIdx >> faceDim) & 1) === faceVal) {
+                                faceVertices.push(vertIdx);
+                            }
+                        }
+                        
+                        if (faceVertices.length === 4) {
+                            // Order vertices to form a proper quadrilateral
+                            faceVertices = this.orderSquareVertices(faceVertices, faceDim, faceVal);
+                            faces.push(faceVertices);
+                        }
+                    }
+                }
+                
+                return faces;
+            }
+            
+            orderSquareVertices(vertices, fixedDim, fixedVal) {
+                // Simple ordering - this could be improved
+                return vertices.sort((a, b) => {
+                    let aSum = 0, bSum = 0;
+                    for (let i = 0; i < 4; i++) {
+                        if (i !== fixedDim) {
+                            aSum += (a >> i) & 1;
+                            bSum += (b >> i) & 1;
+                        }
+                    }
+                    return aSum - bSum;
+                });
+            }
+            
+            isFaceVisible(projectedPoints) {
+                if (projectedPoints.length < 3) return false;
+                
+                // Simple area test - skip faces that are too small
+                let area = this.calculatePolygonArea(projectedPoints);
+                return area > 100; // Minimum area threshold
+            }
+            
+            calculatePolygonArea(points) {
+                // Calculate approximate area of polygon
+                if (points.length < 3) return 0;
+                
+                let area = 0;
+                for (let i = 0; i < points.length; i++) {
+                    let j = (i + 1) % points.length;
+                    area += points[i][0] * points[j][1];
+                    area -= points[j][0] * points[i][1];
+                }
+                return abs(area) / 2;
+            }
+            
+            renderEdgesOnly(angleW) {
+                // Classic wireframe rendering
+                stroke(255, 200);
+                strokeWeight(1.5);
+                noFill();
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i], angleW);
+                    let v2 = this.project4D(this.vertices[j], angleW);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            countDifferences(a, b) {
+                let diff = 0;
+                for (let k = 0; k < 4; k++) {
+                    if (((a >> k) & 1) !== ((b >> k) & 1)) diff++;
+                }
+                return diff;
+            }
+        }
+
+        // ===== MAIN SKETCH =====
+        let renderer;
+        let angleW = 0;
+
+        function setup() {
+            let canvas = createCanvas(800, 800, WEBGL);
+            canvas.parent('sketch-holder');
+            
+            renderer = new HypercubeVolumeRenderer();
+            renderer.createHypercube();
+            
+            setupControls();
+        }
+
+        function draw() {
+            background(0);
+            
+            // Gentle 3D rotation for better viewing
+            rotateX(frameCount * 0.005);
+            rotateY(frameCount * 0.008);
+            
+            angleW += 0.02;
+            
+            switch(renderer.renderMethod) {
+                case 'shells':
+                    renderer.renderShells(angleW);
+                    break;
+                    
+                case 'slices':
+                    renderer.renderSlices(angleW);
+                    if (renderer.viewMode === 'cells') {
+                        renderer.renderCellsTransparent(angleW);
+                    }
+                    break;
+                    
+                case 'rays':
+                    // Ray marching would go here
+                    renderer.renderEdgesOnly(angleW);
+                    break;
+            }
+            
+            // Always show edges for reference
+            if (renderer.viewMode === 'edges') {
+                renderer.renderEdgesOnly(angleW);
+            }
+        }
+
+        function setupControls() {
+            // Render method buttons
+            document.getElementById('method-shells').addEventListener('click', () => {
+                renderer.renderMethod = 'shells';
+                setActive('method-shells', ['method-shells', 'method-slices', 'method-rays']);
+            });
+            
+            document.getElementById('method-slices').addEventListener('click', () => {
+                renderer.renderMethod = 'slices';
+                setActive('method-slices', ['method-shells', 'method-slices', 'method-rays']);
+            });
+            
+            document.getElementById('method-rays').addEventListener('click', () => {
+                renderer.renderMethod = 'rays';
+                setActive('method-rays', ['method-shells', 'method-slices', 'method-rays']);
+            });
+            
+            // View mode buttons
+            document.getElementById('view-cells').addEventListener('click', () => {
+                renderer.viewMode = 'cells';
+                setActive('view-cells', ['view-cells', 'view-faces', 'view-edges']);
+            });
+            
+            document.getElementById('view-faces').addEventListener('click', () => {
+                renderer.viewMode = 'faces';
+                setActive('view-faces', ['view-cells', 'view-faces', 'view-edges']);
+            });
+            
+            document.getElementById('view-edges').addEventListener('click', () => {
+                renderer.viewMode = 'edges';
+                setActive('view-edges', ['view-cells', 'view-faces', 'view-edges']);
+            });
+            
+            // Projection buttons
+            document.getElementById('proj-perspective').addEventListener('click', () => {
+                renderer.projection = 'perspective';
+                setActive('proj-perspective', ['proj-perspective', 'proj-orthographic', 'proj-stereographic']);
+            });
+            
+            document.getElementById('proj-orthographic').addEventListener('click', () => {
+                renderer.projection = 'orthographic';
+                setActive('proj-orthographic', ['proj-perspective', 'proj-orthographic', 'proj-stereographic']);
+            });
+            
+            document.getElementById('proj-stereographic').addEventListener('click', () => {
+                renderer.projection = 'stereographic';
+                setActive('proj-stereographic', ['proj-perspective', 'proj-orthographic', 'proj-stereographic']);
+            });
+        }
+
+        function setActive(activeId, buttonIds) {
+            buttonIds.forEach(id => {
+                document.getElementById(id).classList.toggle('active', id === activeId);
+            });
+        }
+
+        function windowResized() {
+            resizeCanvas(800, 800);
+        }
+    </script>
+</body>
+</html>
