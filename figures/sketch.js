@@ -217,6 +217,10 @@ function draw() {
     lastRenderTime = currentTime;
     
     drawGradientBackground();
+
+    // Always show rotation values to confirm gestures work
+    fill(255);
+    text('RX: ' + rotationX.toFixed(2) + ' RY: ' + rotationY.toFixed(2) + ' Zoom: ' + zoom.toFixed(2), 20, 20);
     
     // Apply camera transformations
     let scaleFactor = min(width, height) * 0.0008 * zoom;
@@ -234,6 +238,21 @@ function draw() {
     drawGestureFeedback();
     
     updateUI();
+}
+
+function drawGradientBackground() {
+    push();
+    resetMatrix();
+    noStroke();
+    
+    // Dark blue to black gradient
+    for (let y = 0; y <= height; y++) {
+        let inter = map(y, 0, height, 0, 1);
+        let c = lerpColor(color(10, 15, 40), color(0, 0, 5), inter);
+        stroke(c);
+        line(0, y, width, y);
+    }
+    pop();
 }
 
 function drawGestureFeedback() {
@@ -257,21 +276,6 @@ function drawGestureFeedback() {
     fill(255, 0, 0, 100);
     circle(gestureFeedback.x, gestureFeedback.y, 30);
     
-    pop();
-}
-
-function drawGradientBackground() {
-    push();
-    resetMatrix();
-    noStroke();
-    
-    // Dark blue to black gradient
-    for (let y = 0; y <= height; y++) {
-        let inter = map(y, 0, height, 0, 1);
-        let c = lerpColor(color(10, 15, 40), color(0, 0, 5), inter);
-        stroke(c);
-        line(0, y, width, y);
-    }
     pop();
 }
 
