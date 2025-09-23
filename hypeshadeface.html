@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Hypercube Face Shading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .canvas-container {
+            flex: 2;
+        }
+        
+        .controls {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        
+        .mode-selector {
+            margin: 15px 0;
+        }
+        
+        button {
+            background: #2196f3;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #1976d2;
+        }
+        
+        button.active {
+            background: #ff9800;
+        }
+        
+        .slider-container {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .face-info {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>4D Hypercube Face Shading</h1>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
+        </div>
+        
+        <div class="controls">
+            <div class="mode-selector">
+                <h3>Rendering Mode</h3>
+                <button id="mode-faces-only">Faces Only</button>
+                <button id="mode-wireframe">Wireframe</button>
+                <button id="mode-faces-wireframe" class="active">Faces + Wireframe</button>
+                <button id="mode-4d-faces">4D Face Colors</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="rotation-speed">Rotation Speed: <span id="speed-value">0.02</span></label>
+                <input type="range" id="rotation-speed" min="0" max="0.1" step="0.001" value="0.02">
+            </div>
+            
+            <div class="slider-container">
+                <label for="cube-size">Hypercube Size: <span id="size-value">100</span></label>
+                <input type="range" id="cube-size" min="50" max="200" step="10" value="100">
+            </div>
+            
+            <div class="slider-container">
+                <label for="face-opacity">Face Opacity: <span id="opacity-value">80</span>%</label>
+                <input type="range" id="face-opacity" min="20" max="100" value="80">
+            </div>
+            
+            <div class="slider-container">
+                <label for="w-rotation">W-Rotation Intensity: <span id="w-value">1.0</span></label>
+                <input type="range" id="w-rotation" min="0" max="2" step="0.1" value="1.0">
+            </div>
+            
+            <div>
+                <button id="toggle-rotation">Pause Rotation</button>
+                <button id="reset-view">Reset View</button>
+                <button id="toggle-faces">Show Face Info</button>
+            </div>
+            
+            <div class="info-panel">
+                <h3>Current Mode: <span id="current-mode">Faces + Wireframe</span></h3>
+                <p id="mode-description">Shaded 3D projections of 4D faces with wireframe overlay.</p>
+                <div id="face-stats" class="face-info" style="display: none;">
+                    <div>Faces Rendered: <span id="face-count">0</span>/24</div>
+                    <div>4D Face Types: 8 cubes, 24 squares</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== HYPERCUBE FACE SHADER =====
+        class HypercubeFaceShader {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.cubes = []; // The 8 cubic cells in 4D
+                this.mode = 'faces-wireframe';
+                this.cubeSize = 100;
+                this.rotationSpeed = 0.02;
+                this.faceOpacity = 0.8;
+                this.wRotationIntensity = 1.0;
+                this.showFaceInfo = false;
+            }
+            
+            createHypercube() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.cubes = [];
+                
+                // Create 16 vertices
+                for (let i = 0; i < 16; i++) {
+                    this.vertices.push({
+                        pos: [
+                            (i & 1) ? this.cubeSize : -this.cubeSize,
+                            (i & 2) ? this.cubeSize : -this.cubeSize,
+                            (i & 4) ? this.cubeSize : -this.cubeSize,
+                            (i & 8) ? this.cubeSize : -this.cubeSize
+                        ],
+                        color: color(
+                            (i & 1) ? 255 : 100,
+                            (i & 2) ? 255 : 100,  
+                            (i & 4) ? 255 : 100
+                        )
+                    });
+                }
+                
+                // Create 32 edges
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        if (this.countDifferences(i, j) === 1) {
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+                
+                // Create 24 square faces and 8 cubic cells
+                this.createFacesAndCubes();
+            }
+            
+            createFacesAndCubes() {
+                // Create 24 square faces (2D faces in 4D)
+                for (let fixedCoord1 = 0; fixedCoord1 < 4; fixedCoord1++) {
+                    for (let fixedCoord2 = fixedCoord1 + 1; fixedCoord2 < 4; fixedCoord2++) {
+                        for (let fixedVal1 = 0; fixedVal1 < 2; fixedVal1++) {
+                            for (let fixedVal2 = 0; fixedVal2 < 2; fixedVal2++) {
+                                let faceVertices = [];
+                                for (let i = 0; i < 16; i++) {
+                                    if (((i >> fixedCoord1) & 1) === fixedVal1 && 
+                                        ((i >> fixedCoord2) & 1) === fixedVal2) {
+                                        faceVertices.push(i);
+                                    }
+                                }
+                                if (faceVertices.length === 4) {
+                                    // Order vertices properly for rendering
+                                    faceVertices = this.orderFaceVertices(faceVertices, fixedCoord1, fixedCoord2);
+                                    this.faces.push({
+                                        vertices: faceVertices,
+                                        type: 'square',
+                                        fixedCoords: [fixedCoord1, fixedCoord2],
+                                        fixedVals: [fixedVal1, fixedVal2],
+                                        color: color(
+                                            fixedCoord1 * 60 + fixedVal1 * 30,
+                                            fixedCoord2 * 60 + fixedVal2 * 30,
+                                            150
+                                        )
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Create 8 cubic cells (3D faces in 4D)
+                for (let fixedCoord = 0; fixedCoord < 4; fixedCoord++) {
+                    for (let fixedVal = 0; fixedVal < 2; fixedVal++) {
+                        let cubeVertices = [];
+                        for (let i = 0; i < 16; i++) {
+                            if (((i >> fixedCoord) & 1) === fixedVal) {
+                                cubeVertices.push(i);
+                            }
+                        }
+                        this.cubes.push({
+                            vertices: cubeVertices,
+                            type: 'cube',
+                            fixedCoord: fixedCoord,
+                            fixedVal: fixedVal,
+                            color: color(
+                                fixedCoord * 85,
+                                100 + fixedVal * 100,
+                                200 - fixedCoord * 40
+                            )
+                        });
+                    }
+                }
+            }
+            
+            orderFaceVertices(vertices, coord1, coord2) {
+                // Order vertices to form a proper quadrilateral
+                if (vertices.length !== 4) return vertices;
+                
+                // Simple ordering - this could be improved for better rendering
+                return vertices.sort((a, b) => {
+                    let aSum = 0, bSum = 0;
+                    for (let i = 0; i < 4; i++) {
+                        if (i !== coord1 && i !== coord2) {
+                            aSum += (a >> i) & 1;
+                            bSum += (b >> i) & 1;
+                        }
+                    }
+                    return aSum - bSum;
+                });
+            }
+            
+            project4D(v, angleW) {
+                let [x, y, z, w] = v;
+                let effectiveAngle = angleW * this.wRotationIntensity;
+                
+                // Rotate in XW and YW planes for more interesting motion
+                let newX = x * cos(effectiveAngle) - w * sin(effectiveAngle);
+                let newW = x * sin(effectiveAngle) + w * cos(effectiveAngle);
+                
+                let newY = y * cos(effectiveAngle * 0.7) - newW * sin(effectiveAngle * 0.7);
+                newW = y * sin(effectiveAngle * 0.7) + newW * cos(effectiveAngle * 0.7);
+                
+                let scale = 400 / (500 - newW); // Perspective projection
+                return [newX * scale, newY * scale, z * scale, newW];
+            }
+            
+            calculateFaceDepth(face, angleW) {
+                // Calculate average depth of face for sorting
+                let depthSum = 0;
+                for (let vertIndex of face.vertices) {
+                    let projected = this.project4D(this.vertices[vertIndex].pos, angleW);
+                    depthSum += projected[2]; // Z-depth
+                }
+                return depthSum / face.vertices.length;
+            }
+            
+            isFaceVisible(face, angleW) {
+                // Simple backface culling for 4D faces
+                if (face.vertices.length < 3) return false;
+                
+                let v0 = this.vertices[face.vertices[0]].pos;
+                let v1 = this.vertices[face.vertices[1]].pos;
+                let v2 = this.vertices[face.vertices[2]].pos;
+                
+                // Calculate normal in 4D (simplified)
+                let u = [v1[0]-v0[0], v1[1]-v0[1], v1[2]-v0[2], v1[3]-v0[3]];
+                let v = [v2[0]-v0[0], v2[1]-v0[1], v2[2]-v0[2], v2[3]-v0[3]];
+                
+                // 4D normal approximation
+                let normal = [
+                    u[1]*v[2] - u[2]*v[1],
+                    u[2]*v[0] - u[0]*v[2],
+                    u[0]*v[1] - u[1]*v[0],
+                    u[0]*v[3] - u[3]*v[0]
+                ];
+                
+                // Project normal to 3D for visibility test
+                let projectedNormal = this.project4D(normal, angleW);
+                return projectedNormal[2] < 0; // Simple depth-based test
+            }
+            
+            renderFaces(angleW) {
+                let visibleFaces = 0;
+                
+                // Collect and sort faces by depth
+                let facesToRender = [];
+                for (let face of this.faces) {
+                    if (this.isFaceVisible(face, angleW)) {
+                        let depth = this.calculateFaceDepth(face, angleW);
+                        facesToRender.push({face, depth});
+                        visibleFaces++;
+                    }
+                }
+                
+                // Sort back to front for proper blending
+                facesToRender.sort((a, b) => b.depth - a.depth);
+                
+                // Render faces
+                for (let {face, depth} of facesToRender) {
+                    let projectedVerts = face.vertices.map(idx => 
+                        this.project4D(this.vertices[idx].pos, angleW)
+                    );
+                    
+                    // Calculate face color with depth shading
+                    let baseColor = face.color;
+                    let brightness = map(depth, -300, 300, 100, 255);
+                    let faceColor = color(
+                        red(baseColor) * brightness/255,
+                        green(baseColor) * brightness/255,
+                        blue(baseColor) * brightness/255,
+                        this.faceOpacity * 255
+                    );
+                    
+                    fill(faceColor);
+                    stroke(0, 50);
+                    strokeWeight(1);
+                    
+                    // Draw face as quadrilateral
+                    beginShape();
+                    for (let vert of projectedVerts) {
+                        vertex(vert[0], vert[1], vert[2]);
+                    }
+                    endShape(CLOSE);
+                }
+                
+                return visibleFaces;
+            }
+            
+            renderWireframe(angleW) {
+                stroke(255, 200);
+                strokeWeight(1.5);
+                noFill();
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].pos, angleW);
+                    let v2 = this.project4D(this.vertices[j].pos, angleW);
+                    
+                    let depth = (v1[2] + v2[2]) / 2;
+                    let brightness = map(depth, -300, 300, 100, 255);
+                    stroke(255, brightness);
+                    
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            render4DFaceColors(angleW) {
+                let visibleFaces = 0;
+                
+                // Color faces based on their 4D properties
+                for (let face of this.faces) {
+                    if (this.isFaceVisible(face, angleW)) {
+                        let projectedVerts = face.vertices.map(idx => 
+                            this.project4D(this.vertices[idx].pos, angleW)
+                        );
+                        
+                        let depth = this.calculateFaceDepth(face, angleW);
+                        
+                        // Color based on which 4D coordinates are fixed
+                        let hue = (face.fixedCoords[0] * 60 + face.fixedCoords[1] * 15) % 255;
+                        let sat = 200;
+                        let bright = map(depth, -300, 300, 150, 255);
+                        
+                        fill(color(hue, sat, bright, this.faceOpacity * 255));
+                        noStroke();
+                        
+                        beginShape();
+                        for (let vert of projectedVerts) {
+                            vertex(vert[0], vert[1], vert[2]);
+                        }
+                        endShape(CLOSE);
+                        
+                        visibleFaces++;
+                    }
+                }
+                
+                return visibleFaces;
+            }
+            
+            countDifferences(a, b) {
+                let diff = 0;
+                for (let k = 0; k < 4; k++) {
+                    if (((a >> k) & 1) !== ((b >> k) & 1)) diff++;
+                }
+                return diff;
+            }
+        }
+
+        // ===== MAIN SKETCH =====
+        let hyperShader;
+        let angleW = 0;
+        let rotate4D = true;
+        let currentMode = 'faces-wireframe';
+
+        function setup() {
+            let canvas = createCanvas(800, 800, WEBGL);
+            canvas.parent('sketch-holder');
+            
+            hyperShader = new HypercubeFaceShader();
+            hyperShader.createHypercube();
+            
+            setupControls();
+        }
+
+        function draw() {
+            background(0);
+            orbitControl();
+            
+            if (rotate4D) {
+                angleW += hyperShader.rotationSpeed;
+            }
+            
+            let visibleFaces = 0;
+            
+            // Apply current rendering mode
+            switch(currentMode) {
+                case 'faces-only':
+                    visibleFaces = hyperShader.renderFaces(angleW);
+                    break;
+                    
+                case 'wireframe':
+                    hyperShader.renderWireframe(angleW);
+                    break;
+                    
+                case 'faces-wireframe':
+                    visibleFaces = hyperShader.renderFaces(angleW);
+                    hyperShader.renderWireframe(angleW);
+                    break;
+                    
+                case '4d-faces':
+                    visibleFaces = hyperShader.render4DFaceColors(angleW);
+                    hyperShader.renderWireframe(angleW);
+                    break;
+            }
+            
+            // Update face count display
+            if (hyperShader.showFaceInfo) {
+                document.getElementById('face-count').textContent = visibleFaces;
+            }
+        }
+
+        function setupControls() {
+            // Mode buttons
+            document.getElementById('mode-faces-only').addEventListener('click', () => setMode('faces-only'));
+            document.getElementById('mode-wireframe').addEventListener('click', () => setMode('wireframe'));
+            document.getElementById('mode-faces-wireframe').addEventListener('click', () => setMode('faces-wireframe'));
+            document.getElementById('mode-4d-faces').addEventListener('click', () => setMode('4d-faces'));
+            
+            // Sliders
+            document.getElementById('rotation-speed').addEventListener('input', function(e) {
+                hyperShader.rotationSpeed = parseFloat(e.target.value);
+                document.getElementById('speed-value').textContent = hyperShader.rotationSpeed.toFixed(3);
+            });
+            
+            document.getElementById('cube-size').addEventListener('input', function(e) {
+                hyperShader.cubeSize = parseInt(e.target.value);
+                document.getElementById('size-value').textContent = hyperShader.cubeSize;
+                hyperShader.createHypercube();
+            });
+            
+            document.getElementById('face-opacity').addEventListener('input', function(e) {
+                hyperShader.faceOpacity = parseInt(e.target.value) / 100;
+                document.getElementById('opacity-value').textContent = parseInt(e.target.value);
+            });
+            
+            document.getElementById('w-rotation').addEventListener('input', function(e) {
+                hyperShader.wRotationIntensity = parseFloat(e.target.value);
+                document.getElementById('w-value').textContent = hyperShader.wRotationIntensity.toFixed(1);
+            });
+            
+            // Toggle buttons
+            document.getElementById('toggle-rotation').addEventListener('click', function() {
+                rotate4D = !rotate4D;
+                this.textContent = rotate4D ? 'Pause Rotation' : 'Resume Rotation';
+            });
+            
+            document.getElementById('reset-view').addEventListener('click', function() {
+                angleW = 0;
+            });
+            
+            document.getElementById('toggle-faces').addEventListener('click', function() {
+                hyperShader.showFaceInfo = !hyperShader.showFaceInfo;
+                document.getElementById('face-stats').style.display = 
+                    hyperShader.showFaceInfo ? 'block' : 'none';
+                this.textContent = hyperShader.showFaceInfo ? 'Hide Face Info' : 'Show Face Info';
+            });
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update active button
+            document.querySelectorAll('.mode-selector button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`mode-${mode}`).classList.add('active');
+            
+            // Update info panel
+            let modeName = mode.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('current-mode').textContent = modeName;
+            updateModeDescription(mode);
+        }
+
+        function updateModeDescription(mode) {
+            const descriptions = {
+                'faces-only': '3D projections of the 24 square faces that form the hypercube surface in 4D space.',
+                'wireframe': 'Traditional edge-based visualization showing the hypercube structure.',
+                'faces-wireframe': 'Combined face shading with wireframe overlay for structural clarity.',
+                '4d-faces': 'Faces colored based on their 4D orientation and fixed coordinates.'
+            };
+            
+            document.getElementById('mode-description').textContent = descriptions[mode];
+        }
+
+        function windowResized() {
+            resizeCanvas(800, 800);
+        }
+    </script>
+</body>
+</html>
