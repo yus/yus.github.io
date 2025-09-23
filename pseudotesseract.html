@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordered Pseudo-W-Rotation Hypercube</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        
+        .canvas-container {
+            flex: 2;
+        }
+        
+        .controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        
+        button {
+            background: #2196f3;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        button.active {
+            background: #ff9800;
+        }
+        
+        .theory {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ordered Pseudo-W-Rotation Hypercube</h1>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
+        </div>
+        
+        <div class="controls">
+            <h3>Rotation Strategy</h3>
+            <button id="strategy-sequential" class="active">Sequential Unfolding</button>
+            <button id="strategy-layered">Layered Expansion</button>
+            <button id="strategy-spiral">Spiral Trajectory</button>
+            
+            <h3>Face Ordering</h3>
+            <button id="order-depth">Depth-Based</button>
+            <button id="order-wvalue">W-Value Based</button>
+            <button id="order-cellbased">Cell-Based</button>
+            
+            <h3>Visualization</h3>
+            <button id="viz-transparent">Transparent Faces</button>
+            <button id="viz-solid">Solid Volumes</button>
+            <button id="viz-wireframe">Wireframe Guide</button>
+            
+            <div class="theory">
+                <strong>Strategy:</strong> Instead of true 4D rotation, we animate vertices along 
+                coordinated trajectories that maintain face integrity. Faces are rendered in 
+                carefully controlled order to prevent intersections.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ORDERED PSEUDO-W-ROTATION RENDERER =====
+        class OrderedHypercubeRenderer {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.cubeSize = 100;
+                this.rotationStrategy = 'sequential';
+                this.faceOrdering = 'depth';
+                this.visualization = 'transparent';
+                this.phase = 0;
+                
+                // Animation parameters
+                this.vertexPhases = [];
+                this.faceDepths = [];
+            }
+            
+            createHypercube() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.vertexPhases = [];
+                this.faceDepths = [];
+                
+                // Create 16 vertices with initial positions
+                for (let i = 0; i < 16; i++) {
+                    this.vertices.push([
+                        (i & 1) ? this.cubeSize : -this.cubeSize,
+                        (i & 2) ? this.cubeSize : -this.cubeSize,
+                        (i & 4) ? this.cubeSize : -this.cubeSize,
+                        (i & 8) ? this.cubeSize : -this.cubeSize
+                    ]);
+                    
+                    // Assign each vertex a phase based on its W coordinate
+                    this.vertexPhases[i] = (i & 8) ? 1 : 0; // Start with W separation
+                }
+                
+                // Create edges
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        if (this.countDifferences(i, j) === 1) {
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+                
+                // Create faces with careful ordering
+                this.createOrderedFaces();
+            }
+            
+            createOrderedFaces() {
+                // Create faces grouped by their W-values to control rendering order
+                let faceGroups = [[], [], [], []]; // Groups based on W characteristics
+                
+                for (let fixed1 = 0; fixed1 < 4; fixed1++) {
+                    for (let fixed2 = fixed1 + 1; fixed2 < 4; fixed2++) {
+                        for (let val1 = 0; val1 < 2; val1++) {
+                            for (let val2 = 0; val2 < 2; val2++) {
+                                let faceVertices = [];
+                                for (let i = 0; i < 16; i++) {
+                                    if (((i >> fixed1) & 1) === val1 && 
+                                        ((i >> fixed2) & 1) === val2) {
+                                        faceVertices.push(i);
+                                    }
+                                }
+                                
+                                if (faceVertices.length === 4) {
+                                    // Determine which group this face belongs to based on W values
+                                    let wSum = 0;
+                                    for (let vertIdx of faceVertices) {
+                                        wSum += (vertIdx & 8) ? 1 : -1; // Sum of W signs
+                                    }
+                                    
+                                    let groupIndex = 0;
+                                    if (fixed1 === 3 || fixed2 === 3) {
+                                        // Face involves W dimension directly
+                                        groupIndex = 2 + (val1 + val2) % 2;
+                                    } else {
+                                        // Face perpendicular to W dimension
+                                        groupIndex = (Math.sign(wSum) + 1);
+                                    }
+                                    
+                                    faceGroups[groupIndex].push({
+                                        vertices: faceVertices,
+                                        fixedCoords: [fixed1, fixed2],
+                                        wCharacteristic: wSum / 4,
+                                        color: this.getFaceColor(fixed1, fixed2, wSum)
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Flatten groups into ordered face list
+                this.faces = [...faceGroups[0], ...faceGroups[1], ...faceGroups[2], ...faceGroups[3]];
+            }
+            
+            getFaceColor(fixed1, fixed2, wChar) {
+                // Color based on fixed dimensions and W characteristic
+                let hue = (fixed1 * 30 + fixed2 * 15) % 360;
+                let sat = 80;
+                let bright = map(wChar, -1, 1, 30, 70);
+                return color(hue, sat, bright);
+            }
+            
+            getAnimatedVertexPosition(vertexIndex, phase) {
+                let [x, y, z, w] = this.vertices[vertexIndex];
+                let vertexPhase = this.vertexPhases[vertexIndex];
+                
+                switch(this.rotationStrategy) {
+                    case 'sequential':
+                        // Vertices move sequentially based on their W value
+                        let progress = (phase + vertexPhase) % 1;
+                        let animatedW = w * cos(progress * PI);
+                        return [x, y, z, animatedW];
+                        
+                    case 'layered':
+                        // Layers expand and contract in sequence
+                        let layer = (vertexIndex & 8) ? 1 : 0; // W layer
+                        let layerPhase = (phase + layer * 0.5) % 1;
+                        let scale = 0.5 + 0.5 * sin(layerPhase * PI);
+                        return [x * scale, y * scale, z * scale, w];
+                        
+                    case 'spiral':
+                        // Spiral trajectory that avoids intersections
+                        let spiralPhase = (phase + vertexPhase) % 1;
+                        let angle = spiralPhase * TWO_PI;
+                        let radius = this.cubeSize * (0.7 + 0.3 * sin(angle * 2));
+                        let spiralX = x + radius * cos(angle);
+                        let spiralZ = z + radius * sin(angle);
+                        return [spiralX, y, spiralZ, w * cos(angle)];
+                }
+            }
+            
+            projectVertex(vertexIndex, phase) {
+                let animatedPos = this.getAnimatedVertexPosition(vertexIndex, phase);
+                let [x, y, z, w] = animatedPos;
+                
+                // Perspective projection with W coordinate influencing depth
+                let depthScale = 400 / (500 - w * 0.5); // Reduced W influence
+                return [x * depthScale, y * depthScale, z * depthScale, w];
+            }
+            
+            calculateFaceDepth(face, phase) {
+                // Calculate depth for rendering order - crucial for avoiding intersections
+                let depth = 0;
+                for (let vertIdx of face.vertices) {
+                    let projected = this.projectVertex(vertIdx, phase);
+                    depth += projected[2]; // Z depth
+                    
+                    // Add W influence based on ordering strategy
+                    if (this.faceOrdering === 'wvalue') {
+                        depth += projected[3] * 10; // W value contributes to depth
+                    }
+                }
+                
+                // For cell-based ordering, group faces by their cubic cells
+                if (this.faceOrdering === 'cellbased') {
+                    let wSum = 0;
+                    for (let vertIdx of face.vertices) {
+                        wSum += (vertIdx & 8) ? 1 : 0;
+                    }
+                    depth += (wSum - 2) * 1000; // Group by W cell
+                }
+                
+                return depth / face.vertices.length;
+            }
+            
+            isFaceVisible(face, phase) {
+                // More sophisticated visibility test that prevents face crossing
+                let vertices3D = face.vertices.map(idx => this.projectVertex(idx, phase));
+                
+                // Check if face is too edge-on or degenerate
+                let area = this.calculateFaceArea(vertices3D);
+                if (area < 50) return false;
+                
+                // Check for self-intersection in projection
+                if (this.faceOrdering === 'depth') {
+                    return this.isConvex(vertices3D);
+                }
+                
+                return true;
+            }
+            
+            calculateFaceArea(vertices3D) {
+                // Calculate area of projected face
+                if (vertices3D.length < 3) return 0;
+                
+                let area = 0;
+                for (let i = 0; i < vertices3D.length; i++) {
+                    let j = (i + 1) % vertices3D.length;
+                    area += vertices3D[i][0] * vertices3D[j][1] - vertices3D[j][0] * vertices3D[i][1];
+                }
+                return abs(area) / 2;
+            }
+            
+            isConvex(vertices3D) {
+                // Check if projected polygon is convex
+                if (vertices3D.length < 4) return true;
+                
+                let sign = 0;
+                for (let i = 0; i < vertices3D.length; i++) {
+                    let a = vertices3D[i];
+                    let b = vertices3D[(i + 1) % vertices3D.length];
+                    let c = vertices3D[(i + 2) % vertices3D.length];
+                    
+                    let cross = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]);
+                    if (abs(cross) > 0.001) {
+                        if (sign === 0) sign = Math.sign(cross);
+                        else if (Math.sign(cross) !== sign) return false;
+                    }
+                }
+                return true;
+            }
+            
+            renderOrderedFaces(phase) {
+                // Sort faces by carefully calculated depth to prevent intersections
+                let facesToRender = [];
+                
+                for (let face of this.faces) {
+                    if (this.isFaceVisible(face, phase)) {
+                        let depth = this.calculateFaceDepth(face, phase);
+                        facesToRender.push({face, depth});
+                    }
+                }
+                
+                // Critical: Sort faces to render back-to-front
+                facesToRender.sort((a, b) => b.depth - a.depth);
+                
+                // Render faces in correct order
+                for (let {face, depth} of facesToRender) {
+                    this.renderSingleFace(face, phase, depth);
+                }
+                
+                return facesToRender.length;
+            }
+            
+            renderSingleFace(face, phase, depth) {
+                let vertices3D = face.vertices.map(idx => this.projectVertex(idx, phase));
+                
+                // Set face appearance based on visualization mode
+                if (this.visualization === 'transparent') {
+                    fill(red(face.color), green(face.color), blue(face.color), 
+                         map(abs(depth), 0, 500, 100, 50));
+                    stroke(255, 30);
+                } else if (this.visualization === 'solid') {
+                    fill(face.color);
+                    stroke(0, 50);
+                } else {
+                    noFill();
+                    stroke(face.color);
+                }
+                
+                strokeWeight(1);
+                
+                // Render the face
+                beginShape();
+                for (let v of vertices3D) {
+                    vertex(v[0], v[1], v[2]);
+                }
+                endShape(CLOSE);
+            }
+            
+            renderEdges(phase) {
+                // Render edges with coordinated animation
+                stroke(255, 150);
+                strokeWeight(1.5);
+                noFill();
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.projectVertex(i, phase);
+                    let v2 = this.projectVertex(j, phase);
+                    
+                    // Adjust edge appearance based on vertex phases
+                    let phaseDiff = abs(this.vertexPhases[i] - this.vertexPhases[j]);
+                    let alpha = map(phaseDiff, 0, 1, 100, 255);
+                    stroke(255, alpha);
+                    
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            countDifferences(a, b) {
+                let diff = 0;
+                for (let k = 0; k < 4; k++) {
+                    if (((a >> k) & 1) !== ((b >> k) & 1)) diff++;
+                }
+                return diff;
+            }
+            
+            updateAnimation() {
+                this.phase += 0.01;
+                if (this.phase > 1) this.phase = 0;
+                
+                // Update vertex phases for coordinated motion
+                for (let i = 0; i < 16; i++) {
+                    // Phases evolve based on strategy
+                    switch(this.rotationStrategy) {
+                        case 'sequential':
+                            this.vertexPhases[i] = (this.phase + (i / 16)) % 1;
+                            break;
+                        case 'layered':
+                            this.vertexPhases[i] = (this.phase + ((i & 8) ? 0.5 : 0)) % 1;
+                            break;
+                        case 'spiral':
+                            this.vertexPhases[i] = (this.phase + (i % 4) * 0.25) % 1;
+                            break;
+                    }
+                }
+            }
+        }
+
+        // ===== MAIN SKETCH =====
+        let renderer;
+        let animationPhase = 0;
+
+        function setup() {
+            let canvas = createCanvas(800, 800, WEBGL);
+            canvas.parent('sketch-holder');
+            
+            renderer = new OrderedHypercubeRenderer();
+            renderer.createHypercube();
+            
+            setupControls();
+        }
+
+        function draw() {
+            background(0);
+            
+            // Gentle 3D rotation for better viewing (independent of W animation)
+            rotateX(sin(frameCount * 0.003) * 0.3);
+            rotateY(cos(frameCount * 0.005) * 0.4);
+            
+            // Update the coordinated animation
+            renderer.updateAnimation();
+            animationPhase = renderer.phase;
+            
+            // Render based on visualization mode
+            if (renderer.visualization !== 'wireframe') {
+                let facesRendered = renderer.renderOrderedFaces(animationPhase);
+            }
+            
+            // Always show wireframe as guide
+            renderer.renderEdges(animationPhase);
+        }
+
+        function setupControls() {
+            // Strategy buttons
+            document.getElementById('strategy-sequential').addEventListener('click', () => {
+                renderer.rotationStrategy = 'sequential';
+                setActive('strategy-sequential', ['strategy-sequential', 'strategy-layered', 'strategy-spiral']);
+            });
+            
+            document.getElementById('strategy-layered').addEventListener('click', () => {
+                renderer.rotationStrategy = 'layered';
+                setActive('strategy-layered', ['strategy-sequential', 'strategy-layered', 'strategy-spiral']);
+            });
+            
+            document.getElementById('strategy-spiral').addEventListener('click', () => {
+                renderer.rotationStrategy = 'spiral';
+                setActive('strategy-spiral', ['strategy-sequential', 'strategy-layered', 'strategy-spiral']);
+            });
+            
+            // Ordering buttons
+            document.getElementById('order-depth').addEventListener('click', () => {
+                renderer.faceOrdering = 'depth';
+                setActive('order-depth', ['order-depth', 'order-wvalue', 'order-cellbased']);
+            });
+            
+            document.getElementById('order-wvalue').addEventListener('click', () => {
+                renderer.faceOrdering = 'wvalue';
+                setActive('order-wvalue', ['order-depth', 'order-wvalue', 'order-cellbased']);
+            });
+            
+            document.getElementById('order-cellbased').addEventListener('click', () => {
+                renderer.faceOrdering = 'cellbased';
+                setActive('order-cellbased', ['order-depth', 'order-wvalue', 'order-cellbased']);
+            });
+            
+            // Visualization buttons
+            document.getElementById('viz-transparent').addEventListener('click', () => {
+                renderer.visualization = 'transparent';
+                setActive('viz-transparent', ['viz-transparent', 'viz-solid', 'viz-wireframe']);
+            });
+            
+            document.getElementById('viz-solid').addEventListener('click', () => {
+                renderer.visualization = 'solid';
+                setActive('viz-solid', ['viz-transparent', 'viz-solid', 'viz-wireframe']);
+            });
+            
+            document.getElementById('viz-wireframe').addEventListener('click', () => {
+                renderer.visualization = 'wireframe';
+                setActive('viz-wireframe', ['viz-transparent', 'viz-solid', 'viz-wireframe']);
+            });
+        }
+
+        function setActive(activeId, buttonIds) {
+            buttonIds.forEach(id => {
+                document.getElementById(id).classList.toggle('active', id === activeId);
+            });
+        }
+
+        function windowResized() {
+            resizeCanvas(800, 800);
+        }
+    </script>
+</body>
+</html>
