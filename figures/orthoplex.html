@@ -1,26 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/p5@2.0.5/lib/p5.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8D Hypercube with 4D Color Space</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: #000;
+        }
         #info { 
             position: absolute; 
             top: 10px; 
             left: 10px; 
             color: white; 
             font-family: Arial; 
+            font-size: 14px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-family: Arial;
             font-size: 12px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px;
-            border-radius: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 15px;
+            border-radius: 8px;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div id="info">Tap dots to select • Pinch to zoom • Drag to rotate</div>
-    <div id="canvas-container"></div>
+    <div id="info">
+        <div>8D Hypercube • 256 Vertices • 1024 Edges</div>
+        <div>Selected: <span id="selectedIndex">0</span></div>
+        <div id="colorInfo">Color: RGB(0, 0, 0)</div>
+    </div>
+    
+    <div id="controls">
+        Drag: Rotate • Pinch: Zoom • Tap: Select Vertex
+    </div>
+
     <script src="sketch.js"></script>
 </body>
 </html>
