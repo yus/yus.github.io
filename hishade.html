@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Color Space Hypercube</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+        }
+        
+        .canvas-container {
+            flex: 2;
+        }
+        
+        .controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        
+        button {
+            background: #2196f3;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button.active {
+            background: #ff9800;
+        }
+        
+        .color-space-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>4D Color Space Hypercube</h1>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <div id="sketch-holder"></div>
+        </div>
+        
+        <div class="controls">
+            <h3>Color Space</h3>
+            <button id="color-rgba" class="active">RGBA 4D</button>
+            <button id="color-hsla">HSLA 4D</button>
+            <button id="color-4dgradient">4D Gradient</button>
+            
+            <h3>Render Mode</h3>
+            <button id="mode-transparent">Transparent Faces</button>
+            <button id="mode-doublesided">Double-Sided</button>
+            <button id="mode-wireframe">Wireframe Overlay</button>
+            
+            <h3>4D Rotation</h3>
+            <button id="rotate-xw">XW Rotation</button>
+            <button id="rotate-yw">YW Rotation</button>
+            <button id="rotate-zw">ZW Rotation</button>
+            <button id="rotate-all">All Rotations</button>
+            
+            <div class="color-space-info">
+                <div>4D Coordinates → Color Mapping:</div>
+                <div id="mapping-info">X→R, Y→G, Z→B, W→A</div>
+                <div>Visible Faces: <span id="face-count">0</span></div>
+                <div>4D Rotation Planes: <span id="rotation-info">XW</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 4D COLOR SPACE HYPERCUBE =====
+        class ColorSpaceHypercube {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                this.cubeSize = 100;
+                this.colorSpace = 'rgba';
+                this.renderMode = 'transparent';
+                this.rotationPlanes = [true, false, false]; // XW, YW, ZW
+            }
+            
+            createHypercube() {
+                this.vertices = [];
+                this.edges = [];
+                this.faces = [];
+                
+                // Create 16 vertices with 4D coordinates
+                for (let i = 0; i < 16; i++) {
+                    this.vertices.push({
+                        coords: [
+                            (i & 1) ? this.cubeSize : -this.cubeSize,
+                            (i & 2) ? this.cubeSize : -this.cubeSize,
+                            (i & 4) ? this.cubeSize : -this.cubeSize,
+                            (i & 8) ? this.cubeSize : -this.cubeSize
+                        ],
+                        // Pre-calculate 4D color
+                        color4D: this.map4DToColor([
+                            (i & 1) ? 1 : 0,
+                            (i & 2) ? 1 : 0,
+                            (i & 4) ? 1 : 0, 
+                            (i & 8) ? 1 : 0
+                        ])
+                    });
+                }
+                
+                // Create edges
+                for (let i = 0; i < 16; i++) {
+                    for (let j = i + 1; j < 16; j++) {
+                        if (this.countDifferences(i, j) === 1) {
+                            this.edges.push([i, j]);
+                        }
+                    }
+                }
+                
+                // Create faces using a robust method
+                this.createStableFaces();
+            }
+            
+            createStableFaces() {
+                // Create 24 faces by fixing two coordinates
+                for (let fixed1 = 0; fixed1 < 4; fixed1++) {
+                    for (let fixed2 = fixed1 + 1; fixed2 < 4; fixed2++) {
+                        for (let val1 = 0; val1 < 2; val1++) {
+                            for (let val2 = 0; val2 < 2; val2++) {
+                                let faceVertices = [];
+                                for (let i = 0; i < 16; i++) {
+                                    if (((i >> fixed1) & 1) === val1 && 
+                                        ((i >> fixed2) & 1) === val2) {
+                                        faceVertices.push(i);
+                                    }
+                                }
+                                
+                                if (faceVertices.length === 4) {
+                                    // Calculate face properties
+                                    let faceCenter4D = [0, 0, 0, 0];
+                                    for (let vertIdx of faceVertices) {
+                                        for (let d = 0; d < 4; d++) {
+                                            faceCenter4D[d] += this.vertices[vertIdx].coords[d];
+                                        }
+                                    }
+                                    for (let d = 0; d < 4; d++) {
+                                        faceCenter4D[d] /= 4;
+                                    }
+                                    
+                                    this.faces.push({
+                                        vertices: faceVertices,
+                                        fixedCoords: [fixed1, fixed2],
+                                        fixedVals: [val1, val2],
+                                        center4D: faceCenter4D,
+                                        color4D: this.map4DToColor(faceCenter4D.map(c => (c + this.cubeSize) / (2 * this.cubeSize)))
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            map4DToColor(normalizedCoords) {
+                // normalizedCoords should be [0,1] range for each dimension
+                let [x, y, z, w] = normalizedCoords;
+                
+                switch(this.colorSpace) {
+                    case 'rgba':
+                        // Direct RGBA mapping
+                        return color(
+                            x * 255,        // R ← X
+                            y * 255,        // G ← Y  
+                            z * 255,        // B ← Z
+                            w * 200 + 55    // A ← W (55-255)
+                        );
+                        
+                    case 'hsla':
+                        // HSLA mapping
+                        return color(
+                            (x * 360) % 360, // H ← X
+                            y * 100,         // S ← Y
+                            z * 100,         // L ← Z
+                            w * 200 + 55     // A ← W
+                        );
+                        
+                    case '4dgradient':
+                        // Custom 4D gradient
+                        return color(
+                            (x * 200 + y * 55) % 255,  // R ← X,Y
+                            (y * 200 + z * 55) % 255,  // G ← Y,Z
+                            (z * 200 + w * 55) % 255,  // B ← Z,W
+                            (x + y + z + w) * 64 + 55  // A ← sum
+                        );
+                }
+            }
+            
+            rotate4D(point, angleXW, angleYW, angleZW) {
+                let [x, y, z, w] = point;
+                
+                // Apply rotations in selected planes
+                if (this.rotationPlanes[0]) { // XW rotation
+                    let newX = x * cos(angleXW) - w * sin(angleXW);
+                    let newW = x * sin(angleXW) + w * cos(angleXW);
+                    x = newX; w = newW;
+                }
+                
+                if (this.rotationPlanes[1]) { // YW rotation
+                    let newY = y * cos(angleYW) - w * sin(angleYW);
+                    let newW = y * sin(angleYW) + w * cos(angleYW);
+                    y = newY; w = newW;
+                }
+                
+                if (this.rotationPlanes[2]) { // ZW rotation
+                    let newZ = z * cos(angleZW) - w * sin(angleZW);
+                    let newW = z * sin(angleZW) + w * cos(angleZW);
+                    z = newZ; w = newW;
+                }
+                
+                return [x, y, z, w];
+            }
+            
+            project4D(point, angleXW, angleYW, angleZW) {
+                let rotated = this.rotate4D(point, angleXW, angleYW, angleZW);
+                let [x, y, z, w] = rotated;
+                
+                // Perspective projection
+                let scale = 400 / (500 - w);
+                return [x * scale, y * scale, z * scale];
+            }
+            
+            renderDoubleSidedFaces(angleXW, angleYW, angleZW) {
+                let visibleCount = 0;
+                
+                // Don't sort by depth - render all faces double-sided
+                for (let face of this.faces) {
+                    let projected = face.vertices.map(idx => 
+                        this.project4D(this.vertices[idx].coords, angleXW, angleYW, angleZW)
+                    );
+                    
+                    // Calculate simple normal for lighting (but don't cull!)
+                    let normal = this.calculateFaceNormal(projected);
+                    let brightness = map(abs(normal[2]), 0, 1, 0.3, 1.0);
+                    
+                    // Get face color from 4D space
+                    let faceColor = face.color4D;
+                    
+                    // Adjust brightness based on normal
+                    if (this.renderMode === 'transparent') {
+                        fill(
+                            red(faceColor) * brightness,
+                            green(faceColor) * brightness,
+                            blue(faceColor) * brightness,
+                            alpha(faceColor) * 0.6 // Semi-transparent
+                        );
+                    } else {
+                        fill(
+                            red(faceColor) * brightness,
+                            green(faceColor) * brightness,
+                            blue(faceColor) * brightness
+                        );
+                    }
+                    
+                    stroke(255, 50); // Subtle stroke for definition
+                    strokeWeight(1);
+                    
+                    // Render face (always render both sides)
+                    beginShape();
+                    for (let p of projected) {
+                        vertex(p[0], p[1], p[2]);
+                    }
+                    endShape(CLOSE);
+                    
+                    visibleCount++;
+                }
+                
+                return visibleCount;
+            }
+            
+            calculateFaceNormal(projectedPoints) {
+                if (projectedPoints.length < 3) return [0, 0, 1];
+                
+                let v0 = projectedPoints[0];
+                let v1 = projectedPoints[1];
+                let v2 = projectedPoints[2];
+                
+                let u = [v1[0]-v0[0], v1[1]-v0[1], v1[2]-v0[2]];
+                let v = [v2[0]-v0[0], v2[1]-v0[1], v2[2]-v0[2]];
+                
+                let normal = [
+                    u[1]*v[2] - u[2]*v[1],
+                    u[2]*v[0] - u[0]*v[2],
+                    u[0]*v[1] - u[1]*v[0]
+                ];
+                
+                // Normalize
+                let len = sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
+                if (len > 0) {
+                    normal = normal.map(n => n / len);
+                }
+                
+                return normal;
+            }
+            
+            renderEdges(angleXW, angleYW, angleZW) {
+                stroke(255, 150);
+                strokeWeight(1.5);
+                noFill();
+                
+                for (let [i, j] of this.edges) {
+                    let v1 = this.project4D(this.vertices[i].coords, angleXW, angleYW, angleZW);
+                    let v2 = this.project4D(this.vertices[j].coords, angleXW, angleYW, angleZW);
+                    line(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+                }
+            }
+            
+            countDifferences(a, b) {
+                let diff = 0;
+                for (let k = 0; k < 4; k++) {
+                    if (((a >> k) & 1) !== ((b >> k) & 1)) diff++;
+                }
+                return diff;
+            }
+        }
+
+        // ===== MAIN SKETCH =====
+        let hypercube;
+        let angleXW = 0, angleYW = 0, angleZW = 0;
+        let rotationSpeed = 0.02;
+
+        function setup() {
+            let canvas = createCanvas(800, 800, WEBGL);
+            canvas.parent('sketch-holder');
+            
+            hypercube = new ColorSpaceHypercube();
+            hypercube.createHypercube();
+            
+            setupControls();
+            updateInfoDisplay();
+        }
+
+        function draw() {
+            background(0);
+            
+            // Smooth 3D rotation for better viewing
+            rotateX(sin(frameCount * 0.005) * 0.5);
+            rotateY(cos(frameCount * 0.007) * 0.3);
+            
+            // 4D rotations
+            angleXW += rotationSpeed;
+            angleYW += rotationSpeed * 0.7;
+            angleZW += rotationSpeed * 0.3;
+            
+            let visibleFaces = hypercube.renderDoubleSidedFaces(angleXW, angleYW, angleZW);
+            
+            if (hypercube.renderMode === 'wireframe') {
+                hypercube.renderEdges(angleXW, angleYW, angleZW);
+            }
+            
+            document.getElementById('face-count').textContent = visibleFaces;
+        }
+
+        function setupControls() {
+            // Color space buttons
+            document.getElementById('color-rgba').addEventListener('click', () => {
+                hypercube.colorSpace = 'rgba';
+                hypercube.createHypercube();
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('color-hsla').addEventListener('click', () => {
+                hypercube.colorSpace = 'hsla';
+                hypercube.createHypercube();
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('color-4dgradient').addEventListener('click', () => {
+                hypercube.colorSpace = '4dgradient';
+                hypercube.createHypercube();
+                updateInfoDisplay();
+            });
+            
+            // Render mode buttons
+            document.getElementById('mode-transparent').addEventListener('click', () => {
+                hypercube.renderMode = 'transparent';
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('mode-doublesided').addEventListener('click', () => {
+                hypercube.renderMode = 'doublesided';
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('mode-wireframe').addEventListener('click', () => {
+                hypercube.renderMode = 'wireframe';
+                updateInfoDisplay();
+            });
+            
+            // Rotation plane buttons
+            document.getElementById('rotate-xw').addEventListener('click', () => {
+                hypercube.rotationPlanes = [true, false, false];
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('rotate-yw').addEventListener('click', () => {
+                hypercube.rotationPlanes = [false, true, false];
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('rotate-zw').addEventListener('click', () => {
+                hypercube.rotationPlanes = [false, false, true];
+                updateInfoDisplay();
+            });
+            
+            document.getElementById('rotate-all').addEventListener('click', () => {
+                hypercube.rotationPlanes = [true, true, true];
+                updateInfoDisplay();
+            });
+        }
+
+        function updateInfoDisplay() {
+            // Update color mapping info
+            let mappingText = "";
+            switch(hypercube.colorSpace) {
+                case 'rgba': mappingText = "X→R, Y→G, Z→B, W→A"; break;
+                case 'hsla': mappingText = "X→H, Y→S, Z→L, W→A"; break;
+                case '4dgradient': mappingText = "XY→R, YZ→G, ZW→B, SUM→A"; break;
+            }
+            document.getElementById('mapping-info').textContent = mappingText;
+            
+            // Update rotation info
+            let planes = [];
+            if (hypercube.rotationPlanes[0]) planes.push("XW");
+            if (hypercube.rotationPlanes[1]) planes.push("YW"); 
+            if (hypercube.rotationPlanes[2]) planes.push("ZW");
+            document.getElementById('rotation-info').textContent = planes.join("+") || "None";
+        }
+
+        function windowResized() {
+            resizeCanvas(800, 800);
+        }
+    </script>
+</body>
+</html>
