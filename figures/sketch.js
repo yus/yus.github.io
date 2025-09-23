@@ -3,171 +3,215 @@ let vertices3D = [];
 let edges = [];
 let vertexColorsRGB = [];
 let selectedVertex = 0;
-let rotationX = 0;
-let rotationY = 0;
+
+// Mobile touch controls
+let rotationX = 0, rotationY = 0;
+let lastTouchX, lastTouchY;
+let zoom = 1.0;
 let isDragging = false;
-let prevMouseX, prevMouseY;
+
+// Performance optimization
+let vertexPoints = [];
+let edgeLines = [];
 
 function setup() {
-  createCanvas(800, 600, WEBGL);
-  noStroke();
-  
-  generate8DHypercube();
-  project8DTo3D(); // Proper projection
-  console.log('Vertices:', vertices8D.length, 'Edges:', edges.length);
+    let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+    canvas.touchMoved(touchMoveHandler);
+    
+    // Mobile performance settings
+    pixelDensity(1);
+    
+    generate8DHypercube();
+    project8DTo3D();
+    precomputeGeometry();
+    
+    console.log('Ready: ' + vertices8D.length + ' vertices, ' + edges.length + ' edges');
 }
 
 function generate8DHypercube() {
-  // Generate 256 vertices in 8D
-  for (let i = 0; i < 256; i++) {
-    let vertex = [];
-    for (let bit = 0; bit < 8; bit++) {
-      vertex.push((i >> bit) & 1 ? 1 : -1);
+    // Generate 256 vertices in 8D
+    for (let i = 0; i < 256; i++) {
+        let vertex = [];
+        for (let bit = 0; bit < 8; bit++) {
+            vertex.push((i >> bit) & 1 ? 1 : -1);
+        }
+        vertices8D.push(vertex);
     }
-    vertices8D.push(vertex);
-  }
-  
-  // Generate edges (vertices differing by 1 bit)
-  for (let i = 0; i < 256; i++) {
-    for (let bit = 0; bit < 8; bit++) {
-      let j = i ^ (1 << bit); // Flip one bit
-      if (i < j) edges.push([i, j]);
+    
+    // Generate edges (vertices differing by 1 bit)
+    for (let i = 0; i < 256; i++) {
+        for (let bit = 0; bit < 8; bit++) {
+            let j = i ^ (1 << bit);
+            if (i < j) edges.push([i, j]);
+        }
     }
-  }
-  
-  // Generate colors from first 4 dimensions
-  for (let vertex of vertices8D) {
-    let color4D = vertex.slice(0, 4).map(x => (x + 1) * 0.5);
-    vertexColorsRGB.push(color4DToRGB(color4D));
-  }
+    
+    // Generate colors using YOUR IEC 4D color mapping
+    for (let vertex of vertices8D) {
+        let color4D = vertex.slice(0, 4).map(x => (x + 1) * 0.5);
+        vertexColorsRGB.push(iec4DToRGB(color4D));
+    }
+}
+
+function iec4DToRGB(color4D) {
+    // YOUR IEC COLOR MAPPING - replace with your actual function
+    let [dim1, dim2, dim3, dim4] = color4D;
+    
+    // Example mapping - modify this to match your IEC space
+    // This is where you'd put your specific 4D->RGB conversion
+    let r = Math.pow(dim1, 0.8) * 255;
+    let g = Math.pow(dim2, 0.9) * 255;
+    let b = Math.pow(dim3, 1.0) * 255;
+    
+    // Use 4th dimension for brightness/alpha modulation
+    let brightness = 0.5 + dim4 * 0.5;
+    r *= brightness;
+    g *= brightness;
+    b *= brightness;
+    
+    return [constrain(r, 0, 255), constrain(g, 0, 255), constrain(b, 0, 255)];
 }
 
 function project8DTo3D() {
-  // Better: random orthogonal projection from 8D to 3D
-  let projection = [];
-  for (let i = 0; i < 3; i++) {
-    let row = [];
-    for (let j = 0; j < 8; j++) {
-      row.push(randomGaussian(0, 1));
+    // Stable orthogonal projection
+    let projection = [
+        [0.35, 0.22, -0.18, 0.41, -0.29, 0.13, 0.17, -0.31],
+        [0.27, -0.38, 0.31, 0.19, 0.22, -0.41, 0.25, 0.18],
+        [-0.21, 0.31, 0.42, -0.25, 0.33, 0.19, -0.38, 0.22]
+    ];
+    
+    vertices3D = [];
+    for (let vertex of vertices8D) {
+        let x = 0, y = 0, z = 0;
+        for (let d = 0; d < 8; d++) {
+            x += vertex[d] * projection[0][d];
+            y += vertex[d] * projection[1][d];
+            z += vertex[d] * projection[2][d];
+        }
+        vertices3D.push(createVector(x * 200, y * 200, z * 200));
     }
-    // Normalize row
-    let length = Math.sqrt(row.reduce((sum, val) => sum + val * val, 0));
-    row = row.map(x => x / length);
-    projection.push(row);
-  }
-  
-  for (let vertex of vertices8D) {
-    let x = 0, y = 0, z = 0;
-    for (let d = 0; d < 8; d++) {
-      x += vertex[d] * projection[0][d];
-      y += vertex[d] * projection[1][d];
-      z += vertex[d] * projection[2][d];
-    }
-    vertices3D.push(createVector(x * 150, y * 150, z * 150)); // Scale
-  }
 }
 
-function color4DToRGB(color4D) {
-  // Better color mapping - treat as RGBA but convert to RGB
-  let [r, g, b, a] = color4D;
-  // Simple mapping - can replace with your IEC conversion
-  return [
-    Math.floor(r * 255),
-    Math.floor(g * 255), 
-    Math.floor(b * 255)
-  ];
+function precomputeGeometry() {
+    // Precompute vertex points for performance
+    vertexPoints = [];
+    for (let i = 0; i < vertices3D.length; i++) {
+        vertexPoints.push({
+            pos: vertices3D[i],
+            color: vertexColorsRGB[i],
+            index: i
+        });
+    }
 }
 
 function draw() {
-  background(0);
-  
-  // Simple rotation controls
-  if (isDragging) {
-    rotationY += (mouseX - prevMouseX) * 0.01;
-    rotationX += (mouseY - prevMouseY) * 0.01;
-    prevMouseX = mouseX;
-    prevMouseY = mouseY;
-  }
-  
-  rotateX(rotationX);
-  rotateY(rotationY);
-  
-  // OPTIMIZATION: Use points instead of spheres for vertices
-  drawVerticesAsPoints();
-  
-  // OPTIMIZATION: Draw edges with beginShape/endShape batch
-  drawEdgesOptimized();
-  
-  // Draw selected vertex highlight
-  drawSelectedVertex();
+    background(0);
+    
+    // Mobile-friendly scaling
+    let scaleFactor = min(width, height) * 0.001 * zoom;
+    scale(scaleFactor);
+    
+    rotateX(rotationX);
+    rotateY(rotationY);
+    
+    drawEdgesOptimized();
+    drawVerticesAsDots(); // Simple dots instead of spheres
+    drawSelectedVertexHighlight();
 }
 
-function drawVerticesAsPoints() {
-  // Much faster than spheres
-  strokeWeight(8);
-  for (let i = 0; i < vertices3D.length; i++) {
-    let v = vertices3D[i];
-    let c = vertexColorsRGB[i];
-    stroke(c[0], c[1], c[2]);
-    point(v.x, v.y, v.z);
-  }
+function drawVerticesAsDots() {
+    // Simple dots - much better for mobile
+    strokeWeight(8);
+    for (let point of vertexPoints) {
+        stroke(point.color[0], point.color[1], point.color[2]);
+        point(point.pos.x, point.pos.y, point.pos.z);
+    }
 }
 
 function drawEdgesOptimized() {
-  // Batch all edges into one draw call
-  strokeWeight(1);
-  stroke(100, 100, 100, 150); // Semi-transparent gray
-  
-  for (let [i, j] of edges) {
-    let v1 = vertices3D[i];
-    let v2 = vertices3D[j];
+    strokeWeight(1);
+    for (let [i, j] of edges) {
+        let v1 = vertices3D[i];
+        let v2 = vertices3D[j];
+        
+        // Subtle edge coloring
+        let alpha = map(zoom, 0.5, 2, 50, 150);
+        stroke(100, 100, 100, alpha);
+        
+        line(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+    }
+}
+
+function drawSelectedVertexHighlight() {
+    let selected = vertices3D[selectedVertex];
+    push();
+    translate(selected.x, selected.y, selected.z);
     
-    // Optional: color edges by vertex colors
-    let c1 = vertexColorsRGB[i];
-    let c2 = vertexColorsRGB[j];
-    stroke(
-      (c1[0] + c2[0]) / 2,
-      (c1[1] + c2[1]) / 2, 
-      (c1[2] + c2[2]) / 2,
-      100
-    );
+    // Empty circled dot - YOUR REQUESTED STYLE
+    fill(0, 0);
+    stroke(255, 255, 0); // Yellow highlight
+    strokeWeight(3);
+    circle(0, 0, 20); // Simple circle instead of sphere
     
-    line(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
-  }
+    pop();
 }
 
-function drawSelectedVertex() {
-  let selected = vertices3D[selectedVertex];
-  push();
-  translate(selected.x, selected.y, selected.z);
-  fill(0, 0, 0, 0);
-  stroke(255, 255, 0);
-  strokeWeight(3);
-  sphere(12);
-  pop();
+// Mobile touch handlers
+function touchMoveHandler(event) {
+    if (touches.length === 1) {
+        // Rotation
+        if (lastTouchX && lastTouchY) {
+            rotationY += (touchX - lastTouchX) * 0.01;
+            rotationX += (touchY - lastTouchY) * 0.01;
+        }
+        lastTouchX = touchX;
+        lastTouchY = touchY;
+    } else if (touches.length === 2) {
+        // Pinch to zoom
+        let touch1 = touches[0];
+        let touch2 = touches[1];
+        let currentDist = dist(touch1.x, touch1.y, touch2.x, touch2.y);
+        
+        if (lastTouchDist) {
+            zoom *= currentDist / lastTouchDist;
+            zoom = constrain(zoom, 0.3, 3.0);
+        }
+        lastTouchDist = currentDist;
+    }
+    return false; // Prevent scrolling
 }
 
-function mousePressed() {
-  isDragging = true;
-  prevMouseX = mouseX;
-  prevMouseY = mouseY;
+function touchStarted() {
+    // Simple vertex selection by tapping near dots
+    let closestVertex = findClosestVertex(touchX - width/2, touchY - height/2);
+    if (closestVertex !== -1) {
+        selectedVertex = closestVertex;
+    }
+    return false;
 }
 
-function mouseReleased() {
-  isDragging = false;
+function findClosestVertex(screenX, screenY) {
+    let closest = -1;
+    let minDist = 50; // Pixel threshold
+    
+    for (let i = 0; i < vertices3D.length; i++) {
+        let screenPos = worldToScreen(vertices3D[i]);
+        let d = dist(screenX, screenY, screenPos.x, screenPos.y);
+        if (d < minDist) {
+            minDist = d;
+            closest = i;
+        }
+    }
+    return closest;
 }
 
-function keyPressed() {
-  // Cycle through vertices with keyboard
-  if (keyCode === RIGHT_ARROW) {
-    selectedVertex = (selectedVertex + 1) % vertices3D.length;
-  } else if (keyCode === LEFT_ARROW) {
-    selectedVertex = (selectedVertex - 1 + vertices3D.length) % vertices3D.length;
-  }
-  
-  // Spacebar to randomize projection
-  if (key === ' ') {
-    vertices3D = [];
-    project8DTo3D();
-  }
+function worldToScreen(worldPos) {
+    // Simple projection to screen space
+    let x = worldPos.x * cos(rotationY) - worldPos.z * sin(rotationY);
+    let y = worldPos.y;
+    return createVector(x, y);
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
 }
