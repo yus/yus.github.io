@@ -4,32 +4,75 @@ let edges = [];
 let vertexColorsRGB = [];
 let selectedVertex = 0;
 
-// Mobile touch controls
-let rotationX = 0, rotationY = 0;
-let lastTouchX, lastTouchY;
+// Camera controls
+let rotationX = 0;
+let rotationY = 0;
 let zoom = 1.0;
+let targetZoom = 1.0;
+
+// Hammer.js manager
+let hammerManager;
 let isDragging = false;
+let lastPanPosition = { x: 0, y: 0 };
 
 // Performance optimization
 let vertexPoints = [];
-let edgeLines = [];
+let lastFrameTime = 0;
+const FRAME_INTERVAL = 1000 / 30; // Target 30 FPS
 
 function setup() {
+    // Create canvas first
     let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
-    canvas.touchMoved(touchMoveHandler);
+    canvas.style('display', 'block');
     
-    // Mobile performance settings
-    pixelDensity(1);
+    // Initialize Hammer.js on the canvas element
+    initHammerJS();
     
+    // Generate geometry
     generate8DHypercube();
     project8DTo3D();
     precomputeGeometry();
     
-    console.log('Ready: ' + vertices8D.length + ' vertices, ' + edges.length + ' edges');
+    // Set initial camera
+    rotationX = -0.5;
+    rotationY = 0.8;
+    
+    console.log('8D Hypercube loaded:');
+    console.log('- Vertices:', vertices8D.length);
+    console.log('- Edges:', edges.length);
+    console.log('- Hammer.js initialized');
+}
+
+function initHammerJS() {
+    // Get the actual canvas DOM element
+    let canvasElement = document.querySelector('canvas');
+    
+    // Create Hammer manager with custom options
+    hammerManager = new Hammer.Manager(canvasElement, {
+        touchAction: 'none',
+        recognizers: [
+            [Hammer.Pan, { direction: Hammer.DIRECTION_ALL, threshold: 0 }],
+            [Hammer.Pinch, { enable: true }],
+            [Hammer.Tap, { event: 'tap', taps: 1 }]
+        ]
+    });
+    
+    // Enable simultaneous recognition of pan and pinch
+    hammerManager.get('pinch').recognizeWith('pan');
+    hammerManager.get('pan').recognizeWith('pinch');
+    
+    // Set up event listeners
+    hammerManager.on('panstart', handlePanStart);
+    hammerManager.on('panmove', handlePanMove);
+    hammerManager.on('panend', handlePanEnd);
+    hammerManager.on('pinchstart', handlePinchStart);
+    hammerManager.on('pinchmove', handlePinchMove);
+    hammerManager.on('pinchend', handlePinchEnd);
+    hammerManager.on('tap', handleTap);
 }
 
 function generate8DHypercube() {
-    // Generate 256 vertices in 8D
+    // Generate 256 vertices in 8D (-1 to 1)
     for (let i = 0; i < 256; i++) {
         let vertex = [];
         for (let bit = 0; bit < 8; bit++) {
@@ -41,12 +84,12 @@ function generate8DHypercube() {
     // Generate edges (vertices differing by 1 bit)
     for (let i = 0; i < 256; i++) {
         for (let bit = 0; bit < 8; bit++) {
-            let j = i ^ (1 << bit);
+            let j = i ^ (1 << bit); // Flip one bit
             if (i < j) edges.push([i, j]);
         }
     }
     
-    // Generate colors using YOUR IEC 4D color mapping
+    // Generate colors using 4D color space mapping
     for (let vertex of vertices8D) {
         let color4D = vertex.slice(0, 4).map(x => (x + 1) * 0.5);
         vertexColorsRGB.push(iec4DToRGB(color4D));
@@ -54,26 +97,29 @@ function generate8DHypercube() {
 }
 
 function iec4DToRGB(color4D) {
-    // YOUR IEC COLOR MAPPING - replace with your actual function
-    let [dim1, dim2, dim3, dim4] = color4D;
+    // Your IEC 4D to RGB conversion - placeholder implementation
+    let [c1, c2, c3, c4] = color4D;
     
-    // Example mapping - modify this to match your IEC space
-    // This is where you'd put your specific 4D->RGB conversion
-    let r = Math.pow(dim1, 0.8) * 255;
-    let g = Math.pow(dim2, 0.9) * 255;
-    let b = Math.pow(dim3, 1.0) * 255;
+    // Enhanced color mapping for better visual distinction
+    let r = Math.sin(c1 * Math.PI * 2) * 127 + 128;
+    let g = Math.sin(c2 * Math.PI * 2 + Math.PI * 2/3) * 127 + 128;
+    let b = Math.sin(c3 * Math.PI * 2 + Math.PI * 4/3) * 127 + 128;
     
-    // Use 4th dimension for brightness/alpha modulation
-    let brightness = 0.5 + dim4 * 0.5;
+    // Apply brightness from 4th dimension
+    let brightness = 0.3 + c4 * 0.7;
     r *= brightness;
     g *= brightness;
     b *= brightness;
     
-    return [constrain(r, 0, 255), constrain(g, 0, 255), constrain(b, 0, 255)];
+    return [
+        constrain(Math.floor(r), 0, 255),
+        constrain(Math.floor(g), 0, 255),
+        constrain(Math.floor(b), 0, 255)
+    ];
 }
 
 function project8DTo3D() {
-    // Stable orthogonal projection
+    // Stable orthogonal projection matrix for consistent viewing
     let projection = [
         [0.35, 0.22, -0.18, 0.41, -0.29, 0.13, 0.17, -0.31],
         [0.27, -0.38, 0.31, 0.19, 0.22, -0.41, 0.25, 0.18],
@@ -88,12 +134,12 @@ function project8DTo3D() {
             y += vertex[d] * projection[1][d];
             z += vertex[d] * projection[2][d];
         }
-        vertices3D.push(createVector(x * 200, y * 200, z * 200));
+        vertices3D.push(createVector(x * 180, y * 180, z * 180));
     }
 }
 
 function precomputeGeometry() {
-    // Precompute vertex points for performance
+    // Precompute for better performance
     vertexPoints = [];
     for (let i = 0; i < vertices3D.length; i++) {
         vertexPoints.push({
@@ -105,94 +151,138 @@ function precomputeGeometry() {
 }
 
 function draw() {
+    // Frame rate limiting for mobile performance
+    let currentTime = millis();
+    if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+        return;
+    }
+    lastFrameTime = currentTime;
+    
     background(0);
     
-    // Mobile-friendly scaling
-    let scaleFactor = min(width, height) * 0.001 * zoom;
+    // Smooth zoom interpolation
+    zoom = lerp(zoom, targetZoom, 0.1);
+    
+    // Apply camera transformations
+    let scaleFactor = min(width, height) * 0.0008 * zoom;
     scale(scaleFactor);
     
     rotateX(rotationX);
     rotateY(rotationY);
     
-    drawEdgesOptimized();
-    drawVerticesAsDots(); // Simple dots instead of spheres
-    drawSelectedVertexHighlight();
+    // Draw geometry
+    drawEdges();
+    drawVertices();
+    drawSelectedVertex();
+    
+    // Update UI
+    updateUI();
 }
 
-function drawVerticesAsDots() {
-    // Simple dots - much better for mobile
-    strokeWeight(8);
+function drawVertices() {
+    // Simple dots for mobile performance
+    strokeWeight(10);
     for (let point of vertexPoints) {
         stroke(point.color[0], point.color[1], point.color[2]);
         point(point.pos.x, point.pos.y, point.pos.z);
     }
 }
 
-function drawEdgesOptimized() {
+function drawEdges() {
     strokeWeight(1);
     for (let [i, j] of edges) {
         let v1 = vertices3D[i];
         let v2 = vertices3D[j];
         
-        // Subtle edge coloring
-        let alpha = map(zoom, 0.5, 2, 50, 150);
-        stroke(100, 100, 100, alpha);
+        // Edge coloring based on vertex colors
+        let c1 = vertexColorsRGB[i];
+        let c2 = vertexColorsRGB[j];
+        stroke(
+            (c1[0] + c2[0]) / 2,
+            (c1[1] + c2[1]) / 2,
+            (c1[2] + c2[2]) / 2,
+            150
+        );
         
         line(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
     }
 }
 
-function drawSelectedVertexHighlight() {
+function drawSelectedVertex() {
     let selected = vertices3D[selectedVertex];
+    let selectedColor = vertexColorsRGB[selectedVertex];
+    
     push();
     translate(selected.x, selected.y, selected.z);
     
-    // Empty circled dot - YOUR REQUESTED STYLE
-    fill(0, 0);
-    stroke(255, 255, 0); // Yellow highlight
+    // Empty circled dot as requested
+    noFill();
+    stroke(255, 255, 0);
     strokeWeight(3);
-    circle(0, 0, 20); // Simple circle instead of sphere
+    circle(0, 0, 25);
+    
+    // Inner highlight
+    stroke(255, 200, 0, 100);
+    strokeWeight(1);
+    circle(0, 0, 28);
     
     pop();
 }
 
-// Mobile touch handlers
-let touchStartZoom = 1;
-let initialDist = 0;
-
-function touchStarted() {
-  // Code for when a touch starts (e.g., selecting a vertex)
-  // Use the touches[] array to get touch positions [citation:6]
-  return false; // Prevents default browser behavior like scrolling
+// Hammer.js Event Handlers
+function handlePanStart(event) {
+    isDragging = true;
+    lastPanPosition.x = event.center.x;
+    lastPanPosition.y = event.center.y;
 }
 
-function touchMoved() {
-  // Handle one-finger drag for rotation
-  if (touches.length === 1) {
-    rotationY += touches[0].x - pmouseX;
-    rotationX += touches[0].y - pmouseY;
-  }
-  // Handle two-finger pinch for zoom
-  if (touches.length >= 2) {
-    let currentDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
-    if (initialDist === 0) initialDist = currentDist; // Set initial distance on first pinch
-    let zoomFactor = currentDist / initialDist;
-    zoom = constrain(touchStartZoom * zoomFactor, 0.3, 3.0); // Limit zoom range
-  }
-  return false; // Prevents default browser behavior
+function handlePanMove(event) {
+    if (!isDragging) return;
+    
+    let deltaX = event.center.x - lastPanPosition.x;
+    let deltaY = event.center.y - lastPanPosition.y;
+    
+    rotationY += deltaX * 0.01;
+    rotationX += deltaY * 0.01;
+    
+    lastPanPosition.x = event.center.x;
+    lastPanPosition.y = event.center.y;
 }
 
-function touchEnded() {
-  // Reset initial distance when pinch ends
-  if (touches.length < 2) {
-    initialDist = 0;
-    touchStartZoom = zoom; // Remember the new zoom level
-  }
+function handlePanEnd(event) {
+    isDragging = false;
+}
+
+function handlePinchStart(event) {
+    // Store initial zoom for relative scaling
+}
+
+function handlePinchMove(event) {
+    targetZoom *= event.scale;
+    targetZoom = constrain(targetZoom, 0.3, 3.0);
+    
+    // Reset scale for next frame to get relative scaling
+    event.preventDefault();
+}
+
+function handlePinchEnd(event) {
+    // Clean up if needed
+}
+
+function handleTap(event) {
+    // Convert tap coordinates to sketch coordinates
+    let sketchX = event.center.x - width / 2;
+    let sketchY = event.center.y - height / 2;
+    
+    let closestVertex = findClosestVertex(sketchX, sketchY);
+    if (closestVertex !== -1) {
+        selectedVertex = closestVertex;
+    }
 }
 
 function findClosestVertex(screenX, screenY) {
     let closest = -1;
-    let minDist = 50; // Pixel threshold
+    let minDist = 80; // Pixel threshold for selection
     
     for (let i = 0; i < vertices3D.length; i++) {
         let screenPos = worldToScreen(vertices3D[i]);
@@ -208,10 +298,24 @@ function findClosestVertex(screenX, screenY) {
 function worldToScreen(worldPos) {
     // Simple projection to screen space
     let x = worldPos.x * cos(rotationY) - worldPos.z * sin(rotationY);
-    let y = worldPos.y;
+    let y = worldPos.y * cos(rotationX) + worldPos.z * sin(rotationX);
     return createVector(x, y);
+}
+
+function updateUI() {
+    let selectedColor = vertexColorsRGB[selectedVertex];
+    document.getElementById('selectedIndex').textContent = selectedVertex;
+    document.getElementById('colorInfo').textContent = 
+        `Color: RGB(${selectedColor[0]}, ${selectedColor[1]}, ${selectedColor[2]})`;
 }
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+}
+
+// Clean up Hammer.js when sketch is removed
+function remove() {
+    if (hammerManager) {
+        hammerManager.destroy();
+    }
 }
