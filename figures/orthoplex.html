@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-    <!-- REMOVED Hammer.js -->
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background: #000; }
-        #info { 
+        body { margin: 0; padding: 0; overflow: hidden; background: #0a0a1a; }
+        #ui { 
             position: absolute; top: 10px; left: 10px; 
-            color: white; font-family: Arial; font-size: 14px;
-            background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        #controls {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            color: #aaffaa; font-family: Arial; font-size: 12px;
-            background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.3);
+            color: white; font: 14px Arial; 
+            background: rgba(0,0,0,0.8); padding: 8px; 
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
-    <div id="info">
-        <div>8D Hypercube • Drag=Rotate • Pinch=Zoom • Tap=Select</div>
-        <div>Selected: <span id="selectedIndex">0</span></div>
-        <div id="colorInfo">RGB(0, 0, 0)</div>
+    <div id="ui">
+        <div>Tap: Select • Drag: Rotate • Pinch: Zoom</div>
+        <div>Selected: <span id="selected">0</span></div>
     </div>
-    
-    <div id="controls">
-        Space=Random View • R=Reset
-    </div>
-
     <script src="sketch.js"></script>
 </body>
 </html>
