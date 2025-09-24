@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Name Matcher for Yus' Colors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .instructions {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(76, 201, 240, 0.1);
+        }
+        
+        .step {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(20, 20, 35, 0.5);
+            border-radius: 8px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .color-card {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .color-info {
+            font-size: 0.9rem;
+        }
+        
+        .color-hex {
+            font-family: monospace;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .color-name {
+            font-style: italic;
+            color: #4cc9f0;
+        }
+        
+        .unknown {
+            border: 2px dashed #ff6b6b;
+        }
+        
+        .named {
+            border: 2px solid #6bff6b;
+        }
+        
+        .tool-section {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(76, 201, 240, 0.1);
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(20, 20, 35, 0.8);
+            color: white;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(20, 20, 35, 0.5);
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Color Name Matcher for Yus' Colors</h1>
+        
+        <div class="instructions">
+            <h2>How to Find and Name Colors from Yus' Page</h2>
+            
+            <div class="step">
+                <h3>Step 1: Extract Colors</h3>
+                <p>Open <a href="https://yus.github.io/colors.html" target="_blank">https://yus.github.io/colors.html</a> and use browser developer tools to extract colors:</p>
+                <ul>
+                    <li>Right-click → Inspect Element</li>
+                    <li>Use the element picker to identify colors</li>
+                    <li>Note which colors have names and which don't</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3>Step 2: Common Color Naming Approaches</h3>
+                <p>For unnamed colors, use these naming strategies based on proximity to known colors:</p>
+                <ul>
+                    <li><strong>Light/Dark prefixes:</strong> Light Crimson, Dark Azure</li>
+                    <li><strong>Color temperature:</strong> Warm Gray, Cool Blue</li>
+                    <li><strong>Natural references:</strong> Sky Blue, Forest Green</li>
+                    <li><strong>Material references:</strong> Steel Gray, Gold Yellow</li>
+                    <li><strong>Subtle variations:</strong> Pale Rose, Deep Violet</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="tool-section">
+            <h2>Color Name Generator Tool</h2>
+            <p>Enter colors in HEX format (one per line) with optional names:</p>
+            <textarea id="colorInput" placeholder="#FF6B6B Crimson
+#4ECDC4 
+#1A535C Navy Teal
+#F7FFF7 
+#FFE66D Light Yellow
+#6BFF6B
+#4CC9F0 Azure
+#4361EE Royal Blue"></textarea>
+            <button onclick="generateNames()">Generate Missing Names</button>
+            
+            <div id="result" class="result"></div>
+        </div>
+        
+        <div id="colorGrid" class="color-grid">
+            <!-- Color cards will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Extended color name database
+        const colorNames = {
+            // Reds
+            '#FF0000': 'Red', '#DC143C': 'Crimson', '#B22222': 'Firebrick', '#8B0000': 'Dark Red',
+            '#FF6B6B': 'Light Crimson', '#FF4500': 'Orange Red', '#FF6347': 'Tomato', '#FF7F50': 'Coral',
+            
+            // Blues
+            '#0000FF': 'Blue', '#1E90FF': 'Dodger Blue', '#4169E1': 'Royal Blue', '#000080': 'Navy',
+            '#4361EE': 'Royal Blue', '#4CC9F0': 'Azure', '#1A535C': 'Navy Teal', '#00BFFF': 'Deep Sky Blue',
+            
+            // Greens
+            '#008000': 'Green', '#228B22': 'Forest Green', '#32CD32': 'Lime Green', '#006400': 'Dark Green',
+            '#6BFF6B': 'Light Green', '#2E8B57': 'Sea Green', '#3CB371': 'Medium Sea Green', '#90EE90': 'Light Green',
+            
+            // Yellows/Oranges
+            '#FFFF00': 'Yellow', '#FFD700': 'Gold', '#FFA500': 'Orange', '#FF8C00': 'Dark Orange',
+            '#FFE66D': 'Light Yellow', '#FFE5B4': 'Peach', '#FFDAB9': 'Peach Puff', '#F0E68C': 'Khaki',
+            
+            // Purples/Violets
+            '#800080': 'Purple', '#4B0082': 'Indigo', '#9400D3': 'Dark Violet', '#8A2BE2': 'Blue Violet',
+            '#9370DB': 'Medium Purple', '#BA55D3': 'Medium Orchid', '#DA70D6': 'Orchid', '#EE82EE': 'Violet',
+            
+            // Grays/Neutrals
+            '#808080': 'Gray', '#A9A9A9': 'Dark Gray', '#C0C0C0': 'Silver', '#D3D3D3': 'Light Gray',
+            '#F7FFF7': 'Off White', '#2F4F4F': 'Dark Slate Gray', '#696969': 'Dim Gray', '#778899': 'Light Slate Gray'
+        };
+        
+        // Find closest named color
+        function findClosestColor(hex) {
+            let minDistance = Infinity;
+            let closestColor = null;
+            
+            for (const [namedHex, name] of Object.entries(colorNames)) {
+                const distance = colorDistance(hex, namedHex);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestColor = { hex: namedHex, name: name, distance: distance };
+                }
+            }
+            
+            return closestColor;
+        }
+        
+        // Calculate color distance (simplified)
+        function colorDistance(hex1, hex2) {
+            const r1 = parseInt(hex1.substr(1, 2), 16);
+            const g1 = parseInt(hex1.substr(3, 2), 16);
+            const b1 = parseInt(hex1.substr(5, 2), 16);
+            
+            const r2 = parseInt(hex2.substr(1, 2), 16);
+            const g2 = parseInt(hex2.substr(3, 2), 16);
+            const b2 = parseInt(hex2.substr(5, 2), 16);
+            
+            return Math.sqrt(
+                Math.pow(r1 - r2, 2) + 
+                Math.pow(g1 - g2, 2) + 
+                Math.pow(b1 - b2, 2)
+            );
+        }
+        
+        // Generate name based on closest color
+        function generateColorName(hex, closest) {
+            if (closest.distance < 30) {
+                return closest.name; // Very close match
+            } else if (closest.distance < 100) {
+                // Add modifier based on brightness difference
+                const brightnessDiff = getBrightness(hex) - getBrightness(closest.hex);
+                
+                if (brightnessDiff > 50) return `Light ${closest.name}`;
+                if (brightnessDiff < -50) return `Dark ${closest.name}`;
+                if (brightnessDiff > 20) return `Pale ${closest.name}`;
+                if (brightnessDiff < -20) return `Deep ${closest.name}`;
+                
+                return `${closest.name} Variant`;
+            } else {
+                return `Custom ${hex}`; // Too far from any known color
+            }
+        }
+        
+        // Get brightness of a color
+        function getBrightness(hex) {
+            const r = parseInt(hex.substr(1, 2), 16);
+            const g = parseInt(hex.substr(3, 2), 16);
+            const b = parseInt(hex.substr(5, 2), 16);
+            return (r * 299 + g * 587 + b * 114) / 1000;
+        }
+        
+        // Process colors and generate names
+        function generateNames() {
+            const input = document.getElementById('colorInput').value;
+            const lines = input.split('\n');
+            const resultDiv = document.getElementById('result');
+            const colorGrid = document.getElementById('colorGrid');
+            
+            colorGrid.innerHTML = '';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<h3>Generated Names:</h3>';
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                
+                const parts = line.split(/\s+/);
+                const hex = parts[0].toUpperCase();
+                
+                if (!/^#[0-9A-F]{6}$/i.test(hex)) {
+                    resultDiv.innerHTML += `<p style="color: #ff6b6b">Invalid HEX: ${hex}</p>`;
+                    return;
+                }
+                
+                // Check if name was provided
+                let existingName = parts.length > 1 ? parts.slice(1).join(' ') : null;
+                
+                if (existingName) {
+                    // Color already has a name
+                    colorNames[hex] = existingName;
+                    resultDiv.innerHTML += `<p><span style="color: #6bff6b">✓</span> ${hex} → ${existingName} (already named)</p>`;
+                    
+                    // Add to grid
+                    const card = createColorCard(hex, existingName, true);
+                    colorGrid.appendChild(card);
+                } else {
+                    // Generate name
+                    const closest = findClosestColor(hex);
+                    const generatedName = generateColorName(hex, closest);
+                    
+                    colorNames[hex] = generatedName;
+                    resultDiv.innerHTML += `<p><span style="color: #4cc9f0">→</span> ${hex} → ${generatedName} (based on ${closest.name})</p>`;
+                    
+                    // Add to grid
+                    const card = createColorCard(hex, generatedName, false);
+                    colorGrid.appendChild(card);
+                }
+            });
+        }
+        
+        // Create color card element
+        function createColorCard(hex, name, isNamed) {
+            const card = document.createElement('div');
+            card.className = 'color-card';
+            
+            card.innerHTML = `
+                <div class="color-swatch ${isNamed ? 'named' : 'unknown'}" style="background: ${hex}"></div>
+                <div class="color-info">
+                    <div class="color-hex">${hex}</div>
+                    <div class="color-name">${name}</div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Initialize with some example colors
+        document.getElementById('colorInput').value = `#FF6B6B Crimson
+#4ECDC4 
+#1A535C Navy Teal
+#F7FFF7 
+#FFE66D Light Yellow
+#6BFF6B
+#4CC9F0 Azure
+#4361EE Royal Blue
+#2F4F4F Dark Slate Gray
+#A9A9A9 Dark Gray`;
+    </script>
+</body>
+</html>
