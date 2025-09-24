@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEC Color Naming System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .tool-section {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(76, 201, 240, 0.1);
+        }
+        
+        .rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .rule-card {
+            background: rgba(20, 20, 35, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .rule-title {
+            color: #4cc9f0;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: rgba(20, 20, 35, 0.8);
+            color: white;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        button {
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .color-card {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .color-swatch {
+            width: 100%;
+            height: 60px;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .color-hex {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .color-name {
+            font-size: 0.8rem;
+            color: #4cc9f0;
+            margin-top: 0.3rem;
+            min-height: 2.2rem;
+        }
+        
+        .results-info {
+            background: rgba(20, 20, 35, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IEC Color Naming System</h1>
+        <div class="subtitle">Following IEC color naming rules for 255 color samples</div>
+        
+        <div class="tool-section">
+            <h2>IEC Naming Rules</h2>
+            <div class="rules">
+                <div class="rule-card">
+                    <div class="rule-title">Primary Structure</div>
+                    <div>Hue-Luminance-Chroma<br>Example: <code>R100L080C120</code></div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">Hue Codes</div>
+                    <div>R=Red, Y=Yellow, G=Green, C=Cyan, B=Blue, M=Magenta</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">Luminance Scale</div>
+                    <div>000 (Black) to 100 (White)<br>3-digit encoding</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">Chroma Scale</div>
+                    <div>000 (Gray) to 150 (Maximum)<br>3-digit encoding</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">Special Codes</div>
+                    <div>W=White, K=Black, N=Neutral Gray<br>Example: <code>W100</code>, <code>K000</code>, <code>N050</code></div>
+                </div>
+            </div>
+            
+            <h2>Input Colors (HEX format)</h2>
+            <textarea id="colorInput" placeholder="#FF6B6B
+#4ECDC4
+#1A535C
+#F7FFF7
+#FFE66D
+#6BFF6B
+#4CC9F0
+#4361EE
+#2F4F4F
+#A9A9A9
+#FF4500
+#32CD32
+#8A2BE2
+#FFD700
+#FF69B4">#FF6B6B
+#4ECDC4
+#1A535C
+#F7FFF7
+#FFE66D
+#6BFF6B
+#4CC9F0
+#4361EE
+#2F4F4F
+#A9A9A9
+#FF4500
+#32CD32
+#8A2BE2
+#FFD700
+#FF69B4</textarea>
+            
+            <button onclick="generateIECNames()">Generate IEC Names</button>
+            <button onclick="generateSample255()">Generate 255 Sample Colors</button>
+        </div>
+        
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // IEC Naming System Implementation
+        class IECNamingSystem {
+            constructor() {
+                this.hueCodes = {
+                    'R': 'Red', 'Y': 'Yellow', 'G': 'Green', 
+                    'C': 'Cyan', 'B': 'Blue', 'M': 'Magenta'
+                };
+            }
+            
+            // Convert HEX to IEC name
+            hexToIECName(hex) {
+                const rgb = this.hexToRgb(hex);
+                const lab = this.rgbToLab(rgb);
+                const hsl = this.rgbToHsl(rgb);
+                
+                // Determine if it's a special case (white, black, gray)
+                if (this.isAchromatic(rgb)) {
+                    return this.getAchromaticName(rgb);
+                }
+                
+                // Get hue code and value
+                const hueCode = this.getHueCode(hsl.h);
+                const hueValue = Math.round(hsl.h / 3.6); // 0-100 scale
+                
+                // Luminance (0-100)
+                const luminance = Math.round(lab.l);
+                
+                // Chroma (approximate from Lab)
+                const chroma = Math.round(Math.sqrt(lab.a * lab.a + lab.b * lab.b) * 1.5);
+                
+                return `${hueCode}${this.padNumber(hueValue, 3)}L${this.padNumber(luminance, 3)}C${this.padNumber(chroma, 3)}`;
+            }
+            
+            // Check if color is achromatic (white, black, gray)
+            isAchromatic(rgb) {
+                const [r, g, b] = rgb;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                return (max - min) < 30; // Small color difference indicates gray
+            }
+            
+            // Get name for achromatic colors
+            getAchromaticName(rgb) {
+                const [r, g, b] = rgb;
+                const luminance = Math.round((r + g + b) / 3 / 255 * 100);
+                
+                if (luminance > 95) return `W${this.padNumber(luminance, 3)}`;
+                if (luminance < 5) return `K${this.padNumber(luminance, 3)}`;
+                return `N${this.padNumber(luminance, 3)}`;
+            }
+            
+            // Get hue code from HSL hue (0-360)
+            getHueCode(hue) {
+                const sectors = [
+                    { code: 'R', range: [330, 360] }, { code: 'R', range: [0, 30] },
+                    { code: 'Y', range: [30, 90] },
+                    { code: 'G', range: [90, 150] },
+                    { code: 'C', range: [150, 210] },
+                    { code: 'B', range: [210, 270] },
+                    { code: 'M', range: [270, 330] }
+                ];
+                
+                for (const sector of sectors) {
+                    const [start, end] = sector.range;
+                    if (hue >= start && hue < end) {
+                        return sector.code;
+                    }
+                }
+                return 'N'; // Neutral fallback
+            }
+            
+            // Utility functions
+            hexToRgb(hex) {
+                const r = parseInt(hex.substr(1, 2), 16);
+                const g = parseInt(hex.substr(3, 2), 16);
+                const b = parseInt(hex.substr(5, 2), 16);
+                return [r, g, b];
+            }
+            
+            rgbToHsl(rgb) {
+                let [r, g, b] = rgb.map(c => c / 255);
+                const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+                
+                if (max === min) {
+                    h = s = 0;
+                } else {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+                
+                return {
+                    h: Math.round(h * 360),
+                    s: Math.round(s * 100),
+                    l: Math.round(l * 100)
+                };
+            }
+            
+            rgbToLab(rgb) {
+                // Simplified RGB to Lab conversion
+                let [r, g, b] = rgb.map(c => c / 255);
+                
+                // Gamma expansion
+                r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+                g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+                b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+                
+                // XYZ conversion
+                let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
+                let y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.00000;
+                let z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
+                
+                // Lab conversion
+                x = x > 0.008856 ? Math.pow(x, 1/3) : (7.787 * x) + 16/116;
+                y = y > 0.008856 ? Math.pow(y, 1/3) : (7.787 * y) + 16/116;
+                z = z > 0.008856 ? Math.pow(z, 1/3) : (7.787 * z) + 16/116;
+                
+                return {
+                    l: Math.max(0, (116 * y) - 16),
+                    a: Math.max(-128, Math.min(127, 500 * (x - y))),
+                    b: Math.max(-128, Math.min(127, 200 * (y - z)))
+                };
+            }
+            
+            padNumber(num, length) {
+                return num.toString().padStart(length, '0');
+            }
+        }
+
+        function generateIECNames() {
+            const input = document.getElementById('colorInput').value;
+            const hexColors = input.split('\n').filter(line => line.trim()).map(line => line.trim());
+            const iecNamer = new IECNamingSystem();
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `<h2>IEC Color Names (${hexColors.length} colors)</h2>`;
+            html += `<div class="color-grid">`;
+            
+            hexColors.forEach(hex => {
+                if (!/^#[0-9A-F]{6}$/i.test(hex)) return;
+                
+                const iecName = iecNamer.hexToIECName(hex.toUpperCase());
+                
+                html += `
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: ${hex}"></div>
+                        <div class="color-hex">${hex}</div>
+                        <div class="color-name">${iecName}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function generateSample255() {
+            // Generate 255 sample colors covering the color space
+            const samples = [];
+            
+            // Generate colors systematically
+            for (let r = 0; r <= 255; r += 85) { // 4 steps
+                for (let g = 0; g <= 255; g += 85) {
+                    for (let b = 0; b <= 255; b += 85) {
+                        if (samples.length >= 255) break;
+                        const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+                        samples.push(hex);
+                    }
+                }
+            }
+            
+            // Add more colors if needed
+            while (samples.length < 255) {
+                const r = Math.floor(Math.random() * 256);
+                const g = Math.floor(Math.random() * 256);
+                const b = Math.floor(Math.random() * 256);
+                const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+                if (!samples.includes(hex)) {
+                    samples.push(hex);
+                }
+            }
+            
+            document.getElementById('colorInput').value = samples.slice(0, 255).join('\n');
+            generateIECNames();
+        }
+        
+        // Initialize with sample colors
+        setTimeout(generateIECNames, 500);
+    </script>
+</body>
+</html>
