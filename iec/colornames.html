@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Metrics with Custom Formulae</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(76, 201, 240, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .formula-section {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 201, 240, 0.1);
+        }
+        
+        .formula-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #4cc9f0;
+        }
+        
+        .formula {
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            background: rgba(20, 20, 35, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .component {
+            background: rgba(20, 20, 35, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .component-name {
+            font-weight: bold;
+            color: #4cc9f0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .metric-card {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(76, 201, 240, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: rgba(76, 201, 240, 0.3);
+        }
+        
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            background: rgba(76, 201, 240, 0.1);
+        }
+        
+        .metric-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0 1rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .metric-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .metric-details {
+            background: rgba(20, 20, 35, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            opacity: 0.7;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .color-preview {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .color-name {
+            font-style: italic;
+            margin-top: 0.5rem;
+            color: #4cc9f0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Color Metrics with Custom Formulae</h1>
+            <p class="subtitle">Visualizing color metrics using the formula U = Σ(I × E × C) / V</p>
+        </header>
+        
+        <div class="formula-section">
+            <div class="formula-title">Color Metric Formula</div>
+            <div class="formula">U = Σ(I × E × C) / V</div>
+            <div class="components">
+                <div class="component">
+                    <div class="component-name">I (Information Density)</div>
+                    <div>Unit: bit/symbol</div>
+                    <div>Measures the information content in color representation</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">E (Emotional Entropy)</div>
+                    <div>Unit: entropy units</div>
+                    <div>Quantifies emotional variance in color perception</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">C (Connectivity Factor)</div>
+                    <div>Unit: siblings/time</div>
+                    <div>Measures color relationship strength in palette</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">V (Volume)</div>
+                    <div>Unit: item×hour</div>
+                    <div>Represents the color space volume</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metrics-grid">
+            <!-- Primary Colors -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🔴</div>
+                    <h2 class="metric-title">Red Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 42.7</div>
+                <p class="metric-description">High emotional entropy with strong connectivity in warm color families.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">18.3 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">7.2 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">5.8 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">17.8 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #ff0000, #ff6b6b)"></div>
+                <div class="color-name">Crimson → Vermilion → Scarlet</div>
+            </div>
+            
+            <!-- Blue Spectrum -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🔵</div>
+                    <h2 class="metric-title">Blue Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 38.2</div>
+                <p class="metric-description">Stable information density with moderate emotional variance across cool tones.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">15.6 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">5.4 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">6.2 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">13.2 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #0000ff, #6b6bff)"></div>
+                <div class="color-name">Azure → Cobalt → Sapphire</div>
+            </div>
+            
+            <!-- Green Spectrum -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🟢</div>
+                    <h2 class="metric-title">Green Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 35.9</div>
+                <p class="metric-description">Balanced metrics with high connectivity in natural color progressions.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">14.2 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">4.8 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">7.1 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">14.1 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #00ff00, #6bff6b)"></div>
+                <div class="color-name">Verdant → Emerald → Jade</div>
+            </div>
+            
+            <!-- Yellow Spectrum -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🟡</div>
+                    <h2 class="metric-title">Yellow Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 29.4</div>
+                <p class="metric-description">High emotional impact with compressed information representation.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">11.7 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">6.9 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">4.5 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">11.8 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #ffff00, #ffff6b)"></div>
+                <div class="color-name">Amber → Gold → Citrine</div>
+            </div>
+            
+            <!-- Purple Spectrum -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🟣</div>
+                    <h2 class="metric-title">Purple Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 33.6</div>
+                <p class="metric-description">Complex information patterns with moderate emotional variance.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">16.8 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">4.2 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">5.1 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">13.0 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #800080, #c06bc0)"></div>
+                <div class="color-name">Violet → Amethyst → Lavender</div>
+            </div>
+            
+            <!-- Orange Spectrum -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🟠</div>
+                    <h2 class="metric-title">Orange Spectrum</h2>
+                </div>
+                <div class="metric-value">U = 31.8</div>
+                <p class="metric-description">Warm color family with strong emotional connectivity and moderate information density.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Information Density</span>
+                        <span class="detail-value">13.5 bit/symbol</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Emotional Entropy</span>
+                        <span class="detail-value">5.7 eu</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Connectivity</span>
+                        <span class="detail-value">5.9 sib/min</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Volume</span>
+                        <span class="detail-value">12.4 item×hr</span>
+                    </div>
+                </div>
+                <div class="color-preview" style="background: linear-gradient(90deg, #ffa500, #ffc46b)"></div>
+                <div class="color-name">Tangerine → Peach → Coral</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Color naming system with ~256 distinct names based on emotional entropy and connectivity factors</p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to calculate U value based on formula
+        function calculateU(I, E, C, V) {
+            return (I * E * C) / V;
+        }
+        
+        // Example calculations for demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can add dynamic calculations here if needed
+            console.log("Color metrics calculator ready");
+        });
+    </script>
+</body>
+</html>
