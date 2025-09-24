@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IEC Hypercube</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2vmin;
+            gap: 2vmin;
+        }
+
+        .header {
+            text-align: center;
+            padding: 1vmin 0;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 300;
+            color: #4fc3f7;
+            margin-bottom: 0.5vmin;
+        }
+
+        .subtitle {
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            color: #90a4ae;
+        }
+
+        .content-area {
+            display: flex;
+            gap: 2vmin;
+            flex: 1;
+            min-height: 0;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+            }
+        }
+
+        #sketch-container {
+            background: #000;
+            border-radius: 1vmin;
+            overflow: hidden;
+            flex: 1;
+            position: relative;
+            min-height: 40vh;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2vmin;
+            width: min(400px, 35vw);
+            min-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .side-panel {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+
+        .controls-panel {
+            background: #1a1a1a;
+            border-radius: 1vmin;
+            padding: 2vmin;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vmin;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .control-group {
+            margin-bottom: 0;
+        }
+
+        .control-group h3 {
+            color: #4fc3f7;
+            font-size: clamp(0.8rem, 1.3vw, 0.9rem);
+            margin-bottom: 1vmin;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slider-container {
+            display: grid;
+            grid-template-columns: 80px 1fr 50px;
+            align-items: center;
+            gap: 1vmin;
+            margin-bottom: 0.8vmin;
+        }
+
+        .slider-container label {
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
+            color: #b0b0b0;
+            white-space: nowrap;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 0.4vmin;
+            background: #333;
+            border-radius: 0.25vmin;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: clamp(10px, 1.5vw, 14px);
+            height: clamp(10px, 1.5vw, 14px);
+            background: #4fc3f7;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
+            color: #4fc3f7;
+            font-family: 'Monaco', 'Consolas', monospace;
+            text-align: center;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1vmin;
+            margin-top: auto;
+        }
+
+        button {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: clamp(6px, 1.2vmin, 10px);
+            border-radius: 0.5vmin;
+            cursor: pointer;
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #333;
+            border-color: #4fc3f7;
+        }
+
+        button.active {
+            background: #4fc3f7;
+            color: #000;
+            border-color: #4fc3f7;
+        }
+
+        .metrics-panel {
+            background: #1a1a1a;
+            border-radius: 1vmin;
+            padding: 2vmin;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vmin;
+            max-height: 30vh;
+            overflow-y: auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1vmin;
+        }
+
+        .metric-item {
+            background: #252525;
+            padding: clamp(8px, 1.5vmin, 12px);
+            border-radius: 0.8vmin;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-value {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            font-weight: 300;
+            color: #4fc3f7;
+            margin-bottom: 0.3vmin;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .metric-label {
+            font-size: clamp(0.55rem, 0.9vw, 0.65rem);
+            color: #90a4ae;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .color-sample {
+            background: #252525;
+            border-radius: 0.8vmin;
+            padding: 1.5vmin;
+            display: flex;
+            align-items: center;
+            gap: 1.5vmin;
+            border: 1px solid #333;
+        }
+
+        .color-display {
+            width: clamp(35px, 6vmin, 50px);
+            height: clamp(35px, 6vmin, 50px);
+            border-radius: 0.6vmin;
+            border: 2px solid #333;
+            flex-shrink: 0;
+        }
+
+        .color-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .color-name {
+            color: #4fc3f7;
+            font-size: clamp(0.7rem, 1.3vw, 0.9rem);
+            font-weight: 600;
+            margin-bottom: 0.3vmin;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .color-values {
+            color: #90a4ae;
+            font-size: clamp(0.55rem, 0.9vw, 0.65rem);
+            margin-bottom: 0.2vmin;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .color-hex {
+            color: #b0b0b0;
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        .vertex-info {
+            position: absolute;
+            top: 1vmin;
+            left: 1vmin;
+            background: rgba(26, 26, 26, 0.95);
+            padding: 1.2vmin;
+            border-radius: 0.8vmin;
+            font-size: clamp(0.6rem, 1vw, 0.7rem);
+            border-left: 3px solid #4fc3f7;
+            display: none;
+            max-width: min(250px, 25vw);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1vmin 0;
+            color: #666;
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            flex-shrink: 0;
+        }
+
+        /* Scrollbar styling */
+        .controls-panel::-webkit-scrollbar,
+        .metrics-panel::-webkit-scrollbar {
+            width: 0.4vmin;
+        }
+
+        .controls-panel::-webkit-scrollbar-track,
+        .metrics-panel::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb,
+        .metrics-panel::-webkit-scrollbar-thumb {
+            background: #4fc3f7;
+            border-radius: 0.25vmin;
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            button {
+                padding: 2vmin;
+                min-height: 44px;
+            }
+            
+            input[type="range"] {
+                height: 0.8vmin;
+            }
+            
+            input[type="range"]::-webkit-slider-thumb {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .slider-container {
+                grid-template-columns: 90px 1fr 60px;
+            }
+        }
+
+        /* Ultra-compact for very small screens */
+        @media (max-width: 480px) {
+            #app {
+                padding: 1vmin;
+                gap: 1vmin;
+            }
+            
+            .content-area {
+                gap: 1vmin;
+            }
+            
+            .side-panel {
+                min-width: auto;
+            }
+            
+            .controls-panel,
+            .metrics-panel {
+                padding: 1.5vmin;
+                gap: 1vmin;
+            }
+            
+            .slider-container {
+                grid-template-columns: 70px 1fr 45px;
+                gap: 0.8vmin;
+                margin-bottom: 0.6vmin;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .button-group {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            button {
+                font-size: 0.6rem;
+                padding: 1vmin;
+            }
+        }
+
+        /* Ensure no overflow */
+        body {
+            overflow: hidden !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>IEC HYPERCUBE</h1>
+            <div class="subtitle">4D Tesseract Visualization</div>
+        </header>
+
+        <div class="content-area">
+            <div id="sketch-container">
+                <div class="vertex-info" id="vertex-info"></div>
+            </div>
+
+            <div class="side-panel">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <h3>Rotation</h3>
+                        <div class="slider-container">
+                            <label for="rotation-x">X Axis</label>
+                            <input type="range" id="rotation-x" min="0" max="360" value="0">
+                            <span class="value-display" id="rotation-x-value">0°</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="rotation-y">Y Axis</label>
+                            <input type="range" id="rotation-y" min="0" max="360" value="0">
+                            <span class="value-display" id="rotation-y-value">0°</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="rotation-z">Z Axis</label>
+                            <input type="range" id="rotation-z" min="0" max="360" value="0">
+                            <span class="value-display" id="rotation-z-value">0°</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="rotation-w">W Axis</label>
+                            <input type="range" id="rotation-w" min="0" max="360" value="0">
+                            <span class="value-display" id="rotation-w-value">0°</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3>Display</h3>
+                        <div class="slider-container">
+                            <label for="scale">Scale</label>
+                            <input type="range" id="scale" min="50" max="200" value="100">
+                            <span class="value-display" id="scale-value">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="perspective">Perspective</label>
+                            <input type="range" id="perspective" min="1" max="10" value="4" step="0.1">
+                            <span class="value-display" id="perspective-value">4.0</span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="reset-view">Reset</button>
+                        <button id="auto-rotate">Auto Rotate</button>
+                        <button id="toggle-vertices">Vertices</button>
+                        <button id="toggle-labels">Labels</button>
+                    </div>
+                </div>
+
+                <div class="metrics-panel">
+                    <h3 style="color: #4fc3f7; font-size: clamp(0.8rem, 1.3vw, 0.9rem);">Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="vertex-count">256</div>
+                            <div class="metric-label">Vertices</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="edge-count">768</div>
+                            <div class="metric-label">Edges</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="face-count">864</div>
+                            <div class="metric-label">Faces</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="cell-count">216</div>
+                            <div class="metric-label">Cells</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="hypervolume">1.00</div>
+                            <div class="metric-label">Hypervolume</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="coherence">85%</div>
+                            <div class="metric-label">Coherence</div>
+                        </div>
+                    </div>
+                    
+                    <div id="color-sample" class="color-sample" style="display: none;">
+                        <div class="color-display"></div>
+                        <div class="color-info">
+                            <div class="color-name"></div>
+                            <div class="color-values"></div>
+                            <div class="color-hex"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            IEC Hypercube Visualization • 4D Tesseract Implementation
+        </footer>
+    </div>
+
+    <script>
+        // IEC Hypercube Visualization - Compact Version
+        const IEC_COLORS = generateIECColors();
+        const VERTEX_DIAMETER = 5;
+
+        // IEC Naming System
+        const IEC_NAMING_SYSTEM = {
+            categories: {
+                energy: ['Quantum', 'Kinetic', 'Potential', 'Thermal', 'Radiant', 'Chemical', 'Electrical', 'Nuclear'],
+                complexity: ['Simple', 'Compound', 'Composite', 'Integrated', 'Fractal', 'Chaotic', 'Harmonic', 'Resonant'],
+                stability: ['Volatile', 'Dynamic', 'Balanced', 'Stable', 'Robust', 'Inert', 'Crystalline', 'Absolute'],
+                dimension: ['Point', 'Linear', 'Planar', 'Volumetric', 'Temporal', 'Spatial', 'Dimensional', 'Hyper']
+            },
+            modifiers: {
+                intensity: ['Faint', 'Subtle', 'Moderate', 'Strong', 'Intense', 'Brilliant', 'Radiant', 'Absolute'],
+                phase: ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'],
+                quality: ['Pure', 'Mixed', 'Graded', 'Layered', 'Textured', 'Patterned', 'Structured', 'Organized']
+            }
+        };
+
+        const IEC_COLOR_SAMPLES = generateColorSamples();
+
+        function generateIECColors() {
+            const baseHue = 200;
+            return {
+                primary: `hsl(${baseHue}, 80%, 60%)`,
+                secondary: `hsl(${baseHue + 20}, 70%, 50%)`,
+                accent: `hsl(${baseHue - 20}, 90%, 40%)`,
+                background: '#000011',
+                grid: `hsl(${baseHue}, 60%, 20%)`,
+                vertex: `hsl(${baseHue}, 30%, 85%)`,
+                selected: '#ff5252',
+                text: '#e0e0e0'
+            };
+        }
+
+        function generateColorSamples() {
+            const samples = [];
+            const hues = [0, 30, 60, 120, 180, 240, 300, 330];
+            const saturations = [60, 70, 80, 90];
+            const lightnesses = [40, 50, 60, 70];
+            
+            let index = 0;
+            for (let h = 0; h < hues.length; h++) {
+                for (let s = 0; s < saturations.length; s++) {
+                    for (let l = 0; l < lightnesses.length; l++) {
+                        if (index < 256) {
+                            samples.push({
+                                hue: hues[h],
+                                saturation: saturations[s],
+                                lightness: lightnesses[l],
+                                hex: hslToHex(hues[h], saturations[s], lightnesses[l]),
+                                name: generateColorName(h, s, l, index)
+                            });
+                            index++;
+                        }
+                    }
+                }
+            }
+            return samples;
+        }
+
+        function generateColorName(hIndex, sIndex, lIndex, globalIndex) {
+            const cat = IEC_NAMING_SYSTEM.categories;
+            const mod = IEC_NAMING_SYSTEM.modifiers;
+            
+            const energy = cat.energy[hIndex % cat.energy.length];
+            const complexity = cat.complexity[sIndex % cat.complexity.length];
+            const stability = cat.stability[lIndex % cat.stability.length];
+            const dimension = cat.dimension[globalIndex % 8];
+            
+            const intensity = mod.intensity[sIndex];
+            const phase = mod.phase[lIndex % mod.phase.length];
+            const quality = mod.quality[hIndex % mod.quality.length];
+            
+            const nameStyles = [
+                `${energy} ${complexity}`,
+                `${stability} ${dimension}`,
+                `${intensity} ${phase}`,
+                `${quality} ${energy}`,
+                `${complexity} ${stability}`,
+                `${dimension} ${phase}`,
+                `${energy}-${phase} ${quality}`,
+                `${stability} ${complexity} ${dimension}`
+            ];
+            
+            return nameStyles[globalIndex % nameStyles.length];
+        }
+
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function getVertexColor(vertex, index) {
+            const colorSample = IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length];
+            return `hsl(${colorSample.hue}, ${colorSample.saturation}%, ${colorSample.lightness}%)`;
+        }
+
+        function getVertexName(vertex, index) {
+            return IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length].name;
+        }
+
+        function getVertexSample(vertex, index) {
+            return IEC_COLOR_SAMPLES[index % IEC_COLOR_SAMPLES.length];
+        }
+
+        function calculateIECMetrics(vertex, index) {
+            const [x, y, z, w] = vertex;
+            const colorSample = getVertexSample(vertex, index);
+            
+            return {
+                energy: (Math.sin(x * Math.PI) * 50 + 50).toFixed(1),
+                complexity: (Math.cos(y * Math.PI * 2) * 30 + 50).toFixed(1),
+                stability: (Math.sin(z * Math.PI * 3) * 20 + 60).toFixed(1),
+                coherence: (Math.cos(w * Math.PI * 4) * 40 + 50).toFixed(1),
+                hue: colorSample.hue,
+                saturation: colorSample.saturation,
+                lightness: colorSample.lightness,
+                hex: colorSample.hex,
+                name: colorSample.name
+            };
+        }
+
+        let tesseract;
+        let canvas;
+        let rotation = { x: 0, y: 0, z: 0, w: 0 };
+        let autoRotate = false;
+        let showVertices = true;
+        let showLabels = false;
+        let scaleFactor = 1.0;
+        let perspective = 4.0;
+        let selectedVertex = null;
+        let baseScale = 1.0;
+        let isMobile = false;
+
+        class Tesseract {
+            constructor() {
+                this.vertices = [];
+                this.edges = [];
+                this.initialize256VertexTesseract();
+            }
+
+            initialize256VertexTesseract() {
+                const subdivisions = 4;
+                this.vertices = [];
+                
+                for (let w = 0; w < subdivisions; w++) {
+                    for (let z = 0; z < subdivisions; z++) {
+                        for (let y = 0; y < subdivisions; y++) {
+                            for (let x = 0; x < subdivisions; x++) {
+                                this.vertices.push([
+                                    (x / (subdivisions - 1) - 0.5) * 2,
+                                    (y / (subdivisions - 1) - 0.5) * 2,
+                                    (z / (subdivisions - 1) - 0.5) * 2,
+                                    (w / (subdivisions - 1) - 0.5) * 2
+                                ]);
+                            }
+                        }
+                    }
+                }
+
+                this.edges = [];
+                for (let i = 0; i < this.vertices.length; i++) {
+                    const coords = this.getGridCoordinates(i, subdivisions);
+                    
+                    for (let dim = 0; dim < 4; dim++) {
+                        if (coords[dim] < subdivisions - 1) {
+                            const neighborCoords = [...coords];
+                            neighborCoords[dim]++;
+                            const neighborIndex = this.getGridIndex(neighborCoords, subdivisions);
+                            this.edges.push([i, neighborIndex]);
+                        }
+                    }
+                }
+            }
+
+            getGridCoordinates(index, subdivisions) {
+                const w = Math.floor(index / Math.pow(subdivisions, 3));
+                const remainder = index % Math.pow(subdivisions, 3);
+                const z = Math.floor(remainder / Math.pow(subdivisions, 2));
+                const remainder2 = remainder % Math.pow(subdivisions, 2);
+                const y = Math.floor(remainder2 / subdivisions);
+                const x = remainder2 % subdivisions;
+                return [x, y, z, w];
+            }
+
+            getGridIndex(coords, subdivisions) {
+                const [x, y, z, w] = coords;
+                return w * Math.pow(subdivisions, 3) + z * Math.pow(subdivisions, 2) + y * subdivisions + x;
+            }
+
+            projectVertex(vertex) {
+                let [x, y, z, w] = vertex;
+                
+                const rx = rotation.x * Math.PI / 180;
+                const ry = rotation.y * Math.PI / 180;
+                const rz = rotation.z * Math.PI / 180;
+                const rw = rotation.w * Math.PI / 180;
+                
+                let x1 = x * Math.cos(rw) - y * Math.sin(rw);
+                let y1 = x * Math.sin(rw) + y * Math.cos(rw);
+                
+                let x2 = x1 * Math.cos(rz) - z * Math.sin(rz);
+                let z1 = x1 * Math.sin(rz) + z * Math.cos(rz);
+                
+                let x3 = x2 * Math.cos(rw) - w * Math.sin(rw);
+                let w1 = x2 * Math.sin(rw) + w * Math.cos(rw);
+                
+                let y2 = y1 * Math.cos(rx) - z1 * Math.sin(rx);
+                let z2 = y1 * Math.sin(rx) + z1 * Math.cos(rx);
+                
+                let y3 = y2 * Math.cos(ry) - w1 * Math.sin(ry);
+                let w2 = y2 * Math.sin(ry) + w1 * Math.cos(ry);
+                
+                const depth = perspective;
+                const factor = depth / (depth - w2);
+                x3 *= factor;
+                y3 *= factor;
+                z2 *= factor;
+                
+                const scale = Math.min(width, height) * 0.2 * scaleFactor * baseScale;
+                return {
+                    x: x3 * scale + width / 2,
+                    y: y3 * scale + height / 2,
+                    z: z2 * scale,
+                    w: w2
+                };
+            }
+        }
+
+        function setup() {
+            const container = document.getElementById('sketch-container');
+            isMobile = window.innerWidth <= 768;
+            baseScale = isMobile ? 0.7 : 1.0;
+            
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            const footerHeight = document.querySelector('footer').offsetHeight;
+            const padding = 20;
+            
+            const availableHeight = window.innerHeight - headerHeight - footerHeight - (padding * 3);
+            const availableWidth = container.offsetWidth;
+            
+            canvas = createCanvas(availableWidth, availableHeight);
+            canvas.parent('sketch-container');
+            
+            tesseract = new Tesseract();
+            setupEventListeners();
+            
+            strokeWeight(0.5 * baseScale);
+            noLoop();
+            createColorSampleElement();
+        }
+
+        function draw() {
+            background(IEC_COLORS.background);
+            
+            if (autoRotate) {
+                const phase = frameCount * 0.02;
+                const amplitude = 80;
+                const center = 180;
+                
+                rotation.x = Math.round(center + Math.sin(phase) * amplitude);
+                rotation.y = Math.round(center + Math.sin(phase * 1.3 + 1) * amplitude);
+                rotation.z = Math.round(center + Math.sin(phase * 0.7 + 2) * amplitude);
+                rotation.w = Math.round(center + Math.sin(phase * 1.1 + 3) * amplitude);
+                
+                updateSliderValues();
+            }
+            
+            const projected = tesseract.vertices.map(v => tesseract.projectVertex(v));
+            
+            stroke(IEC_COLORS.primary);
+            tesseract.edges.forEach(edge => {
+                const v1 = projected[edge[0]];
+                const v2 = projected[edge[1]];
+                line(v1.x, v1.y, v2.x, v2.y);
+            });
+            
+            if (showVertices) {
+                noStroke();
+                projected.forEach((vertex, index) => {
+                    if (index === selectedVertex) {
+                        fill(IEC_COLORS.selected);
+                        drawGlow(vertex.x, vertex.y, VERTEX_DIAMETER * 2 * baseScale);
+                    } else {
+                        fill(getVertexColor(tesseract.vertices[index], index));
+                    }
+                    circle(vertex.x, vertex.y, VERTEX_DIAMETER * baseScale);
+                    
+                    if ((showLabels && index === selectedVertex) || (showLabels && index % 16 === 0)) {
+                        drawVertexLabel(vertex, index);
+                    }
+                });
+            }
+            
+            updateMetrics();
+        }
+
+        function drawGlow(x, y, size) {
+            drawingContext.shadowBlur = 15;
+            drawingContext.shadowColor = IEC_COLORS.selected;
+            circle(x, y, size);
+            drawingContext.shadowBlur = 0;
+        }
+
+        function drawVertexLabel(vertex, index) {
+            const name = getVertexName(tesseract.vertices[index], index);
+            fill(255, 255, 255, 200);
+            textSize(9 * baseScale);
+            textAlign(CENTER, CENTER);
+            text(name, vertex.x, vertex.y - 12 * baseScale);
+            
+            fill(getVertexColor(tesseract.vertices[index], index));
+            rect(vertex.x - 8 * baseScale, vertex.y - 25 * baseScale, 16 * baseScale, 4 * baseScale);
+        }
+
+        function updateMetrics() {
+            if (selectedVertex !== null) {
+                const metrics = calculateIECMetrics(tesseract.vertices[selectedVertex], selectedVertex);
+                
+                document.getElementById('vertex-count').textContent = `#${selectedVertex}`;
+                document.getElementById('edge-count').textContent = metrics.name.split(' ')[0];
+                document.getElementById('face-count').textContent = `${metrics.energy}E`;
+                document.getElementById('cell-count').textContent = `${metrics.complexity}C`;
+                document.getElementById('hypervolume').textContent = `${metrics.stability}S`;
+                document.getElementById('coherence').textContent = `${metrics.coherence}%`;
+                
+                updateColorSample(metrics);
+                showVertexInfo(selectedVertex, metrics);
+            } else {
+                document.getElementById('vertex-count').textContent = '256';
+                document.getElementById('edge-count').textContent = 'Edges';
+                document.getElementById('face-count').textContent = 'Faces';
+                document.getElementById('cell-count').textContent = 'Cells';
+                document.getElementById('hypervolume').textContent = '1.00';
+                document.getElementById('coherence').textContent = '85%';
+                document.getElementById('color-sample').style.display = 'none';
+                document.getElementById('vertex-info').style.display = 'none';
+            }
+        }
+
+        function updateColorSample(metrics) {
+            const sample = document.getElementById('color-sample');
+            sample.innerHTML = `
+                <div class="color-display" style="background: ${metrics.hex}"></div>
+                <div class="color-info">
+                    <div class="color-name">${metrics.name}</div>
+                    <div class="color-values">HSL(${metrics.hue}, ${metrics.saturation}%, ${metrics.lightness}%)</div>
+                    <div class="color-hex">${metrics.hex}</div>
+                </div>
+            `;
+            sample.style.display = 'block';
+        }
+
+        function createColorSampleElement() {
+            // Already exists in HTML
+        }
+
+        function setupEventListeners() {
+            ['x', 'y', 'z', 'w'].forEach(axis => {
+                const slider = document.getElementById(`rotation-${axis}`);
+                const display = document.getElementById(`rotation-${axis}-value`);
+                
+                slider.addEventListener('input', (e) => {
+                    rotation[axis] = parseInt(e.target.value);
+                    display.textContent = `${rotation[axis]}°`;
+                    redraw();
+                });
+            });
+            
+            document.getElementById('scale').addEventListener('input', (e) => {
+                scaleFactor = parseInt(e.target.value) / 100;
+                document.getElementById('scale-value').textContent = `${e.target.value}%`;
+                redraw();
+            });
+            
+            document.getElementById('perspective').addEventListener('input', (e) => {
+                perspective = parseFloat(e.target.value);
+                document.getElementById('perspective-value').textContent = perspective.toFixed(1);
+                redraw();
+            });
+            
+            document.getElementById('reset-view').addEventListener('click', resetView);
+            document.getElementById('auto-rotate').addEventListener('click', toggleAutoRotate);
+            document.getElementById('toggle-vertices').addEventListener('click', toggleVertices);
+            document.getElementById('toggle-labels').addEventListener('click', toggleLabels);
+            
+            canvas.mousePressed(handleCanvasClick);
+            
+            window.addEventListener('resize', windowResized);
+        }
+
+        function handleCanvasClick() {
+            const projected = tesseract.vertices.map(v => tesseract.projectVertex(v));
+            
+            let minDist = 20;
+            let closest = null;
+            
+            projected.forEach((vertex, index) => {
+                const d = dist(mouseX, mouseY, vertex.x, vertex.y);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = index;
+                }
+            });
+            
+            selectedVertex = closest;
+            redraw();
+        }
+
+        function showVertexInfo(vertexIndex, metrics) {
+            const info = document.getElementById('vertex-info');
+            const vertex = tesseract.vertices[vertexIndex];
+            
+            info.innerHTML = `
+                <strong>Vertex ${vertexIndex}</strong><br>
+                Coords: (${vertex.map(v => v.toFixed(1)).join(', ')})<br>
+                Energy: ${metrics.energy}<br>
+                Complexity: ${metrics.complexity}<br>
+                Stability: ${metrics.stability}
+            `;
+            info.style.display = 'block';
+        }
+
+        function resetView() {
+            rotation = { x: 0, y: 0, z: 0, w: 0 };
+            scaleFactor = 1.0;
+            perspective = 4.0;
+            selectedVertex = null;
+            updateSliderValues();
+            redraw();
+        }
+
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            const button = document.getElementById('auto-rotate');
+            button.textContent = autoRotate ? 'Stop' : 'Auto';
+            button.classList.toggle('active', autoRotate);
+            
+            if (autoRotate) {
+                loop();
+            } else {
+                noLoop();
+                redraw();
+            }
+        }
+
+        function toggleVertices() {
+            showVertices = !showVertices;
+            const button = document.getElementById('toggle-vertices');
+            button.textContent = showVertices ? 'Hide V' : 'Show V';
+            button.classList.toggle('active', showVertices);
+            redraw();
+        }
+
+        function toggleLabels() {
+            showLabels = !showLabels;
+            const button = document.getElementById('toggle-labels');
+            button.textContent = showLabels ? 'Hide L' : 'Show L';
+            button.classList.toggle('active', showLabels);
+            redraw();
+        }
+
+        function updateSliderValues() {
+            ['x', 'y', 'z', 'w'].forEach(axis => {
+                const slider = document.getElementById(`rotation-${axis}`);
+                const display = document.getElementById(`rotation-${axis}-value`);
+                slider.value = rotation[axis];
+                display.textContent = `${rotation[axis]}°`;
+            });
+            
+            document.getElementById('scale').value = scaleFactor * 100;
+            document.getElementById('scale-value').textContent = `${Math.round(scaleFactor * 100)}%`;
+            
+            document.getElementById('perspective').value = perspective;
+            document.getElementById('perspective-value').textContent = perspective.toFixed(1);
+        }
+
+        function windowResized() {
+            const container = document.getElementById('sketch-container');
+            isMobile = window.innerWidth <= 768;
+            baseScale = isMobile ? 0.7 : 1.0;
+            
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            const footerHeight = document.querySelector('footer').offsetHeight;
+            const padding = 20;
+            
+            const availableHeight = window.innerHeight - headerHeight - footerHeight - (padding * 3);
+            const availableWidth = container.offsetWidth;
+            
+            resizeCanvas(availableWidth, availableHeight);
+            strokeWeight(0.5 * baseScale);
+            redraw();
+        }
+    </script>
+</body>
+</html>
