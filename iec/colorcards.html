@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEC Color Metric Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(76, 201, 240, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .metric-card {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(76, 201, 240, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: rgba(76, 201, 240, 0.3);
+        }
+        
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            background: rgba(76, 201, 240, 0.1);
+        }
+        
+        .metric-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0 1rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .metric-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .metric-details {
+            background: rgba(20, 20, 35, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            opacity: 0.7;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .color-preview {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>IEC Color Metrics</h1>
+            <p class="subtitle">Comprehensive visualization of color metrics based on International Electrotechnical Commission standards</p>
+        </header>
+        
+        <div class="metrics-grid">
+            <!-- Luminance Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">☀️</div>
+                    <h2 class="metric-title">Luminance</h2>
+                </div>
+                <div class="metric-value">82.5 cd/m²</div>
+                <p class="metric-description">Luminance is the intensity of light emitted from a surface per unit area in a given direction.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">IEC 61966-2-1</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Range</span>
+                        <span class="detail-value">0-100 cd/m²</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Measurement</span>
+                        <span class="detail-value">Photometric</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chromaticity Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🎨</div>
+                    <h2 class="metric-title">Chromaticity</h2>
+                </div>
+                <div class="metric-value">(0.312, 0.329)</div>
+                <p class="metric-description">Chromaticity represents the quality of a color regardless of its luminance, defined by its x and y coordinates.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">CIE 1931</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Coordinates</span>
+                        <span class="detail-value">x, y</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Color Space</span>
+                        <span class="detail-value">CIE xyY</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Color Temperature Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🔥</div>
+                    <h2 class="metric-title">Color Temperature</h2>
+                </div>
+                <div class="metric-value">6500K</div>
+                <p class="metric-description">Color temperature of a light source is the temperature of an ideal black-body radiator that radiates light of comparable hue.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">IEC 60050</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Type</span>
+                        <span class="detail-value">Correlated</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Reference</span>
+                        <span class="detail-value">D65 Illuminant</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Color Rendering Index Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">🌈</div>
+                    <h2 class="metric-title">Color Rendering Index</h2>
+                </div>
+                <div class="metric-value">Ra 95</div>
+                <p class="metric-description">CRI is a quantitative measure of the ability of a light source to reveal the colors of various objects faithfully in comparison with an ideal light source.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">CIE 13.3-1995</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Scale</span>
+                        <span class="detail-value">0-100</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Rating</span>
+                        <span class="detail-value">Excellent</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delta E Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">Δ</div>
+                    <h2 class="metric-title">Delta E</h2>
+                </div>
+                <div class="metric-value">ΔE 2.3</div>
+                <p class="metric-description">Delta E is a metric for understanding the difference between two colors that is perceptually uniform.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">CIEDE2000</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Perceptibility</span>
+                        <span class="detail-value">Just Noticeable</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Acceptability</span>
+                        <span class="detail-value">Good</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gamut Volume Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">📊</div>
+                    <h2 class="metric-title">Gamut Volume</h2>
+                </div>
+                <div class="metric-value">1,250,000</div>
+                <p class="metric-description">Gamut volume represents the total volume of color space that a device can reproduce, measured in color space units.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">IEC 61966-2-1</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Color Space</span>
+                        <span class="detail-value">CIELAB</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Coverage</span>
+                        <span class="detail-value">sRGB: 145%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Spectral Power Distribution Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">📈</div>
+                    <h2 class="metric-title">Spectral Power Distribution</h2>
+                </div>
+                <div class="metric-value">380-780nm</div>
+                <p class="metric-description">SPD describes the power per unit area per unit wavelength of an illumination, representing its composition at each wavelength.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">CIE S 017</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Range</span>
+                        <span class="detail-value">Visible Spectrum</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Peak</span>
+                        <span class="detail-value">550 nm</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metamerism Index Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">👁️</div>
+                    <h2 class="metric-title">Metamerism Index</h2>
+                </div>
+                <div class="metric-value">MI 0.8</div>
+                <p class="metric-description">The Metamerism Index quantifies the degree of color match change under different illuminants for metameric pairs.</p>
+                <div class="metric-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Standard</span>
+                        <span class="detail-value">CIE 15:2004</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Scale</span>
+                        <span class="detail-value">0-5</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Rating</span>
+                        <span class="detail-value">Low</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Based on IEC standards and CIE recommendations | Color metrics visualization</p>
+        </footer>
+    </div>
+</body>
+</html>
