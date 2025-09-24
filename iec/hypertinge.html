@@ -399,8 +399,28 @@
 
         <div class="content-area">
             <div id="sketch-container">
-                <div class="vertex-info" id="vertex-info"></div>
+                <div id="vertex-info" class="control-group">
+                    <h3>Vertex Info</h3>
+                    <div class="control-row">
+                        <label>Selected:</label>
+                        <span id="selected-vertex">None</span>
+                     </div>
+                <!-- MOVED: Color Sample group goes here -->
+                <div class="control-group">
+                    <h4>Color Sample</h4>
+                    <div id="color-sample" style="width: 100px; height: 30px; border: 1px solid #ccc; margin: 5px 0;"></div>
+                    <div class="control-row">
+                        <label>Hex:</label>
+                        <span id="color-hex">#------</span>
+                    </div>
+                    <div class="control-row">
+                        <label>RGBA:</label>
+                        <span id="color-rgba">---, ---, ---, ---</span>
+                    </div>
+                </div>
+                <!-- END MOVED SECTION -->
             </div>
+        <!--/div -->
 
             <div class="side-panel">
                 <div class="controls-panel">
