@@ -26,87 +26,40 @@
         #app {
             width: 100vw;
             height: 100vh;
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            grid-template-columns: 1fr;
-            gap: 1vmin;
+            display: flex;
+            flex-direction: column;
             padding: 2vmin;
-        }
-        /* Fix for controls panel overflow */
-        #app {
-            max-height: 100vh;
-            overflow: hidden;
-        }
-
-        .controls-panel {
-            max-height: 60vh; /* Limit height */
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .main-content {
-            min-height: 0; /* Allow content to shrink */
-        }
-
-        /* Better mobile layout */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-rows: 1fr auto;
-                max-height: 70vh;
-            }
-    
-            .controls-panel {
-                max-height: 40vh;
-                padding: 3vmin;
-            }
-    
-            .button-group {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1vmin;
-            }
-    
-            button {
-                padding: 1.5vmin;
-                font-size: 0.7rem;
-            }
-        }
-
-        /* Ensure canvas container doesn't overflow */
-        #sketch-container {
-            min-height: 300px; /* Minimum height */
-            height: 100%;
+            gap: 2vmin;
         }
 
         .header {
             text-align: center;
             padding: 1vmin 0;
-            border-bottom: 1px solid #333;
+            flex-shrink: 0;
         }
 
         h1 {
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
             font-weight: 300;
             color: #4fc3f7;
             margin-bottom: 0.5vmin;
         }
 
         .subtitle {
-            font-size: clamp(0.8rem, 2vw, 1.1rem);
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
             color: #90a4ae;
-            opacity: 0.8;
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr minmax(300px, 25%);
+        .content-area {
+            display: flex;
             gap: 2vmin;
-            height: 100%;
+            flex: 1;
+            min-height: 0;
         }
 
         @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr auto;
+            .content-area {
+                flex-direction: column;
             }
         }
 
@@ -114,8 +67,24 @@
             background: #000;
             border-radius: 1vmin;
             overflow: hidden;
+            flex: 1;
             position: relative;
-            min-height: 50vh;
+            min-height: 40vh;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2vmin;
+            width: min(400px, 35vw);
+            min-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .side-panel {
+                width: 100%;
+                min-width: auto;
+            }
         }
 
         .controls-panel {
@@ -124,8 +93,9 @@
             padding: 2vmin;
             display: flex;
             flex-direction: column;
-            gap: 2vmin;
+            gap: 1.5vmin;
             overflow-y: auto;
+            flex: 1;
         }
 
         .control-group {
@@ -134,7 +104,7 @@
 
         .control-group h3 {
             color: #4fc3f7;
-            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-size: clamp(0.8rem, 1.3vw, 0.9rem);
             margin-bottom: 1vmin;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -142,21 +112,21 @@
 
         .slider-container {
             display: grid;
-            grid-template-columns: minmax(100px, 1fr) minmax(150px, 2fr) auto;
+            grid-template-columns: 80px 1fr 50px;
             align-items: center;
             gap: 1vmin;
-            margin-bottom: 1vmin;
+            margin-bottom: 0.8vmin;
         }
 
         .slider-container label {
-            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
             color: #b0b0b0;
             white-space: nowrap;
         }
 
         input[type="range"] {
             width: 100%;
-            height: 0.5vmin;
+            height: 0.4vmin;
             background: #333;
             border-radius: 0.25vmin;
             outline: none;
@@ -165,18 +135,17 @@
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: clamp(12px, 2vw, 16px);
-            height: clamp(12px, 2vw, 16px);
+            width: clamp(10px, 1.5vw, 14px);
+            height: clamp(10px, 1.5vw, 14px);
             background: #4fc3f7;
             border-radius: 50%;
             cursor: pointer;
         }
 
         .value-display {
-            font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
             color: #4fc3f7;
             font-family: 'Monaco', 'Consolas', monospace;
-            min-width: 4ch;
             text-align: center;
         }
 
@@ -191,10 +160,10 @@
             background: #2a2a2a;
             color: #e0e0e0;
             border: 1px solid #333;
-            padding: clamp(8px, 1.5vmin, 12px);
+            padding: clamp(6px, 1.2vmin, 10px);
             border-radius: 0.5vmin;
             cursor: pointer;
-            font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
             transition: all 0.3s ease;
             white-space: nowrap;
         }
@@ -214,40 +183,37 @@
             background: #1a1a1a;
             border-radius: 1vmin;
             padding: 2vmin;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 2vmin;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vmin;
+            max-height: 30vh;
+            overflow-y: auto;
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1.5vmin;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1vmin;
         }
 
         .metric-item {
             background: #252525;
-            padding: clamp(10px, 2vmin, 15px);
+            padding: clamp(8px, 1.5vmin, 12px);
             border-radius: 0.8vmin;
             text-align: center;
             transition: all 0.3s ease;
         }
 
-        .metric-item:hover {
-            transform: translateY(-0.3vmin);
-            border-color: #4fc3f7;
-        }
-
         .metric-value {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
             font-weight: 300;
             color: #4fc3f7;
-            margin-bottom: 0.5vmin;
+            margin-bottom: 0.3vmin;
             font-family: 'Monaco', 'Consolas', monospace;
         }
 
         .metric-label {
-            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            font-size: clamp(0.55rem, 0.9vw, 0.65rem);
             color: #90a4ae;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -259,13 +225,13 @@
             padding: 1.5vmin;
             display: flex;
             align-items: center;
-            gap: 2vmin;
+            gap: 1.5vmin;
             border: 1px solid #333;
         }
 
         .color-display {
-            width: clamp(40px, 8vmin, 60px);
-            height: clamp(40px, 8vmin, 60px);
+            width: clamp(35px, 6vmin, 50px);
+            height: clamp(35px, 6vmin, 50px);
             border-radius: 0.6vmin;
             border: 2px solid #333;
             flex-shrink: 0;
@@ -278,9 +244,9 @@
 
         .color-name {
             color: #4fc3f7;
-            font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+            font-size: clamp(0.7rem, 1.3vw, 0.9rem);
             font-weight: 600;
-            margin-bottom: 0.5vmin;
+            margin-bottom: 0.3vmin;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -288,14 +254,14 @@
 
         .color-values {
             color: #90a4ae;
-            font-size: clamp(0.6rem, 1vw, 0.8rem);
-            margin-bottom: 0.3vmin;
+            font-size: clamp(0.55rem, 0.9vw, 0.65rem);
+            margin-bottom: 0.2vmin;
             font-family: 'Monaco', 'Consolas', monospace;
         }
 
         .color-hex {
             color: #b0b0b0;
-            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
             font-family: 'Monaco', 'Consolas', monospace;
         }
 
@@ -304,12 +270,12 @@
             top: 1vmin;
             left: 1vmin;
             background: rgba(26, 26, 26, 0.95);
-            padding: 1.5vmin;
+            padding: 1.2vmin;
             border-radius: 0.8vmin;
-            font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+            font-size: clamp(0.6rem, 1vw, 0.7rem);
             border-left: 3px solid #4fc3f7;
             display: none;
-            max-width: min(300px, 30vw);
+            max-width: min(250px, 25vw);
             backdrop-filter: blur(10px);
             z-index: 100;
         }
@@ -317,21 +283,24 @@
         footer {
             text-align: center;
             padding: 1vmin 0;
-            border-top: 1px solid #333;
             color: #666;
-            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            flex-shrink: 0;
         }
 
         /* Scrollbar styling */
-        .controls-panel::-webkit-scrollbar {
-            width: 0.5vmin;
+        .controls-panel::-webkit-scrollbar,
+        .metrics-panel::-webkit-scrollbar {
+            width: 0.4vmin;
         }
 
-        .controls-panel::-webkit-scrollbar-track {
+        .controls-panel::-webkit-scrollbar-track,
+        .metrics-panel::-webkit-scrollbar-track {
             background: #1a1a1a;
         }
 
-        .controls-panel::-webkit-scrollbar-thumb {
+        .controls-panel::-webkit-scrollbar-thumb,
+        .metrics-panel::-webkit-scrollbar-thumb {
             background: #4fc3f7;
             border-radius: 0.25vmin;
         }
@@ -340,26 +309,69 @@
         @media (hover: none) and (pointer: coarse) {
             button {
                 padding: 2vmin;
-                min-height: 44px; /* Apple touch guideline */
+                min-height: 44px;
             }
             
             input[type="range"] {
-                height: 1vmin;
+                height: 0.8vmin;
             }
             
             input[type="range"]::-webkit-slider-thumb {
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
+            }
+            
+            .slider-container {
+                grid-template-columns: 90px 1fr 60px;
             }
         }
 
-        /* High DPI displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .vertex-info {
-                border-left-width: 2px;
+        /* Ultra-compact for very small screens */
+        @media (max-width: 480px) {
+            #app {
+                padding: 1vmin;
+                gap: 1vmin;
+            }
+            
+            .content-area {
+                gap: 1vmin;
+            }
+            
+            .side-panel {
+                min-width: auto;
+            }
+            
+            .controls-panel,
+            .metrics-panel {
+                padding: 1.5vmin;
+                gap: 1vmin;
+            }
+            
+            .slider-container {
+                grid-template-columns: 70px 1fr 45px;
+                gap: 0.8vmin;
+                margin-bottom: 0.6vmin;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .button-group {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            button {
+                font-size: 0.6rem;
+                padding: 1vmin;
             }
         }
-    </style>
+
+        /* Ensure no overflow */
+        body {
+            overflow: hidden !important;
+        }
+    </script>
 </head>
 <body>
     <div id="app">
