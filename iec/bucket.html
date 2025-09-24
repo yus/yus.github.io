@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Name Matcher for Yus' Colors</title>
+    <title>Color Name Verifier</title>
     <style>
         * {
             margin: 0;
@@ -34,7 +34,7 @@
             color: transparent;
         }
         
-        .instructions {
+        .tool-section {
             background: rgba(30, 30, 46, 0.7);
             border-radius: 12px;
             padding: 1.5rem;
@@ -42,70 +42,9 @@
             border: 1px solid rgba(76, 201, 240, 0.1);
         }
         
-        .step {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: rgba(20, 20, 35, 0.5);
-            border-radius: 8px;
-        }
-        
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .color-card {
-            background: rgba(30, 30, 46, 0.7);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .color-swatch {
-            width: 100%;
-            height: 80px;
-            border-radius: 6px;
-            margin-bottom: 0.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .color-info {
-            font-size: 0.9rem;
-        }
-        
-        .color-hex {
-            font-family: monospace;
-            font-weight: bold;
-            margin-bottom: 0.3rem;
-        }
-        
-        .color-name {
-            font-style: italic;
-            color: #4cc9f0;
-        }
-        
-        .unknown {
-            border: 2px dashed #ff6b6b;
-        }
-        
-        .named {
-            border: 2px solid #6bff6b;
-        }
-        
-        .tool-section {
-            background: rgba(30, 30, 46, 0.7);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border: 1px solid rgba(76, 201, 240, 0.1);
-        }
-        
         textarea {
             width: 100%;
-            height: 150px;
+            height: 200px;
             background: rgba(20, 20, 35, 0.8);
             color: white;
             border: 1px solid rgba(76, 201, 240, 0.3);
@@ -113,6 +52,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
             resize: vertical;
+            font-family: monospace;
         }
         
         button {
@@ -123,6 +63,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            margin-right: 0.5rem;
             transition: transform 0.2s;
         }
         
@@ -130,164 +71,243 @@
             transform: translateY(-2px);
         }
         
-        .result {
-            margin-top: 1rem;
-            padding: 1rem;
+        .results {
+            margin-top: 2rem;
+        }
+        
+        .result-section {
             background: rgba(20, 20, 35, 0.5);
             border-radius: 8px;
-            display: none;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .color-match {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .color-swatch {
+            width: 50px;
+            height: 30px;
+            border-radius: 4px;
+            margin-right: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .color-info {
+            flex: 1;
+        }
+        
+        .duplicate {
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .verified {
+            border-left: 4px solid #6bff6b;
+        }
+        
+        .warning {
+            border-left: 4px solid #ffd700;
+        }
+        
+        .status {
+            font-weight: bold;
+            margin-left: 1rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .status.duplicate { background: #ff6b6b; color: black; }
+        .status.verified { background: #6bff6b; color: black; }
+        .status.warning { background: #ffd700; color: black; }
+        
+        .suggestions {
+            font-size: 0.9rem;
+            color: #4cc9f0;
+            margin-top: 0.3rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Color Name Matcher for Yus' Colors</h1>
-        
-        <div class="instructions">
-            <h2>How to Find and Name Colors from Yus' Page</h2>
-            
-            <div class="step">
-                <h3>Step 1: Extract Colors</h3>
-                <p>Open <a href="https://yus.github.io/colors.html" target="_blank">https://yus.github.io/colors.html</a> and use browser developer tools to extract colors:</p>
-                <ul>
-                    <li>Right-click → Inspect Element</li>
-                    <li>Use the element picker to identify colors</li>
-                    <li>Note which colors have names and which don't</li>
-                </ul>
-            </div>
-            
-            <div class="step">
-                <h3>Step 2: Common Color Naming Approaches</h3>
-                <p>For unnamed colors, use these naming strategies based on proximity to known colors:</p>
-                <ul>
-                    <li><strong>Light/Dark prefixes:</strong> Light Crimson, Dark Azure</li>
-                    <li><strong>Color temperature:</strong> Warm Gray, Cool Blue</li>
-                    <li><strong>Natural references:</strong> Sky Blue, Forest Green</li>
-                    <li><strong>Material references:</strong> Steel Gray, Gold Yellow</li>
-                    <li><strong>Subtle variations:</strong> Pale Rose, Deep Violet</li>
-                </ul>
-            </div>
-        </div>
+        <h1>Color Name Verifier & Duplicate Detector</h1>
         
         <div class="tool-section">
-            <h2>Color Name Generator Tool</h2>
-            <p>Enter colors in HEX format (one per line) with optional names:</p>
-            <textarea id="colorInput" placeholder="#FF6B6B Crimson
-#4ECDC4 
-#1A535C Navy Teal
-#F7FFF7 
+            <h2>Enter Colors to Verify</h2>
+            <p>Format: <code>#HEXCODE Name</code> (one per line)</p>
+            <textarea id="colorInput">#FF6B6B Crimson
+#4ECDC4 Medium Turquoise
+#1A535C Midnight Green
+#F7FFF7 Mint Cream
 #FFE66D Light Yellow
-#6BFF6B
+#6BFF6B Light Green
 #4CC9F0 Azure
-#4361EE Royal Blue"></textarea>
-            <button onclick="generateNames()">Generate Missing Names</button>
+#4361EE Royal Blue
+#FF6B6B Crimson Duplicate
+#4ECDC4 Another Turquoise
+#A9A9A9 Dark Gray
+#808080 Gray
+#A9A9A9 Dark Gray Duplicate</textarea>
             
-            <div id="result" class="result"></div>
+            <button onclick="verifyNames()">Verify Color Names</button>
+            <button onclick="fixDuplicates()">Auto-Fix Duplicates</button>
         </div>
         
-        <div id="colorGrid" class="color-grid">
-            <!-- Color cards will be generated here -->
-        </div>
+        <div id="results" class="results"></div>
     </div>
 
     <script>
-        // Extended color name database
-        const colorNames = {
-            // Reds
-            '#FF0000': 'Red', '#DC143C': 'Crimson', '#B22222': 'Firebrick', '#8B0000': 'Dark Red',
-            '#FF6B6B': 'Light Crimson', '#FF4500': 'Orange Red', '#FF6347': 'Tomato', '#FF7F50': 'Coral',
+        // Official color name databases
+        const officialColorDB = {
+            // CSS named colors
+            '#FF0000': 'Red', '#00FF00': 'Lime', '#0000FF': 'Blue', '#FFFF00': 'Yellow',
+            '#FF00FF': 'Magenta', '#00FFFF': 'Cyan', '#800000': 'Maroon', '#808000': 'Olive',
+            '#008000': 'Green', '#800080': 'Purple', '#008080': 'Teal', '#000080': 'Navy',
+            '#C0C0C0': 'Silver', '#808080': 'Gray', '#FFA500': 'Orange', '#A52A2A': 'Brown',
+            '#FFFFFF': 'White', '#000000': 'Black',
             
-            // Blues
-            '#0000FF': 'Blue', '#1E90FF': 'Dodger Blue', '#4169E1': 'Royal Blue', '#000080': 'Navy',
-            '#4361EE': 'Royal Blue', '#4CC9F0': 'Azure', '#1A535C': 'Navy Teal', '#00BFFF': 'Deep Sky Blue',
-            
-            // Greens
-            '#008000': 'Green', '#228B22': 'Forest Green', '#32CD32': 'Lime Green', '#006400': 'Dark Green',
-            '#6BFF6B': 'Light Green', '#2E8B57': 'Sea Green', '#3CB371': 'Medium Sea Green', '#90EE90': 'Light Green',
-            
-            // Yellows/Oranges
-            '#FFFF00': 'Yellow', '#FFD700': 'Gold', '#FFA500': 'Orange', '#FF8C00': 'Dark Orange',
-            '#FFE66D': 'Light Yellow', '#FFE5B4': 'Peach', '#FFDAB9': 'Peach Puff', '#F0E68C': 'Khaki',
-            
-            // Purples/Violets
-            '#800080': 'Purple', '#4B0082': 'Indigo', '#9400D3': 'Dark Violet', '#8A2BE2': 'Blue Violet',
-            '#9370DB': 'Medium Purple', '#BA55D3': 'Medium Orchid', '#DA70D6': 'Orchid', '#EE82EE': 'Violet',
-            
-            // Grays/Neutrals
-            '#808080': 'Gray', '#A9A9A9': 'Dark Gray', '#C0C0C0': 'Silver', '#D3D3D3': 'Light Gray',
-            '#F7FFF7': 'Off White', '#2F4F4F': 'Dark Slate Gray', '#696969': 'Dim Gray', '#778899': 'Light Slate Gray'
+            // Extended common names
+            '#FF6B6B': 'Crimson', '#DC143C': 'Crimson', '#B22222': 'Firebrick',
+            '#4ECDC4': 'Medium Turquoise', '#48D1CC': 'Medium Turquoise',
+            '#1A535C': 'Midnight Green', '#004953': 'Midnight Green',
+            '#F7FFF7': 'Mint Cream', '#F5FFFA': 'Mint Cream',
+            '#FFE66D': 'Light Yellow', '#FFFFE0': 'Light Yellow',
+            '#6BFF6B': 'Light Green', '#90EE90': 'Light Green',
+            '#4CC9F0': 'Azure', '#F0FFFF': 'Azure',
+            '#4361EE': 'Royal Blue', '#4169E1': 'Royal Blue',
+            '#A9A9A9': 'Dark Gray', '#2F4F4F': 'Dark Slate Gray'
         };
-        
-        // Find closest named color
-        function findClosestColor(hex) {
-            let minDistance = Infinity;
-            let closestColor = null;
-            
-            for (const [namedHex, name] of Object.entries(colorNames)) {
-                const distance = colorDistance(hex, namedHex);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestColor = { hex: namedHex, name: name, distance: distance };
-                }
+
+        // Reverse lookup for name->hex (official names only)
+        const officialNameToHex = {};
+        Object.entries(officialColorDB).forEach(([hex, name]) => {
+            if (!officialNameToHex[name]) {
+                officialNameToHex[name] = hex;
             }
-            
-            return closestColor;
-        }
-        
-        // Calculate color distance (simplified)
-        function colorDistance(hex1, hex2) {
-            const r1 = parseInt(hex1.substr(1, 2), 16);
-            const g1 = parseInt(hex1.substr(3, 2), 16);
-            const b1 = parseInt(hex1.substr(5, 2), 16);
-            
-            const r2 = parseInt(hex2.substr(1, 2), 16);
-            const g2 = parseInt(hex2.substr(3, 2), 16);
-            const b2 = parseInt(hex2.substr(5, 2), 16);
-            
-            return Math.sqrt(
-                Math.pow(r1 - r2, 2) + 
-                Math.pow(g1 - g2, 2) + 
-                Math.pow(b1 - b2, 2)
-            );
-        }
-        
-        // Generate name based on closest color
-        function generateColorName(hex, closest) {
-            if (closest.distance < 30) {
-                return closest.name; // Very close match
-            } else if (closest.distance < 100) {
-                // Add modifier based on brightness difference
-                const brightnessDiff = getBrightness(hex) - getBrightness(closest.hex);
-                
-                if (brightnessDiff > 50) return `Light ${closest.name}`;
-                if (brightnessDiff < -50) return `Dark ${closest.name}`;
-                if (brightnessDiff > 20) return `Pale ${closest.name}`;
-                if (brightnessDiff < -20) return `Deep ${closest.name}`;
-                
-                return `${closest.name} Variant`;
-            } else {
-                return `Custom ${hex}`; // Too far from any known color
-            }
-        }
-        
-        // Get brightness of a color
-        function getBrightness(hex) {
-            const r = parseInt(hex.substr(1, 2), 16);
-            const g = parseInt(hex.substr(3, 2), 16);
-            const b = parseInt(hex.substr(5, 2), 16);
-            return (r * 299 + g * 587 + b * 114) / 1000;
-        }
-        
-        // Process colors and generate names
-        function generateNames() {
+        });
+
+        function verifyNames() {
             const input = document.getElementById('colorInput').value;
             const lines = input.split('\n');
-            const resultDiv = document.getElementById('result');
-            const colorGrid = document.getElementById('colorGrid');
+            const resultsDiv = document.getElementById('results');
             
-            colorGrid.innerHTML = '';
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<h3>Generated Names:</h3>';
+            resultsDiv.innerHTML = '<h2>Verification Results</h2>';
+            
+            const colorMap = new Map(); // name -> [hex1, hex2, ...]
+            const hexToName = new Map();
+            const issues = [];
+            
+            // Parse and group by name
+            lines.forEach((line, index) => {
+                line = line.trim();
+                if (!line) return;
+                
+                const parts = line.split(/\s+/);
+                const hex = parts[0].toUpperCase();
+                const name = parts.slice(1).join(' ');
+                
+                if (!/^#[0-9A-F]{6}$/i.test(hex)) {
+                    issues.push({ type: 'invalid', line, index });
+                    return;
+                }
+                
+                hexToName.set(hex, name);
+                
+                if (!colorMap.has(name)) {
+                    colorMap.set(name, []);
+                }
+                colorMap.get(name).push(hex);
+            });
+            
+            // Check for issues
+            colorMap.forEach((hexes, name) => {
+                if (hexes.length > 1) {
+                    issues.push({ type: 'duplicate', name, hexes });
+                }
+                
+                // Check if name matches official database
+                const officialHex = officialNameToHex[name];
+                if (officialHex) {
+                    hexes.forEach(hex => {
+                        if (hex !== officialHex) {
+                            issues.push({ type: 'mismatch', name, hex, officialHex });
+                        }
+                    });
+                }
+            });
+            
+            // Display results
+            if (issues.length === 0) {
+                resultsDiv.innerHTML += '<div class="result-section verified">✓ All color names are valid and unique!</div>';
+            } else {
+                issues.forEach(issue => {
+                    const div = document.createElement('div');
+                    div.className = 'result-section';
+                    
+                    if (issue.type === 'duplicate') {
+                        div.classList.add('duplicate');
+                        div.innerHTML = `
+                            <h3>❌ Duplicate Name: "${issue.name}"</h3>
+                            <p>Used for multiple colors:</p>
+                            ${issue.hexes.map(hex => `
+                                <div class="color-match duplicate">
+                                    <div class="color-swatch" style="background: ${hex}"></div>
+                                    <div class="color-info">
+                                        <strong>${hex}</strong> → ${issue.name}
+                                        <div class="suggestions">Suggested: ${generateUniqueName(hex, issue.name)}</div>
+                                    </div>
+                                    <span class="status duplicate">DUPLICATE</span>
+                                </div>
+                            `).join('')}
+                        `;
+                    } else if (issue.type === 'mismatch') {
+                        div.classList.add('warning');
+                        div.innerHTML = `
+                            <h3>⚠️ Name Mismatch: "${issue.name}"</h3>
+                            <div class="color-match warning">
+                                <div class="color-swatch" style="background: ${issue.hex}"></div>
+                                <div class="color-info">
+                                    <strong>${issue.hex}</strong> → ${issue.name}
+                                    <div class="suggestions">Official ${issue.name} is ${issue.officialHex}</div>
+                                </div>
+                                <span class="status warning">MISMATCH</span>
+                            </div>
+                        `;
+                    } else if (issue.type === 'invalid') {
+                        div.classList.add('warning');
+                        div.innerHTML = `
+                            <h3>⚠️ Invalid Format</h3>
+                            <p>Line ${issue.index + 1}: "${issue.line}"</p>
+                        `;
+                    }
+                    
+                    resultsDiv.appendChild(div);
+                });
+            }
+            
+            // Show summary
+            const summary = document.createElement('div');
+            summary.className = 'result-section';
+            summary.innerHTML = `
+                <h3>Summary</h3>
+                <p>Total colors: ${hexToName.size}</p>
+                <p>Unique names: ${colorMap.size}</p>
+                <p>Issues found: ${issues.length}</p>
+            `;
+            resultsDiv.appendChild(summary);
+        }
+        
+        function fixDuplicates() {
+            const input = document.getElementById('colorInput').value;
+            const lines = input.split('\n');
+            const fixedLines = [];
+            const usedNames = new Set();
             
             lines.forEach(line => {
                 line = line.trim();
@@ -295,65 +315,56 @@
                 
                 const parts = line.split(/\s+/);
                 const hex = parts[0].toUpperCase();
+                const originalName = parts.slice(1).join(' ');
                 
-                if (!/^#[0-9A-F]{6}$/i.test(hex)) {
-                    resultDiv.innerHTML += `<p style="color: #ff6b6b">Invalid HEX: ${hex}</p>`;
-                    return;
+                let finalName = originalName;
+                
+                // If this name is already used, make it unique
+                if (usedNames.has(originalName)) {
+                    finalName = generateUniqueName(hex, originalName);
                 }
                 
-                // Check if name was provided
-                let existingName = parts.length > 1 ? parts.slice(1).join(' ') : null;
-                
-                if (existingName) {
-                    // Color already has a name
-                    colorNames[hex] = existingName;
-                    resultDiv.innerHTML += `<p><span style="color: #6bff6b">✓</span> ${hex} → ${existingName} (already named)</p>`;
-                    
-                    // Add to grid
-                    const card = createColorCard(hex, existingName, true);
-                    colorGrid.appendChild(card);
-                } else {
-                    // Generate name
-                    const closest = findClosestColor(hex);
-                    const generatedName = generateColorName(hex, closest);
-                    
-                    colorNames[hex] = generatedName;
-                    resultDiv.innerHTML += `<p><span style="color: #4cc9f0">→</span> ${hex} → ${generatedName} (based on ${closest.name})</p>`;
-                    
-                    // Add to grid
-                    const card = createColorCard(hex, generatedName, false);
-                    colorGrid.appendChild(card);
-                }
+                usedNames.add(finalName);
+                fixedLines.push(`${hex} ${finalName}`);
             });
+            
+            document.getElementById('colorInput').value = fixedLines.join('\n');
+            verifyNames(); // Re-verify after fixing
         }
         
-        // Create color card element
-        function createColorCard(hex, name, isNamed) {
-            const card = document.createElement('div');
-            card.className = 'color-card';
+        function generateUniqueName(hex, baseName) {
+            // Get color characteristics for unique naming
+            const r = parseInt(hex.substr(1, 2), 16);
+            const g = parseInt(hex.substr(3, 2), 16);
+            const b = parseInt(hex.substr(5, 2), 16);
+            const brightness = (r + g + b) / 3;
             
-            card.innerHTML = `
-                <div class="color-swatch ${isNamed ? 'named' : 'unknown'}" style="background: ${hex}"></div>
-                <div class="color-info">
-                    <div class="color-hex">${hex}</div>
-                    <div class="color-name">${name}</div>
-                </div>
-            `;
+            const modifiers = [
+                'Light', 'Dark', 'Pale', 'Deep', 'Bright', 'Muted',
+                'Warm', 'Cool', 'Rich', 'Soft', 'Vivid', 'Dull'
+            ];
             
-            return card;
+            const variations = [
+                'ish', 'y', 'esque', '-like', ' tone', ' shade'
+            ];
+            
+            // Try different strategies
+            if (brightness > 200) return `Light ${baseName}`;
+            if (brightness < 80) return `Dark ${baseName}`;
+            
+            // Use RGB dominance
+            if (r > g && r > b) return `Red ${baseName}`;
+            if (g > r && g > b) return `Green ${baseName}`;
+            if (b > r && b > g) return `Blue ${baseName}`;
+            
+            // Use modifier + variation as last resort
+            const modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
+            const variation = variations[Math.floor(Math.random() * variations.length)];
+            return `${modifier} ${baseName}${variation}`;
         }
         
-        // Initialize with some example colors
-        document.getElementById('colorInput').value = `#FF6B6B Crimson
-#4ECDC4 
-#1A535C Navy Teal
-#F7FFF7 
-#FFE66D Light Yellow
-#6BFF6B
-#4CC9F0 Azure
-#4361EE Royal Blue
-#2F4F4F Dark Slate Gray
-#A9A9A9 Dark Gray`;
+        // Initial verification
+        setTimeout(verifyNames, 500);
     </script>
 </body>
 </html>
