@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escher's Ornamental Reptile</title>
+    <title>Escher Lizard Puzzle</title>
     <style>
         * {
             margin: 0;
@@ -11,248 +11,314 @@
             box-sizing: border-box;
         }
         body {
-            background: #fff;
+            background: #f0f0f0;
             font-family: Arial, sans-serif;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         .container {
             max-width: 100%;
             text-align: center;
         }
         h1 {
-            color: #000;
-            margin-bottom: 20px;
+            color: #333;
+            margin-bottom: 10px;
         }
-        .canvas-wrapper {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto 20px;
-            border: 2px solid #000;
-            border-radius: 5px;
-            overflow: hidden;
+        .puzzle-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            max-width: 100%;
         }
-        canvas {
-            display: block;
-            width: 100%;
-            height: auto;
+        .board {
+            width: 300px;
+            height: 300px;
+            border: 3px dashed #666;
+            background: white;
+            position: relative;
+        }
+        .pieces {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 200px;
+        }
+        .lizard-piece {
+            width: 60px;
+            height: 60px;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .lizard-piece:hover {
+            transform: scale(1.1);
+        }
+        .lizard-piece.dragging {
+            opacity: 0.7;
         }
         .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin: 20px 0;
         }
         button {
-            padding: 10px 15px;
-            background: #000;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #333;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
+        .instructions {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 500px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Escher's Ornamental Reptile</h1>
-        <div class="canvas-wrapper">
-            <canvas id="mainCanvas"></canvas>
-        </div>
+        <h1>Escher Lizard Puzzle</h1>
+        <p>Drag the lizards to create a perfect tessellation</p>
+        
         <div class="controls">
-            <button id="invert">Invert Colors</button>
-            <button id="animate">Animate</button>
+            <button id="resetBtn">Reset Puzzle</button>
+            <button id="solveBtn">Show Solution</button>
+        </div>
+        
+        <div class="puzzle-area">
+            <div class="board" id="puzzleBoard"></div>
+            <div class="pieces" id="pieceContainer"></div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to solve:</h3>
+            <p>Drag lizards from the right onto the board. Arrange them so they interlock perfectly without gaps.</p>
+            <p>Each lizard should touch its neighbors exactly like in Escher's original pattern.</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('mainCanvas');
-            const ctx = canvas.getContext('2d');
+            const board = document.getElementById('puzzleBoard');
+            const pieceContainer = document.getElementById('pieceContainer');
+            const resetBtn = document.getElementById('resetBtn');
+            const solveBtn = document.getElementById('solveBtn');
             
-            let isInverted = false;
-            let isAnimating = false;
-            let animationId = null;
+            const lizardSize = 60;
+            const boardSize = 300;
+            const lizardPositions = [];
             
-            function resizeCanvas() {
-                const container = canvas.parentElement;
-                const size = Math.min(container.offsetWidth, 500);
-                canvas.width = size;
-                canvas.height = size;
-                draw();
+            // Create SVG lizard shape (simplified Escher reptile)
+            function createLizardSVG(rotation = 0, isDraggable = true) {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("width", lizardSize.toString());
+                svg.setAttribute("height", lizardSize.toString());
+                svg.setAttribute("viewBox", "0 0 100 100");
+                if (isDraggable) {
+                    svg.classList.add("lizard-piece");
+                }
+                
+                // Lizard body path (simplified Escher shape)
+                const lizardPath = document.createElementNS(svgNS, "path");
+                lizardPath.setAttribute("d", "M30,50 C20,30 40,20 50,30 C60,20 80,30 70,50 C80,70 60,80 50,70 C40,80 20,70 30,50 Z");
+                lizardPath.setAttribute("fill", "#4CAF50");
+                lizardPath.setAttribute("stroke", "#2E7D32");
+                lizardPath.setAttribute("stroke-width", "2");
+                
+                // Lizard head
+                const head = document.createElementNS(svgNS, "circle");
+                head.setAttribute("cx", "65");
+                head.setAttribute("cy", "40");
+                head.setAttribute("r", "8");
+                head.setAttribute("fill", "#2E7D32");
+                
+                // Lizard eye
+                const eye = document.createElementNS(svgNS, "circle");
+                eye.setAttribute("cx", "67");
+                eye.setAttribute("cy", "38");
+                eye.setAttribute("r", "2");
+                eye.setAttribute("fill", "white");
+                
+                // Pattern lines on back
+                const line1 = document.createElementNS(svgNS, "line");
+                line1.setAttribute("x1", "45");
+                line1.setAttribute("y1", "35");
+                line1.setAttribute("x2", "55");
+                line1.setAttribute("y2", "35");
+                line1.setAttribute("stroke", "#2E7D32");
+                line1.setAttribute("stroke-width", "1");
+                
+                const line2 = document.createElementNS(svgNS, "line");
+                line2.setAttribute("x1", "40");
+                line2.setAttribute("y1", "45");
+                line2.setAttribute("x2", "60");
+                line2.setAttribute("y2", "45");
+                line2.setAttribute("stroke", "#2E7D32");
+                line2.setAttribute("stroke-width", "1");
+                
+                svg.appendChild(lizardPath);
+                svg.appendChild(head);
+                svg.appendChild(eye);
+                svg.appendChild(line1);
+                svg.appendChild(line2);
+                
+                // Apply rotation
+                if (rotation !== 0) {
+                    const g = document.createElementNS(svgNS, "g");
+                    g.setAttribute("transform", `rotate(${rotation}, 50, 50)`);
+                    while (svg.firstChild) {
+                        g.appendChild(svg.firstChild);
+                    }
+                    svg.appendChild(g);
+                }
+                
+                return svg;
             }
             
-            function drawEscherReptile(ctx, x, y, size, rotation = 0) {
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(rotation);
+            // Create puzzle pieces
+            function createPuzzlePieces() {
+                pieceContainer.innerHTML = '';
                 
-                // Set colors based on inversion
-                ctx.strokeStyle = isInverted ? '#fff' : '#000';
-                ctx.fillStyle = isInverted ? '#000' : '#fff';
-                ctx.lineWidth = 2;
-                
-                // Draw the ornamental reptile body (curved, organic shape)
-                ctx.beginPath();
-                
-                // Tail start (left side)
-                ctx.moveTo(-size * 0.8, size * 0.1);
-                
-                // Curve to back
-                ctx.bezierCurveTo(
-                    -size * 1.2, size * 0.3,
-                    -size * 1.0, -size * 0.2,
-                    -size * 0.6, -size * 0.4
-                );
-                
-                // Back curve to head
-                ctx.bezierCurveTo(
-                    -size * 0.3, -size * 0.6,
-                    size * 0.3, -size * 0.6,
-                    size * 0.6, -size * 0.4
-                );
-                
-                // Head curve to front leg
-                ctx.bezierCurveTo(
-                    size * 0.9, -size * 0.2,
-                    size * 1.2, size * 0.1,
-                    size * 0.8, size * 0.3
-                );
-                
-                // Front to belly curve
-                ctx.bezierCurveTo(
-                    size * 0.5, size * 0.5,
-                    -size * 0.5, size * 0.5,
-                    -size * 0.8, size * 0.3
-                );
-                
-                // Close the path back to tail
-                ctx.bezierCurveTo(
-                    -size * 1.0, size * 0.2,
-                    -size * 1.0, size * 0.2,
-                    -size * 0.8, size * 0.1
-                );
-                
-                ctx.fill();
-                ctx.stroke();
-                
-                // Add ornamental details
-                
-                // Eye
-                ctx.fillStyle = isInverted ? '#fff' : '#000';
-                ctx.beginPath();
-                ctx.arc(size * 0.4, -size * 0.3, size * 0.08, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Back pattern lines
-                ctx.strokeStyle = isInverted ? '#fff' : '#000';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.2, -size * 0.5);
-                ctx.lineTo(size * 0.2, -size * 0.5);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.3, -size * 0.4);
-                ctx.lineTo(size * 0.3, -size * 0.4);
-                ctx.stroke();
-                
-                // Legs (ornamental style)
-                ctx.lineWidth = size * 0.08;
-                ctx.beginPath();
-                ctx.moveTo(size * 0.3, size * 0.1);
-                ctx.lineTo(size * 0.5, size * 0.3);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.3, size * 0.1);
-                ctx.lineTo(-size * 0.5, size * 0.3);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(size * 0.1, size * 0.3);
-                ctx.lineTo(size * 0.3, size * 0.5);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.1, size * 0.3);
-                ctx.lineTo(-size * 0.3, size * 0.5);
-                ctx.stroke();
-                
-                ctx.restore();
+                // Create lizards with different rotations
+                const rotations = [0, 90, 180, 270];
+                for (let i = 0; i < 6; i++) {
+                    const rotation = rotations[i % rotations.length];
+                    const lizard = createLizardSVG(rotation, true);
+                    
+                    lizard.addEventListener('mousedown', startDrag);
+                    lizard.addEventListener('touchstart', startDrag);
+                    
+                    pieceContainer.appendChild(lizard);
+                }
             }
             
-            function draw(offset = 0) {
-                const width = canvas.width;
-                const height = canvas.height;
+            // Drag and drop functionality
+            let draggedPiece = null;
+            let offsetX, offsetY;
+            
+            function startDrag(e) {
+                e.preventDefault();
+                draggedPiece = e.target.closest('.lizard-piece');
+                if (!draggedPiece) return;
                 
-                // Clear canvas
-                ctx.fillStyle = isInverted ? '#000' : '#fff';
-                ctx.fillRect(0, 0, width, height);
+                draggedPiece.classList.add('dragging');
                 
-                const reptileSize = width / 10;
-                const cols = 6;
-                const rows = 6;
+                const rect = draggedPiece.getBoundingClientRect();
+                if (e.type === 'mousedown') {
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                } else {
+                    offsetX = e.touches[0].clientX - rect.left;
+                    offsetY = e.touches[0].clientY - rect.top;
+                    document.addEventListener('touchmove', onDrag);
+                    document.addEventListener('touchend', stopDrag);
+                }
+            }
+            
+            function onDrag(e) {
+                if (!draggedPiece) return;
                 
-                // Draw tessellating reptiles
+                const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+                
+                draggedPiece.style.position = 'fixed';
+                draggedPiece.style.left = (clientX - offsetX) + 'px';
+                draggedPiece.style.top = (clientY - offsetY) + 'px';
+                draggedPiece.style.zIndex = '1000';
+            }
+            
+            function stopDrag(e) {
+                if (!draggedPiece) return;
+                
+                draggedPiece.classList.remove('dragging');
+                draggedPiece.style.position = '';
+                draggedPiece.style.left = '';
+                draggedPiece.style.top = '';
+                draggedPiece.style.zIndex = '';
+                
+                // Check if dropped on board
+                const boardRect = board.getBoundingClientRect();
+                const lizardRect = draggedPiece.getBoundingClientRect();
+                
+                if (lizardRect.left < boardRect.right && 
+                    lizardRect.right > boardRect.left &&
+                    lizardRect.top < boardRect.bottom && 
+                    lizardRect.bottom > boardRect.top) {
+                    
+                    // Position relative to board
+                    const x = (lizardRect.left + lizardRect.width/2 - boardRect.left) / boardRect.width * boardSize;
+                    const y = (lizardRect.top + lizardRect.height/2 - boardRect.top) / boardRect.height * boardSize;
+                    
+                    placeLizardOnBoard(draggedPiece.cloneNode(true), x, y);
+                }
+                
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', onDrag);
+                document.removeEventListener('touchend', stopDrag);
+                draggedPiece = null;
+            }
+            
+            function placeLizardOnBoard(lizard, x, y) {
+                lizard.style.position = 'absolute';
+                lizard.style.left = (x - lizardSize/2) + 'px';
+                lizard.style.top = (y - lizardSize/2) + 'px';
+                lizard.style.cursor = 'move';
+                
+                lizard.addEventListener('mousedown', startDrag);
+                lizard.addEventListener('touchstart', startDrag);
+                
+                board.appendChild(lizard);
+                lizardPositions.push({element: lizard, x: x, y: y});
+            }
+            
+            function resetPuzzle() {
+                board.innerHTML = '';
+                lizardPositions.length = 0;
+                createPuzzlePieces();
+            }
+            
+            function showSolution() {
+                resetPuzzle();
+                
+                // Create perfect tessellation pattern
+                const cols = 3;
+                const rows = 3;
+                const spacingX = boardSize / cols;
+                const spacingY = boardSize / rows;
+                
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
-                        const x = (col * width / cols) + (width / cols / 2);
-                        let y = (row * height / rows) + (height / rows / 2);
+                        const x = col * spacingX + spacingX/2;
+                        const y = row * spacingY + spacingY/2;
+                        const rotation = (row + col) % 2 === 0 ? 0 : 180;
                         
-                        // Add subtle animation movement
-                        if (isAnimating) {
-                            y += Math.sin(offset + col * 0.8 + row * 0.4) * 5;
-                        }
-                        
-                        // Alternate orientation for interlocking pattern
-                        const rotation = (row + col) % 2 === 0 ? 0 : Math.PI;
-                        
-                        drawEscherReptile(ctx, x, y, reptileSize * 0.8, rotation);
+                        const lizard = createLizardSVG(rotation, false);
+                        placeLizardOnBoard(lizard, x, y);
                     }
                 }
-            }
-            
-            function animate() {
-                let startTime = null;
-                
-                function loop(timestamp) {
-                    if (!startTime) startTime = timestamp;
-                    const elapsed = timestamp - startTime;
-                    const offset = elapsed * 0.002;
-                    
-                    draw(offset);
-                    
-                    if (isAnimating) {
-                        animationId = requestAnimationFrame(loop);
-                    }
-                }
-                
-                animationId = requestAnimationFrame(loop);
             }
             
             // Event listeners
-            document.getElementById('invert').addEventListener('click', function() {
-                isInverted = !isInverted;
-                draw();
-            });
+            resetBtn.addEventListener('click', resetPuzzle);
+            solveBtn.addEventListener('click', showSolution);
             
-            document.getElementById('animate').addEventListener('click', function() {
-                isAnimating = !isAnimating;
-                if (isAnimating) {
-                    animate();
-                } else {
-                    cancelAnimationFrame(animationId);
-                    draw();
-                }
-            });
+            // Initialize
+            createPuzzlePieces();
             
-            // Initial setup
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
+            // Make board a drop zone
+            board.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
         });
     </script>
 </body>
