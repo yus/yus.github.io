@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escher Reptile Primitive</title>
+    <title>Escher's Ornamental Reptile</title>
     <style>
         * {
             margin: 0;
@@ -54,36 +54,17 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .shape-info {
-            max-width: 500px;
-            text-align: left;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Escher's Reptile Primitive</h1>
-        
+        <h1>Escher's Ornamental Reptile</h1>
         <div class="canvas-wrapper">
             <canvas id="mainCanvas"></canvas>
         </div>
-        
         <div class="controls">
-            <button id="toggleGrid">Toggle Grid</button>
-            <button id="toggleOutline">Toggle Outline</button>
             <button id="invert">Invert Colors</button>
-        </div>
-        
-        <div class="shape-info">
-            <h3>About the Shape:</h3>
-            <p>Escher's reptile is a simple concave hexagon that tessellates perfectly. The key features:</p>
-            <ul>
-                <li>6-sided concave polygon</li>
-                <li>Head and tail indentations create interlocking pattern</li>
-                <li>All reptiles are identical and fit together without gaps</li>
-                <li>Based on a hexagonal grid structure</li>
-            </ul>
+            <button id="animate">Animate</button>
         </div>
     </div>
 
@@ -92,61 +73,119 @@
             const canvas = document.getElementById('mainCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Responsive sizing
+            let isInverted = false;
+            let isAnimating = false;
+            let animationId = null;
+            
             function resizeCanvas() {
                 const container = canvas.parentElement;
                 const size = Math.min(container.offsetWidth, 500);
                 canvas.width = size;
-                canvas.height = size * 0.8;
+                canvas.height = size;
                 draw();
             }
             
-            let showGrid = true;
-            let showOutline = true;
-            let isInverted = false;
-            
-            // Escher reptile primitive coordinates (simplified concave hexagon)
-            function createReptileShape(size) {
-                // This creates the classic interlocking reptile shape
-                return [
-                    // Starting from top-left, moving clockwise
-                    { x: -size * 0.5, y: -size * 0.25 },    // Top-left
-                    { x: 0, y: -size * 0.5 },               // Top-middle (head indentation)
-                    { x: size * 0.5, y: -size * 0.25 },     // Top-right
-                    { x: size * 0.5, y: size * 0.25 },      // Bottom-right
-                    { x: 0, y: size * 0.5 },                // Bottom-middle (tail indentation)
-                    { x: -size * 0.5, y: size * 0.25 }      // Bottom-left
-                ];
-            }
-            
-            function drawReptile(ctx, x, y, size, rotation = 0) {
+            function drawEscherReptile(ctx, x, y, size, rotation = 0) {
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(rotation);
                 
-                const shape = createReptileShape(size);
-                
-                // Draw fill
+                // Set colors based on inversion
+                ctx.strokeStyle = isInverted ? '#fff' : '#000';
                 ctx.fillStyle = isInverted ? '#000' : '#fff';
+                ctx.lineWidth = 2;
+                
+                // Draw the ornamental reptile body (curved, organic shape)
                 ctx.beginPath();
-                ctx.moveTo(shape[0].x, shape[0].y);
-                for (let i = 1; i < shape.length; i++) {
-                    ctx.lineTo(shape[i].x, shape[i].y);
-                }
-                ctx.closePath();
+                
+                // Tail start (left side)
+                ctx.moveTo(-size * 0.8, size * 0.1);
+                
+                // Curve to back
+                ctx.bezierCurveTo(
+                    -size * 1.2, size * 0.3,
+                    -size * 1.0, -size * 0.2,
+                    -size * 0.6, -size * 0.4
+                );
+                
+                // Back curve to head
+                ctx.bezierCurveTo(
+                    -size * 0.3, -size * 0.6,
+                    size * 0.3, -size * 0.6,
+                    size * 0.6, -size * 0.4
+                );
+                
+                // Head curve to front leg
+                ctx.bezierCurveTo(
+                    size * 0.9, -size * 0.2,
+                    size * 1.2, size * 0.1,
+                    size * 0.8, size * 0.3
+                );
+                
+                // Front to belly curve
+                ctx.bezierCurveTo(
+                    size * 0.5, size * 0.5,
+                    -size * 0.5, size * 0.5,
+                    -size * 0.8, size * 0.3
+                );
+                
+                // Close the path back to tail
+                ctx.bezierCurveTo(
+                    -size * 1.0, size * 0.2,
+                    -size * 1.0, size * 0.2,
+                    -size * 0.8, size * 0.1
+                );
+                
+                ctx.fill();
+                ctx.stroke();
+                
+                // Add ornamental details
+                
+                // Eye
+                ctx.fillStyle = isInverted ? '#fff' : '#000';
+                ctx.beginPath();
+                ctx.arc(size * 0.4, -size * 0.3, size * 0.08, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Draw outline
-                if (showOutline) {
-                    ctx.strokeStyle = isInverted ? '#fff' : '#000';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
+                // Back pattern lines
+                ctx.strokeStyle = isInverted ? '#fff' : '#000';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.2, -size * 0.5);
+                ctx.lineTo(size * 0.2, -size * 0.5);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.3, -size * 0.4);
+                ctx.lineTo(size * 0.3, -size * 0.4);
+                ctx.stroke();
+                
+                // Legs (ornamental style)
+                ctx.lineWidth = size * 0.08;
+                ctx.beginPath();
+                ctx.moveTo(size * 0.3, size * 0.1);
+                ctx.lineTo(size * 0.5, size * 0.3);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.3, size * 0.1);
+                ctx.lineTo(-size * 0.5, size * 0.3);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(size * 0.1, size * 0.3);
+                ctx.lineTo(size * 0.3, size * 0.5);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.1, size * 0.3);
+                ctx.lineTo(-size * 0.3, size * 0.5);
+                ctx.stroke();
                 
                 ctx.restore();
             }
             
-            function draw() {
+            function draw(offset = 0) {
                 const width = canvas.width;
                 const height = canvas.height;
                 
@@ -154,75 +193,61 @@
                 ctx.fillStyle = isInverted ? '#000' : '#fff';
                 ctx.fillRect(0, 0, width, height);
                 
-                const reptileSize = Math.min(width, height) / 8;
-                const cols = Math.floor(width / (reptileSize * 1.5));
-                const rows = Math.floor(height / (reptileSize * 1.5));
+                const reptileSize = width / 10;
+                const cols = 6;
+                const rows = 6;
                 
-                // Draw grid
-                if (showGrid) {
-                    ctx.strokeStyle = isInverted ? '#333' : '#ccc';
-                    ctx.lineWidth = 1;
-                    
-                    // Vertical lines
-                    for (let x = 0; x <= cols; x++) {
-                        ctx.beginPath();
-                        ctx.moveTo(x * reptileSize * 1.5, 0);
-                        ctx.lineTo(x * reptileSize * 1.5, height);
-                        ctx.stroke();
-                    }
-                    
-                    // Horizontal lines
-                    for (let y = 0; y <= rows; y++) {
-                        ctx.beginPath();
-                        ctx.moveTo(0, y * reptileSize * 1.5);
-                        ctx.lineTo(width, y * reptileSize * 1.5);
-                        ctx.stroke();
-                    }
-                }
-                
-                // Draw reptiles in interlocking pattern
+                // Draw tessellating reptiles
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
-                        const x = col * reptileSize * 1.5 + reptileSize * 0.75;
-                        const y = row * reptileSize * 1.5 + reptileSize * 0.75;
+                        const x = (col * width / cols) + (width / cols / 2);
+                        let y = (row * height / rows) + (height / rows / 2);
                         
-                        // Alternate rotation for interlocking
+                        // Add subtle animation movement
+                        if (isAnimating) {
+                            y += Math.sin(offset + col * 0.8 + row * 0.4) * 5;
+                        }
+                        
+                        // Alternate orientation for interlocking pattern
                         const rotation = (row + col) % 2 === 0 ? 0 : Math.PI;
                         
-                        drawReptile(ctx, x, y, reptileSize, rotation);
+                        drawEscherReptile(ctx, x, y, reptileSize * 0.8, rotation);
+                    }
+                }
+            }
+            
+            function animate() {
+                let startTime = null;
+                
+                function loop(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const elapsed = timestamp - startTime;
+                    const offset = elapsed * 0.002;
+                    
+                    draw(offset);
+                    
+                    if (isAnimating) {
+                        animationId = requestAnimationFrame(loop);
                     }
                 }
                 
-                // Draw center reptile with highlight
-                ctx.save();
-                ctx.translate(width / 2, height / 2);
-                
-                // Highlight effect
-                ctx.fillStyle = isInverted ? '#fff' : '#000';
-                ctx.globalAlpha = 0.1;
-                ctx.beginPath();
-                ctx.arc(0, 0, reptileSize * 1.2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-                
-                drawReptile(ctx, 0, 0, reptileSize * 1.1, 0);
-                ctx.restore();
+                animationId = requestAnimationFrame(loop);
             }
             
             // Event listeners
-            document.getElementById('toggleGrid').addEventListener('click', function() {
-                showGrid = !showGrid;
-                draw();
-            });
-            
-            document.getElementById('toggleOutline').addEventListener('click', function() {
-                showOutline = !showOutline;
-                draw();
-            });
-            
             document.getElementById('invert').addEventListener('click', function() {
                 isInverted = !isInverted;
                 draw();
+            });
+            
+            document.getElementById('animate').addEventListener('click', function() {
+                isAnimating = !isAnimating;
+                if (isAnimating) {
+                    animate();
+                } else {
+                    cancelAnimationFrame(animationId);
+                    draw();
+                }
             });
             
             // Initial setup
