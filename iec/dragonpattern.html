@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escher Dragon Pattern</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e6e6e6;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4cc9f0;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #a5b1c2;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 10px;
+        }
+        label {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            width: 150px;
+        }
+        button {
+            background: #4cc9f0;
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        button:hover {
+            background: #3aa8d0;
+            transform: translateY(-2px);
+        }
+        #canvas-container {
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        .info {
+            max-width: 800px;
+            background: rgba(30, 30, 50, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        .info h2 {
+            color: #4cc9f0;
+            margin-top: 0;
+        }
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+        .color-option.active {
+            border-color: white;
+            transform: scale(1.2);
+        }
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #a5b1c2;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Escher-Style Dragon Pattern</h1>
+            <div class="subtitle">Inspired by M.C. Escher's tessellation artworks</div>
+        </header>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="density">Dragon Density</label>
+                <input type="range" id="density" min="3" max="10" value="5">
+            </div>
+            <div class="control-group">
+                <label for="size">Dragon Size</label>
+                <input type="range" id="size" min="20" max="80" value="40">
+            </div>
+            <div class="control-group">
+                <label for="rotation">Rotation</label>
+                <input type="range" id="rotation" min="0" max="360" value="0">
+            </div>
+            <div class="control-group">
+                <label>Color Scheme</label>
+                <div class="color-palette">
+                    <div class="color-option active" style="background: linear-gradient(135deg, #4cc9f0, #4361ee);" data-palette="0"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #f72585, #7209b7);" data-palette="1"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #f9c74f, #f8961e);" data-palette="2"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #90be6d, #43aa8b);" data-palette="3"></div>
+                </div>
+            </div>
+            <div class="control-group">
+                <button id="animate-btn">Toggle Animation</button>
+                <button id="randomize-btn">Randomize</button>
+            </div>
+        </div>
+        
+        <div id="canvas-container"></div>
+        
+        <div class="info">
+            <h2>About Escher's Dragon Patterns</h2>
+            <p>M.C. Escher was a Dutch graphic artist known for his mathematically inspired lithographs, woodcuts, and mezzotints. His works feature impossible constructions, explorations of infinity, and tessellations.</p>
+            <p>This interactive visualization recreates the style of Escher's dragon tessellations, where dragon shapes fit together perfectly without gaps. The pattern is generated using p5.js with parameters you can adjust to create your own unique dragon patterns.</p>
+        </div>
+        
+        <footer>
+            <p>Created with p5.js | Inspired by M.C. Escher's tessellation art</p>
+        </footer>
+    </div>
+
+    <script>
+        // p5.js sketch
+        let density = 5;
+        let dragonSize = 40;
+        let rotation = 0;
+        let isAnimating = false;
+        let animationOffset = 0;
+        let colorPalette = 0;
+        
+        // Color palettes
+        const palettes = [
+            { primary: [76, 201, 240], secondary: [67, 97, 238], background: [26, 26, 46] },
+            { primary: [247, 37, 133], secondary: [114, 9, 183], background: [30, 20, 40] },
+            { primary: [249, 199, 79], secondary: [248, 150, 30], background: [40, 30, 20] },
+            { primary: [144, 190, 109], secondary: [67, 170, 139], background: [20, 30, 25] }
+        ];
+        
+        function setup() {
+            const container = document.getElementById('canvas-container');
+            const width = Math.min(800, window.innerWidth - 40);
+            const canvas = createCanvas(width, width * 0.8);
+            canvas.parent('canvas-container');
+            
+            // Set up controls
+            document.getElementById('density').addEventListener('input', function() {
+                density = parseInt(this.value);
+                redraw();
+            });
+            
+            document.getElementById('size').addEventListener('input', function() {
+                dragonSize = parseInt(this.value);
+                redraw();
+            });
+            
+            document.getElementById('rotation').addEventListener('input', function() {
+                rotation = parseInt(this.value);
+                redraw();
+            });
+            
+            document.getElementById('animate-btn').addEventListener('click', function() {
+                isAnimating = !isAnimating;
+                if (isAnimating) {
+                    loop();
+                }
+            });
+            
+            document.getElementById('randomize-btn').addEventListener('click', function() {
+                density = Math.floor(Math.random() * 8) + 3;
+                dragonSize = Math.floor(Math.random() * 60) + 20;
+                rotation = Math.floor(Math.random() * 360);
+                colorPalette = Math.floor(Math.random() * 4);
+                
+                document.getElementById('density').value = density;
+                document.getElementById('size').value = dragonSize;
+                document.getElementById('rotation').value = rotation;
+                
+                // Update color buttons
+                document.querySelectorAll('.color-option').forEach((btn, idx) => {
+                    btn.classList.toggle('active', idx === colorPalette);
+                });
+                
+                redraw();
+            });
+            
+            // Color palette buttons
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    colorPalette = parseInt(this.getAttribute('data-palette'));
+                    redraw();
+                });
+            });
+            
+            noLoop(); // Start with no animation
+        }
+        
+        function draw() {
+            background(palettes[colorPalette].background);
+            
+            // Add animation effect if enabled
+            if (isAnimating) {
+                animationOffset += 0.02;
+            }
+            
+            // Calculate spacing based on density
+            const spacing = width / density;
+            
+            // Draw the dragon pattern
+            for (let x = 0; x < density; x++) {
+                for (let y = 0; y < density; y++) {
+                    push();
+                    
+                    // Calculate position with slight offset for more organic feel
+                    const xPos = x * spacing + spacing/2;
+                    const yPos = y * spacing + spacing/2;
+                    
+                    // Add subtle animation movement
+                    const animX = isAnimating ? sin(animationOffset + x * 0.5) * 5 : 0;
+                    const animY = isAnimating ? cos(animationOffset + y * 0.5) * 5 : 0;
+                    
+                    translate(xPos + animX, yPos + animY);
+                    rotate(radians(rotation));
+                    
+                    // Alternate dragon orientation for tessellation effect
+                    if ((x + y) % 2 === 0) {
+                        scale(1, 1);
+                    } else {
+                        scale(-1, 1);
+                    }
+                    
+                    // Draw the dragon
+                    drawEscherDragon(0, 0, dragonSize, colorPalette, x, y);
+                    
+                    pop();
+                }
+            }
+        }
+        
+        function drawEscherDragon(x, y, size, paletteIndex, gridX, gridY) {
+            const palette = palettes[paletteIndex];
+            
+            // Dragon body (main curve)
+            stroke(palette.primary);
+            strokeWeight(size / 10);
+            noFill();
+            
+            // Create dragon curve using bezier curves
+            const curveDetail = 8;
+            for (let i = 0; i < curveDetail; i++) {
+                const t = i / curveDetail;
+                const nextT = (i + 1) / curveDetail;
+                
+                // Calculate points along a dragon-like curve
+                const x1 = x + sin(t * TWO_PI) * size * 0.8;
+                const y1 = y + cos(t * TWO_PI) * size * 0.4 - size * 0.3;
+                
+                const x2 = x + sin(nextT * TWO_PI) * size * 0.8;
+                const y2 = y + cos(nextT * TWO_PI) * size * 0.4 - size * 0.3;
+                
+                // Add some variation based on position for more organic look
+                const variation = sin(gridX * 2 + gridY * 3 + t * 10) * 0.2;
+                
+                line(x1, y1 + variation * size, x2, y2 + variation * size);
+            }
+            
+            // Dragon head
+            fill(palette.secondary);
+            noStroke();
+            ellipse(x, y - size * 0.7, size * 0.4, size * 0.3);
+            
+            // Dragon eyes
+            fill(255, 200);
+            ellipse(x - size * 0.1, y - size * 0.72, size * 0.15, size * 0.15);
+            ellipse(x + size * 0.1, y - size * 0.72, size * 0.15, size * 0.15);
+            fill(0, 150);
+            ellipse(x - size * 0.1, y - size * 0.72, size * 0.07, size * 0.07);
+            ellipse(x + size * 0.1, y - size * 0.72, size * 0.07, size * 0.07);
+            
+            // Dragon wings
+            stroke(palette.secondary);
+            strokeWeight(size / 15);
+            noFill();
+            
+            // Left wing
+            beginShape();
+            vertex(x - size * 0.2, y - size * 0.4);
+            quadraticVertex(
+                x - size * 0.6, y - size * 0.5,
+                x - size * 0.5, y - size * 0.1
+            );
+            quadraticVertex(
+                x - size * 0.4, y + size * 0.2,
+                x - size * 0.2, y + size * 0.1
+            );
+            endShape();
+            
+            // Right wing
+            beginShape();
+            vertex(x + size * 0.2, y - size * 0.4);
+            quadraticVertex(
+                x + size * 0.6, y - size * 0.5,
+                x + size * 0.5, y - size * 0.1
+            );
+            quadraticVertex(
+                x + size * 0.4, y + size * 0.2,
+                x + size * 0.2, y + size * 0.1
+            );
+            endShape();
+            
+            // Dragon tail
+            stroke(palette.primary);
+            strokeWeight(size / 12);
+            
+            beginShape();
+            vertex(x, y + size * 0.3);
+            for (let i = 1; i <= 5; i++) {
+                const segmentX = x + sin(i * 0.7) * size * 0.2 * (i % 2 === 0 ? -1 : 1);
+                const segmentY = y + size * 0.3 + i * size * 0.15;
+                vertex(segmentX, segmentY);
+            }
+            endShape();
+        }
+        
+        function windowResized() {
+            const width = Math.min(800, window.innerWidth - 40);
+            resizeCanvas(width, width * 0.8);
+            redraw();
+        }
+    </script>
+</body>
+</html>
