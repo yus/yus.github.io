@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial; }
+        .container { display: flex; }
+        #canvasContainer { margin-right: 20px; }
+        #svgOutput { 
+            background: white; 
+            padding: 10px; 
+            border: 1px solid #ccc;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h3>Escher-style Dragon to SVG Path</h3>
+    <div class="container">
+        <div id="canvasContainer"></div>
+        <div>
+            <button onclick="generateNewDragon()">Generate New Dragon</button>
+            <button onclick="exportSVG()">Export as SVG</button>
+            <div id="svgOutput"></div>
+        </div>
+    </div>
+
+    <script>
+function setup() {
+    let canvas = createCanvas(600, 400);
+    canvas.parent('canvasContainer');
+    generateNewDragon();
+}
+
+function generateNewDragon() {
+    background(255);
+    drawDragonAsSVGPath();
+}
+
+function drawDragonAsSVGPath() {
+    // Generate dragon points
+    let points = generateDragonPoints([
+        {x: 100, y: 200},
+        {x: 500, y: 200}
+    ], 8);
+    
+    // Create SVG path data
+    let pathData = createSVGPathData(points);
+    
+    // Draw using p5.js
+    stroke(0);
+    strokeWeight(2);
+    noFill();
+    
+    beginShape();
+    for (let i = 0; i < points.length; i++) {
+        if (i === 0) {
+            vertex(points[i].x, points[i].y);
+        } else {
+            curveVertex(points[i].x, points[i].y);
+        }
+    }
+    endShape();
+    
+    // Display SVG path data
+    document.getElementById('svgOutput').innerHTML = 
+        '<h4>SVG Path Data:</h4><textarea style="width:100%; height:100px;">' + 
+        pathData + '</textarea>';
+}
+
+function createSVGPathData(points) {
+    if (points.length < 2) return '';
+    
+    let path = `M ${points[0].x} ${points[0].y}`;
+    
+    for (let i = 1; i < points.length - 2; i++) {
+        let p0 = points[i-1];
+        let p1 = points[i];
+        let p2 = points[i+1];
+        let p3 = points[i+2];
+        
+        // Catmull-Rom to Bezier conversion
+        let cp1x = p1.x + (p2.x - p0.x) / 6;
+        let cp1y = p1.y + (p2.y - p0.y) / 6;
+        let cp2x = p2.x - (p3.x - p1.x) / 6;
+        let cp2y = p2.y - (p3.y - p1.y) / 6;
+        
+        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+    }
+    
+    return path;
+}
+
+function exportSVG() {
+    let points = generateDragonPoints([
+        {x: 100, y: 200},
+        {x: 500, y: 200}
+    ], 8);
+    
+    let pathData = createSVGPathData(points);
+    
+    let svgContent = `
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+    <path d="${pathData}" stroke="black" fill="none" stroke-width="2"/>
+</svg>`;
+    
+    // Create download link
+    let blob = new Blob([svgContent], {type: 'image/svg+xml'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'escher-dragon.svg';
+    a.click();
+}
+
+// Dragon generation functions (same as previous example)
+function generateDragonPoints(points, depth) {
+    if (depth <= 0) return points;
+    
+    let newPoints = [];
+    for (let i = 0; i < points.length - 1; i++) {
+        let p1 = points[i];
+        let p2 = points[i + 1];
+        
+        newPoints.push(p1);
+        
+        let mid = {
+            x: (p1.x + p2.x) / 2,
+            y: (p1.y + p2.y) / 2
+        };
+        
+        let dx = p2.x - p1.x;
+        let dy = p2.y - p1.y;
+        let angle = (i % 2 === 0) ? PI/4 : -PI/4;
+        let rotated = rotatePoint(p1, mid, angle);
+        
+        newPoints.push(rotated);
+    }
+    newPoints.push(points[points.length - 1]);
+    
+    return generateDragonPoints(newPoints, depth - 1);
+}
+
+function rotatePoint(center, point, angle) {
+    let s = sin(angle);
+    let c = cos(angle);
+    let px = point.x - center.x;
+    let py = point.y - center.y;
+    let xnew = px * c - py * s;
+    let ynew = px * s + py * c;
+    return { x: xnew + center.x, y: ynew + center.y };
+}
+    </script>
+</body>
+</html>
