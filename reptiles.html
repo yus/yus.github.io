@@ -3,174 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escher Reptiles - Working Version</title>
-    <script src="https://cdnjs.cloudflare.com/p5.js/1.7.0/p5.min.js"></script>
+    <title>Escher Reptiles - Mobile</title>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #fff;
+            font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #ffffff;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif;
+            justify-content: center;
         }
-        @media (max-width: 768px) {
-            .container {
-            width: 100%;
-            }
+        .container {
+            max-width: 100%;
+            text-align: center;
         }
         h1 {
             color: #000;
             margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .canvas-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
         }
         .controls {
-            margin: 20px 0;
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
         }
         button {
-            padding: 8px 16px;
+            padding: 10px 15px;
             background: #000;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+            min-width: 120px;
         }
-        canvas {
-            border: 2px solid #000;
-            display: block;
+        .info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 500px;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
         }
-        img {
-            max-width: 100%;
-            height: auto;
+        .info h2 {
+            color: #000;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1>Escher's Reptiles Pattern</h1>
-    <div class="controls">
-        <button id="regenerate">New Pattern</button>
-        <button id="invert">Invert Colors</button>
+    <div class="container">
+        <h1>Escher's Reptiles</h1>
+        <div class="subtitle">Mobile-Friendly Tessellation</div>
+        
+        <div class="canvas-wrapper">
+            <!-- Canvas will be inserted here -->
+        </div>
+        
+        <div class="controls">
+            <button id="regenerate">New Pattern</button>
+            <button id="invert">Invert Colors</button>
+            <button id="animate">Animate</button>
+        </div>
+        
+        <div class="info">
+            <h2>About This Pattern</h2>
+            <p>This is a simplified version of M.C. Escher's famous reptile tessellation. The lizards interlock perfectly without gaps, creating a seamless pattern.</p>
+            <p>Use the buttons to generate new patterns or invert the colors.</p>
+        </div>
     </div>
 
     <script>
-        let isInverted = false;
-        
-        function setup() {
-            // Create canvas - using fixed size for reliability
-            const canvas = createCanvas(800, 600);
-            canvas.parent('body');
-            canvas.style('display', 'block');
-            canvas.style('margin', '20px auto');
-            canvas.style('border', '2px solid #000');
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the container for our canvas
+            const container = document.querySelector('.canvas-wrapper');
             
-            noLoop(); // Don't continuously redraw
+            // Get screen dimensions for responsive sizing
+            const maxWidth = 500;
+            const screenWidth = Math.min(window.innerWidth - 40, maxWidth);
+            const canvasHeight = screenWidth * 0.7;
+            
+            // Create canvas element
+            const canvas = document.createElement('canvas');
+            canvas.width = screenWidth;
+            canvas.height = canvasHeight;
+            canvas.style.width = '100%';
+            canvas.style.height = 'auto';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            let isInverted = false;
+            let isAnimating = false;
+            let animationId = null;
+            
+            // Draw the initial pattern
+            drawPattern();
             
             // Set up button events
-            document.getElementById('regenerate').onclick = drawPattern;
-            document.getElementById('invert').onclick = function() {
+            document.getElementById('regenerate').addEventListener('click', function() {
+                if (isAnimating) {
+                    cancelAnimationFrame(animationId);
+                    isAnimating = false;
+                }
+                drawPattern();
+            });
+            
+            document.getElementById('invert').addEventListener('click', function() {
                 isInverted = !isInverted;
                 drawPattern();
-            };
+            });
             
-            // Initial draw
-            drawPattern();
-        }
-        
-        function drawPattern() {
-            console.log("Drawing pattern..."); // Debug log
+            document.getElementById('animate').addEventListener('click', function() {
+                isAnimating = !isAnimating;
+                if (isAnimating) {
+                    animatePattern();
+                } else {
+                    cancelAnimationFrame(animationId);
+                    drawPattern();
+                }
+            });
             
-            // Clear canvas with appropriate background
-            if (isInverted) {
-                background(0); // Black background
-                stroke(255);   // White lines
-                fill(0);       // Black fill
-            } else {
-                background(255); // White background  
-                stroke(0);      // Black lines
-                fill(255);      // White fill
-            }
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const newWidth = Math.min(window.innerWidth - 40, maxWidth);
+                const newHeight = newWidth * 0.7;
+                
+                if (newWidth !== canvas.width) {
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    drawPattern();
+                }
+            });
             
-            strokeWeight(2);
-            
-            // Simple grid parameters
-            const size = 35;
-            const cols = 8;
-            const rows = 6;
-            
-            // Draw the tessellation pattern
-            for (let x = 0; x < cols; x++) {
-                for (let y = 0; y < rows; y++) {
-                    push(); // Save current transformation state
-                    
-                    // Calculate position with offset for interlocking pattern
-                    const xPos = 50 + x * size * 2.5;
-                    const yPos = 50 + y * size * 2;
-                    
-                    // Alternate rows are offset for tessellation
-                    if (y % 2 === 0) {
-                        translate(xPos, yPos);
-                    } else {
-                        translate(xPos + size * 1.25, yPos);
+            function drawPattern(offset = 0) {
+                // Clear canvas
+                if (isInverted) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = '#fff';
+                    ctx.fillStyle = '#000';
+                } else {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.strokeStyle = '#000';
+                    ctx.fillStyle = '#fff';
+                }
+                
+                ctx.lineWidth = 2;
+                
+                // Calculate size based on canvas dimensions
+                const size = Math.min(canvas.width, canvas.height) / 10;
+                const cols = Math.floor(canvas.width / (size * 2.5));
+                const rows = Math.floor(canvas.height / (size * 2));
+                
+                // Draw the tessellation
+                for (let x = 0; x < cols; x++) {
+                    for (let y = 0; y < rows; y++) {
+                        // Save context state
+                        ctx.save();
+                        
+                        // Calculate position with offset for interlocking pattern
+                        let xPos = x * size * 2.5 + 20;
+                        let yPos = y * size * 2 + 20;
+                        
+                        // Add animation offset if animating
+                        if (isAnimating) {
+                            xPos += Math.sin(offset + x * 0.5) * 3;
+                            yPos += Math.cos(offset + y * 0.5) * 3;
+                        }
+                        
+                        // Alternate rows are offset for tessellation
+                        if (y % 2 === 1) {
+                            xPos += size * 1.25;
+                        }
+                        
+                        ctx.translate(xPos, yPos);
+                        drawReptile(ctx, size, isInverted);
+                        
+                        // Restore context state
+                        ctx.restore();
                     }
-                    
-                    drawReptile(size);
-                    pop(); // Restore transformation state
                 }
             }
-        }
-        
-        function drawReptile(size) {
-            // Draw a simple lizard shape
             
-            // Body (main oval)
-            beginShape();
-            vertex(0, -size * 0.4);
-            vertex(size * 0.6, -size * 0.2);
-            vertex(size * 0.8, 0);
-            vertex(size * 0.6, size * 0.2);
-            vertex(0, size * 0.4);
-            vertex(-size * 0.6, size * 0.2);
-            vertex(-size * 0.8, 0);
-            vertex(-size * 0.6, -size * 0.2);
-            endShape(CLOSE);
-            
-            // Head
-            beginShape();
-            vertex(size * 0.8, -size * 0.1);
-            vertex(size * 1.2, -size * 0.05);
-            vertex(size * 1.3, 0);
-            vertex(size * 1.2, size * 0.05);
-            vertex(size * 0.8, size * 0.1);
-            endShape(CLOSE);
-            
-            // Tail
-            beginShape();
-            vertex(-size * 0.8, -size * 0.05);
-            vertex(-size * 1.4, -size * 0.1);
-            vertex(-size * 1.6, 0);
-            vertex(-size * 1.4, size * 0.1);
-            vertex(-size * 0.8, size * 0.05);
-            endShape(CLOSE);
-            
-            // Legs - simpler approach
-            strokeWeight(size/5);
-            line(size * 0.3, -size * 0.2, size * 0.5, -size * 0.4);
-            line(size * 0.1, -size * 0.3, size * 0.3, -size * 0.5);
-            line(size * 0.3, size * 0.2, size * 0.5, size * 0.4);
-            line(size * 0.1, size * 0.3, size * 0.3, size * 0.5);
-            
-            // Eye
-            strokeWeight(1);
-            if (isInverted) {
-                fill(255);
-            } else {
-                fill(0);
+            function drawReptile(ctx, size, inverted) {
+                // Body (hexagon shape)
+                ctx.beginPath();
+                ctx.moveTo(0, -size * 0.4);
+                ctx.lineTo(size * 0.6, -size * 0.2);
+                ctx.lineTo(size * 0.8, 0);
+                ctx.lineTo(size * 0.6, size * 0.2);
+                ctx.lineTo(0, size * 0.4);
+                ctx.lineTo(-size * 0.6, size * 0.2);
+                ctx.lineTo(-size * 0.8, 0);
+                ctx.lineTo(-size * 0.6, -size * 0.2);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Head
+                ctx.beginPath();
+                ctx.moveTo(size * 0.8, -size * 0.1);
+                ctx.lineTo(size * 1.2, -size * 0.05);
+                ctx.lineTo(size * 1.3, 0);
+                ctx.lineTo(size * 1.2, size * 0.05);
+                ctx.lineTo(size * 0.8, size * 0.1);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Tail
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.8, -size * 0.05);
+                ctx.lineTo(-size * 1.4, -size * 0.1);
+                ctx.lineTo(-size * 1.6, 0);
+                ctx.lineTo(-size * 1.4, size * 0.1);
+                ctx.lineTo(-size * 0.8, size * 0.05);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Legs
+                ctx.lineWidth = size / 5;
+                ctx.beginPath();
+                ctx.moveTo(size * 0.3, -size * 0.2);
+                ctx.lineTo(size * 0.5, -size * 0.4);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(size * 0.1, -size * 0.3);
+                ctx.lineTo(size * 0.3, -size * 0.5);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(size * 0.3, size * 0.2);
+                ctx.lineTo(size * 0.5, size * 0.4);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(size * 0.1, size * 0.3);
+                ctx.lineTo(size * 0.3, size * 0.5);
+                ctx.stroke();
+                
+                // Reset line width
+                ctx.lineWidth = 2;
+                
+                // Eye
+                if (inverted) {
+                    ctx.fillStyle = '#fff';
+                } else {
+                    ctx.fillStyle = '#000';
+                }
+                ctx.beginPath();
+                ctx.arc(size * 1.1, 0, size / 8, 0, Math.PI * 2);
+                ctx.fill();
             }
-            ellipse(size * 1.1, 0, size/8, size/8);
-        }
-        
-        // p5.js will automatically call setup() when ready
+            
+            function animatePattern() {
+                let startTime = null;
+                
+                function animate(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const elapsed = timestamp - startTime;
+                    const offset = elapsed * 0.001; // Convert to seconds
+                    
+                    drawPattern(offset);
+                    
+                    if (isAnimating) {
+                        animationId = requestAnimationFrame(animate);
+                    }
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            }
+        });
     </script>
 </body>
 </html>
