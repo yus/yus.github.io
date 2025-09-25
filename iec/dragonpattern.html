@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escher Reptiles Pattern</title>
+    <title>Escher Reptiles - Black & White</title>
     <script src="https://cdnjs.cloudflare.com/p5.js/1.7.0/p5.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #2c3e50;
+            background-color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ecf0f1;
+            color: #000000;
             overflow-x: hidden;
         }
         .container {
@@ -34,13 +34,12 @@
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            color: #e74c3c;
-            text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+            color: #000000;
         }
         .subtitle {
             font-size: 1.2rem;
             margin-bottom: 20px;
-            color: #bdc3c7;
+            color: #333333;
         }
         .controls {
             display: flex;
@@ -49,10 +48,11 @@
             gap: 15px;
             margin: 20px 0;
             padding: 15px;
-            background: rgba(44, 62, 80, 0.7);
+            background: #f5f5f5;
             border-radius: 10px;
             width: 100%;
             max-width: 800px;
+            border: 1px solid #ddd;
         }
         .control-group {
             display: flex;
@@ -63,13 +63,14 @@
         label {
             margin-bottom: 5px;
             font-size: 0.9rem;
+            font-weight: bold;
         }
         input[type="range"] {
             width: 150px;
         }
         button {
-            background: #e74c3c;
-            color: #fff;
+            background: #000000;
+            color: #ffffff;
             border: none;
             padding: 8px 15px;
             border-radius: 5px;
@@ -79,44 +80,35 @@
             margin: 5px;
         }
         button:hover {
-            background: #c0392b;
+            background: #333333;
             transform: translateY(-2px);
         }
         #canvas-container {
             margin: 20px 0;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #000000;
+            background: white;
         }
         .info {
             max-width: 800px;
-            background: rgba(44, 62, 80, 0.7);
+            background: #f5f5f5;
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
             line-height: 1.6;
+            border: 1px solid #ddd;
         }
         .info h2 {
-            color: #e74c3c;
+            color: #000000;
             margin-top: 0;
-        }
-        .pattern-type {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .pattern-btn {
-            background: #34495e;
-            padding: 8px 15px;
-        }
-        .pattern-btn.active {
-            background: #e74c3c;
         }
         footer {
             margin-top: 30px;
             text-align: center;
             font-size: 0.9rem;
-            color: #bdc3c7;
+            color: #333333;
             padding: 10px;
         }
     </style>
@@ -125,32 +117,24 @@
     <div class="container">
         <header>
             <h1>Escher's Reptiles Pattern</h1>
-            <div class="subtitle">Recreating the iconic lizard tessellation</div>
+            <div class="subtitle">Black & White Tessellation</div>
         </header>
         
         <div class="controls">
             <div class="control-group">
                 <label for="scale">Scale</label>
-                <input type="range" id="scale" min="10" max="50" value="25">
+                <input type="range" id="scale" min="15" max="40" value="25">
             </div>
             <div class="control-group">
                 <label for="spacing">Spacing</label>
-                <input type="range" id="spacing" min="5" max="30" value="15">
+                <input type="range" id="spacing" min="0" max="30" value="5">
             </div>
             <div class="control-group">
                 <label for="rotation">Rotation</label>
                 <input type="range" id="rotation" min="0" max="360" value="0">
             </div>
             <div class="control-group">
-                <label>Pattern Type</label>
-                <div class="pattern-type">
-                    <button class="pattern-btn active" data-pattern="flat">Flat</button>
-                    <button class="pattern-btn" data-pattern="3d">3D Effect</button>
-                    <button class="pattern-btn" data-pattern="color">Color Fill</button>
-                </div>
-            </div>
-            <div class="control-group">
-                <button id="animate-btn">Toggle Animation</button>
+                <button id="invert-btn">Invert Colors</button>
                 <button id="randomize-btn">Randomize</button>
             </div>
         </div>
@@ -159,8 +143,8 @@
         
         <div class="info">
             <h2>About Escher's Reptiles</h2>
-            <p>M.C. Escher's "Reptiles" (1943) is one of his most famous tessellation works. It features interlocking lizard shapes that appear to crawl out of a drawing, move around in three dimensions, and then return to the two-dimensional pattern.</p>
-            <p>This interactive visualization recreates the simple lizard shape that forms the basis of this famous work. The lizards fit together perfectly without gaps, creating a seamless pattern that exemplifies Escher's mastery of tessellation.</p>
+            <p>M.C. Escher's "Reptiles" (1943) features interlocking lizard shapes that create a perfect tessellation. The lizards fit together without gaps, exemplifying Escher's mastery of mathematical art.</p>
+            <p>This black and white version highlights the clean lines and geometric precision of Escher's original design.</p>
         </div>
         
         <footer>
@@ -171,11 +155,9 @@
     <script>
         // p5.js sketch
         let scale = 25;
-        let spacing = 15;
+        let spacing = 5;
         let rotation = 0;
-        let isAnimating = false;
-        let animationOffset = 0;
-        let patternType = 'flat';
+        let isInverted = false;
         
         function setup() {
             const container = document.getElementById('canvas-container');
@@ -199,19 +181,14 @@
                 redraw();
             });
             
-            document.getElementById('animate-btn').addEventListener('click', function() {
-                isAnimating = !isAnimating;
-                if (isAnimating) {
-                    loop();
-                } else {
-                    noLoop();
-                    redraw();
-                }
+            document.getElementById('invert-btn').addEventListener('click', function() {
+                isInverted = !isInverted;
+                redraw();
             });
             
             document.getElementById('randomize-btn').addEventListener('click', function() {
-                scale = Math.floor(Math.random() * 40) + 10;
-                spacing = Math.floor(Math.random() * 25) + 5;
+                scale = Math.floor(Math.random() * 25) + 15;
+                spacing = Math.floor(Math.random() * 25);
                 rotation = Math.floor(Math.random() * 360);
                 
                 document.getElementById('scale').value = scale;
@@ -221,26 +198,23 @@
                 redraw();
             });
             
-            // Pattern type buttons
-            document.querySelectorAll('.pattern-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    patternType = this.getAttribute('data-pattern');
-                    redraw();
-                });
-            });
-            
-            noLoop(); // Start with no animation
+            // Draw initial pattern
+            redraw();
         }
         
         function draw() {
-            background(52, 73, 94);
-            
-            // Add animation effect if enabled
-            if (isAnimating) {
-                animationOffset += 0.02;
+            // Set colors based on inversion
+            if (isInverted) {
+                background(0);
+                stroke(255);
+                fill(0);
+            } else {
+                background(255);
+                stroke(0);
+                fill(255);
             }
+            
+            strokeWeight(2);
             
             // Calculate grid dimensions
             const cols = Math.floor(width / (scale * 3 + spacing));
@@ -255,188 +229,76 @@
                 for (let y = 0; y < rows; y++) {
                     push();
                     
-                    // Calculate position
+                    // Calculate position with offset for interlocking pattern
                     const xPos = offsetX + x * (scale * 3 + spacing) + (y % 2) * (scale * 1.5 + spacing/2);
                     const yPos = offsetY + y * (scale * 2 + spacing);
                     
-                    // Add subtle animation movement
-                    const animX = isAnimating ? sin(animationOffset + x * 0.7 + y * 0.3) * 3 : 0;
-                    const animY = isAnimating ? cos(animationOffset + y * 0.5 + x * 0.2) * 3 : 0;
-                    
-                    translate(xPos + animX, yPos + animY);
+                    translate(xPos, yPos);
                     rotate(radians(rotation));
                     
                     // Draw the reptile
-                    drawEscherReptile(0, 0, scale, patternType, x, y);
+                    drawEscherReptile(0, 0, scale);
                     
                     pop();
                 }
             }
         }
         
-        function drawEscherReptile(x, y, size, type, gridX, gridY) {
-            // Define the reptile shape points (simplified version of Escher's lizard)
-            // Body
-            const bodyPoints = [
-                {x: x, y: y - size * 0.5},
-                {x: x + size * 0.7, y: y - size * 0.3},
-                {x: x + size, y: y},
-                {x: x + size * 0.7, y: y + size * 0.3},
-                {x: x, y: y + size * 0.5},
-                {x: x - size * 0.7, y: y + size * 0.3},
-                {x: x - size, y: y},
-                {x: x - size * 0.7, y: y - size * 0.3}
-            ];
+        function drawEscherReptile(x, y, size) {
+            // Define the reptile shape points (based on Escher's lizard)
+            
+            // Main body (hexagon-like shape)
+            beginShape();
+            vertex(x, y - size * 0.5);          // Top
+            vertex(x + size * 0.7, y - size * 0.3); // Top right
+            vertex(x + size, y);                // Right
+            vertex(x + size * 0.7, y + size * 0.3); // Bottom right
+            vertex(x, y + size * 0.5);          // Bottom
+            vertex(x - size * 0.7, y + size * 0.3); // Bottom left
+            vertex(x - size, y);                // Left
+            vertex(x - size * 0.7, y - size * 0.3); // Top left
+            endShape(CLOSE);
             
             // Head
-            const headPoints = [
-                {x: x + size * 0.8, y: y - size * 0.2},
-                {x: x + size * 1.3, y: y - size * 0.1},
-                {x: x + size * 1.4, y: y},
-                {x: x + size * 1.3, y: y + size * 0.1},
-                {x: x + size * 0.8, y: y + size * 0.2}
-            ];
-            
-            // Legs (four legs)
-            const legs = [
-                // Front right
-                {x1: x + size * 0.5, y1: y - size * 0.2, x2: x + size * 0.8, y2: y - size * 0.5},
-                // Front left
-                {x1: x + size * 0.3, y1: y - size * 0.3, x2: x + size * 0.6, y2: y - size * 0.6},
-                // Back right
-                {x1: x + size * 0.5, y1: y + size * 0.2, x2: x + size * 0.8, y2: y + size * 0.5},
-                // Back left
-                {x1: x + size * 0.3, y1: y + size * 0.3, x2: x + size * 0.6, y2: y + size * 0.6}
-            ];
+            beginShape();
+            vertex(x + size * 0.8, y - size * 0.2);  // Neck top
+            vertex(x + size * 1.3, y - size * 0.1);  // Head top
+            vertex(x + size * 1.4, y);               // Nose
+            vertex(x + size * 1.3, y + size * 0.1);  // Head bottom
+            vertex(x + size * 0.8, y + size * 0.2);  // Neck bottom
+            endShape(CLOSE);
             
             // Tail
-            const tailPoints = [
-                {x: x - size * 0.8, y: y - size * 0.1},
-                {x: x - size * 1.5, y: y - size * 0.3},
-                {x: x - size * 1.8, y: y},
-                {x: x - size * 1.5, y: y + size * 0.3},
-                {x: x - size * 0.8, y: y + size * 0.1}
-            ];
+            beginShape();
+            vertex(x - size * 0.8, y - size * 0.1);  // Tail base top
+            vertex(x - size * 1.5, y - size * 0.3);  // Tail middle top
+            vertex(x - size * 1.8, y);               // Tail tip
+            vertex(x - size * 1.5, y + size * 0.3);  // Tail middle bottom
+            vertex(x - size * 0.8, y + size * 0.1);  // Tail base bottom
+            endShape(CLOSE);
             
-            // Draw based on pattern type
-            if (type === 'color') {
-                // Color fill style
-                fill(231, 76, 60, 200);
-                stroke(192, 57, 43);
-                strokeWeight(2);
-                
-                // Draw body
-                beginShape();
-                for (let point of bodyPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw head
-                beginShape();
-                for (let point of headPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw tail
-                beginShape();
-                for (let point of tailPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw legs
-                strokeWeight(size/8);
-                for (let leg of legs) {
-                    line(leg.x1, leg.y1, leg.x2, leg.y2);
-                }
-                
-                // Draw eye
+            // Legs (four legs)
+            strokeWeight(size/8);
+            
+            // Front right leg
+            line(x + size * 0.5, y - size * 0.2, x + size * 0.8, y - size * 0.5);
+            // Front left leg
+            line(x + size * 0.3, y - size * 0.3, x + size * 0.6, y - size * 0.6);
+            // Back right leg
+            line(x + size * 0.5, y + size * 0.2, x + size * 0.8, y + size * 0.5);
+            // Back left leg
+            line(x + size * 0.3, y + size * 0.3, x + size * 0.6, y + size * 0.6);
+            
+            // Reset stroke weight
+            strokeWeight(2);
+            
+            // Eye
+            if (isInverted) {
                 fill(255);
-                ellipse(x + size * 1.2, y, size/6, size/6);
-                fill(0);
-                ellipse(x + size * 1.2, y, size/12, size/12);
-                
-            } else if (type === '3d') {
-                // 3D effect style
-                noFill();
-                stroke(241, 196, 15);
-                strokeWeight(3);
-                
-                // Draw body with 3D effect
-                beginShape();
-                for (let point of bodyPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw head
-                beginShape();
-                for (let point of headPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw tail
-                beginShape();
-                for (let point of tailPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw legs
-                for (let leg of legs) {
-                    line(leg.x1, leg.y1, leg.x2, leg.y2);
-                }
-                
-                // Add shading for 3D effect
-                fill(241, 196, 15, 100);
-                noStroke();
-                beginShape();
-                vertex(bodyPoints[0].x, bodyPoints[0].y);
-                vertex(bodyPoints[1].x, bodyPoints[1].y);
-                vertex(bodyPoints[2].x, bodyPoints[2].y);
-                vertex(bodyPoints[3].x, bodyPoints[3].y);
-                vertex(bodyPoints[4].x, bodyPoints[4].y);
-                endShape(CLOSE);
-                
             } else {
-                // Flat style (closest to Escher's original)
-                noFill();
-                stroke(236, 240, 241);
-                strokeWeight(2);
-                
-                // Draw body
-                beginShape();
-                for (let point of bodyPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw head
-                beginShape();
-                for (let point of headPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw tail
-                beginShape();
-                for (let point of tailPoints) {
-                    vertex(point.x, point.y);
-                }
-                endShape(CLOSE);
-                
-                // Draw legs
-                for (let leg of legs) {
-                    line(leg.x1, leg.y1, leg.x2, leg.y2);
-                }
-                
-                // Draw eye
-                fill(236, 240, 241);
-                ellipse(x + size * 1.2, y, size/10, size/10);
+                fill(0);
             }
+            ellipse(x + size * 1.2, y, size/8, size/8);
         }
         
         function windowResized() {
