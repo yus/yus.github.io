@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escher Reptiles - Fixed</title>
+    <title>Escher Reptiles - Working Version</title>
     <script src="https://cdnjs.cloudflare.com/p5.js/1.7.0/p5.min.js"></script>
     <style>
         body {
@@ -23,8 +23,6 @@
             margin: 20px 0;
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
         }
         button {
             padding: 8px 16px;
@@ -33,102 +31,125 @@
             border: none;
             cursor: pointer;
         }
-        #canvas-container {
+        canvas {
             border: 2px solid #000;
-            margin: 20px 0;
+            display: block;
         }
     </style>
 </head>
 <body>
     <h1>Escher's Reptiles Pattern</h1>
     <div class="controls">
-        <button onclick="regenerate()">New Pattern</button>
-        <button onclick="toggleInvert()">Invert Colors</button>
+        <button id="regenerate">New Pattern</button>
+        <button id="invert">Invert Colors</button>
     </div>
-    <div id="canvas-container"></div>
 
     <script>
-        let canvas;
         let isInverted = false;
         
         function setup() {
-            const container = document.getElementById('canvas-container');
-            canvas = createCanvas(800, 600);
-            canvas.parent('canvas-container');
-            noLoop();
+            // Create canvas - using fixed size for reliability
+            const canvas = createCanvas(800, 600);
+            canvas.parent('body');
+            canvas.style('display', 'block');
+            canvas.style('margin', '20px auto');
+            canvas.style('border', '2px solid #000');
+            
+            noLoop(); // Don't continuously redraw
+            
+            // Set up button events
+            document.getElementById('regenerate').onclick = drawPattern;
+            document.getElementById('invert').onclick = function() {
+                isInverted = !isInverted;
+                drawPattern();
+            };
+            
+            // Initial draw
             drawPattern();
         }
         
         function drawPattern() {
-            // Clear canvas
+            console.log("Drawing pattern..."); // Debug log
+            
+            // Clear canvas with appropriate background
             if (isInverted) {
-                background(0);
-                stroke(255);
-                fill(0);
+                background(0); // Black background
+                stroke(255);   // White lines
+                fill(0);       // Black fill
             } else {
-                background(255);
-                stroke(0);
-                fill(255);
+                background(255); // White background  
+                stroke(0);      // Black lines
+                fill(255);      // White fill
             }
             
             strokeWeight(2);
             
-            // Draw the tessellation
-            const size = 40;
-            const cols = 10;
-            const rows = 8;
+            // Simple grid parameters
+            const size = 35;
+            const cols = 8;
+            const rows = 6;
             
+            // Draw the tessellation pattern
             for (let x = 0; x < cols; x++) {
                 for (let y = 0; y < rows; y++) {
-                    push();
-                    // Position with offset for interlocking pattern
-                    const xPos = x * size * 2.5 + (y % 2) * size * 1.25;
-                    const yPos = y * size * 1.8;
-                    translate(xPos + 50, yPos + 50);
+                    push(); // Save current transformation state
+                    
+                    // Calculate position with offset for interlocking pattern
+                    const xPos = 50 + x * size * 2.5;
+                    const yPos = 50 + y * size * 2;
+                    
+                    // Alternate rows are offset for tessellation
+                    if (y % 2 === 0) {
+                        translate(xPos, yPos);
+                    } else {
+                        translate(xPos + size * 1.25, yPos);
+                    }
                     
                     drawReptile(size);
-                    pop();
+                    pop(); // Restore transformation state
                 }
             }
         }
         
         function drawReptile(size) {
-            // Main body (hexagon shape)
+            // Draw a simple lizard shape
+            
+            // Body (main oval)
             beginShape();
-            vertex(0, -size/2);
-            vertex(size*0.7, -size*0.3);
-            vertex(size, 0);
-            vertex(size*0.7, size*0.3);
-            vertex(0, size/2);
-            vertex(-size*0.7, size*0.3);
-            vertex(-size, 0);
-            vertex(-size*0.7, -size*0.3);
+            vertex(0, -size * 0.4);
+            vertex(size * 0.6, -size * 0.2);
+            vertex(size * 0.8, 0);
+            vertex(size * 0.6, size * 0.2);
+            vertex(0, size * 0.4);
+            vertex(-size * 0.6, size * 0.2);
+            vertex(-size * 0.8, 0);
+            vertex(-size * 0.6, -size * 0.2);
             endShape(CLOSE);
             
             // Head
             beginShape();
-            vertex(size*0.8, -size*0.2);
-            vertex(size*1.3, -size*0.1);
-            vertex(size*1.4, 0);
-            vertex(size*1.3, size*0.1);
-            vertex(size*0.8, size*0.2);
+            vertex(size * 0.8, -size * 0.1);
+            vertex(size * 1.2, -size * 0.05);
+            vertex(size * 1.3, 0);
+            vertex(size * 1.2, size * 0.05);
+            vertex(size * 0.8, size * 0.1);
             endShape(CLOSE);
             
             // Tail
             beginShape();
-            vertex(-size*0.8, -size*0.1);
-            vertex(-size*1.5, -size*0.3);
-            vertex(-size*1.8, 0);
-            vertex(-size*1.5, size*0.3);
-            vertex(-size*0.8, size*0.1);
+            vertex(-size * 0.8, -size * 0.05);
+            vertex(-size * 1.4, -size * 0.1);
+            vertex(-size * 1.6, 0);
+            vertex(-size * 1.4, size * 0.1);
+            vertex(-size * 0.8, size * 0.05);
             endShape(CLOSE);
             
-            // Legs
-            strokeWeight(size/6);
-            line(size*0.5, -size*0.2, size*0.8, -size*0.5);
-            line(size*0.3, -size*0.3, size*0.6, -size*0.6);
-            line(size*0.5, size*0.2, size*0.8, size*0.5);
-            line(size*0.3, size*0.3, size*0.6, size*0.6);
+            // Legs - simpler approach
+            strokeWeight(size/5);
+            line(size * 0.3, -size * 0.2, size * 0.5, -size * 0.4);
+            line(size * 0.1, -size * 0.3, size * 0.3, -size * 0.5);
+            line(size * 0.3, size * 0.2, size * 0.5, size * 0.4);
+            line(size * 0.1, size * 0.3, size * 0.3, size * 0.5);
             
             // Eye
             strokeWeight(1);
@@ -137,20 +158,10 @@
             } else {
                 fill(0);
             }
-            ellipse(size*1.2, 0, size/6, size/6);
+            ellipse(size * 1.1, 0, size/8, size/8);
         }
         
-        function regenerate() {
-            drawPattern();
-        }
-        
-        function toggleInvert() {
-            isInverted = !isInverted;
-            drawPattern();
-        }
-        
-        // Initialize
-        window.onload = setup;
+        // p5.js will automatically call setup() when ready
     </script>
 </body>
 </html>
