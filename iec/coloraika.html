@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Emission Converter</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff9e44;
+            --light: #f5f7fa;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent), #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .converter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .converter-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .converter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.8rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--accent), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 158, 68, 0.4);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Color Emission Converter</h1>
+            <p class="subtitle">Convert between nits, candelas, foot-lamberts, and more for color science applications</p>
+        </header>
+        
+        <div class="converter-grid">
+            <!-- Luminance Converter -->
+            <div class="converter-card">
+                <h2 class="card-title">🔆 Luminance Converter</h2>
+                <div class="input-group">
+                    <label for="luminanceValue">Luminance Value</label>
+                    <input type="number" id="luminanceValue" value="100" min="0" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="luminanceUnit">From Unit</label>
+                    <select id="luminanceUnit">
+                        <option value="nits">Nits (cd/m²)</option>
+                        <option value="footLamberts">Foot-Lamberts (fL)</option>
+                    </select>
+                </div>
+                <button id="convertLuminance">Convert Luminance</button>
+                <div class="result" id="luminanceResult">
+                    <p>Enter values and click convert</p>
+                </div>
+            </div>
+            
+            <!-- RGB to Luminance -->
+            <div class="converter-card">
+                <h2 class="card-title">🎨 RGB to Luminance</h2>
+                <div class="input-group">
+                    <label for="redValue">Red (0-255)</label>
+                    <input type="range" id="redValue" min="0" max="255" value="200">
+                    <span id="redDisplay">200</span>
+                </div>
+                <div class="input-group">
+                    <label for="greenValue">Green (0-255)</label>
+                    <input type="range" id="greenValue" min="0" max="255" value="150">
+                    <span id="greenDisplay">150</span>
+                </div>
+                <div class="input-group">
+                    <label for="blueValue">Blue (0-255)</label>
+                    <input type="range" id="blueValue" min="0" max="255" value="100">
+                    <span id="blueDisplay">100</span>
+                </div>
+                <div class="input-group">
+                    <label for="maxNits">Maximum Brightness (nits)</label>
+                    <input type="number" id="maxNits" value="1000" min="1" max="10000">
+                </div>
+                <div class="color-preview" id="colorPreview"></div>
+                <button id="calculateLuminance">Calculate Luminance</button>
+                <div class="result" id="rgbResult">
+                    <p>Adjust sliders and click calculate</p>
+                </div>
+            </div>
+            
+            <!-- Color Temperature -->
+            <div class="converter-card">
+                <h2 class="card-title">🌡️ Color Temperature</h2>
+                <div class="input-group">
+                    <label for="kelvinValue">Temperature (Kelvin)</label>
+                    <input type="range" id="kelvinValue" min="1000" max="40000" value="6500">
+                    <span id="kelvinDisplay">6500K</span>
+                </div>
+                <div class="color-preview" id="tempPreview"></div>
+                <button id="convertTemperature">Convert to RGB</button>
+                <div class="result" id="temperatureResult">
+                    <p>Adjust temperature and click convert</p>
+                </div>
+            </div>
+            
+            <!-- Brightness Adjustment -->
+            <div class="converter-card">
+                <h2 class="card-title">💡 Brightness Adjustment</h2>
+                <div class="input-group">
+                    <label for="adjustRed">Red (0-255)</label>
+                    <input type="number" id="adjustRed" min="0" max="255" value="255">
+                </div>
+                <div class="input-group">
+                    <label for="adjustGreen">Green (0-255)</label>
+                    <input type="number" id="adjustGreen" min="0" max="255" value="200">
+                </div>
+                <div class="input-group">
+                    <label for="adjustBlue">Blue (0-255)</label>
+                    <input type="number" id="adjustBlue" min="0" max="255" value="150">
+                </div>
+                <div class="input-group">
+                    <label for="targetNits">Target Brightness (nits)</label>
+                    <input type="number" id="targetNits" value="300" min="1" max="10000">
+                </div>
+                <div class="input-group">
+                    <label for="maxBrightness">Max Display Brightness (nits)</label>
+                    <input type="number" id="maxBrightness" value="1000" min="1" max="10000">
+                </div>
+                <button id="adjustBrightness">Adjust Brightness</button>
+                <div class="result" id="adjustmentResult">
+                    <p>Enter values and click adjust</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Color Emission Converter • For the Sake of Colors! • Created with JavaScript</p>
+        </div>
+    </div>
+
+    <script>
+        // Luminance Conversion Functions
+        class ColorEmissionConverter {
+            static convertNitsToFootLamberts(nits) {
+                return nits / 3.426;
+            }
+            
+            static convertFootLambertsToNits(fl) {
+                return fl * 3.426;
+            }
+            
+            static rgbToLuminance(r, g, b) {
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            }
+            
+            static rgbToNits(r, g, b, maxNits = 1000) {
+                const luminance = this.rgbToLuminance(r, g, b);
+                return luminance * maxNits;
+            }
+            
+            static normalizeRGB(r, g, b) {
+                return [r / 255, g / 255, b / 255];
+            }
+            
+            static kelvinToRGB(kelvin) {
+                let temp = kelvin / 100;
+                let red, green, blue;
+                
+                if (temp <= 66) {
+                    red = 255;
+                } else {
+                    red = temp - 60;
+                    red = 329.698727446 * Math.pow(red, -0.1332047592);
+                    red = Math.max(0, Math.min(255, red));
+                }
+                
+                if (temp <= 66) {
+                    green = temp;
+                    green = 99.4708025861 * Math.log(green) - 161.1195681661;
+                } else {
+                    green = temp - 60;
+                    green = 288.1221695283 * Math.pow(green, -0.0755148492);
+                }
+                green = Math.max(0, Math.min(255, green));
+                
+                if (temp >= 66) {
+                    blue = 255;
+                } else if (temp <= 19) {
+                    blue = 0;
+                } else {
+                    blue = temp - 10;
+                    blue = 138.5177312231 * Math.log(blue) - 305.0447927307;
+                    blue = Math.max(0, Math.min(255, blue));
+                }
+                
+                return { 
+                    r: Math.round(red), 
+                    g: Math.round(green), 
+                    b: Math.round(blue) 
+                };
+            }
+            
+            static adjustBrightness(rgb, targetNits, maxBrightnessNits) {
+                const [r, g, b] = rgb;
+                const normalized = this.normalizeRGB(r, g, b);
+                const currentEmission = this.rgbToNits(...normalized, maxBrightnessNits);
+                const scale = targetNits / currentEmission;
+                
+                return [
+                    Math.min(255, Math.round(r * scale)),
+                    Math.min(255, Math.round(g * scale)),
+                    Math.min(255, Math.round(b * scale))
+                ];
+            }
+        }
+
+        // DOM Elements
+        const luminanceValue = document.getElementById('luminanceValue');
+        const luminanceUnit = document.getElementById('luminanceUnit');
+        const convertLuminanceBtn = document.getElementById('convertLuminance');
+        const luminanceResult = document.getElementById('luminanceResult');
+        
+        const redValue = document.getElementById('redValue');
+        const greenValue = document.getElementById('greenValue');
+        const blueValue = document.getElementById('blueValue');
+        const redDisplay = document.getElementById('redDisplay');
+        const greenDisplay = document.getElementById('greenDisplay');
+        const blueDisplay = document.getElementById('blueDisplay');
+        const maxNits = document.getElementById('maxNits');
+        const colorPreview = document.getElementById('colorPreview');
+        const calculateLuminanceBtn = document.getElementById('calculateLuminance');
+        const rgbResult = document.getElementById('rgbResult');
+        
+        const kelvinValue = document.getElementById('kelvinValue');
+        const kelvinDisplay = document.getElementById('kelvinDisplay');
+        const tempPreview = document.getElementById('tempPreview');
+        const convertTemperatureBtn = document.getElementById('convertTemperature');
+        const temperatureResult = document.getElementById('temperatureResult');
+        
+        const adjustRed = document.getElementById('adjustRed');
+        const adjustGreen = document.getElementById('adjustGreen');
+        const adjustBlue = document.getElementById('adjustBlue');
+        const targetNits = document.getElementById('targetNits');
+        const maxBrightness = document.getElementById('maxBrightness');
+        const adjustBrightnessBtn = document.getElementById('adjustBrightness');
+        const adjustmentResult = document.getElementById('adjustmentResult');
+
+        // Event Listeners
+        convertLuminanceBtn.addEventListener('click', convertLuminance);
+        
+        redValue.addEventListener('input', updateRGBDisplays);
+        greenValue.addEventListener('input', updateRGBDisplays);
+        blueValue.addEventListener('input', updateRGBDisplays);
+        calculateLuminanceBtn.addEventListener('click', calculateRGBLuminance);
+        
+        kelvinValue.addEventListener('input', updateKelvinDisplay);
+        convertTemperatureBtn.addEventListener('click', convertTemperature);
+        
+        adjustBrightnessBtn.addEventListener('click', adjustColorBrightness);
+
+        // Initialize displays
+        updateRGBDisplays();
+        updateKelvinDisplay();
+        updateColorPreview();
+
+        // Functions
+        function convertLuminance() {
+            const value = parseFloat(luminanceValue.value);
+            const unit = luminanceUnit.value;
+            
+            if (isNaN(value) || value < 0) {
+                luminanceResult.innerHTML = '<p style="color: var(--danger)">Please enter a valid positive number</p>';
+                return;
+            }
+            
+            let nits, footLamberts;
+            
+            if (unit === 'nits') {
+                nits = value;
+                footLamberts = ColorEmissionConverter.convertNitsToFootLamberts(value);
+            } else {
+                footLamberts = value;
+                nits = ColorEmissionConverter.convertFootLambertsToNits(value);
+            }
+            
+            luminanceResult.innerHTML = `
+                <div class="result-item">
+                    <span>Nits (cd/m²):</span>
+                    <span class="result-value">${nits.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Foot-Lamberts (fL):</span>
+                    <span class="result-value">${footLamberts.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Relationship:</span>
+                    <span class="result-value">1 fL = 3.426 nits</span>
+                </div>
+            `;
+        }
+        
+        function updateRGBDisplays() {
+            redDisplay.textContent = redValue.value;
+            greenDisplay.textContent = greenValue.value;
+            blueDisplay.textContent = blueValue.value;
+            updateColorPreview();
+        }
+        
+        function updateColorPreview() {
+            const r = redValue.value;
+            const g = greenValue.value;
+            const b = blueValue.value;
+            colorPreview.style.background = `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        function calculateRGBLuminance() {
+            const r = parseInt(redValue.value);
+            const g = parseInt(greenValue.value);
+            const b = parseInt(blueValue.value);
+            const maxNitsValue = parseFloat(maxNits.value);
+            
+            const normalized = ColorEmissionConverter.normalizeRGB(r, g, b);
+            const nits = ColorEmissionConverter.rgbToNits(...normalized, maxNitsValue);
+            const footLamberts = ColorEmissionConverter.convertNitsToFootLamberts(nits);
+            const relativeLuminance = ColorEmissionConverter.rgbToLuminance(...normalized);
+            
+            rgbResult.innerHTML = `
+                <div class="result-item">
+                    <span>Luminance (nits):</span>
+                    <span class="result-value">${nits.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Luminance (fL):</span>
+                    <span class="result-value">${footLamberts.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Relative Luminance:</span>
+                    <span class="result-value">${relativeLuminance.toFixed(4)}</span>
+                </div>
+                <div class="result-item">
+                    <span>RGB Values:</span>
+                    <span class="result-value">${r}, ${g}, ${b}</span>
+                </div>
+            `;
+        }
+        
+        function updateKelvinDisplay() {
+            kelvinDisplay.textContent = `${kelvinValue.value}K`;
+            updateTempPreview();
+        }
+        
+        function updateTempPreview() {
+            const kelvin = parseInt(kelvinValue.value);
+            const rgb = ColorEmissionConverter.kelvinToRGB(kelvin);
+            tempPreview.style.background = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        }
+        
+        function convertTemperature() {
+            const kelvin = parseInt(kelvinValue.value);
+            const rgb = ColorEmissionConverter.kelvinToRGB(kelvin);
+            
+            temperatureResult.innerHTML = `
+                <div class="result-item">
+                    <span>RGB Values:</span>
+                    <span class="result-value">${rgb.r}, ${rgb.g}, ${rgb.b}</span>
+                </div>
+                <div class="result-item">
+                    <span>Hex Color:</span>
+                    <span class="result-value">#${rgb.r.toString(16).padStart(2, '0')}${rgb.g.toString(16).padStart(2, '0')}${rgb.b.toString(16).padStart(2, '0')}</span>
+                </div>
+                <div class="result-item">
+                    <span>Temperature:</span>
+                    <span class="result-value">${kelvin}K</span>
+                </div>
+            `;
+        }
+        
+        function adjustColorBrightness() {
+            const r = parseInt(adjustRed.value);
+            const g = parseInt(adjustGreen.value);
+            const b = parseInt(adjustBlue.value);
+            const targetNitsValue = parseFloat(targetNits.value);
+            const maxBrightnessValue = parseFloat(maxBrightness.value);
+            
+            if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                adjustmentResult.innerHTML = '<p style="color: var(--danger)">RGB values must be between 0 and 255</p>';
+                return;
+            }
+            
+            const adjustedRGB = ColorEmissionConverter.adjustBrightness(
+                [r, g, b], targetNitsValue, maxBrightnessValue
+            );
+            
+            const normalizedOriginal = ColorEmissionConverter.normalizeRGB(r, g, b);
+            const originalNits = ColorEmissionConverter.rgbToNits(...normalizedOriginal, maxBrightnessValue);
+            
+            const normalizedAdjusted = ColorEmissionConverter.normalizeRGB(...adjustedRGB);
+            const adjustedNits = ColorEmissionConverter.rgbToNits(...normalizedAdjusted, maxBrightnessValue);
+            
+            adjustmentResult.innerHTML = `
+                <div class="result-item">
+                    <span>Original RGB:</span>
+                    <span class="result-value">${r}, ${g}, ${b}</span>
+                </div>
+                <div class="result-item">
+                    <span>Original Brightness:</span>
+                    <span class="result-value">${originalNits.toFixed(2)} nits</span>
+                </div>
+                <div class="result-item">
+                    <span>Adjusted RGB:</span>
+                    <span class="result-value">${adjustedRGB.join(', ')}</span>
+                </div>
+                <div class="result-item">
+                    <span>Adjusted Brightness:</span>
+                    <span class="result-value">${adjustedNits.toFixed(2)} nits</span>
+                </div>
+                <div class="result-item">
+                    <span>Target Brightness:</span>
+                    <span class="result-value">${targetNitsValue} nits</span>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
