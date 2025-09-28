@@ -1841,42 +1841,7 @@
                 
                 // Add to history if it's a RAL code
                 if (text.startsWith('RAL')) {
-                    addToHistory(text);
-                }
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showCopyNotification();
-                
-                if (text.startsWith('RAL')) {
-                    addToHistory(text);
-                }
-            });
-        }
-        
-        // Show copy notification
-        function showCopyNotification() {
-            elements.copyNotification.classList.add('show');
-            setTimeout(() => {
-                elements.copyNotification.classList.remove('show');
-            }, 2000);
-        }
-        
-        // Add RAL code to history
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showCopyNotification();
-                
-                // Add to history if it's a RAL code
-                if (text.startsWith('RAL')) {
-                    console.log('Adding to history:', text);
-                    addToHistory(text);
+                    addToHistory(text); // Make sure this line says addToHistory, not addToHistory
                 }
             }).catch(err => {
                 console.error('Failed to copy: ', err);
@@ -1890,11 +1855,46 @@
                 showCopyNotification();
                 
                 if (text.startsWith('RAL')) {
-                    console.log('Adding to history (fallback):', text);
-                    addToHistory(text);
+                    addToHistory(text); // And here too
                 }
             });
         }
+        
+        // Show copy notification
+        function showCopyNotification() {
+            elements.copyNotification.classList.add('show');
+            setTimeout(() => {
+                elements.copyNotification.classList.remove('show');
+            }, 2000);
+        }
+        
+        // // Add RAL code to history
+        // function copyToClipboard(text) {
+        //     navigator.clipboard.writeText(text).then(() => {
+        //         showCopyNotification();
+                
+        //         // Add to history if it's a RAL code
+        //         if (text.startsWith('RAL')) {
+        //             console.log('Adding to history:', text);
+        //             addToHistory(text);
+        //         }
+        //     }).catch(err => {
+        //         console.error('Failed to copy: ', err);
+        //         // Fallback
+        //         const textArea = document.createElement('textarea');
+        //         textArea.value = text;
+        //         document.body.appendChild(textArea);
+        //         textArea.select();
+        //         document.execCommand('copy');
+        //         document.body.removeChild(textArea);
+        //         showCopyNotification();
+                
+        //         if (text.startsWith('RAL')) {
+        //             console.log('Adding to history (fallback):', text);
+        //             addToHistory(text);
+        //         }
+        //     });
+        // }
 
         // Update History
         function updateHistoryDisplay() {
@@ -1972,55 +1972,44 @@
             }
         }
         
-        // function updateCatalogHistoryDisplay() {
-        //     if (colorData.copyHistory.length === 0) {
-        //         elements.catalogHistorySection.style.display = 'none';
-        //         elements.catalogClearHistory.style.display = 'none';
-        //         return;
-        //     }
+        // // //
+
+        // Add this function - it was probably lost during our changes
+        function addToHistory(ralCode) {
+            // Remove if already exists (to avoid duplicates)
+            colorData.copyHistory = colorData.copyHistory.filter(code => code !== ralCode);
             
-        //     elements.catalogHistorySection.style.display = 'block';
-        //     elements.catalogClearHistory.style.display = 'block';
-        //     elements.catalogHistoryBreadcrumb.innerHTML = '';
+            // Add to beginning of array
+            colorData.copyHistory.unshift(ralCode);
             
-        //     // Create history items
-        //     colorData.copyHistory.forEach(ralCode => {
-        //         const color = colorData.ralColors.find(c => c.code === ralCode);
-        //         const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
-                
-        //         const historyItem = document.createElement('div');
-        //         historyItem.className = 'history-swatch';
-        //         historyItem.title = `Click to copy ${ralCode}`;
-                
-        //         historyItem.innerHTML = `
-        //             <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
-        //             <span>${ralCode}</span>
-        //         `;
-                
-        //         historyItem.addEventListener('click', (e) => {
-        //             e.stopPropagation();
-        //             copyToClipboard(ralCode);
-        //         });
-                
-        //         elements.catalogHistoryBreadcrumb.appendChild(historyItem);
-        //     });
+            // Keep only last 10 items
+            if (colorData.copyHistory.length > 10) {
+                colorData.copyHistory = colorData.copyHistory.slice(0, 10);
+            }
             
-        //     // Add "Copy All" button - THIS WAS MISSING!
-        //     const copyAllButton = document.createElement('button');
-        //     copyAllButton.className = 'history-copy-all';
-        //     copyAllButton.textContent = 'Copy All';
-        //     copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-            
-        //     copyAllButton.addEventListener('click', () => {
-        //         const allCodes = colorData.copyHistory.join(', ');
-        //         copyToClipboard(allCodes);
-        //     });
-            
-        //     elements.catalogHistoryBreadcrumb.appendChild(copyAllButton);
-        // }
+            // Update history displays
+            updateHistoryDisplay();
+        }
+        
+        // Also make sure clearHistory exists
+        function clearHistory() {
+            colorData.copyHistory = [];
+            updateHistoryDisplay();
+        }
+        
+        // And make sure toggleHistoryPin exists
+        function toggleHistoryPin(ralCode) {
+            const index = colorData.pinnedHistory.indexOf(ralCode);
+            if (index > -1) {
+                colorData.pinnedHistory.splice(index, 1);
+            } else {
+                colorData.pinnedHistory.push(ralCode);
+            }
+            localStorage.setItem('pinnedHistory', JSON.stringify(colorData.pinnedHistory));
+            updateHistoryDisplay();
+        }
 
         // Add pin/unpin functionality
-        // Add pin functionality
         function togglePin(ralCode) {
             const index = colorData.pinnedColors.indexOf(ralCode);
             if (index > -1) {
