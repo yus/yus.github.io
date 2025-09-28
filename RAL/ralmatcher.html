@@ -94,6 +94,24 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
+        .preview-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .preview-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .preview-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
         .input-row {
             display: flex;
             gap: 10px;
@@ -208,6 +226,7 @@
             font-size: 0.9rem;
             color: #666;
             margin-bottom: 8px;
+            font-style: italic;
         }
 
         .color-values {
@@ -237,6 +256,21 @@
             border-radius: 4px;
         }
 
+        .difference-low {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .difference-medium {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .difference-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -250,6 +284,25 @@
             color: #666;
         }
 
+        .settings-group {
+            margin-bottom: 15px;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .slider-value {
+            display: inline-block;
+            width: 50px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
         @media (max-width: 768px) {
             .color-inputs {
                 grid-template-columns: 1fr;
@@ -260,6 +313,10 @@
             }
             
             .color-values {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-values {
                 grid-template-columns: 1fr;
             }
         }
@@ -277,8 +334,16 @@
                 <div class="input-group">
                     <h2>Input Color</h2>
                     <div class="color-preview" id="colorPreview">
-                        <div>RGB: 120, 120, 120</div>
-                        <div>CMYK: 0%, 0%, 0%, 53%</div>
+                        <div class="preview-values">
+                            <div class="preview-group">
+                                <div class="preview-label">RGB</div>
+                                <div>120, 120, 120</div>
+                            </div>
+                            <div class="preview-group">
+                                <div class="preview-label">CMYK</div>
+                                <div>0%, 0%, 0%, 53%</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="tab-buttons">
@@ -332,24 +397,37 @@
 
                 <div class="input-group">
                     <h2>Settings</h2>
-                    <div class="input-row">
-                        <label for="resultsCount">Number of results:</label>
-                        <input type="number" id="resultsCount" min="1" max="50" value="12">
+                    
+                    <div class="settings-group">
+                        <label for="resultsCount">
+                            Number of results: <span class="slider-value" id="resultsCountValue">12</span>
+                        </label>
+                        <input type="range" id="resultsCount" min="1" max="50" value="12">
                     </div>
-                    <div class="input-row">
+                    
+                    <div class="settings-group">
+                        <label for="maxDifference">
+                            Max color difference: <span class="slider-value" id="maxDifferenceValue">100</span>
+                        </label>
+                        <input type="range" id="maxDifference" min="1" max="200" value="100">
+                    </div>
+                    
+                    <div class="settings-group">
                         <label for="language">Language:</label>
                         <select id="language">
                             <option value="en">English</option>
                             <option value="ru">Russian</option>
                         </select>
                     </div>
-                    <div class="input-row">
+                    
+                    <div class="settings-group">
                         <label for="colorSpace">Color difference method:</label>
                         <select id="colorSpace">
                             <option value="rgb">RGB Euclidean</option>
                             <option value="cie76">CIE76 (Lab)</option>
                         </select>
                     </div>
+                    
                     <button id="findMatches" style="width: 100%; padding: 10px; background-color: var(--secondary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Find Matching Colors</button>
                 </div>
             </div>
@@ -406,11 +484,16 @@
             blackInput: document.getElementById('blackInput'),
             cmykInput: document.getElementById('cmykInput'),
             
-            // Other elements
-            colorPreview: document.getElementById('colorPreview'),
+            // Settings
             resultsCount: document.getElementById('resultsCount'),
+            resultsCountValue: document.getElementById('resultsCountValue'),
+            maxDifference: document.getElementById('maxDifference'),
+            maxDifferenceValue: document.getElementById('maxDifferenceValue'),
             language: document.getElementById('language'),
             colorSpace: document.getElementById('colorSpace'),
+            
+            // Other elements
+            colorPreview: document.getElementById('colorPreview'),
             findMatches: document.getElementById('findMatches'),
             resultsContainer: document.getElementById('resultsContainer'),
             loadingIndicator: document.getElementById('loadingIndicator'),
@@ -448,7 +531,7 @@
             });
         }
 
-        // Load complete RAL color data
+        // Load complete RAL color data with actual names
         async function loadColorData() {
             try {
                 elements.loadingIndicator.style.display = 'block';
@@ -489,14 +572,14 @@
                 colorData.loaded = true;
                 elements.loadingIndicator.style.display = 'none';
                 
-                console.log(`Loaded ${colorData.ralColors.length} RAL colors`);
+                console.log(`Loaded ${colorData.ralColors.length} RAL colors with ${Object.keys(colorData.colorNames.en).length} English names`);
                 
             } catch (error) {
                 console.error('Error loading color data:', error);
                 elements.loadingIndicator.innerHTML = 'Error loading color data. Using limited sample set.';
                 
-                // Fallback to sample data
-                loadSampleData();
+                // Fallback to sample data with beautiful names
+                loadSampleDataWithNames();
                 colorData.loaded = true;
                 elements.loadingIndicator.style.display = 'none';
             }
@@ -514,72 +597,74 @@
                 if (parts.length >= 2) {
                     const code = parts[0].trim();
                     const name = parts[1].trim();
-                    names[code] = name;
+                    if (name && name !== 'undefined') {
+                        names[code] = name;
+                    }
                 }
             }
             
             return names;
         }
 
-        // Sample data for fallback (extended)
-        function loadSampleData() {
-            // Generate a more comprehensive sample set
-            colorData.ralColors = [];
+        // Sample data with beautiful color names for fallback
+        function loadSampleDataWithNames() {
+            colorData.ralColors = [
+                { code: "RAL 000 15 00", rgb: { r: 0, g: 0, b: 0 }, lab: rgbToLab(0, 0, 0) },
+                { code: "RAL 010 30 44", rgb: { r: 125, g: 57, b: 71 }, lab: rgbToLab(125, 57, 71) },
+                { code: "RAL 030 50 60", rgb: { r: 191, g: 98, b: 56 }, lab: rgbToLab(191, 98, 56) },
+                { code: "RAL 050 50 78", rgb: { r: 255, g: 132, b: 0 }, lab: rgbToLab(255, 132, 0) },
+                { code: "RAL 060 70 70", rgb: { r: 255, g: 175, b: 69 }, lab: rgbToLab(255, 175, 69) },
+                { code: "RAL 075 70 30", rgb: { r: 181, g: 178, b: 130 }, lab: rgbToLab(181, 178, 130) },
+                { code: "RAL 095 90 10", rgb: { r: 230, g: 229, b: 207 }, lab: rgbToLab(230, 229, 207) },
+                { code: "RAL 110 60 40", rgb: { r: 138, g: 162, b: 120 }, lab: rgbToLab(138, 162, 120) },
+                { code: "RAL 120 50 40", rgb: { r: 81, g: 130, b: 107 }, lab: rgbToLab(81, 130, 107) },
+                { code: "RAL 160 50 45", rgb: { r: 62, g: 140, b: 125 }, lab: rgbToLab(62, 140, 125) },
+                { code: "RAL 200 40 35", rgb: { r: 42, g: 108, b: 140 }, lab: rgbToLab(42, 108, 140) },
+                { code: "RAL 240 40 35", rgb: { r: 42, g: 92, b: 142 }, lab: rgbToLab(42, 92, 142) },
+                { code: "RAL 280 40 35", rgb: { r: 58, g: 71, b: 142 }, lab: rgbToLab(58, 71, 142) },
+                { code: "RAL 310 50 35", rgb: { r: 130, g: 102, b: 142 }, lab: rgbToLab(130, 102, 142) },
+                { code: "RAL 340 40 45", rgb: { r: 142, g: 56, b: 107 }, lab: rgbToLab(142, 56, 107) },
+                { code: "RAL 350 40 45", rgb: { r: 142, g: 56, b: 81 }, lab: rgbToLab(142, 56, 81) }
+            ];
             
-            // Create samples across the color spectrum
-            const hues = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 
-                         160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350];
-            const lightness = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95];
-            const chroma = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+            // Beautiful color names
+            colorData.colorNames.en = {
+                "RAL 000 15 00": "Jet Black",
+                "RAL 010 30 44": "Deep Claret",
+                "RAL 030 50 60": "Fiery Orange",
+                "RAL 050 50 78": "Sunburst Yellow",
+                "RAL 060 70 70": "Golden Apricot",
+                "RAL 075 70 30": "Pistachio Cream",
+                "RAL 095 90 10": "Pearl White",
+                "RAL 110 60 40": "Sage Green",
+                "RAL 120 50 40": "Forest Depth",
+                "RAL 160 50 45": "Ocean Teal",
+                "RAL 200 40 35": "Marine Blue",
+                "RAL 240 40 35": "Cobalt Night",
+                "RAL 280 40 35": "Royal Velvet",
+                "RAL 310 50 35": "Misty Lilac",
+                "RAL 340 40 45": "Magenta Bloom",
+                "RAL 350 40 45": "Berry Wine"
+            };
             
-            let count = 0;
-            for (let h = 0; h < hues.length && count < 200; h++) {
-                for (let l = 0; l < lightness.length && count < 200; l++) {
-                    for (let c = 0; c < chroma.length && count < 200; c++) {
-                        if (Math.random() > 0.7) continue; // Skip some to keep sample manageable
-                        
-                        const hue = hues[h];
-                        const light = lightness[l];
-                        const chrom = chroma[c];
-                        
-                        // Convert HLC to RGB (simplified)
-                        const rgb = hlcToRgb(hue, light, chrom);
-                        
-                        if (rgb) {
-                            colorData.ralColors.push({
-                                code: `RAL ${hue.toString().padStart(3, '0')} ${light} ${chrom}`,
-                                rgb: rgb,
-                                lab: rgbToLab(rgb.r, rgb.g, rgb.b)
-                            });
-                            count++;
-                        }
-                    }
-                }
-            }
-            
-            // Sample names for fallback
-            colorData.colorNames.en = {};
-            colorData.colorNames.ru = {};
-            
-            colorData.ralColors.forEach(color => {
-                colorData.colorNames.en[color.code] = `Sample ${color.code}`;
-                colorData.colorNames.ru[color.code] = `Образец ${color.code}`;
-            });
-        }
-
-        // Simplified HLC to RGB conversion for sample data
-        function hlcToRgb(h, l, c) {
-            // This is a very simplified conversion for demonstration
-            const hue = h / 360;
-            const lightness = l / 100;
-            const chroma = c / 100;
-            
-            // Simple conversion - in reality this would be more complex
-            const r = Math.min(255, Math.max(0, Math.round((Math.sin(hue * 2 * Math.PI) * chroma + lightness) * 255)));
-            const g = Math.min(255, Math.max(0, Math.round((Math.sin((hue + 0.333) * 2 * Math.PI) * chroma + lightness) * 255)));
-            const b = Math.min(255, Math.max(0, Math.round((Math.sin((hue + 0.667) * 2 * Math.PI) * chroma + lightness) * 255)));
-            
-            return { r, g, b };
+            colorData.colorNames.ru = {
+                "RAL 000 15 00": "Глубокий черный",
+                "RAL 010 30 44": "Темно-бордовый",
+                "RAL 030 50 60": "Огненно-оранжевый",
+                "RAL 050 50 78": "Солнечно-желтый",
+                "RAL 060 70 70": "Золотисто-абрикосовый",
+                "RAL 075 70 30": "Фисташковый крем",
+                "RAL 095 90 10": "Жемчужно-белый",
+                "RAL 110 60 40": "Шалфейно-зеленый",
+                "RAL 120 50 40": "Лесная глушь",
+                "RAL 160 50 45": "Океанская бирюза",
+                "RAL 200 40 35": "Морская синева",
+                "RAL 240 40 35": "Кобальтовая ночь",
+                "RAL 280 40 35": "Королевский бархат",
+                "RAL 310 50 35": "Туманная сирень",
+                "RAL 340 40 45": "Малиновый цвет",
+                "RAL 350 40 45": "Ягодное вино"
+            };
         }
 
         // Set up event listeners for user interactions
@@ -608,12 +693,25 @@
             // CMYK text input
             elements.cmykInput.addEventListener('input', updateFromCmyk);
             
+            // Settings sliders
+            elements.resultsCount.addEventListener('input', updateResultsCount);
+            elements.maxDifference.addEventListener('input', updateMaxDifference);
+            
             // Find matches button
             elements.findMatches.addEventListener('click', findMatchingColors);
             
             // Language and color space selectors
             elements.language.addEventListener('change', findMatchingColors);
             elements.colorSpace.addEventListener('change', findMatchingColors);
+        }
+
+        // Update settings sliders
+        function updateResultsCount() {
+            elements.resultsCountValue.textContent = elements.resultsCount.value;
+        }
+
+        function updateMaxDifference() {
+            elements.maxDifferenceValue.textContent = elements.maxDifference.value;
         }
 
         // RGB update functions
@@ -765,7 +863,7 @@
             elements.cmykInput.value = `${Math.round(cmyk.c * 100)},${Math.round(cmyk.m * 100)},${Math.round(cmyk.y * 100)},${Math.round(cmyk.k * 100)}`;
         }
 
-        // Update color preview
+        // Update color preview with separate RGB/CMYK columns
         function updateColorPreview() {
             const r = parseInt(elements.redInput.value);
             const g = parseInt(elements.greenInput.value);
@@ -778,13 +876,22 @@
             // Adjust text color for better contrast
             const brightness = (r * 299 + g * 587 + b * 114) / 1000;
             elements.colorPreview.style.color = brightness > 128 ? 'black' : 'white';
+            
             elements.colorPreview.innerHTML = `
-                <div>RGB: ${r}, ${g}, ${b}</div>
-                <div>CMYK: ${Math.round(cmyk.c * 100)}%, ${Math.round(cmyk.m * 100)}%, ${Math.round(cmyk.y * 100)}%, ${Math.round(cmyk.k * 100)}%</div>
+                <div class="preview-values">
+                    <div class="preview-group">
+                        <div class="preview-label">RGB</div>
+                        <div>${r}, ${g}, ${b}</div>
+                    </div>
+                    <div class="preview-group">
+                        <div class="preview-label">CMYK</div>
+                        <div>${Math.round(cmyk.c * 100)}%, ${Math.round(cmyk.m * 100)}%, ${Math.round(cmyk.y * 100)}%, ${Math.round(cmyk.k * 100)}%</div>
+                    </div>
+                </div>
             `;
         }
 
-        // Color conversion functions
+        // Color conversion functions (same as before)
         function rgbToHex(r, g, b) {
             return '#' + [r, g, b].map(x => {
                 const hex = x.toString(16);
@@ -839,9 +946,10 @@
             };
         }
 
-        // RGB to Lab conversion for better color difference calculations
+        // RGB to Lab conversion (same as before)
         function rgbToLab(r, g, b) {
-            // First convert RGB to XYZ
+            // Implementation same as previous version
+            // ... (keeping the same implementation for brevity)
             let rLinear = r / 255;
             let gLinear = g / 255;
             let bLinear = b / 255;
@@ -854,12 +962,10 @@
             gLinear *= 100;
             bLinear *= 100;
             
-            // Convert to XYZ using D65 reference white
             const x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
             const y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
             const z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
             
-            // Convert XYZ to Lab
             const xRef = 95.047;
             const yRef = 100.000;
             const zRef = 108.883;
@@ -879,7 +985,7 @@
             return { l, a, b: bLab };
         }
 
-        // Color difference calculations
+        // Color difference calculations (same as before)
         function colorDifferenceRgb(rgb1, rgb2) {
             const rDiff = rgb1.r - rgb2.r;
             const gDiff = rgb1.g - rgb2.g;
@@ -896,7 +1002,7 @@
             return Math.sqrt(lDiff * lDiff + aDiff * aDiff + bDiff * bDiff);
         }
 
-        // Find matching colors
+        // Find matching colors with difference threshold
         function findMatchingColors() {
             if (!colorData.loaded) {
                 elements.resultsContainer.innerHTML = '<div class="loading">Still loading color data...</div>';
@@ -911,6 +1017,7 @@
             
             const inputLab = rgbToLab(inputRgb.r, inputRgb.g, inputRgb.b);
             const resultsCount = parseInt(elements.resultsCount.value) || 12;
+            const maxDifference = parseInt(elements.maxDifference.value) || 100;
             const language = elements.language.value;
             const colorSpace = elements.colorSpace.value;
             
@@ -928,7 +1035,7 @@
                     difference: difference,
                     cmyk: rgbToCmyk(color.rgb.r, color.rgb.g, color.rgb.b)
                 };
-            });
+            }).filter(color => color.difference <= maxDifference);
             
             // Sort by difference (ascending)
             colorsWithDifferences.sort((a, b) => a.difference - b.difference);
@@ -940,12 +1047,12 @@
             displayResults(topMatches, language);
         }
 
-        // Display results in the UI
+        // Display results with beautiful names and difference indicators
         function displayResults(matches, language) {
             elements.resultsContainer.innerHTML = '';
             
             if (matches.length === 0) {
-                elements.resultsContainer.innerHTML = '<p>No matching colors found.</p>';
+                elements.resultsContainer.innerHTML = '<p>No matching colors found within the specified difference threshold.</p>';
                 return;
             }
             
@@ -975,7 +1082,12 @@
                 
                 const colorName = document.createElement('div');
                 colorName.className = 'color-name';
-                colorName.textContent = colorData.colorNames[language][match.code] || 'Name not available';
+                const actualName = colorData.colorNames[language][match.code];
+                colorName.textContent = actualName || 'Name not available';
+                if (!actualName) {
+                    colorName.style.color = '#999';
+                    colorName.textContent = 'No name available';
+                }
                 
                 const colorValues = document.createElement('div');
                 colorValues.className = 'color-values';
@@ -999,6 +1111,16 @@
                 
                 const difference = document.createElement('div');
                 difference.className = 'difference';
+                
+                // Add color coding based on difference value
+                if (match.difference < 30) {
+                    difference.classList.add('difference-low');
+                } else if (match.difference < 70) {
+                    difference.classList.add('difference-medium');
+                } else {
+                    difference.classList.add('difference-high');
+                }
+                
                 difference.textContent = `Color difference: ${match.difference.toFixed(2)}`;
                 
                 colorInfo.appendChild(colorCode);
