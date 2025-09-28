@@ -570,1183 +570,1362 @@
             border: 1px solid #ffeaa7;
         }
         
-            /* Copy notification styles */
-            .copy-notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--secondary-color);
-                color: white;
-                padding: 10px 20px;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow);
-                z-index: 1000;
-                transform: translateY(-100px);
-                transition: transform 0.3s ease;
-            }
-            
-            .copy-notification.show {
-                transform: translateY(0);
-            }
-            
-            /* History breadcrumb styles */
-            .history-section {
-                background: var(--card-background);
-                padding: 15px 20px;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow);
-                margin-bottom: 20px;
-            }
-            
-            .history-title {
-                font-weight: bold;
-                margin-bottom: 10px;
-                color: var(--primary-color);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .history-breadcrumb {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                align-items: center;
-            }
-            
-            .history-swatch {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                padding: 5px 10px;
-                background: var(--background-color);
-                border-radius: 20px;
-                border: 1px solid #ddd;
-                cursor: pointer;
-                transition: var(--transition);
-                font-size: 0.8rem;
-            }
-            
-            .history-swatch:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            
-            .history-color {
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                border: 1px solid #ddd;
-            }
-            
-            .history-copy-all {
-                padding: 5px 12px;
-                background: var(--secondary-color);
-                color: white;
-                border: none;
-                border-radius: 15px;
-                cursor: pointer;
-                font-size: 0.8rem;
-                transition: var(--transition);
-            }
-            
-            .history-copy-all:hover {
-                background: var(--primary-color);
-            }
-            
-            .clear-history {
-                padding: 3px 8px;
-                background: #e74c3c;
-                color: white;
-                border: none;
-                border-radius: 12px;
-                cursor: pointer;
-                font-size: 0.7rem;
-                transition: var(--transition);
-            }
-            
-            .clear-history:hover {
-                background: #c0392b;
-            }
-            
-            /* Catalog search highlight */
-            .search-highlight {
-                animation: searchPulse 2s ease-in-out;
-            }
-            
-            @keyframes searchPulse {
-                0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
-                50% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <header>
-                <h1>RAL Color Matcher & Catalog</h1>
-                <p class="description">Find the closest RAL colors or browse the complete RAL Design System Plus catalog with names in English and Russian.</p>
-            </header>
+        /* Copy notification styles */
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+        }
+        
+        .copy-notification.show {
+            transform: translateY(0);
+        }
+        
+        /* History breadcrumb styles */
+        .history-section {
+            background: var(--card-background);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        .history-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .history-swatch {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: var(--background-color);
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+        
+        .history-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .history-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+        
+        .history-copy-all {
+            padding: 5px 12px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .history-copy-all:hover {
+            background: var(--primary-color);
+        }
+        
+        .clear-history {
+            padding: 3px 8px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+        
+        .clear-history:hover {
+            background: #c0392b;
+        }
+        
+        /* Catalog search highlight */
+        .search-highlight {
+            animation: searchPulse 2s ease-in-out;
+        }
+        
+        @keyframes searchPulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
 
-            <div class="nav-tabs">
-                <div class="nav-tab active" data-page="matcher">Color Matcher</div>
-                <div class="nav-tab" data-page="catalog">Full Catalog</div>
-            </div>
+        /* Error message styles */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .retry-button {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .retry-button:hover {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RAL Color Matcher & Catalog</h1>
+            <p class="description">Find the closest RAL colors or browse the complete RAL Design System Plus catalog with names in English and Russian.</p>
+        </header>
 
-            <!-- Copy Notification -->
-            <div class="copy-notification" id="copyNotification">RAL code copied to clipboard!</div>
-
-            <!-- Color Matcher Page -->
-            <div class="page active" id="matcherPage">
-                <section class="input-section">
-                    <div class="color-inputs">
-                        <div class="input-group">
-                            <h2>Input Color</h2>
-                            <div class="color-preview" id="colorPreview">
-                                <div class="preview-values">
-                                    <div class="preview-group">
-                                        <div class="preview-label">RGB</div>
-                                        <div>120, 120, 120</div>
-                                    </div>
-                                    <div class="preview-group">
-                                        <div class="preview-label">CMYK</div>
-                                        <div>0%, 0%, 0%, 53%</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="tab-buttons">
-                                <button class="tab-button active" data-tab="rgb">RGB/HEX</button>
-                                <button class="tab-button" data-tab="cmyk">CMYK</button>
-                            </div>
-                            
-                            <div class="tab-content active" id="rgbTab">
-                                <div class="input-row">
-                                    <label>R:</label>
-                                    <input type="range" id="redSlider" min="0" max="255" value="120">
-                                    <input type="number" id="redInput" min="0" max="255" value="120">
-                                </div>
-                                <div class="input-row">
-                                    <label>G:</label>
-                                    <input type="range" id="greenSlider" min="0" max="255" value="120">
-                                    <input type="number" id="greenInput" min="0" max="255" value="120">
-                                </div>
-                                <div class="input-row">
-                                    <label>B:</label>
-                                    <input type="range" id="blueSlider" min="0" max="255" value="120">
-                                    <input type="number" id="blueInput" min="0" max="255" value="120">
-                                </div>
-                                <input type="text" id="hexInput" class="hex-input" placeholder="#787878" value="#787878">
-                            </div>
-                            
-                            <div class="tab-content" id="cmykTab">
-                                <div class="input-row">
-                                    <label>C:</label>
-                                    <input type="range" id="cyanSlider" min="0" max="100" value="0">
-                                    <input type="number" id="cyanInput" min="0" max="100" value="0">%
-                                </div>
-                                <div class="input-row">
-                                    <label>M:</label>
-                                    <input type="range" id="magentaSlider" min="0" max="100" value="0">
-                                    <input type="number" id="magentaInput" min="0" max="100" value="0">%
-                                </div>
-                                <div class="input-row">
-                                    <label>Y:</label>
-                                    <input type="range" id="yellowSlider" min="0" max="100" value="0">
-                                    <input type="number" id="yellowInput" min="0" max="100" value="0">%
-                                </div>
-                                <div class="input-row">
-                                    <label>K:</label>
-                                    <input type="range" id="blackSlider" min="0" max="100" value="53">
-                                    <input type="number" id="blackInput" min="0" max="100" value="53">%
-                                </div>
-                                <input type="text" id="cmykInput" class="cmyk-input" placeholder="0,0,0,53" value="0,0,0,53">
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <h2>Settings</h2>
-                            
-                            <div class="settings-group">
-                                <label for="resultsCount">
-                                    Number of results: <span class="slider-value" id="resultsCountValue">12</span>
-                                </label>
-                                <input type="range" id="resultsCount" min="1" max="50" value="12">
-                            </div>
-                            
-                            <div class="settings-group">
-                                <label for="maxDifference">
-                                    Max color difference: <span class="slider-value" id="maxDifferenceValue">100</span>
-                                </label>
-                                <input type="range" id="maxDifference" min="1" max="200" value="100">
-                            </div>
-
-                            <div class="settings-group">
-                                <label for="colorSpace">Color difference method:</label>
-                                <select id="colorSpace">
-                                    <option value="rgb">RGB Euclidean</option>
-                                    <option value="cie76">CIE76 (Lab)</option>
-                                </select>
-                            </div>
-                            
-                            <button id="findMatches" style="width: 100%; padding: 10px; background-color: var(--secondary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Find Matching Colors</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- History Breadcrumb Section -->
-                <div class="history-section" id="historySection" style="display: none;">
-                    <div class="history-title">
-                        <span>Recently Copied RAL Colors</span>
-                        <button class="clear-history" id="clearHistory" style="display: none;">Clear</button>
-                    </div>
-                    <div class="history-breadcrumb" id="historyBreadcrumb">
-                        <!-- History items will be added here -->
-                    </div>
-                </div>
-
-                <section class="results-section">
-                    <h2>Closest RAL Colors</h2>
-                    <a href="#" class="view-catalog-link" id="viewCatalogLink" style="display: none;">View this color in full catalog →</a>
-                    <div class="loading" id="loadingIndicator">Loading RAL color data...</div>
-                    <div class="results-grid" id="resultsContainer">
-                        <!-- Results will be displayed here -->
-                    </div>
-                </section>
-            </div>
-
-            <!-- Catalog Page -->
-            <div class="page" id="catalogPage">
-                <!-- Catalog History Breadcrumb -->
-                <div class="history-section" id="catalogHistorySection" style="display: none;">
-                    <div class="history-title">
-                        <span>Recently Copied RAL Colors</span>
-                        <button class="clear-history" id="catalogClearHistory" style="display: none;">Clear</button>
-                    </div>
-                    <div class="history-breadcrumb" id="catalogHistoryBreadcrumb">
-                        <!-- History items will be added here -->
-                    </div>
-                </div>
-
-                <div class="catalog-controls">
-                    <input type="text" id="catalogSearch" class="catalog-search" placeholder="Search by RAL code or color name...">
-                    <div class="hue-filter">
-                        <div class="hue-button active" data-hue="all">All Colors</div>
-                        <div class="hue-button" data-hue="red">Reds</div>
-                        <div class="hue-button" data-hue="orange">Oranges</div>
-                        <div class="hue-button" data-hue="yellow">Yellows</div>
-                        <div class="hue-button" data-hue="green">Greens</div>
-                        <div class="hue-button" data-hue="blue">Blues</div>
-                        <div class="hue-button" data-hue="purple">Purples</div>
-                        <div class="hue-button" data-hue="neutral">Neutrals</div>
-                    </div>
-                </div>
-
-                <div class="loading" id="catalogLoading">Loading RAL catalog...</div>
-                <div id="catalogContainer">
-                    <!-- Catalog will be displayed here -->
-                </div>
-            </div>
-
-            <div class="back-to-top" id="backToTop">↑</div>
-
-            <footer>
-                <p>RAL Color Matcher & Catalog - Based on RAL Design System Plus | Data sources: 
-                    <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt" target="_blank">English names</a>, 
-                    <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt" target="_blank">Russian names</a>
-                </p>
-            </footer>
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-page="matcher">Color Matcher</div>
+            <div class="nav-tab" data-page="catalog">Full Catalog</div>
         </div>
 
-        <script>
-            // Color data structure
-            const colorData = {
-                ralColors: [],
-                loaded: false,
-                currentHighlight: null,
-                copyHistory: [] // Store copied RAL codes
-            };
+        <!-- Copy Notification -->
+        <div class="copy-notification" id="copyNotification">RAL code copied to clipboard!</div>
 
-            // DOM elements
-            const elements = {
-                // Navigation
-                navTabs: document.querySelectorAll('.nav-tab'),
-                pages: document.querySelectorAll('.page'),
-                backToTop: document.getElementById('backToTop'),
-
-                // Copy notification
-                copyNotification: document.getElementById('copyNotification'),
-
-                // History elements
-                historySection: document.getElementById('historySection'),
-                historyBreadcrumb: document.getElementById('historyBreadcrumb'),
-                clearHistory: document.getElementById('clearHistory'),
-                catalogHistorySection: document.getElementById('catalogHistorySection'),
-                catalogHistoryBreadcrumb: document.getElementById('catalogHistoryBreadcrumb'),
-                catalogClearHistory: document.getElementById('catalogClearHistory'),
-
-                // Matcher page elements
-                redSlider: document.getElementById('redSlider'),
-                redInput: document.getElementById('redInput'),
-                greenSlider: document.getElementById('greenSlider'),
-                greenInput: document.getElementById('greenInput'),
-                blueSlider: document.getElementById('blueSlider'),
-                blueInput: document.getElementById('blueInput'),
-                hexInput: document.getElementById('hexInput'),
-                cyanSlider: document.getElementById('cyanSlider'),
-                cyanInput: document.getElementById('cyanInput'),
-                magentaSlider: document.getElementById('magentaSlider'),
-                magentaInput: document.getElementById('magentaInput'),
-                yellowSlider: document.getElementById('yellowSlider'),
-                yellowInput: document.getElementById('yellowInput'),
-                blackSlider: document.getElementById('blackSlider'),
-                blackInput: document.getElementById('blackInput'),
-                cmykInput: document.getElementById('cmykInput'),
-                resultsCount: document.getElementById('resultsCount'),
-                resultsCountValue: document.getElementById('resultsCountValue'),
-                maxDifference: document.getElementById('maxDifference'),
-                maxDifferenceValue: document.getElementById('maxDifferenceValue'),
-                colorSpace: document.getElementById('colorSpace'),
-                colorPreview: document.getElementById('colorPreview'),
-                findMatches: document.getElementById('findMatches'),
-                resultsContainer: document.getElementById('resultsContainer'),
-                loadingIndicator: document.getElementById('loadingIndicator'),
-                viewCatalogLink: document.getElementById('viewCatalogLink'),
-                rgbTab: document.getElementById('rgbTab'),
-                cmykTab: document.getElementById('cmykTab'),
-
-                // Catalog page elements
-                catalogSearch: document.getElementById('catalogSearch'),
-                catalogLoading: document.getElementById('catalogLoading'),
-                catalogContainer: document.getElementById('catalogContainer'),
-                hueButtons: document.querySelectorAll('.hue-button')
-            };
-
-            // Initialize the application
-            async function init() {
-                setupNavigation();
-                setupEventListeners();
-                setupTabs();
-                await loadColorData();
-                updateColorPreview();
-                findMatchingColors();
-                
-                // Pre-load catalog when page loads
-                displayCatalog();
-            }
-
-            // Set up navigation between pages
-            function setupNavigation() {
-                elements.navTabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const pageId = tab.getAttribute('data-page') + 'Page';
-                        
-                        // Update active tab
-                        elements.navTabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        // Show corresponding page
-                        elements.pages.forEach(page => page.classList.remove('active'));
-                        document.getElementById(pageId).classList.add('active');
-                        
-                        // Update catalog history when switching to catalog page
-                        if (pageId === 'catalogPage') {
-                            updateCatalogHistoryDisplay();
-                        }
-                        
-                        // Ensure catalog is loaded when switching to catalog page
-                        if (pageId === 'catalogPage' && colorData.loaded && elements.catalogContainer.children.length === 0) {
-                            displayCatalog();
-                        }
-                    });
-                });
-
-                // Back to top button
-                elements.backToTop.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-
-                window.addEventListener('scroll', () => {
-                    elements.backToTop.style.display = window.scrollY > 500 ? 'block' : 'none';
-                });
-            }
-
-            // Set up tab functionality
-            function setupTabs() {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.classList.remove('active');
-                        });
-                        
-                        button.classList.add('active');
-                        const tabId = button.getAttribute('data-tab') + 'Tab';
-                        document.getElementById(tabId).classList.add('active');
-                    });
-                });
-            }
-
-            // Copy RAL code to clipboard with notification
-            function copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showCopyNotification();
-                    
-                    // Add to history if it's a RAL code
-                    if (text.startsWith('RAL')) {
-                        addToHistory(text);
-                    }
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    // Fallback for older browsers
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showCopyNotification();
-                    
-                    if (text.startsWith('RAL')) {
-                        addToHistory(text);
-                    }
-                });
-            }
-
-            // Show copy notification
-            function showCopyNotification() {
-                elements.copyNotification.classList.add('show');
-                setTimeout(() => {
-                    elements.copyNotification.classList.remove('show');
-                }, 2000);
-            }
-
-            // Add RAL code to history
-            function addToHistory(ralCode) {
-                // Remove if already exists (to avoid duplicates)
-                colorData.copyHistory = colorData.copyHistory.filter(code => code !== ralCode);
-                
-                // Add to beginning of array
-                colorData.copyHistory.unshift(ralCode);
-                
-                // Keep only last 10 items
-                if (colorData.copyHistory.length > 10) {
-                    colorData.copyHistory = colorData.copyHistory.slice(0, 10);
-                }
-                
-                // Update history displays
-                updateHistoryDisplay();
-                updateCatalogHistoryDisplay();
-            }
-
-            // Clear history
-            function clearHistory() {
-                colorData.copyHistory = [];
-                updateHistoryDisplay();
-                updateCatalogHistoryDisplay();
-            }
-
-            // Update matcher history breadcrumb display
-            function updateHistoryDisplay() {
-                if (colorData.copyHistory.length === 0) {
-                    elements.historySection.style.display = 'none';
-                    elements.clearHistory.style.display = 'none';
-                    return;
-                }
-                
-                elements.historySection.style.display = 'block';
-                elements.clearHistory.style.display = 'block';
-                elements.historyBreadcrumb.innerHTML = '';
-                
-                colorData.copyHistory.forEach(ralCode => {
-                    // Find the color data for this RAL code
-                    const color = colorData.ralColors.find(c => c.code === ralCode);
-                    const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
-                    
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-swatch';
-                    historyItem.title = `Click to copy ${ralCode}`;
-                    
-                    historyItem.innerHTML = `
-                        <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
-                        <span>${ralCode}</span>
-                    `;
-                    
-                    historyItem.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        copyToClipboard(ralCode);
-                    });
-                    
-                    elements.historyBreadcrumb.appendChild(historyItem);
-                });
-                
-                // Add "Copy All" button
-                const copyAllButton = document.createElement('button');
-                copyAllButton.className = 'history-copy-all';
-                copyAllButton.textContent = 'Copy All';
-                copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-                
-                copyAllButton.addEventListener('click', () => {
-                    const allCodes = colorData.copyHistory.join(', ');
-                    copyToClipboard(allCodes);
-                });
-                
-                elements.historyBreadcrumb.appendChild(copyAllButton);
-            }
-
-            // Update catalog history breadcrumb display
-            function updateCatalogHistoryDisplay() {
-                if (colorData.copyHistory.length === 0) {
-                    elements.catalogHistorySection.style.display = 'none';
-                    elements.catalogClearHistory.style.display = 'none';
-                    return;
-                }
-                
-                elements.catalogHistorySection.style.display = 'block';
-                elements.catalogClearHistory.style.display = 'block';
-                elements.catalogHistoryBreadcrumb.innerHTML = '';
-                
-                colorData.copyHistory.forEach(ralCode => {
-                    // Find the color data for this RAL code
-                    const color = colorData.ralColors.find(c => c.code === ralCode);
-                    const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
-                    
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-swatch';
-                    historyItem.title = `Click to copy ${ralCode}`;
-                    
-                    historyItem.innerHTML = `
-                        <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
-                        <span>${ralCode}</span>
-                    `;
-                    
-                    historyItem.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        copyToClipboard(ralCode);
-                        // Also search for this code in catalog
-                        elements.catalogSearch.value = ralCode;
-                        filterCatalog();
-                    });
-                    
-                    elements.catalogHistoryBreadcrumb.appendChild(historyItem);
-                });
-                
-                // Add "Copy All" button
-                const copyAllButton = document.createElement('button');
-                copyAllButton.className = 'history-copy-all';
-                copyAllButton.textContent = 'Copy All';
-                copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-                
-                copyAllButton.addEventListener('click', () => {
-                    const allCodes = colorData.copyHistory.join(', ');
-                    copyToClipboard(allCodes);
-                });
-                
-                elements.catalogHistoryBreadcrumb.appendChild(copyAllButton);
-            }
-
-            // Set up event listeners
-            function setupEventListeners() {
-                // RGB inputs
-                elements.redSlider.addEventListener('input', updateRed);
-                elements.redInput.addEventListener('input', updateRed);
-                elements.greenSlider.addEventListener('input', updateGreen);
-                elements.greenInput.addEventListener('input', updateGreen);
-                elements.blueSlider.addEventListener('input', updateBlue);
-                elements.blueInput.addEventListener('input', updateBlue);
-                elements.hexInput.addEventListener('input', updateFromHex);
-                
-                // CMYK inputs
-                elements.cyanSlider.addEventListener('input', updateCyan);
-                elements.cyanInput.addEventListener('input', updateCyan);
-                elements.magentaSlider.addEventListener('input', updateMagenta);
-                elements.magentaInput.addEventListener('input', updateMagenta);
-                elements.yellowSlider.addEventListener('input', updateYellow);
-                elements.yellowInput.addEventListener('input', updateYellow);
-                elements.blackSlider.addEventListener('input', updateBlack);
-                elements.blackInput.addEventListener('input', updateBlack);
-                elements.cmykInput.addEventListener('input', updateFromCmyk);
-                
-                // Settings
-                elements.resultsCount.addEventListener('input', updateResultsCount);
-                elements.maxDifference.addEventListener('input', updateMaxDifference);
-                elements.findMatches.addEventListener('click', findMatchingColors);
-                
-                // Clear history buttons
-                elements.clearHistory.addEventListener('click', clearHistory);
-                elements.catalogClearHistory.addEventListener('click', clearHistory);
-                
-                // Catalog hue filter buttons - FIXED: Now properly scrolls without clearing
-                elements.hueButtons.forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const hue = button.getAttribute('data-hue');
-                        
-                        // Clear search when using hue filters
-                        elements.catalogSearch.value = '';
-                        filterCatalog();
-                        
-                        if (hue === 'all') {
-                            // Scroll to top
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        } else {
-                            // Scroll to the specific hue section
-                            const section = document.getElementById(`section-${hue}`);
-                            if (section) {
-                                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                        }
-                        
-                        // Update active button for visual feedback
-                        elements.hueButtons.forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-                    });
-                });
-                
-                // Catalog search - FIXED: Now properly filters
-                elements.catalogSearch.addEventListener('input', filterCatalog);
-            }
-
-            // Update settings
-            function updateResultsCount() {
-                elements.resultsCountValue.textContent = elements.resultsCount.value;
-            }
-
-            function updateMaxDifference() {
-                elements.maxDifferenceValue.textContent = elements.maxDifference.value;
-            }
-
-            // RGB update functions
-            function updateRed() {
-                const value = Math.min(255, Math.max(0, parseInt(elements.redSlider.value) || 0));
-                elements.redSlider.value = value;
-                elements.redInput.value = value;
-                updateColorFromRGB();
-            }
-
-            function updateGreen() {
-                const value = Math.min(255, Math.max(0, parseInt(elements.greenSlider.value) || 0));
-                elements.greenSlider.value = value;
-                elements.greenInput.value = value;
-                updateColorFromRGB();
-            }
-
-            function updateBlue() {
-                const value = Math.min(255, Math.max(0, parseInt(elements.blueSlider.value) || 0));
-                elements.blueSlider.value = value;
-                elements.blueInput.value = value;
-                updateColorFromRGB();
-            }
-
-            // CMYK update functions
-            function updateCyan() {
-                const value = Math.min(100, Math.max(0, parseInt(elements.cyanSlider.value) || 0));
-                elements.cyanSlider.value = value;
-                elements.cyanInput.value = value;
-                updateColorFromCMYK();
-            }
-
-            function updateMagenta() {
-                const value = Math.min(100, Math.max(0, parseInt(elements.magentaSlider.value) || 0));
-                elements.magentaSlider.value = value;
-                elements.magentaInput.value = value;
-                updateColorFromCMYK();
-            }
-
-            function updateYellow() {
-                const value = Math.min(100, Math.max(0, parseInt(elements.yellowSlider.value) || 0));
-                elements.yellowSlider.value = value;
-                elements.yellowInput.value = value;
-                updateColorFromCMYK();
-            }
-
-            function updateBlack() {
-                const value = Math.min(100, Math.max(0, parseInt(elements.blackSlider.value) || 0));
-                elements.blackSlider.value = value;
-                elements.blackInput.value = value;
-                updateColorFromCMYK();
-            }
-
-            // Color conversion and update functions
-            function updateColorFromRGB() {
-                const r = parseInt(elements.redInput.value);
-                const g = parseInt(elements.greenInput.value);
-                const b = parseInt(elements.blueInput.value);
-                
-                const hex = rgbToHex(r, g, b);
-                elements.hexInput.value = hex;
-                
-                const cmyk = rgbToCmyk(r, g, b);
-                updateCmykInputs(cmyk);
-                
-                updateColorPreview();
-            }
-
-            function updateColorFromCMYK() {
-                const c = parseInt(elements.cyanInput.value) / 100;
-                const m = parseInt(elements.magentaInput.value) / 100;
-                const y = parseInt(elements.yellowInput.value) / 100;
-                const k = parseInt(elements.blackInput.value) / 100;
-                
-                elements.cmykInput.value = `${Math.round(c*100)},${Math.round(m*100)},${Math.round(y*100)},${Math.round(k*100)}`;
-                
-                const rgb = cmykToRgb(c, m, y, k);
-                updateRgbInputs(rgb);
-                
-                updateColorPreview();
-            }
-
-            function updateFromHex() {
-                const hex = elements.hexInput.value.replace('#', '');
-                
-                if (hex.length === 3 || hex.length === 6) {
-                    const rgb = hexToRgb(hex);
-                    if (rgb) {
-                        updateRgbInputs(rgb);
-                        const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-                        updateCmykInputs(cmyk);
-                        updateColorPreview();
-                    }
-                }
-            }
-
-            function updateFromCmyk() {
-                const cmykStr = elements.cmykInput.value;
-                const parts = cmykStr.split(',').map(part => parseInt(part.trim()));
-                
-                if (parts.length === 4 && parts.every(p => !isNaN(p) && p >= 0 && p <= 100)) {
-                    const [c, m, y, k] = parts;
-                    elements.cyanInput.value = c;
-                    elements.cyanSlider.value = c;
-                    elements.magentaInput.value = m;
-                    elements.magentaSlider.value = m;
-                    elements.yellowInput.value = y;
-                    elements.yellowSlider.value = y;
-                    elements.blackInput.value = k;
-                    elements.blackSlider.value = k;
-                    
-                    updateColorFromCMYK();
-                }
-            }
-
-            function updateRgbInputs(rgb) {
-                elements.redSlider.value = rgb.r;
-                elements.redInput.value = rgb.r;
-                elements.greenSlider.value = rgb.g;
-                elements.greenInput.value = rgb.g;
-                elements.blueSlider.value = rgb.b;
-                elements.blueInput.value = rgb.b;
-                elements.hexInput.value = rgbToHex(rgb.r, rgb.g, rgb.b);
-            }
-
-            function updateCmykInputs(cmyk) {
-                elements.cyanInput.value = Math.round(cmyk.c * 100);
-                elements.cyanSlider.value = Math.round(cmyk.c * 100);
-                elements.magentaInput.value = Math.round(cmyk.m * 100);
-                elements.magentaSlider.value = Math.round(cmyk.m * 100);
-                elements.yellowInput.value = Math.round(cmyk.y * 100);
-                elements.yellowSlider.value = Math.round(cmyk.y * 100);
-                elements.blackInput.value = Math.round(cmyk.k * 100);
-                elements.blackSlider.value = Math.round(cmyk.k * 100);
-                elements.cmykInput.value = `${Math.round(cmyk.c * 100)},${Math.round(cmyk.m * 100)},${Math.round(cmyk.y * 100)},${Math.round(cmyk.k * 100)}`;
-            }
-
-            function updateColorPreview() {
-                const r = parseInt(elements.redInput.value);
-                const g = parseInt(elements.greenInput.value);
-                const b = parseInt(elements.blueInput.value);
-                const cmyk = rgbToCmyk(r, g, b);
-                
-                elements.colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-                elements.colorPreview.style.color = brightness > 128 ? 'black' : 'white';
-                
-                elements.colorPreview.innerHTML = `
-                    <div class="preview-values">
-                        <div class="preview-group">
-                            <div class="preview-label">RGB</div>
-                            <div>${r}, ${g}, ${b}</div>
+        <!-- Color Matcher Page -->
+        <div class="page active" id="matcherPage">
+            <section class="input-section">
+                <div class="color-inputs">
+                    <div class="input-group">
+                        <h2>Input Color</h2>
+                        <div class="color-preview" id="colorPreview">
+                            <div class="preview-values">
+                                <div class="preview-group">
+                                    <div class="preview-label">RGB</div>
+                                    <div>120, 120, 120</div>
+                                </div>
+                                <div class="preview-group">
+                                    <div class="preview-label">CMYK</div>
+                                    <div>0%, 0%, 0%, 53%</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="preview-group">
-                            <div class="preview-label">CMYK</div>
-                            <div>${Math.round(cmyk.c * 100)}%, ${Math.round(cmyk.m * 100)}%, ${Math.round(cmyk.y * 100)}%, ${Math.round(cmyk.k * 100)}%</div>
+                        
+                        <div class="tab-buttons">
+                            <button class="tab-button active" data-tab="rgb">RGB/HEX</button>
+                            <button class="tab-button" data-tab="cmyk">CMYK</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="rgbTab">
+                            <div class="input-row">
+                                <label>R:</label>
+                                <input type="range" id="redSlider" min="0" max="255" value="120">
+                                <input type="number" id="redInput" min="0" max="255" value="120">
+                            </div>
+                            <div class="input-row">
+                                <label>G:</label>
+                                <input type="range" id="greenSlider" min="0" max="255" value="120">
+                                <input type="number" id="greenInput" min="0" max="255" value="120">
+                            </div>
+                            <div class="input-row">
+                                <label>B:</label>
+                                <input type="range" id="blueSlider" min="0" max="255" value="120">
+                                <input type="number" id="blueInput" min="0" max="255" value="120">
+                            </div>
+                            <input type="text" id="hexInput" class="hex-input" placeholder="#787878" value="#787878">
+                        </div>
+                        
+                        <div class="tab-content" id="cmykTab">
+                            <div class="input-row">
+                                <label>C:</label>
+                                <input type="range" id="cyanSlider" min="0" max="100" value="0">
+                                <input type="number" id="cyanInput" min="0" max="100" value="0">%
+                            </div>
+                            <div class="input-row">
+                                <label>M:</label>
+                                <input type="range" id="magentaSlider" min="0" max="100" value="0">
+                                <input type="number" id="magentaInput" min="0" max="100" value="0">%
+                            </div>
+                            <div class="input-row">
+                                <label>Y:</label>
+                                <input type="range" id="yellowSlider" min="0" max="100" value="0">
+                                <input type="number" id="yellowInput" min="0" max="100" value="0">%
+                            </div>
+                            <div class="input-row">
+                                <label>K:</label>
+                                <input type="range" id="blackSlider" min="0" max="100" value="53">
+                                <input type="number" id="blackInput" min="0" max="100" value="53">%
+                            </div>
+                            <input type="text" id="cmykInput" class="cmyk-input" placeholder="0,0,0,53" value="0,0,0,53">
                         </div>
                     </div>
-                `;
-            }
 
-            // Color conversion functions
-            function rgbToHex(r, g, b) {
-                return '#' + [r, g, b].map(x => {
-                    const hex = x.toString(16);
-                    return hex.length === 1 ? '0' + hex : hex;
-                }).join('');
-            }
-
-            function hexToRgb(hex) {
-                if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
-                const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : null;
-            }
-
-            function rgbToCmyk(r, g, b) {
-                if (r === 0 && g === 0 && b === 0) return { c: 0, m: 0, y: 0, k: 1 };
-                const rPrime = r / 255, gPrime = g / 255, bPrime = b / 255;
-                const k = 1 - Math.max(rPrime, gPrime, bPrime);
-                return {
-                    c: (1 - rPrime - k) / (1 - k) || 0,
-                    m: (1 - gPrime - k) / (1 - k) || 0,
-                    y: (1 - bPrime - k) / (1 - k) || 0,
-                    k: k || 0
-                };
-            }
-
-            function cmykToRgb(c, m, y, k) {
-                return {
-                    r: Math.round(255 * (1 - c) * (1 - k)),
-                    g: Math.round(255 * (1 - m) * (1 - k)),
-                    b: Math.round(255 * (1 - y) * (1 - k))
-                };
-            }
-
-            function rgbToLab(r, g, b) {
-                // Simplified Lab conversion for color difference
-                const rLinear = r / 255;
-                const gLinear = g / 255;
-                const bLinear = b / 255;
-                
-                const x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
-                const y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
-                const z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
-                
-                return {
-                    l: Math.max(0, Math.min(100, y * 100)),
-                    a: Math.max(-128, Math.min(127, (x - y) * 200)),
-                    b: Math.max(-128, Math.min(127, (y - z) * 200))
-                };
-            }
-
-            // Color matching functions
-            function colorDifferenceRgb(rgb1, rgb2) {
-                const rDiff = rgb1.r - rgb2.r, gDiff = rgb1.g - rgb2.g, bDiff = rgb1.b - rgb2.b;
-                return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
-            }
-
-            function colorDifferenceLab(lab1, lab2) {
-                const lDiff = lab1.l - lab2.l, aDiff = lab1.a - lab2.a, bDiff = lab1.b - lab2.b;
-                return Math.sqrt(lDiff * lDiff + aDiff * aDiff + bDiff * bDiff);
-            }
-
-            function findMatchingColors() {
-                if (!colorData.loaded) {
-                    elements.resultsContainer.innerHTML = '<div class="loading">Still loading color data...</div>';
-                    return;
-                }
-                
-                const inputRgb = {
-                    r: parseInt(elements.redInput.value),
-                    g: parseInt(elements.greenInput.value),
-                    b: parseInt(elements.blueInput.value)
-                };
-                
-                const inputLab = rgbToLab(inputRgb.r, inputRgb.g, inputRgb.b);
-                const resultsCount = parseInt(elements.resultsCount.value) || 12;
-                const maxDifference = parseInt(elements.maxDifference.value) || 100;
-                const colorSpace = elements.colorSpace.value;
-                
-                const colorsWithDifferences = colorData.ralColors.map(color => {
-                    let difference;
-                    if (colorSpace === 'cie76' && color.lab) {
-                        difference = colorDifferenceLab(inputLab, color.lab);
-                    } else {
-                        difference = colorDifferenceRgb(inputRgb, color.rgb);
-                    }
-                    
-                    return {
-                        ...color,
-                        difference: difference,
-                        cmyk: rgbToCmyk(color.rgb.r, color.rgb.g, color.rgb.b)
-                    };
-                }).filter(color => color.difference <= maxDifference);
-                
-                colorsWithDifferences.sort((a, b) => a.difference - b.difference);
-                const topMatches = colorsWithDifferences.slice(0, resultsCount);
-                
-                displayResults(topMatches);
-                
-                // Show catalog link for closest match
-                if (topMatches.length > 0) {
-                    elements.viewCatalogLink.style.display = 'inline-block';
-                    elements.viewCatalogLink.onclick = (e) => {
-                        e.preventDefault();
-                        // When clicking view catalog link, copy the first match and put it in catalog search
-                        const firstMatchCode = topMatches[0].code;
-                        copyToClipboard(firstMatchCode);
-                        elements.catalogSearch.value = firstMatchCode;
-                        filterCatalog();
+                    <div class="input-group">
+                        <h2>Settings</h2>
                         
-                        // Switch to catalog page
-                        elements.navTabs.forEach(tab => tab.classList.remove('active'));
-                        document.querySelector('.nav-tab[data-page="catalog"]').classList.add('active');
-                        elements.pages.forEach(page => page.classList.remove('active'));
-                        elements.catalogPage.classList.add('active');
-                    };
-                } else {
-                    elements.viewCatalogLink.style.display = 'none';
-                }
-            }
-
-            function displayResults(matches) {
-                elements.resultsContainer.innerHTML = '';
-                
-                if (matches.length === 0) {
-                    elements.resultsContainer.innerHTML = '<p>No matching colors found within the specified difference threshold. Try increasing the max difference value.</p>';
-                    return;
-                }
-                
-                matches.forEach(match => {
-                    const colorCard = document.createElement('div');
-                    colorCard.className = 'color-card';
-                    colorCard.addEventListener('click', () => {
-                        // Copy RAL code to clipboard
-                        copyToClipboard(match.code);
-                    });
-                    
-                    const colorSwatch = document.createElement('div');
-                    colorSwatch.className = 'color-swatch';
-                    colorSwatch.style.backgroundColor = `rgb(${match.rgb.r}, ${match.rgb.g}, ${match.rgb.b})`;
-                    
-                    const brightness = (match.rgb.r * 299 + match.rgb.g * 587 + match.rgb.b * 114) / 1000;
-                    colorSwatch.style.color = brightness > 128 ? 'black' : 'white';
-                    colorSwatch.innerHTML = `
-                        <div>${match.code}</div>
-                        <div style="font-size: 0.8rem;">Click to copy</div>
-                    `;
-                    
-                    const colorInfo = document.createElement('div');
-                    colorInfo.className = 'color-info';
-                    
-                    const colorCode = document.createElement('div');
-                    colorCode.className = 'color-code';
-                    colorCode.textContent = match.code;
-                    
-                    const colorNameEn = document.createElement('div');
-                    colorNameEn.className = 'color-name';
-                    colorNameEn.textContent = match.nameEn || 'No English name';
-                    if (!match.nameEn) colorNameEn.style.color = '#999';
-                    
-                    const colorNameRu = document.createElement('div');
-                    colorNameRu.className = 'color-name-ru';
-                    colorNameRu.textContent = match.nameRu || 'No Russian name';
-                    if (!match.nameRu) colorNameRu.style.color = '#999';
-                    
-                    const colorValues = document.createElement('div');
-                    colorValues.className = 'color-values';
-                    colorValues.innerHTML = `
-                        <div class="value-group">
-                            <div class="value-label">RGB</div>
-                            <div>${match.rgb.r}, ${match.rgb.g}, ${match.rgb.b}</div>
+                        <div class="settings-group">
+                            <label for="resultsCount">
+                                Number of results: <span class="slider-value" id="resultsCountValue">12</span>
+                            </label>
+                            <input type="range" id="resultsCount" min="1" max="50" value="12">
                         </div>
-                        <div class="value-group">
-                            <div class="value-label">CMYK</div>
-                            <div>${Math.round(match.cmyk.c * 100)}%, ${Math.round(match.cmyk.m * 100)}%, ${Math.round(match.cmyk.y * 100)}%, ${Math.round(match.cmyk.k * 100)}%</div>
+                        
+                        <div class="settings-group">
+                            <label for="maxDifference">
+                                Max color difference: <span class="slider-value" id="maxDifferenceValue">100</span>
+                            </label>
+                            <input type="range" id="maxDifference" min="1" max="200" value="100">
                         </div>
-                    `;
-                    
-                    const difference = document.createElement('div');
-                    difference.className = 'difference';
-                    if (match.difference < 30) difference.classList.add('difference-low');
-                    else if (match.difference < 70) difference.classList.add('difference-medium');
-                    else difference.classList.add('difference-high');
-                    difference.textContent = `Color difference: ${match.difference.toFixed(2)}`;
-                    
-                    colorInfo.appendChild(colorCode);
-                    colorInfo.appendChild(colorNameEn);
-                    colorInfo.appendChild(colorNameRu);
-                    colorInfo.appendChild(colorValues);
-                    colorInfo.appendChild(difference);
-                    
-                    colorCard.appendChild(colorSwatch);
-                    colorCard.appendChild(colorInfo);
-                    elements.resultsContainer.appendChild(colorCard);
-                });
-            }
 
-            // Catalog functions
-            function displayCatalog() {
-                if (!colorData.loaded || colorData.ralColors.length === 0) {
-                    console.log('No color data available for catalog');
-                    elements.catalogContainer.innerHTML = '<div class="loading">No color data available. Please check the data sources.</div>';
-                    return;
-                }
-                
-                const hueCategories = {
-                    red: [], orange: [], yellow: [], green: [], blue: [], purple: [], neutral: []
-                };
-                
-                // Sort colors by hue category
-                colorData.ralColors.forEach(color => {
-                    if (hueCategories[color.hue]) {
-                        hueCategories[color.hue].push(color);
-                    } else {
-                        hueCategories.neutral.push(color);
+                        <div class="settings-group">
+                            <label for="colorSpace">Color difference method:</label>
+                            <select id="colorSpace">
+                                <option value="rgb">RGB Euclidean</option>
+                                <option value="cie76">CIE76 (Lab)</option>
+                            </select>
+                        </div>
+                        
+                        <button id="findMatches" style="width: 100%; padding: 10px; background-color: var(--secondary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Find Matching Colors</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Breadcrumb Section -->
+            <div class="history-section" id="historySection" style="display: none;">
+                <div class="history-title">
+                    <span>Recently Copied RAL Colors</span>
+                    <button class="clear-history" id="clearHistory" style="display: none;">Clear</button>
+                </div>
+                <div class="history-breadcrumb" id="historyBreadcrumb">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+
+            <section class="results-section">
+                <h2>Closest RAL Colors</h2>
+                <a href="#" class="view-catalog-link" id="viewCatalogLink" style="display: none;">View this color in full catalog →</a>
+                <div class="loading" id="loadingIndicator">Loading RAL color data...</div>
+                <div id="errorContainer"></div>
+                <div class="results-grid" id="resultsContainer">
+                    <!-- Results will be displayed here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Catalog Page -->
+        <div class="page" id="catalogPage">
+            <!-- Catalog History Breadcrumb -->
+            <div class="history-section" id="catalogHistorySection" style="display: none;">
+                <div class="history-title">
+                    <span>Recently Copied RAL Colors</span>
+                    <button class="clear-history" id="catalogClearHistory" style="display: none;">Clear</button>
+                </div>
+                <div class="history-breadcrumb" id="catalogHistoryBreadcrumb">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+
+            <div class="catalog-controls">
+                <input type="text" id="catalogSearch" class="catalog-search" placeholder="Search by RAL code or color name...">
+                <div class="hue-filter">
+                    <div class="hue-button active" data-hue="all">All Colors</div>
+                    <div class="hue-button" data-hue="red">Reds</div>
+                    <div class="hue-button" data-hue="orange">Oranges</div>
+                    <div class="hue-button" data-hue="yellow">Yellows</div>
+                    <div class="hue-button" data-hue="green">Greens</div>
+                    <div class="hue-button" data-hue="blue">Blues</div>
+                    <div class="hue-button" data-hue="purple">Purples</div>
+                    <div class="hue-button" data-hue="neutral">Neutrals</div>
+                </div>
+            </div>
+
+            <div class="loading" id="catalogLoading">Loading RAL catalog...</div>
+            <div id="catalogErrorContainer"></div>
+            <div id="catalogContainer">
+                <!-- Catalog will be displayed here -->
+            </div>
+        </div>
+
+        <div class="back-to-top" id="backToTop">↑</div>
+
+        <footer>
+            <p>RAL Color Matcher & Catalog - Based on RAL Design System Plus | Data sources: 
+                <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt" target="_blank">English names</a>, 
+                <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt" target="_blank">Russian names</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Color data structure
+        const colorData = {
+            ralColors: [],
+            loaded: false,
+            currentHighlight: null,
+            copyHistory: [] // Store copied RAL codes
+        };
+
+        // DOM elements
+        const elements = {
+            // Navigation
+            navTabs: document.querySelectorAll('.nav-tab'),
+            pages: document.querySelectorAll('.page'),
+            backToTop: document.getElementById('backToTop'),
+
+            // Copy notification
+            copyNotification: document.getElementById('copyNotification'),
+
+            // Error containers
+            errorContainer: document.getElementById('errorContainer'),
+            catalogErrorContainer: document.getElementById('catalogErrorContainer'),
+
+            // History elements
+            historySection: document.getElementById('historySection'),
+            historyBreadcrumb: document.getElementById('historyBreadcrumb'),
+            clearHistory: document.getElementById('clearHistory'),
+            catalogHistorySection: document.getElementById('catalogHistorySection'),
+            catalogHistoryBreadcrumb: document.getElementById('catalogHistoryBreadcrumb'),
+            catalogClearHistory: document.getElementById('catalogClearHistory'),
+
+            // Matcher page elements
+            redSlider: document.getElementById('redSlider'),
+            redInput: document.getElementById('redInput'),
+            greenSlider: document.getElementById('greenSlider'),
+            greenInput: document.getElementById('greenInput'),
+            blueSlider: document.getElementById('blueSlider'),
+            blueInput: document.getElementById('blueInput'),
+            hexInput: document.getElementById('hexInput'),
+            cyanSlider: document.getElementById('cyanSlider'),
+            cyanInput: document.getElementById('cyanInput'),
+            magentaSlider: document.getElementById('magentaSlider'),
+            magentaInput: document.getElementById('magentaInput'),
+            yellowSlider: document.getElementById('yellowSlider'),
+            yellowInput: document.getElementById('yellowInput'),
+            blackSlider: document.getElementById('blackSlider'),
+            blackInput: document.getElementById('blackInput'),
+            cmykInput: document.getElementById('cmykInput'),
+            resultsCount: document.getElementById('resultsCount'),
+            resultsCountValue: document.getElementById('resultsCountValue'),
+            maxDifference: document.getElementById('maxDifference'),
+            maxDifferenceValue: document.getElementById('maxDifferenceValue'),
+            colorSpace: document.getElementById('colorSpace'),
+            colorPreview: document.getElementById('colorPreview'),
+            findMatches: document.getElementById('findMatches'),
+            resultsContainer: document.getElementById('resultsContainer'),
+            loadingIndicator: document.getElementById('loadingIndicator'),
+            viewCatalogLink: document.getElementById('viewCatalogLink'),
+            rgbTab: document.getElementById('rgbTab'),
+            cmykTab: document.getElementById('cmykTab'),
+
+            // Catalog page elements
+            catalogSearch: document.getElementById('catalogSearch'),
+            catalogLoading: document.getElementById('catalogLoading'),
+            catalogContainer: document.getElementById('catalogContainer'),
+            hueButtons: document.querySelectorAll('.hue-button')
+        };
+
+        // Initialize the application
+        async function init() {
+            setupNavigation();
+            setupEventListeners();
+            setupTabs();
+            await loadColorData();
+            updateColorPreview();
+            
+            if (colorData.loaded) {
+                findMatchingColors();
+                displayCatalog();
+            }
+        }
+
+        // Set up navigation between pages
+        function setupNavigation() {
+            elements.navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const pageId = tab.getAttribute('data-page') + 'Page';
+                    
+                    // Update active tab
+                    elements.navTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show corresponding page
+                    elements.pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update catalog history when switching to catalog page
+                    if (pageId === 'catalogPage') {
+                        updateCatalogHistoryDisplay();
                     }
                 });
-                
-                // Sort each category by RAL code for consistent ordering
-                Object.keys(hueCategories).forEach(hue => {
-                    hueCategories[hue].sort((a, b) => a.code.localeCompare(b.code));
-                });
-                
-                elements.catalogContainer.innerHTML = '';
-                
-                // Display each category
-                const categoryOrder = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'neutral'];
-                let totalColors = 0;
-                
-                categoryOrder.forEach(hue => {
-                    if (hueCategories[hue].length === 0) return;
-                    
-                    totalColors += hueCategories[hue].length;
-                    const section = document.createElement('div');
-                    section.id = `section-${hue}`;
-                    section.className = 'catalog-section';
-                    
-                    const header = document.createElement('div');
-                    header.className = 'section-header';
-                    header.textContent = `${hue.charAt(0).toUpperCase() + hue.slice(1)} Colors (${hueCategories[hue].length})`;
-                    section.appendChild(header);
-                    
-                    const grid = document.createElement('div');
-                    grid.className = 'catalog-grid';
-                    
-                    hueCategories[hue].forEach(color => {
-                        const card = createCatalogCard(color);
-                        grid.appendChild(card);
+            });
+
+            // Back to top button
+            elements.backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            window.addEventListener('scroll', () => {
+                elements.backToTop.style.display = window.scrollY > 500 ? 'block' : 'none';
+            });
+        }
+
+        // Set up tab functionality
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
                     });
                     
-                    section.appendChild(grid);
-                    elements.catalogContainer.appendChild(section);
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab') + 'Tab';
+                    document.getElementById(tabId).classList.add('active');
                 });
-                
-                console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
-            }
+            });
+        }
 
-            function createCatalogCard(color) {
-                const card = document.createElement('div');
-                card.className = 'catalog-card';
-                card.id = `color-${color.code.replace(/\s+/g, '-')}`;
-                card.addEventListener('click', () => {
-                    // Copy RAL code to clipboard and put it in search field
-                    copyToClipboard(color.code);
-                    elements.catalogSearch.value = color.code;
+        // Show error message
+        function showError(message, container, retryCallback = null) {
+            container.innerHTML = `
+                <div class="error-message">
+                    <strong>Error:</strong> ${message}
+                    ${retryCallback ? '<br><button class="retry-button" onclick="' + retryCallback + '">Retry Loading</button>' : ''}
+                </div>
+            `;
+        }
+
+        // Clear error message
+        function clearError(container) {
+            container.innerHTML = '';
+        }
+
+        // Load RAL color data from text files - IMPROVED PARSING
+        async function loadColorData() {
+            try {
+                elements.loadingIndicator.style.display = 'block';
+                elements.catalogLoading.style.display = 'block';
+                elements.loadingIndicator.textContent = 'Loading RAL color data from text files...';
+                elements.catalogLoading.textContent = 'Loading RAL catalog from text files...';
+                
+                console.log('Starting to load RAL data from text files...');
+                
+                // Clear any previous errors
+                clearError(elements.errorContainer);
+                clearError(elements.catalogErrorContainer);
+                
+                // Load English color names
+                console.log('Loading English names...');
+                const enResponse = await fetch('https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt');
+                if (!enResponse.ok) throw new Error(`English names fetch failed: ${enResponse.status}`);
+                
+                const enText = await enResponse.text();
+                console.log('English text sample:', enText.substring(0, 500));
+                
+                const enColors = parseRALTextFileImproved(enText, 'en');
+                console.log(`Loaded ${enColors.length} English colors`);
+                
+                // Load Russian color names
+                console.log('Loading Russian names...');
+                const ruResponse = await fetch('https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt');
+                if (!ruResponse.ok) throw new Error(`Russian names fetch failed: ${ruResponse.status}`);
+                
+                const ruText = await ruResponse.text();
+                console.log('Russian text sample:', ruText.substring(0, 500));
+                
+                const ruColors = parseRALTextFileImproved(ruText, 'ru');
+                console.log(`Loaded ${ruColors.length} Russian colors`);
+                
+                // Merge the data from both languages
+                colorData.ralColors = mergeColorData(enColors, ruColors);
+                console.log(`Merged ${colorData.ralColors.length} total colors`);
+                
+                if (colorData.ralColors.length === 0) {
+                    throw new Error('No colors were successfully parsed from the text files');
+                }
+                
+                colorData.loaded = true;
+                elements.loadingIndicator.style.display = 'none';
+                elements.catalogLoading.style.display = 'none';
+                
+                console.log(`Final: ${colorData.ralColors.length} RAL colors loaded successfully`);
+                
+            } catch (error) {
+                console.error('Error loading color data:', error);
+                elements.loadingIndicator.style.display = 'none';
+                elements.catalogLoading.style.display = 'none';
+                
+                const errorMessage = `Failed to load RAL color data: ${error.message}. The text files might have an unexpected format.`;
+                showError(errorMessage, elements.errorContainer, 'retryLoadColorData()');
+                showError(errorMessage, elements.catalogErrorContainer, 'retryLoadColorData()');
+                
+                colorData.loaded = false;
+                
+                // Load sample data as fallback
+                loadSampleData();
+            }
+        }
+
+        // Retry loading color data
+        function retryLoadColorData() {
+            clearError(elements.errorContainer);
+            clearError(elements.catalogErrorContainer);
+            loadColorData();
+        }
+
+        // Improved RAL text file parser
+        function parseRALTextFileImproved(text, language) {
+            const colors = [];
+            const lines = text.split('\n');
+            
+            console.log(`Parsing ${language} file with ${lines.length} lines`);
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line === '') continue;
+                
+                // Try multiple parsing patterns
+                let code, name;
+                
+                // Pattern 1: "000 15 00" format followed by color name
+                if (line.match(/^\d{3}\s+\d{2}\s+\d{2}/)) {
+                    const parts = line.split(/\s+/);
+                    if (parts.length >= 4) {
+                        code = `RAL ${parts[0]} ${parts[1]} ${parts[2]}`;
+                        name = parts.slice(3).join(' ');
+                    }
+                }
+                // Pattern 2: "RAL 000 15 00" format
+                else if (line.match(/^RAL\s+\d{3}\s+\d{2}\s+\d{2}/)) {
+                    const parts = line.split(/\s+/);
+                    if (parts.length >= 5) {
+                        code = `${parts[0]} ${parts[1]} ${parts[2]} ${parts[3]}`;
+                        name = parts.slice(4).join(' ');
+                    }
+                }
+                // Pattern 3: Tab-separated values
+                else if (line.includes('\t')) {
+                    const parts = line.split('\t');
+                    if (parts.length >= 2) {
+                        code = parts[0].trim();
+                        name = parts[1].trim();
+                    }
+                }
+                
+                if (code && name) {
+                    // Generate RGB values from RAL code for visualization
+                    const rgb = generateRGBFromRALCode(code);
+                    
+                    colors.push({
+                        code: code,
+                        name: name,
+                        language: language,
+                        rgb: rgb,
+                        hue: getHueCategory(rgb.r, rgb.g, rgb.b),
+                        lab: rgbToLab(rgb.r, rgb.g, rgb.b)
+                    });
+                } else {
+                    console.log(`Skipping line ${i + 1}: "${line}" - could not parse`);
+                }
+            }
+            
+            console.log(`Parsed ${colors.length} ${language} colors`);
+            return colors;
+        }
+
+        // Merge color data
+        function mergeColorData(enColors, ruColors) {
+            const mergedMap = new Map();
+            
+            // Add English colors
+            enColors.forEach(color => {
+                mergedMap.set(color.code, {
+                    code: color.code,
+                    nameEn: color.name,
+                    nameRu: '',
+                    rgb: color.rgb,
+                    hue: color.hue,
+                    lab: color.lab
+                });
+            });
+            
+            // Add Russian names to existing entries or create new ones
+            ruColors.forEach(color => {
+                if (mergedMap.has(color.code)) {
+                    mergedMap.get(color.code).nameRu = color.name;
+                } else {
+                    mergedMap.set(color.code, {
+                        code: color.code,
+                        nameEn: '',
+                        nameRu: color.name,
+                        rgb: color.rgb,
+                        hue: color.hue,
+                        lab: color.lab
+                    });
+                }
+            });
+            
+            return Array.from(mergedMap.values());
+        }
+
+        // Load sample data as fallback
+        function loadSampleData() {
+            console.log('Loading sample data as fallback...');
+            
+            // Create a comprehensive sample dataset
+            const sampleColors = [];
+            
+            // Generate sample RAL colors across the spectrum
+            const hues = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+            const lightness = [20, 30, 40, 50, 60, 70, 80];
+            const chroma = [0, 20, 40, 60, 80];
+            
+            let count = 0;
+            for (let h = 0; h < hues.length && count < 100; h++) {
+                for (let l = 0; l < lightness.length && count < 100; l++) {
+                    for (let c = 0; c < chroma.length && count < 100; c++) {
+                        const hue = hues[h];
+                        const light = lightness[l];
+                        const chrom = chroma[c];
+                        
+                        const code = `RAL ${hue.toString().padStart(3, '0')} ${light} ${chrom}`;
+                        const rgb = hlcToRgb(hue, light, chrom);
+                        
+                        sampleColors.push({
+                            code: code,
+                            nameEn: `Sample Color ${count + 1}`,
+                            nameRu: `Пример цвета ${count + 1}`,
+                            rgb: rgb,
+                            hue: getHueCategory(rgb.r, rgb.g, rgb.b),
+                            lab: rgbToLab(rgb.r, rgb.g, rgb.b)
+                        });
+                        
+                        count++;
+                    }
+                }
+            }
+            
+            colorData.ralColors = sampleColors;
+            colorData.loaded = true;
+            
+            console.log(`Loaded ${sampleColors.length} sample colors`);
+            
+            // Update UI
+            elements.loadingIndicator.style.display = 'none';
+            elements.catalogLoading.style.display = 'none';
+            
+            // Show info message about using sample data
+            const sampleMessage = 'Using sample color data. The RAL text files could not be loaded. You can still test all features with these sample colors.';
+            showError(sampleMessage, elements.errorContainer, 'retryLoadColorData()');
+            showError(sampleMessage, elements.catalogErrorContainer, 'retryLoadColorData()');
+            
+            // Enable the find matches button
+            findMatchingColors();
+            displayCatalog();
+        }
+
+        // Generate RGB values from RAL H L C code
+        function generateRGBFromRALCode(code) {
+            // Extract H, L, C from "RAL H L C" format
+            const matches = code.match(/RAL\s+(\d+)\s+(\d+)\s+(\d+)/);
+            if (!matches) {
+                return { r: 128, g: 128, b: 128 }; // Default gray
+            }
+            
+            const h = parseInt(matches[1]); // Hue (0-360)
+            const l = parseInt(matches[2]); // Lightness (0-100)
+            const c = parseInt(matches[3]); // Chroma (0-100)
+            
+            // Convert HLC to RGB
+            return hlcToRgb(h, l, c);
+        }
+
+        // Convert HLC to RGB
+        function hlcToRgb(h, l, c) {
+            // Normalize values
+            const hue = (h % 360) * Math.PI / 180;
+            const lightness = l / 100;
+            const chroma = c / 100;
+            
+            // Convert HLC to RGB using better algorithm
+            let r, g, b;
+            
+            if (chroma === 0) {
+                // Grayscale
+                r = g = b = lightness;
+            } else {
+                // Convert to HSL-like coordinates then to RGB
+                const hPrime = hue;
+                const x = chroma * (1 - Math.abs((hPrime / (Math.PI/3)) % 2 - 1));
+                
+                let r1, g1, b1;
+                if (hPrime < Math.PI/3) {
+                    [r1, g1, b1] = [chroma, x, 0];
+                } else if (hPrime < 2*Math.PI/3) {
+                    [r1, g1, b1] = [x, chroma, 0];
+                } else if (hPrime < Math.PI) {
+                    [r1, g1, b1] = [0, chroma, x];
+                } else if (hPrime < 4*Math.PI/3) {
+                    [r1, g1, b1] = [0, x, chroma];
+                } else if (hPrime < 5*Math.PI/3) {
+                    [r1, g1, b1] = [x, 0, chroma];
+                } else {
+                    [r1, g1, b1] = [chroma, 0, x];
+                }
+                
+                const m = lightness - chroma/2;
+                r = r1 + m;
+                g = g1 + m;
+                b = b1 + m;
+                
+                // Clamp values
+                r = Math.max(0, Math.min(1, r));
+                g = Math.max(0, Math.min(1, g));
+                b = Math.max(0, Math.min(1, b));
+            }
+            
+            // Convert to 0-255 range
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
+        }
+
+        // Get hue category for filtering
+        function getHueCategory(r, g, b) {
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            
+            if (delta === 0) return 'neutral';
+            
+            let hue;
+            if (max === r) {
+                hue = ((g - b) / delta) % 6;
+            } else if (max === g) {
+                hue = (b - r) / delta + 2;
+            } else {
+                hue = (r - g) / delta + 4;
+            }
+            
+            hue = Math.round(hue * 60);
+            if (hue < 0) hue += 360;
+            
+            // Define hue ranges for categories
+            if ((hue >= 0 && hue < 15) || (hue >= 345 && hue <= 360)) return 'red';
+            if (hue >= 15 && hue < 45) return 'orange';
+            if (hue >= 45 && hue < 75) return 'yellow';
+            if (hue >= 75 && hue < 165) return 'green';
+            if (hue >= 165 && hue < 195) return 'blue';
+            if (hue >= 195 && hue < 285) return 'purple';
+            if (hue >= 285 && hue < 345) return 'purple';
+            return 'neutral';
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // RGB inputs
+            elements.redSlider.addEventListener('input', updateRed);
+            elements.redInput.addEventListener('input', updateRed);
+            elements.greenSlider.addEventListener('input', updateGreen);
+            elements.greenInput.addEventListener('input', updateGreen);
+            elements.blueSlider.addEventListener('input', updateBlue);
+            elements.blueInput.addEventListener('input', updateBlue);
+            elements.hexInput.addEventListener('input', updateFromHex);
+            
+            // CMYK inputs
+            elements.cyanSlider.addEventListener('input', updateCyan);
+            elements.cyanInput.addEventListener('input', updateCyan);
+            elements.magentaSlider.addEventListener('input', updateMagenta);
+            elements.magentaInput.addEventListener('input', updateMagenta);
+            elements.yellowSlider.addEventListener('input', updateYellow);
+            elements.yellowInput.addEventListener('input', updateYellow);
+            elements.blackSlider.addEventListener('input', updateBlack);
+            elements.blackInput.addEventListener('input', updateBlack);
+            elements.cmykInput.addEventListener('input', updateFromCmyk);
+            
+            // Settings
+            elements.resultsCount.addEventListener('input', updateResultsCount);
+            elements.maxDifference.addEventListener('input', updateMaxDifference);
+            elements.findMatches.addEventListener('click', findMatchingColors);
+            
+            // Catalog hue filter buttons
+            elements.hueButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const hue = button.getAttribute('data-hue');
+                    
+                    if (hue === 'all') {
+                        // Scroll to top
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        // Scroll to the specific hue section
+                        const section = document.getElementById(`section-${hue}`);
+                        if (section) {
+                            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                    
+                    // Update active button for visual feedback
+                    elements.hueButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+            
+            // Catalog search
+            elements.catalogSearch.addEventListener('input', filterCatalog);
+        }
+
+        // Update settings
+        function updateResultsCount() {
+            elements.resultsCountValue.textContent = elements.resultsCount.value;
+        }
+
+        function updateMaxDifference() {
+            elements.maxDifferenceValue.textContent = elements.maxDifference.value;
+        }
+
+        // RGB update functions
+        function updateRed() {
+            const value = Math.min(255, Math.max(0, parseInt(elements.redSlider.value) || 0));
+            elements.redSlider.value = value;
+            elements.redInput.value = value;
+            updateColorFromRGB();
+        }
+
+        function updateGreen() {
+            const value = Math.min(255, Math.max(0, parseInt(elements.greenSlider.value) || 0));
+            elements.greenSlider.value = value;
+            elements.greenInput.value = value;
+            updateColorFromRGB();
+        }
+
+        function updateBlue() {
+            const value = Math.min(255, Math.max(0, parseInt(elements.blueSlider.value) || 0));
+            elements.blueSlider.value = value;
+            elements.blueInput.value = value;
+            updateColorFromRGB();
+        }
+
+        // CMYK update functions
+        function updateCyan() {
+            const value = Math.min(100, Math.max(0, parseInt(elements.cyanSlider.value) || 0));
+            elements.cyanSlider.value = value;
+            elements.cyanInput.value = value;
+            updateColorFromCMYK();
+        }
+
+        function updateMagenta() {
+            const value = Math.min(100, Math.max(0, parseInt(elements.magentaSlider.value) || 0));
+            elements.magentaSlider.value = value;
+            elements.magentaInput.value = value;
+            updateColorFromCMYK();
+        }
+
+        function updateYellow() {
+            const value = Math.min(100, Math.max(0, parseInt(elements.yellowSlider.value) || 0));
+            elements.yellowSlider.value = value;
+            elements.yellowInput.value = value;
+            updateColorFromCMYK();
+        }
+
+        function updateBlack() {
+            const value = Math.min(100, Math.max(0, parseInt(elements.blackSlider.value) || 0));
+            elements.blackSlider.value = value;
+            elements.blackInput.value = value;
+            updateColorFromCMYK();
+        }
+
+        // Color conversion and update functions
+        function updateColorFromRGB() {
+            const r = parseInt(elements.redInput.value);
+            const g = parseInt(elements.greenInput.value);
+            const b = parseInt(elements.blueInput.value);
+            
+            const hex = rgbToHex(r, g, b);
+            elements.hexInput.value = hex;
+            
+            const cmyk = rgbToCmyk(r, g, b);
+            updateCmykInputs(cmyk);
+            
+            updateColorPreview();
+        }
+
+        function updateColorFromCMYK() {
+            const c = parseInt(elements.cyanInput.value) / 100;
+            const m = parseInt(elements.magentaInput.value) / 100;
+            const y = parseInt(elements.yellowInput.value) / 100;
+            const k = parseInt(elements.blackInput.value) / 100;
+            
+            elements.cmykInput.value = `${Math.round(c*100)},${Math.round(m*100)},${Math.round(y*100)},${Math.round(k*100)}`;
+            
+            const rgb = cmykToRgb(c, m, y, k);
+            updateRgbInputs(rgb);
+            
+            updateColorPreview();
+        }
+
+        function updateFromHex() {
+            const hex = elements.hexInput.value.replace('#', '');
+            
+            if (hex.length === 3 || hex.length === 6) {
+                const rgb = hexToRgb(hex);
+                if (rgb) {
+                    updateRgbInputs(rgb);
+                    const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+                    updateCmykInputs(cmyk);
+                    updateColorPreview();
+                }
+            }
+        }
+
+        function updateFromCmyk() {
+            const cmykStr = elements.cmykInput.value;
+            const parts = cmykStr.split(',').map(part => parseInt(part.trim()));
+            
+            if (parts.length === 4 && parts.every(p => !isNaN(p) && p >= 0 && p <= 100)) {
+                const [c, m, y, k] = parts;
+                elements.cyanInput.value = c;
+                elements.cyanSlider.value = c;
+                elements.magentaInput.value = m;
+                elements.magentaSlider.value = m;
+                elements.yellowInput.value = y;
+                elements.yellowSlider.value = y;
+                elements.blackInput.value = k;
+                elements.blackSlider.value = k;
+                
+                updateColorFromCMYK();
+            }
+        }
+
+        function updateRgbInputs(rgb) {
+            elements.redSlider.value = rgb.r;
+            elements.redInput.value = rgb.r;
+            elements.greenSlider.value = rgb.g;
+            elements.greenInput.value = rgb.g;
+            elements.blueSlider.value = rgb.b;
+            elements.blueInput.value = rgb.b;
+            elements.hexInput.value = rgbToHex(rgb.r, rgb.g, rgb.b);
+        }
+
+        function updateCmykInputs(cmyk) {
+            elements.cyanInput.value = Math.round(cmyk.c * 100);
+            elements.cyanSlider.value = Math.round(cmyk.c * 100);
+            elements.magentaInput.value = Math.round(cmyk.m * 100);
+            elements.magentaSlider.value = Math.round(cmyk.m * 100);
+            elements.yellowInput.value = Math.round(cmyk.y * 100);
+            elements.yellowSlider.value = Math.round(cmyk.y * 100);
+            elements.blackInput.value = Math.round(cmyk.k * 100);
+            elements.blackSlider.value = Math.round(cmyk.k * 100);
+            elements.cmykInput.value = `${Math.round(cmyk.c * 100)},${Math.round(cmyk.m * 100)},${Math.round(cmyk.y * 100)},${Math.round(cmyk.k * 100)}`;
+        }
+
+        function updateColorPreview() {
+            const r = parseInt(elements.redInput.value);
+            const g = parseInt(elements.greenInput.value);
+            const b = parseInt(elements.blueInput.value);
+            const cmyk = rgbToCmyk(r, g, b);
+            
+            elements.colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            elements.colorPreview.style.color = brightness > 128 ? 'black' : 'white';
+            
+            elements.colorPreview.innerHTML = `
+                <div class="preview-values">
+                    <div class="preview-group">
+                        <div class="preview-label">RGB</div>
+                        <div>${r}, ${g}, ${b}</div>
+                    </div>
+                    <div class="preview-group">
+                        <div class="preview-label">CMYK</div>
+                        <div>${Math.round(cmyk.c * 100)}%, ${Math.round(cmyk.m * 100)}%, ${Math.round(cmyk.y * 100)}%, ${Math.round(cmyk.k * 100)}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Color conversion functions
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function hexToRgb(hex) {
+            if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+            const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToCmyk(r, g, b) {
+            if (r === 0 && g === 0 && b === 0) return { c: 0, m: 0, y: 0, k: 1 };
+            const rPrime = r / 255, gPrime = g / 255, bPrime = b / 255;
+            const k = 1 - Math.max(rPrime, gPrime, bPrime);
+            return {
+                c: (1 - rPrime - k) / (1 - k) || 0,
+                m: (1 - gPrime - k) / (1 - k) || 0,
+                y: (1 - bPrime - k) / (1 - k) || 0,
+                k: k || 0
+            };
+        }
+
+        function cmykToRgb(c, m, y, k) {
+            return {
+                r: Math.round(255 * (1 - c) * (1 - k)),
+                g: Math.round(255 * (1 - m) * (1 - k)),
+                b: Math.round(255 * (1 - y) * (1 - k))
+            };
+        }
+
+        function rgbToLab(r, g, b) {
+            // Simplified Lab conversion for color difference
+            const rLinear = r / 255;
+            const gLinear = g / 255;
+            const bLinear = b / 255;
+            
+            const x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
+            const y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
+            const z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
+            
+            return {
+                l: Math.max(0, Math.min(100, y * 100)),
+                a: Math.max(-128, Math.min(127, (x - y) * 200)),
+                b: Math.max(-128, Math.min(127, (y - z) * 200))
+            };
+        }
+
+        // Color matching functions
+        function colorDifferenceRgb(rgb1, rgb2) {
+            const rDiff = rgb1.r - rgb2.r, gDiff = rgb1.g - rgb2.g, bDiff = rgb1.b - rgb2.b;
+            return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+        }
+
+        function colorDifferenceLab(lab1, lab2) {
+            const lDiff = lab1.l - lab2.l, aDiff = lab1.a - lab2.a, bDiff = lab1.b - lab2.b;
+            return Math.sqrt(lDiff * lDiff + aDiff * aDiff + bDiff * bDiff);
+        }
+
+        function findMatchingColors() {
+            if (!colorData.loaded) {
+                elements.resultsContainer.innerHTML = '<div class="loading">Still loading color data...</div>';
+                return;
+            }
+            
+            const inputRgb = {
+                r: parseInt(elements.redInput.value),
+                g: parseInt(elements.greenInput.value),
+                b: parseInt(elements.blueInput.value)
+            };
+            
+            const inputLab = rgbToLab(inputRgb.r, inputRgb.g, inputRgb.b);
+            const resultsCount = parseInt(elements.resultsCount.value) || 12;
+            const maxDifference = parseInt(elements.maxDifference.value) || 100;
+            const colorSpace = elements.colorSpace.value;
+            
+            const colorsWithDifferences = colorData.ralColors.map(color => {
+                let difference;
+                if (colorSpace === 'cie76' && color.lab) {
+                    difference = colorDifferenceLab(inputLab, color.lab);
+                } else {
+                    difference = colorDifferenceRgb(inputRgb, color.rgb);
+                }
+                
+                return {
+                    ...color,
+                    difference: difference,
+                    cmyk: rgbToCmyk(color.rgb.r, color.rgb.g, color.rgb.b)
+                };
+            }).filter(color => color.difference <= maxDifference);
+            
+            colorsWithDifferences.sort((a, b) => a.difference - b.difference);
+            const topMatches = colorsWithDifferences.slice(0, resultsCount);
+            
+            displayResults(topMatches);
+            
+            // Show catalog link for closest match
+            if (topMatches.length > 0) {
+                elements.viewCatalogLink.style.display = 'inline-block';
+                elements.viewCatalogLink.onclick = (e) => {
+                    e.preventDefault();
+                    // When clicking view catalog link, copy the first match and put it in catalog search
+                    const firstMatchCode = topMatches[0].code;
+                    copyToClipboard(firstMatchCode);
+                    elements.catalogSearch.value = firstMatchCode;
                     filterCatalog();
                     
-                    // Add highlight effect to the searched card
-                    card.classList.add('search-highlight');
-                    setTimeout(() => {
-                        card.classList.remove('search-highlight');
-                    }, 2000);
+                    // Switch to catalog page
+                    elements.navTabs.forEach(tab => tab.classList.remove('active'));
+                    document.querySelector('.nav-tab[data-page="catalog"]').classList.add('active');
+                    elements.pages.forEach(page => page.classList.remove('active'));
+                    elements.catalogPage.classList.add('active');
+                };
+            } else {
+                elements.viewCatalogLink.style.display = 'none';
+            }
+        }
+
+        function displayResults(matches) {
+            elements.resultsContainer.innerHTML = '';
+            
+            if (matches.length === 0) {
+                elements.resultsContainer.innerHTML = '<p>No matching colors found within the specified difference threshold. Try increasing the max difference value.</p>';
+                return;
+            }
+            
+            matches.forEach(match => {
+                const colorCard = document.createElement('div');
+                colorCard.className = 'color-card';
+                colorCard.addEventListener('click', () => {
+                    // Copy RAL code to clipboard
+                    copyToClipboard(match.code);
                 });
                 
-                const swatch = document.createElement('div');
-                swatch.className = 'catalog-swatch';
-                swatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
+                const colorSwatch = document.createElement('div');
+                colorSwatch.className = 'color-swatch';
+                colorSwatch.style.backgroundColor = `rgb(${match.rgb.r}, ${match.rgb.g}, ${match.rgb.b})`;
                 
-                const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
-                swatch.style.color = brightness > 128 ? 'black' : 'white';
-                swatch.innerHTML = `
-                    <div>${color.code}</div>
+                const brightness = (match.rgb.r * 299 + match.rgb.g * 587 + match.rgb.b * 114) / 1000;
+                colorSwatch.style.color = brightness > 128 ? 'black' : 'white';
+                colorSwatch.innerHTML = `
+                    <div>${match.code}</div>
+                    <div style="font-size: 0.8rem;">Click to copy</div>
                 `;
                 
-                const info = document.createElement('div');
-                info.className = 'catalog-info';
+                const colorInfo = document.createElement('div');
+                colorInfo.className = 'color-info';
                 
-                const code = document.createElement('div');
-                code.className = 'catalog-code';
-                code.textContent = color.code;
+                const colorCode = document.createElement('div');
+                colorCode.className = 'color-code';
+                colorCode.textContent = match.code;
                 
-                const nameEn = document.createElement('div');
-                nameEn.className = 'catalog-name';
-                nameEn.textContent = color.nameEn || 'No English name';
+                const colorNameEn = document.createElement('div');
+                colorNameEn.className = 'color-name';
+                colorNameEn.textContent = match.nameEn || 'No English name';
+                if (!match.nameEn) colorNameEn.style.color = '#999';
                 
-                const nameRu = document.createElement('div');
-                nameRu.className = 'catalog-name-ru';
-                nameRu.textContent = color.nameRu || 'No Russian name';
+                const colorNameRu = document.createElement('div');
+                colorNameRu.className = 'color-name-ru';
+                colorNameRu.textContent = match.nameRu || 'No Russian name';
+                if (!match.nameRu) colorNameRu.style.color = '#999';
                 
-                info.appendChild(code);
-                info.appendChild(nameEn);
-                info.appendChild(nameRu);
-                card.appendChild(swatch);
-                card.appendChild(info);
+                const colorValues = document.createElement('div');
+                colorValues.className = 'color-values';
+                colorValues.innerHTML = `
+                    <div class="value-group">
+                        <div class="value-label">RGB</div>
+                        <div>${match.rgb.r}, ${match.rgb.g}, ${match.rgb.b}</div>
+                    </div>
+                    <div class="value-group">
+                        <div class="value-label">CMYK</div>
+                        <div>${Math.round(match.cmyk.c * 100)}%, ${Math.round(match.cmyk.m * 100)}%, ${Math.round(match.cmyk.y * 100)}%, ${Math.round(match.cmyk.k * 100)}%</div>
+                    </div>
+                `;
                 
-                return card;
-            }
+                const difference = document.createElement('div');
+                difference.className = 'difference';
+                if (match.difference < 30) difference.classList.add('difference-low');
+                else if (match.difference < 70) difference.classList.add('difference-medium');
+                else difference.classList.add('difference-high');
+                difference.textContent = `Color difference: ${match.difference.toFixed(2)}`;
+                
+                colorInfo.appendChild(colorCode);
+                colorInfo.appendChild(colorNameEn);
+                colorInfo.appendChild(colorNameRu);
+                colorInfo.appendChild(colorValues);
+                colorInfo.appendChild(difference);
+                
+                colorCard.appendChild(colorSwatch);
+                colorCard.appendChild(colorInfo);
+                elements.resultsContainer.appendChild(colorCard);
+            });
+        }
 
-            // FIXED: Catalog search now works properly
-            function filterCatalog() {
-                const searchTerm = elements.catalogSearch.value.toLowerCase();
+        // Catalog functions
+        function displayCatalog() {
+            if (!colorData.loaded || colorData.ralColors.length === 0) {
+                console.log('No color data available for catalog');
+                elements.catalogContainer.innerHTML = '<div class="loading">No color data available. Please check the data sources.</div>';
+                return;
+            }
+            
+            const hueCategories = {
+                red: [], orange: [], yellow: [], green: [], blue: [], purple: [], neutral: []
+            };
+            
+            // Sort colors by hue category
+            colorData.ralColors.forEach(color => {
+                if (hueCategories[color.hue]) {
+                    hueCategories[color.hue].push(color);
+                } else {
+                    hueCategories.neutral.push(color);
+                }
+            });
+            
+            // Sort each category by RAL code for consistent ordering
+            Object.keys(hueCategories).forEach(hue => {
+                hueCategories[hue].sort((a, b) => a.code.localeCompare(b.code));
+            });
+            
+            elements.catalogContainer.innerHTML = '';
+            
+            // Display each category
+            const categoryOrder = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'neutral'];
+            let totalColors = 0;
+            
+            categoryOrder.forEach(hue => {
+                if (hueCategories[hue].length === 0) return;
                 
-                // Show all cards and sections first
+                totalColors += hueCategories[hue].length;
+                const section = document.createElement('div');
+                section.id = `section-${hue}`;
+                section.className = 'catalog-section';
+                
+                const header = document.createElement('div');
+                header.className = 'section-header';
+                header.textContent = `${hue.charAt(0).toUpperCase() + hue.slice(1)} Colors (${hueCategories[hue].length})`;
+                section.appendChild(header);
+                
+                const grid = document.createElement('div');
+                grid.className = 'catalog-grid';
+                
+                hueCategories[hue].forEach(color => {
+                    const card = createCatalogCard(color);
+                    grid.appendChild(card);
+                });
+                
+                section.appendChild(grid);
+                elements.catalogContainer.appendChild(section);
+            });
+            
+            console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
+        }
+
+        function createCatalogCard(color) {
+            const card = document.createElement('div');
+            card.className = 'catalog-card';
+            card.id = `color-${color.code.replace(/\s+/g, '-')}`;
+            card.addEventListener('click', () => {
+                // Copy RAL code to clipboard and put it in search field
+                copyToClipboard(color.code);
+                elements.catalogSearch.value = color.code;
+                filterCatalog();
+                
+                // Add highlight effect to the searched card
+                card.classList.add('search-highlight');
+                setTimeout(() => {
+                    card.classList.remove('search-highlight');
+                }, 2000);
+            });
+            
+            const swatch = document.createElement('div');
+            swatch.className = 'catalog-swatch';
+            swatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
+            
+            const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
+            swatch.style.color = brightness > 128 ? 'black' : 'white';
+            swatch.innerHTML = `
+                <div>${color.code}</div>
+                <div style="font-size: 0.7rem;">Click to copy & search</div>
+            `;
+            
+            const info = document.createElement('div');
+            info.className = 'catalog-info';
+            
+            const code = document.createElement('div');
+            code.className = 'catalog-code';
+            code.textContent = color.code;
+            
+            const nameEn = document.createElement('div');
+            nameEn.className = 'catalog-name';
+            nameEn.textContent = color.nameEn || 'No English name';
+            
+            const nameRu = document.createElement('div');
+            nameRu.className = 'catalog-name-ru';
+            nameRu.textContent = color.nameRu || 'No Russian name';
+            
+            info.appendChild(code);
+            info.appendChild(nameEn);
+            info.appendChild(nameRu);
+            card.appendChild(swatch);
+            card.appendChild(info);
+            
+            return card;
+        }
+
+        function filterCatalog() {
+            const searchTerm = elements.catalogSearch.value.toLowerCase();
+            
+            if (!searchTerm) {
+                // If no search term, show all cards
                 document.querySelectorAll('.catalog-card').forEach(card => {
                     card.style.display = 'block';
                 });
                 
+                // Show all sections
                 document.querySelectorAll('.section-header, .catalog-grid').forEach(el => {
                     el.style.display = 'block';
                 });
-                
-                if (!searchTerm) {
-                    return;
-                }
-                
-                // Filter cards based on search term
-                let hasVisibleCards = false;
-                document.querySelectorAll('.catalog-card').forEach(card => {
-                    const code = card.querySelector('.catalog-code').textContent.toLowerCase();
-                    const nameEn = card.querySelector('.catalog-name').textContent.toLowerCase();
-                    const nameRu = card.querySelector('.catalog-name-ru').textContent.toLowerCase();
-                    
-                    const matchesSearch = code.includes(searchTerm) || nameEn.includes(searchTerm) || nameRu.includes(searchTerm);
-                    card.style.display = matchesSearch ? 'block' : 'none';
-                    
-                    if (matchesSearch) {
-                        hasVisibleCards = true;
-                    }
-                });
-                
-                // Hide empty sections
-                document.querySelectorAll('.section-header').forEach(header => {
-                    const section = header.nextElementSibling;
-                    const visibleCards = section.querySelectorAll('.catalog-card[style=""]').length + 
-                                       section.querySelectorAll('.catalog-card:not([style])').length;
-                    
-                    if (visibleCards === 0) {
-                        header.style.display = 'none';
-                        section.style.display = 'none';
-                    } else {
-                        header.style.display = 'block';
-                        section.style.display = 'grid';
-                    }
-                });
-                
-                // Scroll to first visible card if searching
-                if (searchTerm && hasVisibleCards) {
-                    const firstVisibleCard = document.querySelector('.catalog-card[style=""]') || 
-                                           document.querySelector('.catalog-card:not([style])');
-                    if (firstVisibleCard) {
-                        firstVisibleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }
+                return;
             }
+            
+            // Filter cards based on search term
+            document.querySelectorAll('.catalog-card').forEach(card => {
+                const code = card.querySelector('.catalog-code').textContent.toLowerCase();
+                const nameEn = card.querySelector('.catalog-name').textContent.toLowerCase();
+                const nameRu = card.querySelector('.catalog-name-ru').textContent.toLowerCase();
+                
+                const matchesSearch = code.includes(searchTerm) || nameEn.includes(searchTerm) || nameRu.includes(searchTerm);
+                card.style.display = matchesSearch ? 'block' : 'none';
+            });
+            
+            // Hide empty sections
+            document.querySelectorAll('.section-header').forEach(header => {
+                const section = header.nextElementSibling;
+                const visibleCards = section.querySelectorAll('.catalog-card[style=""]').length + 
+                                   section.querySelectorAll('.catalog-card:not([style])').length;
+                header.style.display = visibleCards > 0 ? 'block' : 'none';
+                section.style.display = visibleCards > 0 ? 'grid' : 'none';
+            });
+        }
 
-            // Initialize the application
-            document.addEventListener('DOMContentLoaded', init);
-        </script>
-    </body>
-    </html>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
