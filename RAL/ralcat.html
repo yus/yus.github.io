@@ -1883,9 +1883,8 @@
             
             // Update history displays
             updateHistoryDisplay();
-            //updateCatalogHistoryDisplay();
         }
-        
+
         // Clear history
         function clearHistory() {
             colorData.copyHistory = [];
@@ -1896,20 +1895,25 @@
         // Update History
         function updateHistoryDisplay() {
             const hasHistory = colorData.copyHistory.length > 0;
+            const hasPinned = colorData.pinnedHistory.length > 0;
             
-            // Update matcher history
+            // Update main history sections and clear buttons
             elements.historySection.style.display = hasHistory ? 'block' : 'none';
             elements.clearHistory.style.display = hasHistory ? 'block' : 'none';
-            
-            // Update catalog history  
             elements.catalogHistorySection.style.display = hasHistory ? 'block' : 'none';
             elements.catalogClearHistory.style.display = hasHistory ? 'block' : 'none';
             
-            if (!hasHistory) return;
+            if (hasHistory) {
+                updateBreadcrumb(elements.historyBreadcrumb, colorData.copyHistory, false);
+                updateBreadcrumb(elements.catalogHistoryBreadcrumb, colorData.copyHistory, false);
+            } else {
+                // Clear the breadcrumbs if no history
+                elements.historyBreadcrumb.innerHTML = '';
+                elements.catalogHistoryBreadcrumb.innerHTML = '';
+            }
             
-            // Update BOTH breadcrumbs with the same content
-            updateBreadcrumb(elements.historyBreadcrumb);
-            updateBreadcrumb(elements.catalogHistoryBreadcrumb);
+            // Update pinned sections
+            updatePinnedDisplay();
         }
         
         function updateBreadcrumb(breadcrumbElement, items, isPinned) {
