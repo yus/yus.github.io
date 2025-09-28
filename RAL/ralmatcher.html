@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAL Color Matcher</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --text: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .input-group {
+            display: inline-block;
+            margin: 0 20px;
+            vertical-align: top;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        input[type="text"] {
+            padding: 12px 15px;
+            width: 200px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        input[type="color"] {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .color-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: inline-block;
+            margin: 0 15px;
+            vertical-align: middle;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--accent);
+        }
+        
+        .match-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .match-color {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin-right: 20px;
+            border: 2px solid #eee;
+        }
+        
+        .match-info h3 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .match-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            background: var(--light);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .detail-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .sampler-section {
+            margin-top: 30px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .color-swatch {
+            height: 100px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+        
+        .color-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px;
+            font-size: 0.9em;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+        
+        .loading {
+            color: var(--accent);
+        }
+        
+        .success {
+            color: #27ae60;
+        }
+        
+        .language-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .hue-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                display: block;
+                margin: 15px 0;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 RAL Color Matcher</h1>
+            <div class="subtitle">Professional color matching with RAL Design System</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <div class="input-label">Color Picker</div>
+                    <input type="color" id="colorPicker" value="#ff0000">
+                </div>
+                
+                <div class="color-preview" id="colorPreview"></div>
+                
+                <div class="input-group">
+                    <div class="input-label">HEX Code</div>
+                    <input type="text" id="hexInput" placeholder="#FF0000" maxlength="7">
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-primary" onclick="findRALMatches()">Find RAL Match</button>
+                    <button class="btn-secondary" onclick="loadRALData()">Reload RAL Data</button>
+                    <button class="btn-secondary" onclick="sampleRandomColors()">Show Color Samples</button>
+                </div>
+            </div>
+            
+            <div class="status" id="status">
+                <div class="loading">Loading RAL Design System database...</div>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <h2>🎯 Closest RAL Matches</h2>
+                <div id="results"></div>
+                
+                <div class="sampler-section" id="samplerSection">
+                    <h2>🎨 Color Sampler</h2>
+                    <p>Closest official RAL colors from the database</p>
+                    <div class="color-grid" id="colorSampler"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+
+        const RAL_FILES = {
+            en: 'https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.pdf',
+            ru: 'https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.pdf'
+        };
+
+        let ralDatabase = [];
+        let isLoaded = false;
+
+        // Initialize color picker and preview
+        function initializeColorTools() {
+            const colorPicker = document.getElementById('colorPicker');
+            const hexInput = document.getElementById('hexInput');
+            const colorPreview = document.getElementById('colorPreview');
+            
+            // Color picker to HEX input sync
+            colorPicker.addEventListener('input', function() {
+                hexInput.value = this.value.toUpperCase();
+                colorPreview.style.backgroundColor = this.value;
+            });
+            
+            // HEX input to color picker sync
+            hexInput.addEventListener('input', function() {
+                const hex = normalizeHex(this.value);
+                if (isValidHex(hex)) {
+                    colorPicker.value = hex;
+                    colorPreview.style.backgroundColor = hex;
+                }
+            });
+            
+            // Set initial values
+            colorPreview.style.backgroundColor = colorPicker.value;
+            hexInput.value = colorPicker.value.toUpperCase();
+        }
+
+        async function loadRALData() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<div class="loading">📖 Loading RAL Design System database...</div>';
+            
+            try {
+                ralDatabase = [];
+                
+                // Load English data
+                statusDiv.innerHTML = '<div class="loading">📖 Processing English RAL data...</div>';
+                const englishData = await extractRALDataFromPDF(RAL_FILES.en, 'en');
+                ralDatabase.push(...englishData);
+                
+                // Load Russian data
+                statusDiv.innerHTML = '<div class="loading">📖 Processing Russian RAL data...</div>';
+                const russianData = await extractRALDataFromPDF(RAL_FILES.ru, 'ru');
+                ralDatabase.push(...russianData);
+                
+                // Remove duplicates and clean data
+                ralDatabase = removeDuplicates(ralDatabase);
+                
+                statusDiv.innerHTML = `<div class="success">✅ Loaded ${ralDatabase.length} unique RAL colors</div>`;
+                isLoaded = true;
+                
+                // Show results section
+                document.getElementById('resultsSection').style.display = 'block';
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="loading">❌ Error: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function extractRALDataFromPDF(pdfUrl, language) {
+            try {
+                const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+                const ralData = [];
+                
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    
+                    const colors = extractRALDesignColors(pageText, language);
+                    ralData.push(...colors);
+                }
+                
+                return ralData.filter(color => color.hex && color.ralCode);
+                
+            } catch (error) {
+                console.error(`Error extracting from ${pdfUrl}:`, error);
+                return [];
+            }
+        }
+
+        function extractRALDesignColors(text, language) {
+            const colors = [];
+            const pattern = /RAL\s*(\d{3})[\s\-]*(\d{2})[\s\-]*(\d{2})[^#]*#([0-9A-F]{6})/gi;
+            let match;
+            
+            while ((match = pattern.exec(text)) !== null) {
+                const hue = parseInt(match[1]);
+                const lightness = parseInt(match[2]);
+                const chroma = parseInt(match[3]);
+                const hexColor = `#${match[4]}`;
+                
+                colors.push({
+                    ralCode: `RAL ${hue} ${lightness} ${chroma}`,
+                    hex: hexColor,
+                    language: language,
+                    hue: hue,
+                    lightness: lightness,
+                    chroma: chroma,
+                    rgb: hexToRGB(hexColor)
+                });
+            }
+            
+            return colors;
+        }
+
+        function removeDuplicates(colors) {
+            const unique = new Map();
+            colors.forEach(color => {
+                const key = color.hex + color.ralCode;
+                if (!unique.has(key)) {
+                    unique.set(key, color);
+                }
+            });
+            return Array.from(unique.values());
+        }
+
+        function findRALMatches() {
+            if (!isLoaded) {
+                alert('Please wait for RAL data to finish loading');
+                return;
+            }
+            
+            const hexInput = document.getElementById('hexInput').value.trim();
+            if (!hexInput) {
+                alert('Please enter a HEX color code');
+                return;
+            }
+            
+            const hexColor = normalizeHex(hexInput);
+            if (!isValidHex(hexColor)) {
+                alert('Please enter a valid HEX color code');
+                return;
+            }
+            
+            const matches = findClosestRALColors(hexColor);
+            displayMatches(matches, hexColor);
+            displayColorSampler(hexColor);
+        }
+
+        function normalizeHex(hex) {
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            return '#' + hex.toUpperCase();
+        }
+
+        function isValidHex(hex) {
+            return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+        }
+
+        function hexToRGB(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function colorDistance(hex1, hex2) {
+            const rgb1 = hexToRGB(hex1);
+            const rgb2 = hexToRGB(hex2);
+            return Math.sqrt(
+                Math.pow(rgb1.r - rgb2.r, 2) +
+                Math.pow(rgb1.g - rgb2.g, 2) +
+                Math.pow(rgb1.b - rgb2.b, 2)
+            );
+        }
+
+        function findClosestRALColors(targetHex) {
+            const colorsWithDistance = ralDatabase.map(color => ({
+                ...color,
+                distance: colorDistance(targetHex, color.hex)
+            }));
+            
+            return colorsWithDistance
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, 5);
+        }
+
+        function displayMatches(matches, targetHex) {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = matches.map((match, index) => {
+                const isTopMatch = index === 0;
+                return `
+                    <div class="match-card" style="border-left-color: ${isTopMatch ? '#e74c3c' : '#3498db'}">
+                        <div class="match-header">
+                            <div class="match-color" style="background-color: ${match.hex}"></div>
+                            <div class="match-info">
+                                <h3>${match.ralCode} 
+                                    <span class="language-badge">${match.language.toUpperCase()}</span>
+                                    ${isTopMatch ? '🏆' : ''}
+                                </h3>
+                                <div>HEX: ${match.hex} | Distance: ${match.distance.toFixed(1)}</div>
+                            </div>
+                        </div>
+                        <div class="match-details">
+                            <div class="detail-item">
+                                <div>HUE</div>
+                                <div class="detail-value">${match.hue}°</div>
+                            </div>
+                            <div class="detail-item">
+                                <div>LIGHTNESS</div>
+                                <div class="detail-value">${match.lightness}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div>CHROMA</div>
+                                <div class="detail-value">${match.chroma}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div>LANGUAGE</div>
+                                <div class="detail-value">${match.language.toUpperCase()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function displayColorSampler(targetHex) {
+            const samplerDiv = document.getElementById('colorSampler');
+            const uniqueColors = getUniqueColorsByHue(ralDatabase, 12);
+            
+            samplerDiv.innerHTML = uniqueColors.map(color => {
+                const distance = colorDistance(targetHex, color.hex);
+                return `
+                    <div class="color-swatch" style="background-color: ${color.hex}" 
+                         onclick="setColorFromSampler('${color.hex}')">
+                        <div class="color-info">
+                            ${color.ralCode}<br>
+                            Δ: ${distance.toFixed(1)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('samplerSection').style.display = 'block';
+        }
+
+        function getUniqueColorsByHue(colors, count) {
+            const hueGroups = {};
+            colors.forEach(color => {
+                if (color.hue) {
+                    const hueGroup = Math.floor(color.hue / 30) * 30; // Group by 30° increments
+                    if (!hueGroups[hueGroup]) hueGroups[hueGroup] = [];
+                    hueGroups[hueGroup].push(color);
+                }
+            });
+            
+            const result = [];
+            Object.values(hueGroups).forEach(group => {
+                if (group.length > 0) {
+                    result.push(group[0]); // Take first color from each hue group
+                }
+            });
+            
+            return result.slice(0, count);
+        }
+
+        function setColorFromSampler(hexColor) {
+            document.getElementById('colorPicker').value = hexColor;
+            document.getElementById('hexInput').value = hexColor;
+            document.getElementById('colorPreview').style.backgroundColor = hexColor;
+            findRALMatches();
+        }
+
+        function sampleRandomColors() {
+            if (!isLoaded) return;
+            
+            const randomColors = [];
+            const usedHues = new Set();
+            
+            // Get one color from each major hue group
+            for (let hue = 0; hue < 360; hue += 30) {
+                const colorsInHue = ralDatabase.filter(c => 
+                    c.hue >= hue && c.hue < hue + 30
+                );
+                if (colorsInHue.length > 0) {
+                    randomColors.push(colorsInHue[Math.floor(Math.random() * colorsInHue.length)]);
+                }
+            }
+            
+            displayColorSampler('#000000');
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeColorTools();
+            loadRALData();
+            
+            // Enter key support
+            document.getElementById('hexInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') findRALMatches();
+            });
+        });
+    </script>
+</body>
+</html>
