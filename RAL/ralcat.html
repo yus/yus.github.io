@@ -890,9 +890,10 @@
             ralColors: [],
             loaded: false,
             currentHighlight: null,
-            copyHistory: [] // Store copied RAL codes
+            copyHistory: [], // Store copied RAL codes
+            pinnedColors: [] // New: store pinned RAL codes
         };
-
+      
         // DOM elements
         const elements = {
             // Navigation
@@ -952,8 +953,32 @@
             hueButtons: document.querySelectorAll('.hue-button')
         };
 
+        // Save/load from localStorage
+        function saveToLocalStorage() {
+            const data = {
+                copyHistory: colorData.copyHistory,
+                pinnedColors: colorData.pinnedColors
+            };
+            localStorage.setItem('ralColorApp', JSON.stringify(data));
+        }
+        
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('ralColorApp');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    colorData.copyHistory = data.copyHistory || [];
+                    colorData.pinnedColors = data.pinnedColors || [];
+                } catch (e) {
+                    console.log('No saved data found');
+                }
+            }
+        }
+        
+        // Call loadFromLocalStorage in init()
         // Initialize the application
         async function init() {
+            loadFromLocalStorage(); // Add this line
             setupNavigation();
             setupEventListeners();
             setupTabs();
@@ -1782,119 +1807,6 @@
             });
         }
 
-        // // Catalog functions
-        // function displayCatalog() {
-        //     if (!colorData.loaded || colorData.ralColors.length === 0) {
-        //         console.log('No color data available for catalog');
-        //         elements.catalogContainer.innerHTML = '<div class="loading">No color data available. Please check the data sources.</div>';
-        //         return;
-        //     }
-            
-        //     const hueCategories = {
-        //         red: [], orange: [], yellow: [], green: [], blue: [], purple: [], neutral: []
-        //     };
-            
-        //     // Sort colors by hue category
-        //     colorData.ralColors.forEach(color => {
-        //         if (hueCategories[color.hue]) {
-        //             hueCategories[color.hue].push(color);
-        //         } else {
-        //             hueCategories.neutral.push(color);
-        //         }
-        //     });
-            
-        //     // Sort each category by RAL code for consistent ordering
-        //     Object.keys(hueCategories).forEach(hue => {
-        //         hueCategories[hue].sort((a, b) => a.code.localeCompare(b.code));
-        //     });
-            
-        //     elements.catalogContainer.innerHTML = '';
-            
-        //     // Display each category
-        //     const categoryOrder = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'neutral'];
-        //     let totalColors = 0;
-            
-        //     categoryOrder.forEach(hue => {
-        //         if (hueCategories[hue].length === 0) return;
-                
-        //         totalColors += hueCategories[hue].length;
-        //         const section = document.createElement('div');
-        //         section.id = `section-${hue}`;
-        //         section.className = 'catalog-section';
-                
-        //         const header = document.createElement('div');
-        //         header.className = 'section-header';
-        //         header.textContent = `${hue.charAt(0).toUpperCase() + hue.slice(1)} Colors (${hueCategories[hue].length})`;
-        //         section.appendChild(header);
-                
-        //         const grid = document.createElement('div');
-        //         grid.className = 'catalog-grid';
-                
-        //         hueCategories[hue].forEach(color => {
-        //             const card = createCatalogCard(color);
-        //             grid.appendChild(card);
-        //         });
-                
-        //         section.appendChild(grid);
-        //         elements.catalogContainer.appendChild(section);
-        //     });
-            
-        //     console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
-        // }
-
-        // function createCatalogCard(color) {
-        //     const card = document.createElement('div');
-        //     card.className = 'catalog-card';
-        //     card.id = `color-${color.code.replace(/\s+/g, '-')}`;
-        //     card.addEventListener('click', () => {
-        //         // Copy RAL code to clipboard and put it in search field
-        //         copyToClipboard(color.code);
-        //         elements.catalogSearch.value = color.code;
-        //         filterCatalog();
-                
-        //         // Add highlight effect to the searched card
-        //         card.classList.add('search-highlight');
-        //         setTimeout(() => {
-        //             card.classList.remove('search-highlight');
-        //         }, 2000);
-        //     });
-            
-        //     const swatch = document.createElement('div');
-        //     swatch.className = 'catalog-swatch';
-        //     swatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
-            
-        //     const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
-        //     swatch.style.color = brightness > 128 ? 'black' : 'white';
-        //     swatch.innerHTML = `
-        //         <div>${color.code}</div>
-        //         <div style="font-size: 0.7rem;">Click to copy & search</div>
-        //     `;
-            
-        //     const info = document.createElement('div');
-        //     info.className = 'catalog-info';
-            
-        //     const code = document.createElement('div');
-        //     code.className = 'catalog-code';
-        //     code.textContent = color.code;
-            
-        //     const nameEn = document.createElement('div');
-        //     nameEn.className = 'catalog-name';
-        //     nameEn.textContent = color.nameEn || 'No English name';
-            
-        //     const nameRu = document.createElement('div');
-        //     nameRu.className = 'catalog-name-ru';
-        //     nameRu.textContent = color.nameRu || 'No Russian name';
-            
-        //     info.appendChild(code);
-        //     info.appendChild(nameEn);
-        //     info.appendChild(nameRu);
-        //     card.appendChild(swatch);
-        //     card.appendChild(info);
-            
-        //     return card;
-        // }
-        // Add these missing functions back:
-
         // Copy RAL code to clipboard with notification
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
@@ -1953,21 +1865,19 @@
             updateHistoryDisplay();
             updateCatalogHistoryDisplay();
         }
-        
-        // Update matcher history breadcrumb display
+
+        // Update History
         function updateHistoryDisplay() {
             if (colorData.copyHistory.length === 0) {
                 elements.historySection.style.display = 'none';
-                elements.clearHistory.style.display = 'none';
                 return;
             }
             
             elements.historySection.style.display = 'block';
-            elements.clearHistory.style.display = 'block';
             elements.historyBreadcrumb.innerHTML = '';
             
+            // Create history items
             colorData.copyHistory.forEach(ralCode => {
-                // Find the color data for this RAL code
                 const color = colorData.ralColors.find(c => c.code === ralCode);
                 const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
                 
@@ -1987,35 +1897,19 @@
                 
                 elements.historyBreadcrumb.appendChild(historyItem);
             });
-            
-            // Add "Copy All" button
-            const copyAllButton = document.createElement('button');
-            copyAllButton.className = 'history-copy-all';
-            copyAllButton.textContent = 'Copy All';
-            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-            
-            copyAllButton.addEventListener('click', () => {
-                const allCodes = colorData.copyHistory.join(', ');
-                copyToClipboard(allCodes);
-            });
-            
-            elements.historyBreadcrumb.appendChild(copyAllButton);
         }
         
-        // Update catalog history breadcrumb display
         function updateCatalogHistoryDisplay() {
             if (colorData.copyHistory.length === 0) {
                 elements.catalogHistorySection.style.display = 'none';
-                elements.catalogClearHistory.style.display = 'none';
                 return;
             }
             
             elements.catalogHistorySection.style.display = 'block';
-            elements.catalogClearHistory.style.display = 'block';
             elements.catalogHistoryBreadcrumb.innerHTML = '';
             
+            // Create history items
             colorData.copyHistory.forEach(ralCode => {
-                // Find the color data for this RAL code
                 const color = colorData.ralColors.find(c => c.code === ralCode);
                 const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
                 
@@ -2031,28 +1925,142 @@
                 historyItem.addEventListener('click', (e) => {
                     e.stopPropagation();
                     copyToClipboard(ralCode);
-                    // Also search for this code in catalog
-                    elements.catalogSearch.value = ralCode;
-                    filterCatalog();
                 });
                 
                 elements.catalogHistoryBreadcrumb.appendChild(historyItem);
             });
-            
-            // Add "Copy All" button
-            const copyAllButton = document.createElement('button');
-            copyAllButton.className = 'history-copy-all';
-            copyAllButton.textContent = 'Copy All';
-            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-            
-            copyAllButton.addEventListener('click', () => {
-                const allCodes = colorData.copyHistory.join(', ');
-                copyToClipboard(allCodes);
-            });
-            
-            elements.catalogHistoryBreadcrumb.appendChild(copyAllButton);
+        }
+
+        // Add pin/unpin functionality
+        function togglePin(ralCode) {
+            const index = colorData.pinnedColors.indexOf(ralCode);
+            if (index > -1) {
+                // Unpin
+                colorData.pinnedColors.splice(index, 1);
+            } else {
+                // Pin
+                colorData.pinnedColors.push(ralCode);
+            }
+            updatePinnedDisplay();
+            saveToLocalStorage();
         }
         
+        // Update pinned display
+        function updatePinnedDisplay() {
+            // We'll add this to both pages
+            updateMatcherPinnedDisplay();
+            updateCatalogPinnedDisplay();
+        }
+        
+        function updateMatcherPinnedDisplay() {
+            // Add pinned section to matcher if needed
+            let pinnedSection = document.getElementById('pinnedSection');
+            if (!pinnedSection && colorData.pinnedColors.length > 0) {
+                pinnedSection = document.createElement('div');
+                pinnedSection.id = 'pinnedSection';
+                pinnedSection.className = 'history-section';
+                pinnedSection.innerHTML = `
+                    <div class="history-title">
+                        <span>Pinned RAL Colors</span>
+                        <button class="clear-history" id="clearPinned">Clear Pinned</button>
+                    </div>
+                    <div class="history-breadcrumb" id="pinnedBreadcrumb"></div>
+                `;
+                elements.historySection.parentNode.insertBefore(pinnedSection, elements.historySection);
+                
+                document.getElementById('clearPinned').addEventListener('click', clearPinned);
+            }
+            
+            if (pinnedSection) {
+                const pinnedBreadcrumb = document.getElementById('pinnedBreadcrumb');
+                if (pinnedBreadcrumb) {
+                    pinnedBreadcrumb.innerHTML = '';
+                    
+                    colorData.pinnedColors.forEach(ralCode => {
+                        const color = colorData.ralColors.find(c => c.code === ralCode);
+                        const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
+                        
+                        const pinnedItem = document.createElement('div');
+                        pinnedItem.className = 'history-swatch pinned-item';
+                        pinnedItem.title = `Click to copy ${ralCode}`;
+                        pinnedItem.innerHTML = `
+                            <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
+                            <span>${ralCode}</span>
+                            <button class="unpin-btn" title="Unpin">×</button>
+                        `;
+                        
+                        pinnedItem.addEventListener('click', (e) => {
+                            if (!e.target.classList.contains('unpin-btn')) {
+                                copyToClipboard(ralCode);
+                            }
+                        });
+                        
+                        pinnedItem.querySelector('.unpin-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            togglePin(ralCode);
+                        });
+                        
+                        pinnedBreadcrumb.appendChild(pinnedItem);
+                    });
+                }
+                
+                pinnedSection.style.display = colorData.pinnedColors.length > 0 ? 'block' : 'none';
+            }
+        }
+        
+        function clearPinned() {
+            colorData.pinnedColors = [];
+            updatePinnedDisplay();
+            saveToLocalStorage();
+        }
+        
+        // Add pin buttons to color cards
+        function addPinButton(card, ralCode) {
+            const pinBtn = document.createElement('button');
+            pinBtn.className = 'pin-btn';
+            pinBtn.innerHTML = '📌';
+            pinBtn.title = 'Pin this color';
+            
+            // Check if already pinned
+            if (colorData.pinnedColors.includes(ralCode)) {
+                pinBtn.classList.add('pinned');
+                pinBtn.innerHTML = '📍';
+                pinBtn.title = 'Unpin this color';
+            }
+            
+            pinBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePin(ralCode);
+                
+                // Update button state
+                if (colorData.pinnedColors.includes(ralCode)) {
+                    pinBtn.classList.add('pinned');
+                    pinBtn.innerHTML = '📍';
+                    pinBtn.title = 'Unpin this color';
+                } else {
+                    pinBtn.classList.remove('pinned');
+                    pinBtn.innerHTML = '📌';
+                    pinBtn.title = 'Pin this color';
+                }
+            });
+            
+            // Add to card (position it appropriately)
+            card.style.position = 'relative';
+            pinBtn.style.position = 'absolute';
+            pinBtn.style.top = '10px';
+            pinBtn.style.right = '10px';
+            pinBtn.style.background = 'rgba(255,255,255,0.9)';
+            pinBtn.style.border = 'none';
+            pinBtn.style.borderRadius = '50%';
+            pinBtn.style.width = '30px';
+            pinBtn.style.height = '30px';
+            pinBtn.style.cursor = 'pointer';
+            pinBtn.style.zIndex = '10';
+            
+            card.appendChild(pinBtn);
+        }
+        
+        // Update createCatalogCard and displayResults to include pin buttons
         // Update the catalog card creation to match matcher design
         function createCatalogCard(color) {
             const card = document.createElement('div');
@@ -2191,35 +2199,31 @@
             const searchTerm = elements.catalogSearch.value.toLowerCase();
             
             if (!searchTerm) {
-                // If no search term, show all cards
-                document.querySelectorAll('.catalog-card').forEach(card => {
+                // Show all cards
+                document.querySelectorAll('.color-card').forEach(card => {
                     card.style.display = 'block';
-                });
-                
-                // Show all sections
-                document.querySelectorAll('.section-header, .catalog-grid').forEach(el => {
-                    el.style.display = 'block';
                 });
                 return;
             }
             
             // Filter cards based on search term
-            document.querySelectorAll('.catalog-card').forEach(card => {
-                const code = card.querySelector('.catalog-code').textContent.toLowerCase();
-                const nameEn = card.querySelector('.catalog-name').textContent.toLowerCase();
-                const nameRu = card.querySelector('.catalog-name-ru').textContent.toLowerCase();
+            document.querySelectorAll('.color-card').forEach(card => {
+                const codeElement = card.querySelector('.color-code');
+                const nameElements = card.querySelectorAll('.color-name, .color-name-ru');
                 
-                const matchesSearch = code.includes(searchTerm) || nameEn.includes(searchTerm) || nameRu.includes(searchTerm);
+                if (!codeElement) return;
+                
+                const code = codeElement.textContent.toLowerCase();
+                let nameMatch = false;
+                
+                nameElements.forEach(nameEl => {
+                    if (nameEl.textContent.toLowerCase().includes(searchTerm)) {
+                        nameMatch = true;
+                    }
+                });
+                
+                const matchesSearch = code.includes(searchTerm) || nameMatch;
                 card.style.display = matchesSearch ? 'block' : 'none';
-            });
-            
-            // Hide empty sections
-            document.querySelectorAll('.section-header').forEach(header => {
-                const section = header.nextElementSibling;
-                const visibleCards = section.querySelectorAll('.catalog-card[style=""]').length + 
-                                   section.querySelectorAll('.catalog-card:not([style])').length;
-                header.style.display = visibleCards > 0 ? 'block' : 'none';
-                section.style.display = visibleCards > 0 ? 'grid' : 'none';
             });
         }
 
