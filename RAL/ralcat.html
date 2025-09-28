@@ -680,6 +680,30 @@
             100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
         }
 
+        .pin-btn, .unpin-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 4px;
+            margin-left: 4px;
+            border-radius: 2px;
+            font-size: 10px;
+            line-height: 1;
+        }
+        
+        .pin-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .unpin-btn {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        .unpin-btn:hover {
+            background: rgba(255, 68, 68, 0.1);
+        }
+
         /* Error message styles */
         .error-message {
             background: #ffebee;
@@ -1902,6 +1926,10 @@
                 historyItem.innerHTML = `
                     <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
                     <span>${ralCode}</span>
+                    ${isPinned ? 
+                        '<button class="unpin-btn" title="Unpin">✕</button>' : 
+                        '<button class="pin-btn" title="Pin">📍</button>'
+                    }
                 `;
                 
                 historyItem.addEventListener('click', (e) => {
@@ -2064,13 +2092,13 @@
             pinBtn.style.position = 'absolute';
             pinBtn.style.top = '10px';
             pinBtn.style.right = '10px';
-            pinBtn.style.background = 'rgba(255,255,255,0.9)';
+            pinBtn.style.background = 'rgba(0,0,0,0)';
             pinBtn.style.border = 'none';
             pinBtn.style.borderRadius = '50%';
-            pinBtn.style.width = '30px';
-            pinBtn.style.height = '30px';
+            pinBtn.style.width = '20px';
+            pinBtn.style.height = '20px';
             pinBtn.style.cursor = 'pointer';
-            pinBtn.style.fontSize = '16px';
+            pinBtn.style.fontSize = '12px';
             pinBtn.style.zIndex = '10';
             
             pinBtn.addEventListener('click', (e) => {
