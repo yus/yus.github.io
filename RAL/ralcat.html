@@ -1103,59 +1103,61 @@
         }
 
         // Improved RAL text file parser
+        // CORRECTED RAL text file parser - handles double line breaks
         function parseRALTextFileImproved(text, language) {
             const colors = [];
             const lines = text.split('\n');
             
             console.log(`Parsing ${language} file with ${lines.length} lines`);
             
+            let currentCode = '';
+            let emptyLineCount = 0;
+            let lineType = 'expectingCode'; // 'expectingCode' or 'expectingName'
+            
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
-                if (line === '') continue;
-                
-                // Try multiple parsing patterns
-                let code, name;
-                
-                // Pattern 1: "000 15 00" format followed by color name
-                if (line.match(/^\d{3}\s+\d{2}\s+\d{2}/)) {
-                    const parts = line.split(/\s+/);
-                    if (parts.length >= 4) {
-                        code = `RAL ${parts[0]} ${parts[1]} ${parts[2]}`;
-                        name = parts.slice(3).join(' ');
-                    }
-                }
-                // Pattern 2: "RAL 000 15 00" format
-                else if (line.match(/^RAL\s+\d{3}\s+\d{2}\s+\d{2}/)) {
-                    const parts = line.split(/\s+/);
-                    if (parts.length >= 5) {
-                        code = `${parts[0]} ${parts[1]} ${parts[2]} ${parts[3]}`;
-                        name = parts.slice(4).join(' ');
-                    }
-                }
-                // Pattern 3: Tab-separated values
-                else if (line.includes('\t')) {
-                    const parts = line.split('\t');
-                    if (parts.length >= 2) {
-                        code = parts[0].trim();
-                        name = parts[1].trim();
-                    }
-                }
-                
-                if (code && name) {
-                    // Generate RGB values from RAL code for visualization
-                    const rgb = generateRGBFromRALCode(code);
+                if (line === '') {
+                    emptyLineCount++;
                     
+                    // After 2 empty lines, we should have a complete pair
+                    if (emptyLineCount === 2 && currentCode) {
+                        lineType = 'expectingName';
+                        emptyLineCount = 0;
+                    }
+                    continue;
+                }
+                
+                // Reset empty line counter when we find content
+                emptyLineCount = 0;
+                
+                if (lineType === 'expectingCode') {
+                    // This should be a RAL code line like "000 15 00"
+                    if (line.match(/^\d{3}\s+\d{2}\s+\d{2}$/)) {
+                        currentCode = `RAL ${line}`;
+                        console.log(`Found code: ${currentCode}`);
+                    } else {
+                        console.log(`Skipping line ${i + 1} (expected code): "${line}"`);
+                    }
+                } else if (lineType === 'expectingName') {
+                    // This should be a color name
+                    const currentName = line;
+                    console.log(`Found name: ${currentName} for code: ${currentCode}`);
+                    
+                    // Generate RGB and add to colors
+                    const rgb = generateRGBFromRALCode(currentCode);
                     colors.push({
-                        code: code,
-                        name: name,
+                        code: currentCode,
+                        name: currentName,
                         language: language,
                         rgb: rgb,
                         hue: getHueCategory(rgb.r, rgb.g, rgb.b),
                         lab: rgbToLab(rgb.r, rgb.g, rgb.b)
                     });
-                } else {
-                    console.log(`Skipping line ${i + 1}: "${line}" - could not parse`);
+                    
+                    // Reset for next color
+                    currentCode = '';
+                    lineType = 'expectingCode';
                 }
             }
             
