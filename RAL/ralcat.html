@@ -763,21 +763,30 @@
             });
         }
 
-        // Load complete RAL color data with actual names
+        // Load complete RAL color data with actual names - DYNAMIC VERSION
         async function loadColorData() {
             try {
                 elements.loadingIndicator.style.display = 'block';
                 elements.catalogLoading.style.display = 'block';
+                elements.loadingIndicator.textContent = 'Loading RAL color data...';
+                elements.catalogLoading.textContent = 'Loading RAL catalog...';
+                
+                console.log('Starting to load RAL data...');
                 
                 // Load comprehensive RAL data
                 const jsonResponse = await fetch('https://yus.github.io/RAL/comprehensiveRAL.json');
+                if (!jsonResponse.ok) throw new Error(`JSON fetch failed: ${jsonResponse.status}`);
+                
                 const jsonData = await jsonResponse.json();
+                console.log('Raw JSON data received:', jsonData);
                 
                 if (jsonData.colors && Array.isArray(jsonData.colors)) {
+                    console.log(`Found ${jsonData.colors.length} colors in JSON`);
+                    
                     colorData.ralColors = jsonData.colors.map(color => {
-                        if (color.rgb) {
+                        if (color.rgb && color.code) {
                             return {
-                                code: color.code,
+                                code: color.code.trim(),
                                 rgb: color.rgb,
                                 lab: rgbToLab(color.rgb.r, color.rgb.g, color.rgb.b),
                                 hue: getHueCategory(color.rgb.r, color.rgb.g, color.rgb.b)
@@ -785,41 +794,87 @@
                         }
                         return null;
                     }).filter(color => color !== null);
+                    
+                    console.log(`Processed ${colorData.ralColors.length} valid colors`);
                 } else {
-                    throw new Error('Invalid data structure');
+                    throw new Error('Invalid JSON structure: No colors array found');
                 }
                 
                 // Load English color names
+                console.log('Loading English names...');
                 const enResponse = await fetch('https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt');
+                if (!enResponse.ok) throw new Error(`English names fetch failed: ${enResponse.status}`);
+                
                 const enText = await enResponse.text();
                 colorData.colorNames.en = parseColorNames(enText);
+                console.log(`Loaded ${Object.keys(colorData.colorNames.en).length} English names`);
                 
                 // Load Russian color names
+                console.log('Loading Russian names...');
                 const ruResponse = await fetch('https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt');
+                if (!ruResponse.ok) throw new Error(`Russian names fetch failed: ${ruResponse.status}`);
+                
                 const ruText = await ruResponse.text();
                 colorData.colorNames.ru = parseColorNames(ruText);
+                console.log(`Loaded ${Object.keys(colorData.colorNames.ru).length} Russian names`);
+                
+                // Match names with colors and ensure we have complete data
+                matchNamesWithColors();
                 
                 colorData.loaded = true;
                 elements.loadingIndicator.style.display = 'none';
                 elements.catalogLoading.style.display = 'none';
                 
-                console.log(`Loaded ${colorData.ralColors.length} RAL colors with ${Object.keys(colorData.colorNames.en).length} English names`);
+                console.log(`Final: ${colorData.ralColors.length} RAL colors with names`);
                 
             } catch (error) {
                 console.error('Error loading color data:', error);
-                elements.loadingIndicator.innerHTML = 'Error loading color data. Using limited sample set.';
-                elements.catalogLoading.innerHTML = 'Error loading catalog data. Using limited sample set.';
+                elements.loadingIndicator.innerHTML = `Error: ${error.message}. Please check the data sources.`;
+                elements.catalogLoading.innerHTML = `Error: ${error.message}. Please check the data sources.`;
                 
-                loadSampleDataWithNames();
-                colorData.loaded = true;
-                elements.loadingIndicator.style.display = 'none';
-                elements.catalogLoading.style.display = 'none';
+                // Don't use fallback - show error to user
+                colorData.loaded = false;
             }
         }
 
-        // Get hue category for filtering - FIXED VERSION
+        // Match color names with color data
+        function matchNamesWithColors() {
+            let matchedCount = 0;
+            
+            colorData.ralColors.forEach(color => {
+                // Try to find matching name in both languages
+                const enName = colorData.colorNames.en[color.code];
+                const ruName = colorData.colorNames.ru[color.code];
+                
+                if (enName) matchedCount++;
+                if (ruName) matchedCount++;
+                
+                // If no exact match, try to find similar codes
+                if (!enName) {
+                    // Try alternative code formats
+                    const alternativeCodes = [
+                        color.code,
+                        color.code.replace(/ /g, ''),
+                        color.code.replace('RAL ', ''),
+                        color.code.toLowerCase(),
+                        color.code.toUpperCase()
+                    ];
+                    
+                    for (const altCode of alternativeCodes) {
+                        if (colorData.colorNames.en[altCode]) {
+                            colorData.colorNames.en[color.code] = colorData.colorNames.en[altCode];
+                            matchedCount++;
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            console.log(`Matched ${matchedCount} names with colors`);
+        }
+
+        // Get hue category for filtering
         function getHueCategory(r, g, b) {
-            // Convert RGB to HSL to get accurate hue
             const max = Math.max(r, g, b);
             const min = Math.min(r, g, b);
             const delta = max - min;
@@ -849,120 +904,50 @@
             return 'neutral';
         }
 
-        // Parse color names from text format
+        // Parse color names from text format - IMPROVED VERSION
         function parseColorNames(text) {
             const names = {};
             const lines = text.split('\n');
+            let parsedCount = 0;
             
             for (const line of lines) {
                 if (line.trim() === '') continue;
                 
-                const parts = line.split('\t');
+                // Handle different possible delimiters and formats
+                const delimiters = ['\t', '  ', ' - ', ': '];
+                let parts = [];
+                
+                for (const delimiter of delimiters) {
+                    if (line.includes(delimiter)) {
+                        parts = line.split(delimiter).map(part => part.trim());
+                        break;
+                    }
+                }
+                
+                // If no delimiter found, try to split by first space after RAL code
+                if (parts.length === 1) {
+                    const match = line.match(/^(RAL\s*\S+)\s+(.+)$/);
+                    if (match) {
+                        parts = [match[1], match[2]];
+                    }
+                }
+                
                 if (parts.length >= 2) {
-                    const code = parts[0].trim();
-                    const name = parts[1].trim();
-                    if (name && name !== 'undefined') {
+                    let code = parts[0].trim();
+                    let name = parts.slice(1).join(' ').trim();
+                    
+                    // Normalize RAL code format
+                    code = code.replace(/\s+/g, ' ').toUpperCase();
+                    
+                    if (code && name && name !== 'undefined' && !name.match(/^\d/)) {
                         names[code] = name;
+                        parsedCount++;
                     }
                 }
             }
             
+            console.log(`Parsed ${parsedCount} color names`);
             return names;
-        }
-
-        // Sample data with beautiful color names for fallback - FIXED VERSION
-        function loadSampleDataWithNames() {
-            // Create a more comprehensive sample dataset
-            const sampleColors = [
-                // Reds
-                { code: "RAL 010 20 20", rgb: { r: 85, g: 35, b: 45 }, hue: 'red' },
-                { code: "RAL 010 30 44", rgb: { r: 125, g: 57, b: 71 }, hue: 'red' },
-                { code: "RAL 010 40 36", rgb: { r: 160, g: 85, b: 105 }, hue: 'red' },
-                
-                // Oranges
-                { code: "RAL 020 30 36", rgb: { r: 125, g: 65, b: 45 }, hue: 'orange' },
-                { code: "RAL 030 50 60", rgb: { r: 191, g: 98, b: 56 }, hue: 'orange' },
-                { code: "RAL 040 60 50", rgb: { r: 210, g: 130, b: 90 }, hue: 'orange' },
-                
-                // Yellows
-                { code: "RAL 050 50 78", rgb: { r: 255, g: 132, b: 0 }, hue: 'yellow' },
-                { code: "RAL 060 70 70", rgb: { r: 255, g: 175, b: 69 }, hue: 'yellow' },
-                { code: "RAL 070 80 60", rgb: { r: 255, g: 200, b: 100 }, hue: 'yellow' },
-                
-                // Greens
-                { code: "RAL 110 60 40", rgb: { r: 138, g: 162, b: 120 }, hue: 'green' },
-                { code: "RAL 120 50 40", rgb: { r: 81, g: 130, b: 107 }, hue: 'green' },
-                { code: "RAL 130 70 30", rgb: { r: 170, g: 200, b: 160 }, hue: 'green' },
-                
-                // Blues
-                { code: "RAL 200 40 35", rgb: { r: 42, g: 108, b: 140 }, hue: 'blue' },
-                { code: "RAL 240 40 35", rgb: { r: 42, g: 92, b: 142 }, hue: 'blue' },
-                { code: "RAL 250 60 30", rgb: { r: 120, g: 160, b: 190 }, hue: 'blue' },
-                
-                // Purples
-                { code: "RAL 280 40 35", rgb: { r: 58, g: 71, b: 142 }, hue: 'purple' },
-                { code: "RAL 310 50 35", rgb: { r: 130, g: 102, b: 142 }, hue: 'purple' },
-                { code: "RAL 320 60 25", rgb: { r: 150, g: 140, b: 170 }, hue: 'purple' },
-                
-                // Neutrals
-                { code: "RAL 000 15 00", rgb: { r: 0, g: 0, b: 0 }, hue: 'neutral' },
-                { code: "RAL 075 70 30", rgb: { r: 181, g: 178, b: 130 }, hue: 'neutral' },
-                { code: "RAL 095 90 10", rgb: { r: 230, g: 229, b: 207 }, hue: 'neutral' }
-            ];
-            
-            colorData.ralColors = sampleColors.map(color => ({
-                ...color,
-                lab: rgbToLab(color.rgb.r, color.rgb.g, color.rgb.b)
-            }));
-            
-            // Beautiful color names
-            colorData.colorNames.en = {
-                "RAL 010 20 20": "Deep Burgundy",
-                "RAL 010 30 44": "Rich Claret",
-                "RAL 010 40 36": "Rose Wine",
-                "RAL 020 30 36": "Burnt Sienna",
-                "RAL 030 50 60": "Fiery Orange",
-                "RAL 040 60 50": "Apricot Glow",
-                "RAL 050 50 78": "Sunburst Yellow",
-                "RAL 060 70 70": "Golden Apricot",
-                "RAL 070 80 60": "Buttercup Yellow",
-                "RAL 110 60 40": "Sage Green",
-                "RAL 120 50 40": "Forest Depth",
-                "RAL 130 70 30": "Mint Fresh",
-                "RAL 200 40 35": "Marine Blue",
-                "RAL 240 40 35": "Cobalt Night",
-                "RAL 250 60 30": "Sky Blue",
-                "RAL 280 40 35": "Royal Velvet",
-                "RAL 310 50 35": "Misty Lilac",
-                "RAL 320 60 25": "Lavender Mist",
-                "RAL 000 15 00": "Jet Black",
-                "RAL 075 70 30": "Pistachio Cream",
-                "RAL 095 90 10": "Pearl White"
-            };
-            
-            colorData.colorNames.ru = {
-                "RAL 010 20 20": "Глубокий бургунди",
-                "RAL 010 30 44": "Насыщенный кларет",
-                "RAL 010 40 36": "Розовое вино",
-                "RAL 020 30 36": "Жженая сиена",
-                "RAL 030 50 60": "Огненно-оранжевый",
-                "RAL 040 60 50": "Абрикосовый отсвет",
-                "RAL 050 50 78": "Солнечно-желтый",
-                "RAL 060 70 70": "Золотисто-абрикосовый",
-                "RAL 070 80 60": "Лютиковый желтый",
-                "RAL 110 60 40": "Шалфейно-зеленый",
-                "RAL 120 50 40": "Лесная глушь",
-                "RAL 130 70 30": "Свежая мята",
-                "RAL 200 40 35": "Морская синева",
-                "RAL 240 40 35": "Кобальтовая ночь",
-                "RAL 250 60 30": "Небесно-голубой",
-                "RAL 280 40 35": "Королевский бархат",
-                "RAL 310 50 35": "Туманная сирень",
-                "RAL 320 60 25": "Лавандовый туман",
-                "RAL 000 15 00": "Глубокий черный",
-                "RAL 075 70 30": "Фисташковый крем",
-                "RAL 095 90 10": "Жемчужно-белый"
-            };
         }
 
         // Set up event listeners
@@ -1212,13 +1197,11 @@
         }
 
         function rgbToLab(r, g, b) {
-            // Simplified Lab conversion for demonstration
-            // In a real application, you'd want a more accurate conversion
+            // Simplified Lab conversion
             const rLinear = r / 255;
             const gLinear = g / 255;
             const bLinear = b / 255;
             
-            // Simple approximation
             const x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
             const y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
             const z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
@@ -1356,10 +1339,11 @@
             });
         }
 
-        // Catalog functions - FIXED VERSION
+        // Catalog functions - DYNAMIC VERSION
         function displayCatalog() {
             if (!colorData.loaded || colorData.ralColors.length === 0) {
                 console.log('No color data available for catalog');
+                elements.catalogContainer.innerHTML = '<div class="loading">No color data available. Please check the data sources.</div>';
                 return;
             }
             
@@ -1373,7 +1357,6 @@
                 if (hueCategories[color.hue]) {
                     hueCategories[color.hue].push(color);
                 } else {
-                    // If hue category is not recognized, put in neutral
                     hueCategories.neutral.push(color);
                 }
             });
@@ -1387,9 +1370,12 @@
             
             // Display each category
             const categoryOrder = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'neutral'];
+            let totalColors = 0;
+            
             categoryOrder.forEach(hue => {
                 if (hueCategories[hue].length === 0) return;
                 
+                totalColors += hueCategories[hue].length;
                 const section = document.createElement('div');
                 section.id = `section-${hue}`;
                 
@@ -1410,7 +1396,7 @@
                 elements.catalogContainer.appendChild(section);
             });
             
-            console.log('Catalog displayed with', colorData.ralColors.length, 'colors');
+            console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
             
             // Re-apply highlight if needed
             if (colorData.currentHighlight) {
@@ -1443,9 +1429,10 @@
             code.textContent = color.code;
             
             const name = document.createElement('div');
-            name.textContent = colorData.colorNames[language][color.code] || '';
+            const actualName = colorData.colorNames[language][color.code];
+            name.textContent = actualName || 'No name';
             name.style.fontSize = '0.8rem';
-            name.style.color = '#666';
+            name.style.color = actualName ? '#666' : '#999';
             name.style.fontStyle = 'italic';
             
             info.appendChild(code);
