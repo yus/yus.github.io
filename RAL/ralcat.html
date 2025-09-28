@@ -822,7 +822,7 @@
             <div class="history-section" id="historySection" style="display: none;">
                 <div class="history-title">
                     <span>Recently Copied RAL Colors</span>
-                    <button class="clear-history" id="clearHistory" style="display: none;">Clear</button>
+                    <button class="clear-history" id="clearHistory" style="display: none;">Clear Crumb</button>
                 </div>
                 <div class="history-breadcrumb" id="historyBreadcrumb">
                     <!-- History items will be added here -->
@@ -1007,7 +1007,8 @@
                     
                     // Update catalog history when switching to catalog page
                     if (pageId === 'catalogPage') {
-                        updateCatalogHistoryDisplay();
+                        updateHistoryDisplay();
+                        // updateCatalogHistoryDisplay();
                     }
                 });
             });
@@ -1856,59 +1857,39 @@
             
             // Update history displays
             updateHistoryDisplay();
-            updateCatalogHistoryDisplay();
+            //updateCatalogHistoryDisplay();
         }
         
         // Clear history
         function clearHistory() {
             colorData.copyHistory = [];
             updateHistoryDisplay();
-            updateCatalogHistoryDisplay();
+            //updateCatalogHistoryDisplay();
         }
 
         // Update History
         function updateHistoryDisplay() {
-            if (colorData.copyHistory.length === 0) {
-                elements.historySection.style.display = 'none';
-                return;
-            }
+            const hasHistory = colorData.copyHistory.length > 0;
             
-            elements.historySection.style.display = 'block';
-            elements.historyBreadcrumb.innerHTML = '';
+            // Update matcher history
+            elements.historySection.style.display = hasHistory ? 'block' : 'none';
+            elements.clearHistory.style.display = hasHistory ? 'block' : 'none';
             
-            // Create history items
-            colorData.copyHistory.forEach(ralCode => {
-                const color = colorData.ralColors.find(c => c.code === ralCode);
-                const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
-                
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-swatch';
-                historyItem.title = `Click to copy ${ralCode}`;
-                
-                historyItem.innerHTML = `
-                    <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
-                    <span>${ralCode}</span>
-                `;
-                
-                historyItem.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    copyToClipboard(ralCode);
-                });
-                
-                elements.historyBreadcrumb.appendChild(historyItem);
-            });
+            // Update catalog history  
+            elements.catalogHistorySection.style.display = hasHistory ? 'block' : 'none';
+            elements.catalogClearHistory.style.display = hasHistory ? 'block' : 'none';
+            
+            if (!hasHistory) return;
+            
+            // Update BOTH breadcrumbs with the same content
+            updateBreadcrumb(elements.historyBreadcrumb);
+            updateBreadcrumb(elements.catalogHistoryBreadcrumb);
         }
         
-        function updateCatalogHistoryDisplay() {
-            if (colorData.copyHistory.length === 0) {
-                elements.catalogHistorySection.style.display = 'none';
-                return;
-            }
+        function updateBreadcrumb(breadcrumbElement) {
+            breadcrumbElement.innerHTML = '';
             
-            elements.catalogHistorySection.style.display = 'block';
-            elements.catalogHistoryBreadcrumb.innerHTML = '';
-            
-            // Create history items
+            // Add history items
             colorData.copyHistory.forEach(ralCode => {
                 const color = colorData.ralColors.find(c => c.code === ralCode);
                 const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
@@ -1916,7 +1897,6 @@
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-swatch';
                 historyItem.title = `Click to copy ${ralCode}`;
-                
                 historyItem.innerHTML = `
                     <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
                     <span>${ralCode}</span>
@@ -1927,9 +1907,69 @@
                     copyToClipboard(ralCode);
                 });
                 
-                elements.catalogHistoryBreadcrumb.appendChild(historyItem);
+                breadcrumbElement.appendChild(historyItem);
             });
+            
+            // Add "Copy All" button to BOTH
+            const copyAllButton = document.createElement('button');
+            copyAllButton.className = 'history-copy-all';
+            copyAllButton.textContent = 'Copy All';
+            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
+            
+            copyAllButton.addEventListener('click', () => {
+                const allCodes = colorData.copyHistory.join(', ');
+                copyToClipboard(allCodes);
+            });
+            
+            breadcrumbElement.appendChild(copyAllButton);
         }
+        
+        // function updateCatalogHistoryDisplay() {
+        //     if (colorData.copyHistory.length === 0) {
+        //         elements.catalogHistorySection.style.display = 'none';
+        //         elements.catalogClearHistory.style.display = 'none';
+        //         return;
+        //     }
+            
+        //     elements.catalogHistorySection.style.display = 'block';
+        //     elements.catalogClearHistory.style.display = 'block';
+        //     elements.catalogHistoryBreadcrumb.innerHTML = '';
+            
+        //     // Create history items
+        //     colorData.copyHistory.forEach(ralCode => {
+        //         const color = colorData.ralColors.find(c => c.code === ralCode);
+        //         const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
+                
+        //         const historyItem = document.createElement('div');
+        //         historyItem.className = 'history-swatch';
+        //         historyItem.title = `Click to copy ${ralCode}`;
+                
+        //         historyItem.innerHTML = `
+        //             <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
+        //             <span>${ralCode}</span>
+        //         `;
+                
+        //         historyItem.addEventListener('click', (e) => {
+        //             e.stopPropagation();
+        //             copyToClipboard(ralCode);
+        //         });
+                
+        //         elements.catalogHistoryBreadcrumb.appendChild(historyItem);
+        //     });
+            
+        //     // Add "Copy All" button - THIS WAS MISSING!
+        //     const copyAllButton = document.createElement('button');
+        //     copyAllButton.className = 'history-copy-all';
+        //     copyAllButton.textContent = 'Copy All';
+        //     copyAllButton.title = 'Copy all RAL codes as comma-separated list';
+            
+        //     copyAllButton.addEventListener('click', () => {
+        //         const allCodes = colorData.copyHistory.join(', ');
+        //         copyToClipboard(allCodes);
+        //     });
+            
+        //     elements.catalogHistoryBreadcrumb.appendChild(copyAllButton);
+        // }
 
         // Add pin/unpin functionality
         function togglePin(ralCode) {
