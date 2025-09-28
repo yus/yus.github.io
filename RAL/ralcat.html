@@ -1381,6 +1381,10 @@
             elements.resultsCount.addEventListener('input', updateResultsCount);
             elements.maxDifference.addEventListener('input', updateMaxDifference);
             elements.findMatches.addEventListener('click', findMatchingColors);
+
+            // Breadcrumb
+            elements.clearHistory.addEventListener('click', clearHistory);
+            elements.catalogClearHistory.addEventListener('click', clearHistory);
             
             // Catalog hue filter buttons
             elements.hueButtons.forEach(button => {
