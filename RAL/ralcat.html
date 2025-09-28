@@ -1869,47 +1869,51 @@
         }
         
         // Add RAL code to history
-        function addToHistory(ralCode) {
-            // Remove if already exists (to avoid duplicates)
-            colorData.copyHistory = colorData.copyHistory.filter(code => code !== ralCode);
-            
-            // Add to beginning of array
-            colorData.copyHistory.unshift(ralCode);
-            
-            // Keep only last 10 items
-            if (colorData.copyHistory.length > 10) {
-                colorData.copyHistory = colorData.copyHistory.slice(0, 10);
-            }
-            
-            // Update history displays
-            updateHistoryDisplay();
-        }
-
-        // Clear history
-        function clearHistory() {
-            colorData.copyHistory = [];
-            updateHistoryDisplay();
-            //updateCatalogHistoryDisplay();
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyNotification();
+                
+                // Add to history if it's a RAL code
+                if (text.startsWith('RAL')) {
+                    console.log('Adding to history:', text);
+                    addToHistory(text);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyNotification();
+                
+                if (text.startsWith('RAL')) {
+                    console.log('Adding to history (fallback):', text);
+                    addToHistory(text);
+                }
+            });
         }
 
         // Update History
         function updateHistoryDisplay() {
-            const hasHistory = colorData.copyHistory.length > 0;
-            const hasPinned = colorData.pinnedHistory.length > 0;
+            console.log('updateHistoryDisplay called');
+            console.log('copyHistory:', colorData.copyHistory);
+            console.log('historySection exists:', !!elements.historySection);
+            console.log('catalogHistorySection exists:', !!elements.catalogHistorySection);
             
-            // Update main history sections and clear buttons
+            const hasHistory = colorData.copyHistory.length > 0;
+            console.log('hasHistory:', hasHistory);
+            
+            // Update main history sections
             elements.historySection.style.display = hasHistory ? 'block' : 'none';
-            elements.clearHistory.style.display = hasHistory ? 'block' : 'none';
             elements.catalogHistorySection.style.display = hasHistory ? 'block' : 'none';
-            elements.catalogClearHistory.style.display = hasHistory ? 'block' : 'none';
             
             if (hasHistory) {
+                console.log('Updating breadcrumbs with history');
                 updateBreadcrumb(elements.historyBreadcrumb, colorData.copyHistory, false);
                 updateBreadcrumb(elements.catalogHistoryBreadcrumb, colorData.copyHistory, false);
-            } else {
-                // Clear the breadcrumbs if no history
-                elements.historyBreadcrumb.innerHTML = '';
-                elements.catalogHistoryBreadcrumb.innerHTML = '';
             }
             
             // Update pinned sections
