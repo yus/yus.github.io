@@ -1778,7 +1778,348 @@
             });
         }
 
-        // Catalog functions
+        // // Catalog functions
+        // function displayCatalog() {
+        //     if (!colorData.loaded || colorData.ralColors.length === 0) {
+        //         console.log('No color data available for catalog');
+        //         elements.catalogContainer.innerHTML = '<div class="loading">No color data available. Please check the data sources.</div>';
+        //         return;
+        //     }
+            
+        //     const hueCategories = {
+        //         red: [], orange: [], yellow: [], green: [], blue: [], purple: [], neutral: []
+        //     };
+            
+        //     // Sort colors by hue category
+        //     colorData.ralColors.forEach(color => {
+        //         if (hueCategories[color.hue]) {
+        //             hueCategories[color.hue].push(color);
+        //         } else {
+        //             hueCategories.neutral.push(color);
+        //         }
+        //     });
+            
+        //     // Sort each category by RAL code for consistent ordering
+        //     Object.keys(hueCategories).forEach(hue => {
+        //         hueCategories[hue].sort((a, b) => a.code.localeCompare(b.code));
+        //     });
+            
+        //     elements.catalogContainer.innerHTML = '';
+            
+        //     // Display each category
+        //     const categoryOrder = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'neutral'];
+        //     let totalColors = 0;
+            
+        //     categoryOrder.forEach(hue => {
+        //         if (hueCategories[hue].length === 0) return;
+                
+        //         totalColors += hueCategories[hue].length;
+        //         const section = document.createElement('div');
+        //         section.id = `section-${hue}`;
+        //         section.className = 'catalog-section';
+                
+        //         const header = document.createElement('div');
+        //         header.className = 'section-header';
+        //         header.textContent = `${hue.charAt(0).toUpperCase() + hue.slice(1)} Colors (${hueCategories[hue].length})`;
+        //         section.appendChild(header);
+                
+        //         const grid = document.createElement('div');
+        //         grid.className = 'catalog-grid';
+                
+        //         hueCategories[hue].forEach(color => {
+        //             const card = createCatalogCard(color);
+        //             grid.appendChild(card);
+        //         });
+                
+        //         section.appendChild(grid);
+        //         elements.catalogContainer.appendChild(section);
+        //     });
+            
+        //     console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
+        // }
+
+        // function createCatalogCard(color) {
+        //     const card = document.createElement('div');
+        //     card.className = 'catalog-card';
+        //     card.id = `color-${color.code.replace(/\s+/g, '-')}`;
+        //     card.addEventListener('click', () => {
+        //         // Copy RAL code to clipboard and put it in search field
+        //         copyToClipboard(color.code);
+        //         elements.catalogSearch.value = color.code;
+        //         filterCatalog();
+                
+        //         // Add highlight effect to the searched card
+        //         card.classList.add('search-highlight');
+        //         setTimeout(() => {
+        //             card.classList.remove('search-highlight');
+        //         }, 2000);
+        //     });
+            
+        //     const swatch = document.createElement('div');
+        //     swatch.className = 'catalog-swatch';
+        //     swatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
+            
+        //     const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
+        //     swatch.style.color = brightness > 128 ? 'black' : 'white';
+        //     swatch.innerHTML = `
+        //         <div>${color.code}</div>
+        //         <div style="font-size: 0.7rem;">Click to copy & search</div>
+        //     `;
+            
+        //     const info = document.createElement('div');
+        //     info.className = 'catalog-info';
+            
+        //     const code = document.createElement('div');
+        //     code.className = 'catalog-code';
+        //     code.textContent = color.code;
+            
+        //     const nameEn = document.createElement('div');
+        //     nameEn.className = 'catalog-name';
+        //     nameEn.textContent = color.nameEn || 'No English name';
+            
+        //     const nameRu = document.createElement('div');
+        //     nameRu.className = 'catalog-name-ru';
+        //     nameRu.textContent = color.nameRu || 'No Russian name';
+            
+        //     info.appendChild(code);
+        //     info.appendChild(nameEn);
+        //     info.appendChild(nameRu);
+        //     card.appendChild(swatch);
+        //     card.appendChild(info);
+            
+        //     return card;
+        // }
+        // Add these missing functions back:
+
+        // Copy RAL code to clipboard with notification
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyNotification();
+                
+                // Add to history if it's a RAL code
+                if (text.startsWith('RAL')) {
+                    addToHistory(text);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyNotification();
+                
+                if (text.startsWith('RAL')) {
+                    addToHistory(text);
+                }
+            });
+        }
+        
+        // Show copy notification
+        function showCopyNotification() {
+            elements.copyNotification.classList.add('show');
+            setTimeout(() => {
+                elements.copyNotification.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Add RAL code to history
+        function addToHistory(ralCode) {
+            // Remove if already exists (to avoid duplicates)
+            colorData.copyHistory = colorData.copyHistory.filter(code => code !== ralCode);
+            
+            // Add to beginning of array
+            colorData.copyHistory.unshift(ralCode);
+            
+            // Keep only last 10 items
+            if (colorData.copyHistory.length > 10) {
+                colorData.copyHistory = colorData.copyHistory.slice(0, 10);
+            }
+            
+            // Update history displays
+            updateHistoryDisplay();
+            updateCatalogHistoryDisplay();
+        }
+        
+        // Clear history
+        function clearHistory() {
+            colorData.copyHistory = [];
+            updateHistoryDisplay();
+            updateCatalogHistoryDisplay();
+        }
+        
+        // Update matcher history breadcrumb display
+        function updateHistoryDisplay() {
+            if (colorData.copyHistory.length === 0) {
+                elements.historySection.style.display = 'none';
+                elements.clearHistory.style.display = 'none';
+                return;
+            }
+            
+            elements.historySection.style.display = 'block';
+            elements.clearHistory.style.display = 'block';
+            elements.historyBreadcrumb.innerHTML = '';
+            
+            colorData.copyHistory.forEach(ralCode => {
+                // Find the color data for this RAL code
+                const color = colorData.ralColors.find(c => c.code === ralCode);
+                const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-swatch';
+                historyItem.title = `Click to copy ${ralCode}`;
+                
+                historyItem.innerHTML = `
+                    <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
+                    <span>${ralCode}</span>
+                `;
+                
+                historyItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyToClipboard(ralCode);
+                });
+                
+                elements.historyBreadcrumb.appendChild(historyItem);
+            });
+            
+            // Add "Copy All" button
+            const copyAllButton = document.createElement('button');
+            copyAllButton.className = 'history-copy-all';
+            copyAllButton.textContent = 'Copy All';
+            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
+            
+            copyAllButton.addEventListener('click', () => {
+                const allCodes = colorData.copyHistory.join(', ');
+                copyToClipboard(allCodes);
+            });
+            
+            elements.historyBreadcrumb.appendChild(copyAllButton);
+        }
+        
+        // Update catalog history breadcrumb display
+        function updateCatalogHistoryDisplay() {
+            if (colorData.copyHistory.length === 0) {
+                elements.catalogHistorySection.style.display = 'none';
+                elements.catalogClearHistory.style.display = 'none';
+                return;
+            }
+            
+            elements.catalogHistorySection.style.display = 'block';
+            elements.catalogClearHistory.style.display = 'block';
+            elements.catalogHistoryBreadcrumb.innerHTML = '';
+            
+            colorData.copyHistory.forEach(ralCode => {
+                // Find the color data for this RAL code
+                const color = colorData.ralColors.find(c => c.code === ralCode);
+                const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-swatch';
+                historyItem.title = `Click to copy ${ralCode}`;
+                
+                historyItem.innerHTML = `
+                    <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
+                    <span>${ralCode}</span>
+                `;
+                
+                historyItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyToClipboard(ralCode);
+                    // Also search for this code in catalog
+                    elements.catalogSearch.value = ralCode;
+                    filterCatalog();
+                });
+                
+                elements.catalogHistoryBreadcrumb.appendChild(historyItem);
+            });
+            
+            // Add "Copy All" button
+            const copyAllButton = document.createElement('button');
+            copyAllButton.className = 'history-copy-all';
+            copyAllButton.textContent = 'Copy All';
+            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
+            
+            copyAllButton.addEventListener('click', () => {
+                const allCodes = colorData.copyHistory.join(', ');
+                copyToClipboard(allCodes);
+            });
+            
+            elements.catalogHistoryBreadcrumb.appendChild(copyAllButton);
+        }
+        
+        // Update the catalog card creation to match matcher design
+        function createCatalogCard(color) {
+            const card = document.createElement('div');
+            card.className = 'color-card'; // Use same class as matcher
+            card.id = `color-${color.code.replace(/\s+/g, '-')}`;
+            card.addEventListener('click', () => {
+                // Copy RAL code to clipboard and put it in search field
+                copyToClipboard(color.code);
+                elements.catalogSearch.value = color.code;
+                filterCatalog();
+                
+                // Add highlight effect to the searched card
+                card.classList.add('search-highlight');
+                setTimeout(() => {
+                    card.classList.remove('search-highlight');
+                }, 2000);
+            });
+            
+            const colorSwatch = document.createElement('div');
+            colorSwatch.className = 'color-swatch'; // Same as matcher
+            colorSwatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
+            
+            const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
+            colorSwatch.style.color = brightness > 128 ? 'black' : 'white';
+            colorSwatch.innerHTML = `
+                <div>${color.code}</div>
+                <div style="font-size: 0.8rem;">Click to copy</div>
+            `;
+            
+            const colorInfo = document.createElement('div');
+            colorInfo.className = 'color-info'; // Same as matcher
+            
+            const colorCode = document.createElement('div');
+            colorCode.className = 'color-code';
+            colorCode.textContent = color.code;
+            
+            const colorNameEn = document.createElement('div');
+            colorNameEn.className = 'color-name';
+            colorNameEn.textContent = color.nameEn || 'No English name';
+            if (!color.nameEn) colorNameEn.style.color = '#999';
+            
+            const colorNameRu = document.createElement('div');
+            colorNameRu.className = 'color-name-ru';
+            colorNameRu.textContent = color.nameRu || 'No Russian name';
+            if (!color.nameRu) colorNameRu.style.color = '#999';
+            
+            const colorValues = document.createElement('div');
+            colorValues.className = 'color-values';
+            colorValues.innerHTML = `
+                <div class="value-group">
+                    <div class="value-label">RGB</div>
+                    <div>${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}</div>
+                </div>
+                <div class="value-group">
+                    <div class="value-label">CMYK</div>
+                    <div>${Math.round(color.cmyk.c * 100)}%, ${Math.round(color.cmyk.m * 100)}%, ${Math.round(color.cmyk.y * 100)}%, ${Math.round(color.cmyk.k * 100)}%</div>
+                </div>
+            `;
+            
+            colorInfo.appendChild(colorCode);
+            colorInfo.appendChild(colorNameEn);
+            colorInfo.appendChild(colorNameRu);
+            colorInfo.appendChild(colorValues);
+            
+            card.appendChild(colorSwatch);
+            card.appendChild(colorInfo);
+            
+            return card;
+        }
+        
+        // Also update the displayCatalog function to calculate CMYK
         function displayCatalog() {
             if (!colorData.loaded || colorData.ralColors.length === 0) {
                 console.log('No color data available for catalog');
@@ -1790,8 +2131,11 @@
                 red: [], orange: [], yellow: [], green: [], blue: [], purple: [], neutral: []
             };
             
-            // Sort colors by hue category
+            // Sort colors by hue category and calculate CMYK
             colorData.ralColors.forEach(color => {
+                // Calculate CMYK for catalog display
+                color.cmyk = rgbToCmyk(color.rgb.r, color.rgb.g, color.rgb.b);
+                
                 if (hueCategories[color.hue]) {
                     hueCategories[color.hue].push(color);
                 } else {
@@ -1836,58 +2180,6 @@
             });
             
             console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
-        }
-
-        function createCatalogCard(color) {
-            const card = document.createElement('div');
-            card.className = 'catalog-card';
-            card.id = `color-${color.code.replace(/\s+/g, '-')}`;
-            card.addEventListener('click', () => {
-                // Copy RAL code to clipboard and put it in search field
-                copyToClipboard(color.code);
-                elements.catalogSearch.value = color.code;
-                filterCatalog();
-                
-                // Add highlight effect to the searched card
-                card.classList.add('search-highlight');
-                setTimeout(() => {
-                    card.classList.remove('search-highlight');
-                }, 2000);
-            });
-            
-            const swatch = document.createElement('div');
-            swatch.className = 'catalog-swatch';
-            swatch.style.backgroundColor = `rgb(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b})`;
-            
-            const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
-            swatch.style.color = brightness > 128 ? 'black' : 'white';
-            swatch.innerHTML = `
-                <div>${color.code}</div>
-                <div style="font-size: 0.7rem;">Click to copy & search</div>
-            `;
-            
-            const info = document.createElement('div');
-            info.className = 'catalog-info';
-            
-            const code = document.createElement('div');
-            code.className = 'catalog-code';
-            code.textContent = color.code;
-            
-            const nameEn = document.createElement('div');
-            nameEn.className = 'catalog-name';
-            nameEn.textContent = color.nameEn || 'No English name';
-            
-            const nameRu = document.createElement('div');
-            nameRu.className = 'catalog-name-ru';
-            nameRu.textContent = color.nameRu || 'No Russian name';
-            
-            info.appendChild(code);
-            info.appendChild(nameEn);
-            info.appendChild(nameRu);
-            card.appendChild(swatch);
-            card.appendChild(info);
-            
-            return card;
         }
 
         function filterCatalog() {
