@@ -43,8 +43,7 @@ Architecture grey
 000 50 00
 
 
-Steel 
-grey
+Steel grey
 
 
 000 55 00
@@ -110,8 +109,7 @@ Cherry black
 010 20 20
 
 
-Dark 
-mahogany
+Dark mahogany
 
 
 010 20 25
@@ -120,12 +118,10 @@ mahogany
 Rusty red
 
 
-010 30 10 
+010 30 10
 
 
-Wood
--
-black red
+Wood black red
 
 
 010 30 15
@@ -173,8 +169,7 @@ Atlas red
 010 40 10
 
 
-Caput mortuum grey 
-red
+Caput mortuum grey red
 
 
 010 40 15
@@ -266,11 +261,6 @@ Marble red
 
 Geranium red
 
-
-
-
- 
-
 
 010 50 40
 
@@ -308,8 +298,7 @@ Ice orchid red
 Lime pink
 
 
-010 60 
-25
+010 60 25
 
 
 Lipstick pink
@@ -369,8 +358,7 @@ Flamingo pink
 Cherry blossom pink
 
 
-010 70 
-35
+010 70 35
 
 
 Baby pink
@@ -433,9 +421,7 @@ Light apricot
 010 93 05
 
 
-White
--
-red
+White-red
 
 
 020 20 05
@@ -501,8 +487,7 @@ Sweet cherry red
 020 40 05
 
 
-Greyish
-brown
+Greyish brown
 
 
 020 40 10
@@ -540,11 +525,6 @@ Bright red
 
 Zircon grey
 
-
-
-
- 
-
 
 020 50 10
 
@@ -570,8 +550,7 @@ Venetian red
 Alsike clover red
 
 
-020 50 
-50
+020 50 50
 
 
 Flame red
@@ -631,8 +610,7 @@ Tourmaline mauve
 Rosewood apricot
 
 
-020 70
-30
+020 70 30
 
 
 Marker pink
@@ -662,7 +640,7 @@ Marzipan pink
 Almond blossom pink
 
 
-020 85 10 
+020 85 10
 
 
 Salmon cream
@@ -811,11 +789,6 @@ Desert red
 
 Antique pink
 
-
-
-
- 
-
 
 030 60 40
 
@@ -886,8 +859,7 @@ Peach red
 030 90 05
 
 
-Antique 
-white
+Antique white
 
 
 030 90 10
@@ -1019,8 +991,7 @@ Ant red
 040 50 50
 
 
-English 
-red
+English red
 
 
 040 50 60
@@ -1082,11 +1053,6 @@ Coral orange
 
 Passepartout grey
 
-
-
-
- 
-
 
 040 70 10
 
@@ -1142,7 +1108,7 @@ Madder orange
 Nature apricot
 
 
-040 85 05 
+040 85 05
 
 
 Pandora grey
@@ -1151,8 +1117,7 @@ Pandora grey
 040 85 10
 
 
-Fine 
-alabaster
+Fine alabaster
 
 
 040 85 20
@@ -1191,7 +1156,7 @@ Granite brown
 Night brown
 
 
-050 30 10 
+050 30 10
 
 
 Obsidian brown
@@ -1266,9 +1231,7 @@ Golden brown
 050 50 40
 
 
-Copper
--
-metal red
+Copper-metal red
 
 
 050 50 50
@@ -1353,11 +1316,6 @@ Bamboo beige
 
 
 Amber grey
-
-
-
-
- 
 
 
 050 70 30
@@ -1462,8 +1420,7 @@ Nutria fur brown
 Peat brown
 
 
-060
-30 27
+060 30 27
 
 
 Cassiterite brown
@@ -1624,11 +1581,6 @@ Peanut butter
 
 Peach yellow
 
-
-
-
- 
-
 
 060 70 40
 
@@ -1696,7 +1648,7 @@ Champagne rose
 Cornmeal beige
 
 
-060 85 20 
+060 85 20
 
 
 Dough yellow
@@ -1711,8 +1663,7 @@ Light saffron orange
 060 90 05
 
 
-Grain 
-white
+Grain white
 
 
 060 90 10
@@ -1733,7 +1684,7 @@ Apricot cream
 Wool white
 
 
-070 30 10 
+070 30 10
 
 
 Mineral brown
@@ -1775,7 +1726,7 @@ Autumn gold
 Saruk grey
 
 
-070 50 
+070 50
 20
 
 
@@ -1839,8 +1790,7 @@ Mud yellow
 070 60 60
 
 
-Mustard 
-yellow
+Mustard yellow
 
 
 070 60 70
@@ -1895,11 +1845,6 @@ Gorse yellow orange
 
 
 Naples yellow
-
-
-
-
- 
 
 
 070 70 80
@@ -1992,7 +1937,7 @@ Chalk yellow
 Anemone white
 
 
-075 40 10 
+075 40 10
 
 
 Tree bark brown
@@ -2016,7 +1961,7 @@ Bark brown
 Lizard brown
 
 
-075 50 10 
+075 50 10
 
 
 Rye dough brown
@@ -2079,8 +2024,7 @@ Funchal yellow
 075 60 50
 
 
-Mango 
-brown
+Mango brown
 
 
 075 60 60
@@ -2165,11 +2109,6 @@ Dark yellow
 
 
 Ash yellow
-
-
-
-
- 
 
 
 075 80 50
@@ -2259,8 +2198,7 @@ Clove yellow brown
 080 30 26
 
 
-Smoked 
-oak brown
+Smoked oak brown
 
 
 080 40 05
@@ -2380,8 +2318,7 @@ Yellow gold
 080 70 05
 
 
-Garlic 
-beige
+Garlic beige
 
 
 080 70 10
@@ -2437,11 +2374,6 @@ Sunflower yellow
 
 Arnica yellow
 
-
-
-
- 
-
 
 080 80 05
 
@@ -2476,7 +2408,7 @@ Straw yellow
 080 80 50
 
 
-Mirabelle yellow 
+Mirabelle yellow
 
 
 080 80 60
@@ -2560,11 +2492,10 @@ Horseradish yellow
 080 93 05
 
 
-Milk star 
-white
+Milk star white
 
 
-085 40 10 
+085 40 10
 
 
 Mineral green
@@ -2681,8 +2612,7 @@ Autumn apple yellow
 085 70 60
 
 
-Pitmaston pear 
-yellow
+Pitmaston pear yellow
 
 
 085 70 70
@@ -2707,11 +2637,6 @@ Velvet beige
 
 
 Mineral beige
-
-
-
-
- 
 
 
 085 80 30
@@ -2756,7 +2681,7 @@ Dandelion yellow
 Decor yellow
 
 
-085 85 10 
+085 85 10
 
 
 Alabaster white
@@ -2768,12 +2693,10 @@ Alabaster white
 Light blond
 
 
-085 85 30 
+085 85 30
 
 
-Willow
--
-flower yellow
+Willow flower yellow
 
 
 085 85 40
@@ -2800,8 +2723,7 @@ Alpine berry yellow
 China clay yellow
 
 
-085 93
-05
+085 93 05
 
 
 Vintage white
@@ -2861,8 +2783,7 @@ Giant cactus green
 Aubergine green
 
 
-090 
-60 10
+090 60 10
 
 
 Oyster grey
@@ -2919,8 +2840,7 @@ Rhubarb leaf green
 090 70 40
 
 
-Hedgehog cactus 
-yellow green
+Hedgehog cactus yellow green
 
 
 090 70 50
@@ -2982,11 +2902,6 @@ Tasman honey yellow
 
 New yellow
 
-
-
-
- 
-
 
 090 80 70
 
@@ -3039,8 +2954,7 @@ March yellow
 090 85 50
 
 
-Oriole 
-yellow
+Oriole yellow
 
 
 090 90 05
@@ -3073,7 +2987,7 @@ Wax yellow
 Lemon cream
 
 
-090 90 50 
+090 90 50
 
 
 Tiger yellow
@@ -3091,7 +3005,7 @@ Sunrose yellow
 Cream white
 
 
-095 40 10 
+095 40 10
 
 
 Shady green
@@ -3103,8 +3017,7 @@ Shady green
 Forest green
 
 
-095 
-40 30
+095 40 30
 
 
 Bean green
@@ -3224,8 +3137,7 @@ Papaya yellow green
 Bronze green
 
 
-095
-80 10
+095 80 10
 
 
 Sapphire light yellow
@@ -3253,11 +3165,6 @@ Pea green
 
 
 Williams pear yellow
-
-
-
-
- 
 
 
 095 80 60
@@ -3287,8 +3194,7 @@ Salsify white
 095 85 20
 
 
-Dull light
-yellow
+Dull light yellow
 
 
 095 85 30
@@ -3456,10 +3362,7 @@ Olivine grey
 100 60 20
 
 
-Grey
--
-headed woodpecker 
-green
+Grey headed woodpecker green
 
 
 100 60 30
@@ -3526,11 +3429,6 @@ Dill green
 
 
 New green
-
-
-
-
- 
 
 
 100 80 05
@@ -3659,7 +3557,7 @@ Fog white
 Metal construction green
 
 
-110 30 10 
+110 30 10
 
 
 Dark olive green
@@ -3764,8 +3662,7 @@ Airline green
 110 60 60
 
 
-Woodruff 
-green
+Woodruff green
 
 
 110 60 65
@@ -3797,11 +3694,6 @@ Wasabi green
 
 April green
 
-
-
-
- 
-
 
 110 70 50
 
@@ -3830,8 +3722,7 @@ Marker green
 110 80 10
 
 
-Spring 
-grey
+Spring grey
 
 
 110 80 20
@@ -3951,8 +3842,7 @@ Racing green
 120 30 10
 
 
-Country
-house green
+Country house green
 
 
 120 30 20
@@ -4012,8 +3902,7 @@ Parrot green
 120 50 30
 
 
-Quartz
-green
+Quartz green
 
 
 120 50 40
@@ -4069,14 +3958,8 @@ Aloe vera green
 
 Mamba green
 
-
-
-
- 
-
 
-120 60 
-63
+120 60 63
 
 
 Luminescent green
@@ -4184,7 +4067,7 @@ Neon green
 Chalk green
 
 
-120 85 10 
+120 85 10
 
 
 Light feather green
@@ -4196,8 +4079,7 @@ Light feather green
 Lake green
 
 
-120 
-85 30
+120 85 30
 
 
 Aqua green
@@ -4224,9 +4106,7 @@ Kiwi sorbet green
 120 90 30
 
 
-Ice
--
-cold green
+Ice-cold green
 
 
 120 93 05
@@ -4235,7 +4115,7 @@ cold green
 Touch of white green
 
 
-130 30 10 
+130 30 10
 
 
 Arame seaweed green
@@ -4342,11 +4222,6 @@ Limestone green
 
 Soap green
 
-
-
-
- 
-
 
 130 70 30
 
@@ -4375,8 +4250,7 @@ Ultra green
 130 80 10
 
 
-Jade light 
-green
+Jade light green
 
 
 130 80 20
@@ -4433,8 +4307,7 @@ Viridine green
 Silver poplar white
 
 
-130 90
-10
+130 90 10
 
 
 Mediterranean green
@@ -4613,11 +4486,6 @@ Fresh green
 
 Parsley green
 
-
-
-
- 
-
 
 140 60 60
 
@@ -4745,7 +4613,7 @@ Touch of green
 Chestnut white
 
 
-150 30 10 
+150 30 10
 
 
 Thyme green
@@ -4853,8 +4721,7 @@ Rosemary green
 Mosaic green
 
 
-150 60
-50
+150 60 50
 
 
 Bouncy ball green
@@ -4882,11 +4749,6 @@ Liebermann green
 
 
 Oilcloth green
-
-
-
-
- 
 
 
 150 70 40
@@ -4916,18 +4778,13 @@ Pastel mint green
 150 80 30
 
 
-Bright 
-green
+Bright green
 
 
 150 80 40
 
 
-Mother
--
-of
--
-pearl green
+Mother-of-pearl green
 
 
 150 85 05
@@ -4978,8 +4835,7 @@ Beryl black green
 Mussel green
 
 
-160 20 
-15
+160 20 15
 
 
 Pumpkin green black
@@ -5158,11 +5014,6 @@ Metallic green
 
 Vital green
 
-
-
-
- 
-
 
 160 50 50
 
@@ -5278,8 +5129,7 @@ Andean slate
 Ceramic green
 
 
-160 70 
-25
+160 70 25
 
 
 Water green
@@ -5339,7 +5189,7 @@ Sun yellow
 Feather green
 
 
-160 80 
+160 80
 25
 
 
@@ -5397,8 +5247,7 @@ Mountain crystal silver
 170 20 10
 
 
-Deep 
-green
+Deep green
 
 
 170 20 15
@@ -5416,9 +5265,7 @@ Coach green
 170 20 25
 
 
-Off
--
-road green
+Off-road green
 
 
 170 30 10
@@ -5431,11 +5278,6 @@ Garnet black green
 
 
 Dark green
-
-
-
-
- 
 
 
 170 30 20
@@ -5462,8 +5304,7 @@ Chrysocolla dark green
 Trapper green
 
 
-170 30
-40
+170 30 40
 
 
 Permanent green
@@ -5520,8 +5361,7 @@ Environmental green
 170 40 50
 
 
-Vegan 
-green
+Vegan green
 
 
 170 50 10
@@ -5578,8 +5418,7 @@ Mallard green
 Chagall green
 
 
-170 50 
-55
+170 50 55
 
 
 Absinthe turquoise
@@ -5639,8 +5478,7 @@ Sport green
 Active green
 
 
-170 70
-10
+170 70 10
 
 
 Lovage green
@@ -5705,11 +5543,6 @@ Sky green
 
 Larimar green
 
-
-
-
- 
-
 
 170 85 05
 
@@ -5723,7 +5556,7 @@ Silicate light turquoise
 Topaz green
 
 
-170 85 15 
+170 85 15
 
 
 Refrigerator green
@@ -5816,8 +5649,7 @@ Urban green
 180 30 35
 
 
-Jungle 
-green
+Jungle green
 
 
 180 40 05
@@ -5877,8 +5709,7 @@ Teal dark green
 180 50 05
 
 
-Dusk
-green
+Dusk green
 
 
 180 50 10
@@ -5938,9 +5769,7 @@ Ocean green
 180 60 05
 
 
-Marble green
--
-grey
+Marble green-grey
 
 
 180 60 10
@@ -5978,13 +5807,6 @@ Dioptase green
 
 Stamp pad green
 
-
-
-
- 
-
- 
-
 
 180 60 40
 
@@ -6001,8 +5823,7 @@ Caribbean green
 180 60 50
 
 
-Brilliant
-turquoise
+Brilliant turquoise
 
 
 180 70 05
@@ -6059,8 +5880,7 @@ Pure cyan
 Aragonite white
 
 
-180 80
-10
+180 80 10
 
 
 Light teal
@@ -6114,8 +5934,7 @@ Pale mountain lake turquoise
 Coral green
 
 
-180 
-90 05
+180 90 05
 
 
 Transparent green
@@ -6252,13 +6071,6 @@ Egyptian green
 
 Ornamental turquoise
 
-
-
-
- 
-
- 
-
 
 190 50 40
 
@@ -6317,9 +6129,7 @@ Baltic turquoise
 190 60 45
 
 
-Tyrolite blue
--
-green
+Tyrolite blue-green
 
 
 190 70 10
@@ -6472,8 +6282,7 @@ Tree bark green
 Hornblende green
 
 
-200 30 
-20
+200 30 20
 
 
 Malachite blue turquoise
@@ -6526,16 +6335,8 @@ Dusky alpine blue
 
 Bath green
 
-
-
-
- 
-
- 
-
 
-200 40
-30
+200 40 30
 
 
 Mayan blue
@@ -6595,8 +6396,7 @@ Caribbean turquoise
 Well blue
 
 
-200 50 
-40
+200 50 40
 
 
 Industrial blue
@@ -6707,8 +6507,7 @@ Ice boutique turquoise
 200 80 20
 
 
-Summer soft 
-blue
+Summer soft blue
 
 
 200 80 25
@@ -6759,11 +6558,10 @@ Frosty white blue
 Chilly white
 
 
-210 30 10 
+210 30 10
 
 
-Graphite black 
-green
+Graphite black green
 
 
 210 30 15
@@ -6801,13 +6599,6 @@ Linen grey
 
 China green blue
 
-
-
-
- 
-
- 
-
 
 210 40 20
 
@@ -6833,8 +6624,7 @@ Indigo blue
 Cold blue
 
 
-210 
-40 38
+210 40 38
 
 
 Mary blue
@@ -7073,13 +6863,6 @@ Hurricane green blue
 
 Watercolour blue
 
-
-
-
- 
-
- 
-
 
 220 30 25
 
@@ -7147,8 +6930,7 @@ Cyan blue
 Winter cloud grey
 
 
-220 50 
-10
+220 50 10
 
 
 Cadet grey
@@ -7214,8 +6996,7 @@ Morning blue
 Frost blue
 
 
-220 60
-25
+220 60 25
 
 
 Summer turquoise blue
@@ -7272,8 +7053,7 @@ Blouson blue
 220 70 30
 
 
-Mountain range 
-blue
+Mountain range blue
 
 
 220 70 35
@@ -7285,7 +7065,7 @@ Holiday blue
 220 80 05
 
 
-Frost grey blue 
+Frost grey blue
 
 
 220 80 10
@@ -7347,13 +7127,6 @@ Full moon grey
 
 Ore bluish black
 
-
-
-
- 
-
- 
-
 
 230 20 15
 
@@ -7391,8 +7164,7 @@ Teal dark blue
 Thunderstorm blue
 
 
-230
-40 10
+230 40 10
 
 
 Cone green blue
@@ -7455,11 +7227,7 @@ Casual blue
 230 50 25
 
 
-Forget
--
-me
--
-not blue
+Forget-me-not blue
 
 
 230 50 30
@@ -7519,8 +7287,7 @@ Greek blue
 230 60 40
 
 
-Alpine 
-blue
+Alpine blue
 
 
 230 70 10
@@ -7624,13 +7391,6 @@ Metal blue
 
 Crowberry blue
 
-
-
-
- 
-
- 
-
 
 240 20 22
 
@@ -7641,8 +7401,7 @@ Rich blue
 240 30 05
 
 
-Diamond
-grey
+Diamond grey
 
 
 240 30 10
@@ -7705,8 +7464,7 @@ Celeste blue
 Denim blue
 
 
-240 40 
-25
+240 40 25
 
 
 Orient blue
@@ -7896,13 +7654,6 @@ Ice grey
 
 
 Air blue
-
-
-
-
- 
-
- 
 
 
 240 85 15
@@ -8148,8 +7899,7 @@ Washing powder soft blue
 250 85 15
 
 
-Diamond 
-soft blue
+Diamond soft blue
 
 
 250 90 05
@@ -8161,22 +7911,13 @@ Ice white
 260 20 05
 
 
-Blue
--
-black
+Blue-black
 
 
 260 20 10
 
 
 Nato blue
-
-
-
-
- 
-
- 
 
 
 260 20 15
@@ -8442,13 +8183,6 @@ Sea breeze green
 
 Milk blue
 
-
-
-
- 
-
- 
-
 
 270 20 20
 
@@ -8525,9 +8259,7 @@ Functional blue
 270 40 30
 
 
-Make
--
-up blue
+Make-up blue
 
 
 270 40 35
@@ -8539,8 +8271,7 @@ Lapis lazuli blue
 270 40 40
 
 
-Magic 
-blue
+Magic blue
 
 
 270 50 10
@@ -8603,8 +8334,7 @@ Lilac blue
 Lavender blue
 
 
-270 
-60 25
+270 60 25
 
 
 Delphinium blue
@@ -8661,18 +8391,13 @@ Retina soft blue
 270 85 05
 
 
-Angel hair 
-silver
+Angel hair silver
 
 
 270 85 10
 
 
-Mother
--
-of
--
-pearl silver
+Mother-of-pearl silver
 
 
 270 85 15
@@ -8721,13 +8446,6 @@ Elite blue
 
 
 Ambassador blue
-
-
-
-
- 
-
- 
 
 
 280 30 05
@@ -8790,8 +8508,7 @@ Gallery grey
 Suede indigo
 
 
-280 40 
-15
+280 40 15
 
 
 Dark lavender
@@ -8914,8 +8631,7 @@ Opal violet
 280 60 30
 
 
-Persian 
-violet
+Persian violet
 
 
 280 60 35
@@ -8969,8 +8685,7 @@ Hyacinth white soft blue
 280 80 15
 
 
-Violet scent 
-soft blue
+Violet scent soft blue
 
 
 280 85 05
@@ -8995,13 +8710,6 @@ Mauve white
 
 
 Porcelain white
-
-
-
-
- 
-
- 
 
 
 290 20 10
@@ -9031,8 +8739,7 @@ Indigo violet
 290 20 30
 
 
-Ultramarine 
-violet
+Ultramarine violet
 
 
 290 20 35
@@ -9212,8 +8919,7 @@ True lavender
 290 70 10
 
 
-Cream 
-violet
+Cream violet
 
 
 290 70 15
@@ -9268,13 +8974,6 @@ Violet white
 
 
 Lilac white
-
-
-
-
- 
-
- 
 
 
 300 20 05
@@ -9540,13 +9239,6 @@ Pink lavender
 
 Hazy mauve
 
-
-
-
- 
-
- 
-
 
 300 80 10
 
@@ -9590,8 +9282,7 @@ Obsidian lava black
 Operetta mauve
 
 
-310 
-20 30
+310 20 30
 
 
 Powerful violet
@@ -9714,8 +9405,7 @@ Violet rose
 310 50 40
 
 
-Orchid 
-mauve
+Orchid mauve
 
 
 310 60 10
@@ -9813,13 +9503,6 @@ Wallflower white
 
 Lava black
 
-
-
-
- 
-
- 
-
 
 320 20 10
 
@@ -9845,8 +9528,7 @@ Aubergine mauve
 Dark purple
 
 
-320
-30 05
+320 30 05
 
 
 Violet black
@@ -9966,8 +9648,7 @@ Parma grey
 Cyclamen
 
 
-320 
-50 25
+320 50 25
 
 
 Poetry mauve
@@ -10027,8 +9708,7 @@ Nightshade violet
 Lobby lilac
 
 
-320 
-60 35
+320 60 35
 
 
 Blackberry sorbet
@@ -10085,15 +9765,7 @@ Cosmetic mauve
 320 85 05
 
 
-Blackberry 
-cream
-
-
-
-
- 
-
- 
+Blackberry cream
 
 
 320 85 10
@@ -10359,13 +10031,6 @@ Heavenly pink
 
 Delicacy white
 
-
-
-
- 
-
- 
-
 
 340 20 05
 
@@ -10397,8 +10062,7 @@ Juice violet
 Prestige mauve
 
 
-340
-30 05
+340 30 05
 
 
 Apple herb black
@@ -10575,8 +10239,7 @@ Evening pink
 340 60 20
 
 
-Capri fashion 
-pink
+Capri fashion pink
 
 
 340 60 25
@@ -10632,19 +10295,11 @@ Idyllic pink
 
 Morning glory pink
 
-
-
-
- 
-
- 
-
 
 340 70 30
 
 
-Soft
-fuschia
+Soft fuschia
 
 
 340 70 35
@@ -10827,8 +10482,7 @@ Cyclamen red
 Powder red
 
 
-350 
-40 50
+350 40 50
 
 
 Madder red
@@ -10905,13 +10559,6 @@ Mohair pink
 
 Heather violet
 
-
-
-
- 
-
- 
-
 
 350 60 25
 
@@ -10961,8 +10608,7 @@ Shady pink
 Lady’s cushions pink
 
 
-350 70 
-25
+350 70 25
 
 
 Coral pink
@@ -11028,8 +10674,7 @@ Light rose
 Ranuncula white
 
 
-350
-93 05
+350 93 05
 
 
 Clichy white
@@ -11178,13 +10823,6 @@ Copper pink
 
 Art Nouveau pink
 
-
-
-
- 
-
- 
-
 
 360 50 30
 
@@ -11225,8 +10863,7 @@ Ash pink
 360 60 10
 
 
-Majolica 
-mauve
+Majolica mauve
 
 
 360 60 15
@@ -11268,11 +10905,7 @@ Opaline pink
 360 80 05
 
 
-Mother
--
-of
--
-pearl pink
+Mother-of-pearl pink
 
 
 360 80 10
@@ -11290,8 +10923,7 @@ Soap pink
 360 85 05
 
 
-Theatre powder 
-rose
+Theatre powder rose
 
 
 360 85 10
@@ -11316,12 +10948,3 @@ Cake frosting
 
 
 Arrowhead white
-
-
-
-
- 
-
- 
-
-
