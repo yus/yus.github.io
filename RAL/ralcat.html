@@ -891,7 +891,8 @@
             loaded: false,
             currentHighlight: null,
             copyHistory: [], // Store copied RAL codes
-            pinnedColors: [] // New: store pinned RAL codes
+            // New: store pinned RAL codes
+            pinnedColors: JSON.parse(localStorage.getItem('pinnedColors')) || [] // Load from storage
         };
       
         // DOM elements
@@ -988,6 +989,7 @@
             if (colorData.loaded) {
                 findMatchingColors();
                 displayCatalog();
+                updatePinnedDisplay(); // ADD THIS LINE
             }
         }
 
@@ -1972,47 +1974,49 @@
         // }
 
         // Add pin/unpin functionality
+        // Add pin functionality
         function togglePin(ralCode) {
             const index = colorData.pinnedColors.indexOf(ralCode);
             if (index > -1) {
-                // Unpin
                 colorData.pinnedColors.splice(index, 1);
             } else {
-                // Pin
                 colorData.pinnedColors.push(ralCode);
             }
+            
+            // Save to localStorage
+            localStorage.setItem('pinnedColors', JSON.stringify(colorData.pinnedColors));
+            
             updatePinnedDisplay();
-            saveToLocalStorage();
         }
         
         // Update pinned display
         function updatePinnedDisplay() {
-            // We'll add this to both pages
-            updateMatcherPinnedDisplay();
-            updateCatalogPinnedDisplay();
+            updatePinnedSection('historySection', 'pinnedHistory');
+            updatePinnedSection('catalogHistorySection', 'catalogPinnedHistory');
         }
         
-        function updateMatcherPinnedDisplay() {
-            // Add pinned section to matcher if needed
-            let pinnedSection = document.getElementById('pinnedSection');
-            if (!pinnedSection && colorData.pinnedColors.length > 0) {
-                pinnedSection = document.createElement('div');
-                pinnedSection.id = 'pinnedSection';
-                pinnedSection.className = 'history-section';
-                pinnedSection.innerHTML = `
-                    <div class="history-title">
-                        <span>Pinned RAL Colors</span>
-                        <button class="clear-history" id="clearPinned">Clear Pinned</button>
-                    </div>
-                    <div class="history-breadcrumb" id="pinnedBreadcrumb"></div>
-                `;
-                elements.historySection.parentNode.insertBefore(pinnedSection, elements.historySection);
-                
-                document.getElementById('clearPinned').addEventListener('click', clearPinned);
-            }
+        function updatePinnedSection(historySectionId, pinnedId) {
+            const historySection = document.getElementById(historySectionId);
+            if (!historySection) return;
             
-            if (pinnedSection) {
-                const pinnedBreadcrumb = document.getElementById('pinnedBreadcrumb');
+            let pinnedSection = document.getElementById(pinnedId);
+            
+            if (colorData.pinnedColors.length > 0) {
+                if (!pinnedSection) {
+                    pinnedSection = document.createElement('div');
+                    pinnedSection.id = pinnedId;
+                    pinnedSection.className = 'history-section';
+                    pinnedSection.innerHTML = `
+                        <div class="history-title">
+                            <span>📌 Pinned RAL Colors</span>
+                            <button class="clear-history" onclick="clearPinned()">Clear Pins</button>
+                        </div>
+                        <div class="history-breadcrumb" id="${pinnedId}Breadcrumb"></div>
+                    `;
+                    historySection.parentNode.insertBefore(pinnedSection, historySection);
+                }
+                
+                const pinnedBreadcrumb = document.getElementById(pinnedId + 'Breadcrumb');
                 if (pinnedBreadcrumb) {
                     pinnedBreadcrumb.innerHTML = '';
                     
@@ -2021,12 +2025,11 @@
                         const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
                         
                         const pinnedItem = document.createElement('div');
-                        pinnedItem.className = 'history-swatch pinned-item';
-                        pinnedItem.title = `Click to copy ${ralCode}`;
+                        pinnedItem.className = 'history-swatch';
                         pinnedItem.innerHTML = `
                             <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
                             <span>${ralCode}</span>
-                            <button class="unpin-btn" title="Unpin">×</button>
+                            <button class="unpin-btn" onclick="togglePin('${ralCode}')" title="Unpin">×</button>
                         `;
                         
                         pinnedItem.addEventListener('click', (e) => {
@@ -2035,57 +2038,29 @@
                             }
                         });
                         
-                        pinnedItem.querySelector('.unpin-btn').addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            togglePin(ralCode);
-                        });
-                        
                         pinnedBreadcrumb.appendChild(pinnedItem);
                     });
                 }
                 
-                pinnedSection.style.display = colorData.pinnedColors.length > 0 ? 'block' : 'none';
+                pinnedSection.style.display = 'block';
+            } else if (pinnedSection) {
+                pinnedSection.style.display = 'none';
             }
         }
         
         function clearPinned() {
             colorData.pinnedColors = [];
+            localStorage.removeItem('pinnedColors');
             updatePinnedDisplay();
-            saveToLocalStorage();
         }
         
         // Add pin buttons to color cards
         function addPinButton(card, ralCode) {
             const pinBtn = document.createElement('button');
             pinBtn.className = 'pin-btn';
-            pinBtn.innerHTML = '📌';
-            pinBtn.title = 'Pin this color';
+            pinBtn.innerHTML = colorData.pinnedColors.includes(ralCode) ? '📍' : '📌';
+            pinBtn.title = colorData.pinnedColors.includes(ralCode) ? 'Unpin this color' : 'Pin this color';
             
-            // Check if already pinned
-            if (colorData.pinnedColors.includes(ralCode)) {
-                pinBtn.classList.add('pinned');
-                pinBtn.innerHTML = '📍';
-                pinBtn.title = 'Unpin this color';
-            }
-            
-            pinBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                togglePin(ralCode);
-                
-                // Update button state
-                if (colorData.pinnedColors.includes(ralCode)) {
-                    pinBtn.classList.add('pinned');
-                    pinBtn.innerHTML = '📍';
-                    pinBtn.title = 'Unpin this color';
-                } else {
-                    pinBtn.classList.remove('pinned');
-                    pinBtn.innerHTML = '📌';
-                    pinBtn.title = 'Pin this color';
-                }
-            });
-            
-            // Add to card (position it appropriately)
-            card.style.position = 'relative';
             pinBtn.style.position = 'absolute';
             pinBtn.style.top = '10px';
             pinBtn.style.right = '10px';
@@ -2095,8 +2070,24 @@
             pinBtn.style.width = '30px';
             pinBtn.style.height = '30px';
             pinBtn.style.cursor = 'pointer';
+            pinBtn.style.fontSize = '16px';
             pinBtn.style.zIndex = '10';
             
+            pinBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePin(ralCode);
+                
+                // Update button appearance
+                if (colorData.pinnedColors.includes(ralCode)) {
+                    pinBtn.innerHTML = '📍';
+                    pinBtn.title = 'Unpin this color';
+                } else {
+                    pinBtn.innerHTML = '📌';
+                    pinBtn.title = 'Pin this color';
+                }
+            });
+            
+            card.style.position = 'relative';
             card.appendChild(pinBtn);
         }
         
@@ -2168,7 +2159,10 @@
             
             card.appendChild(colorSwatch);
             card.appendChild(colorInfo);
-            
+
+            // Add Pins
+            addPinButton(card, color.code);
+           
             return card;
         }
         
