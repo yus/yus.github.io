@@ -482,19 +482,92 @@
             }
         }
         
-        /* Remove language selector styles since we don't need them */
-        .language-selector {
-            display: none;
+        /* Copy notification styles */
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
         }
         
-        /* Add smooth scrolling for the page */
-        html {
-            scroll-behavior: smooth;
+        .copy-notification.show {
+            transform: translateY(0);
         }
         
-        /* Ensure catalog sections are properly targetable */
-        .catalog-section {
-            scroll-margin-top: 20px;
+        /* Breadcrumb history styles */
+        .history-section {
+            background: var(--card-background);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        .history-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .history-breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .history-swatch {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: var(--background-color);
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+        
+        .history-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .history-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+        
+        .history-copy-all {
+            margin-left: auto;
+            padding: 5px 12px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        
+        .history-copy-all:hover {
+            background: var(--primary-color);
+        }
+        
+        /* Catalog search highlight */
+        .search-highlight {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
         }
     </style>
 </head>
@@ -509,6 +582,9 @@
             <div class="nav-tab active" data-page="matcher">Color Matcher</div>
             <div class="nav-tab" data-page="catalog">Full Catalog</div>
         </div>
+
+        <!-- Copy Notification -->
+        <div class="copy-notification" id="copyNotification">RAL code copied to clipboard!</div>
 
         <!-- Color Matcher Page -->
         <div class="page active" id="matcherPage">
@@ -608,6 +684,14 @@
                 </div>
             </section>
 
+            <!-- History Breadcrumb Section -->
+            <div class="history-section" id="historySection" style="display: none;">
+                <div class="history-title">Recently Copied RAL Colors</div>
+                <div class="history-breadcrumb" id="historyBreadcrumb">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+
             <section class="results-section">
                 <h2>Closest RAL Colors</h2>
                 <a href="#" class="view-catalog-link" id="viewCatalogLink" style="display: none;">View this color in full catalog →</a>
@@ -655,7 +739,8 @@
         const colorData = {
             ralColors: [],
             loaded: false,
-            currentHighlight: null
+            currentHighlight: null,
+            copyHistory: [] // Store copied RAL codes
         };
 
         // DOM elements
@@ -664,6 +749,13 @@
             navTabs: document.querySelectorAll('.nav-tab'),
             pages: document.querySelectorAll('.page'),
             backToTop: document.getElementById('backToTop'),
+
+            // Copy notification
+            copyNotification: document.getElementById('copyNotification'),
+
+            // History elements
+            historySection: document.getElementById('historySection'),
+            historyBreadcrumb: document.getElementById('historyBreadcrumb'),
 
             // Matcher page elements
             redSlider: document.getElementById('redSlider'),
@@ -761,6 +853,103 @@
                     document.getElementById(tabId).classList.add('active');
                 });
             });
+        }
+
+        // Copy RAL code to clipboard with notification
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyNotification();
+                
+                // Add to history if it's a RAL code
+                if (text.startsWith('RAL')) {
+                    addToHistory(text);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyNotification();
+                
+                if (text.startsWith('RAL')) {
+                    addToHistory(text);
+                }
+            });
+        }
+
+        // Show copy notification
+        function showCopyNotification() {
+            elements.copyNotification.classList.add('show');
+            setTimeout(() => {
+                elements.copyNotification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Add RAL code to history
+        function addToHistory(ralCode) {
+            // Remove if already exists (to avoid duplicates)
+            colorData.copyHistory = colorData.copyHistory.filter(code => code !== ralCode);
+            
+            // Add to beginning of array
+            colorData.copyHistory.unshift(ralCode);
+            
+            // Keep only last 10 items
+            if (colorData.copyHistory.length > 10) {
+                colorData.copyHistory = colorData.copyHistory.slice(0, 10);
+            }
+            
+            // Update history display
+            updateHistoryDisplay();
+        }
+
+        // Update history breadcrumb display
+        function updateHistoryDisplay() {
+            if (colorData.copyHistory.length === 0) {
+                elements.historySection.style.display = 'none';
+                return;
+            }
+            
+            elements.historySection.style.display = 'block';
+            elements.historyBreadcrumb.innerHTML = '';
+            
+            colorData.copyHistory.forEach(ralCode => {
+                // Find the color data for this RAL code
+                const color = colorData.ralColors.find(c => c.code === ralCode);
+                const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-swatch';
+                historyItem.title = `Click to copy ${ralCode}`;
+                
+                historyItem.innerHTML = `
+                    <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
+                    <span>${ralCode}</span>
+                `;
+                
+                historyItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyToClipboard(ralCode);
+                });
+                
+                elements.historyBreadcrumb.appendChild(historyItem);
+            });
+            
+            // Add "Copy All" button
+            const copyAllButton = document.createElement('button');
+            copyAllButton.className = 'history-copy-all';
+            copyAllButton.textContent = 'Copy All';
+            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
+            
+            copyAllButton.addEventListener('click', () => {
+                const allCodes = colorData.copyHistory.join(', ');
+                copyToClipboard(allCodes);
+            });
+            
+            elements.historyBreadcrumb.appendChild(copyAllButton);
         }
 
         // Load RAL color data from text files
@@ -1012,7 +1201,7 @@
             elements.maxDifference.addEventListener('input', updateMaxDifference);
             elements.findMatches.addEventListener('click', findMatchingColors);
             
-            // Catalog hue filter buttons - now scroll to sections instead of filtering
+            // Catalog hue filter buttons
             elements.hueButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1315,7 +1504,17 @@
                 elements.viewCatalogLink.style.display = 'inline-block';
                 elements.viewCatalogLink.onclick = (e) => {
                     e.preventDefault();
-                    highlightAndShowInCatalog(topMatches[0].code);
+                    // When clicking view catalog link, copy the first match and put it in catalog search
+                    const firstMatchCode = topMatches[0].code;
+                    copyToClipboard(firstMatchCode);
+                    elements.catalogSearch.value = firstMatchCode;
+                    filterCatalog();
+                    
+                    // Switch to catalog page
+                    elements.navTabs.forEach(tab => tab.classList.remove('active'));
+                    document.querySelector('.nav-tab[data-page="catalog"]').classList.add('active');
+                    elements.pages.forEach(page => page.classList.remove('active'));
+                    elements.catalogPage.classList.add('active');
                 };
             } else {
                 elements.viewCatalogLink.style.display = 'none';
@@ -1334,8 +1533,8 @@
                 const colorCard = document.createElement('div');
                 colorCard.className = 'color-card';
                 colorCard.addEventListener('click', () => {
-                    // When clicking a match result, go to catalog and scroll to it
-                    highlightAndShowInCatalog(match.code);
+                    // Copy RAL code to clipboard
+                    copyToClipboard(match.code);
                 });
                 
                 const colorSwatch = document.createElement('div');
@@ -1346,7 +1545,7 @@
                 colorSwatch.style.color = brightness > 128 ? 'black' : 'white';
                 colorSwatch.innerHTML = `
                     <div>${match.code}</div>
-                    <div style="font-size: 0.8rem;">RGB: ${match.rgb.r}, ${match.rgb.g}, ${match.rgb.b}</div>
+                    <div style="font-size: 0.8rem;">Click to copy</div>
                 `;
                 
                 const colorInfo = document.createElement('div');
@@ -1456,11 +1655,6 @@
             });
             
             console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
-            
-            // Re-apply highlight if needed
-            if (colorData.currentHighlight) {
-                setTimeout(() => highlightColorInCatalog(colorData.currentHighlight), 100);
-            }
         }
 
         function createCatalogCard(color) {
@@ -1468,8 +1662,16 @@
             card.className = 'catalog-card';
             card.id = `color-${color.code.replace(/\s+/g, '-')}`;
             card.addEventListener('click', () => {
-                // When clicking a catalog card, go back to matcher and set it as input
-                setColorAsInput(color);
+                // Copy RAL code to clipboard and put it in search field
+                copyToClipboard(color.code);
+                elements.catalogSearch.value = color.code;
+                filterCatalog();
+                
+                // Add highlight effect to the searched card
+                card.classList.add('search-highlight');
+                setTimeout(() => {
+                    card.classList.remove('search-highlight');
+                }, 2000);
             });
             
             const swatch = document.createElement('div');
@@ -1478,7 +1680,10 @@
             
             const brightness = (color.rgb.r * 299 + color.rgb.g * 587 + color.rgb.b * 114) / 1000;
             swatch.style.color = brightness > 128 ? 'black' : 'white';
-            swatch.textContent = color.code;
+            swatch.innerHTML = `
+                <div>${color.code}</div>
+                <div style="font-size: 0.7rem;">Click to copy & search</div>
+            `;
             
             const info = document.createElement('div');
             info.className = 'catalog-info';
@@ -1538,58 +1743,6 @@
                 header.style.display = visibleCards > 0 ? 'block' : 'none';
                 section.style.display = visibleCards > 0 ? 'grid' : 'none';
             });
-        }
-
-        function highlightAndShowInCatalog(colorCode) {
-            // Switch to catalog page
-            elements.navTabs.forEach(tab => tab.classList.remove('active'));
-            document.querySelector('.nav-tab[data-page="catalog"]').classList.add('active');
-            elements.pages.forEach(page => page.classList.remove('active'));
-            elements.catalogPage.classList.add('active');
-            
-            // Ensure catalog is loaded
-            if (elements.catalogContainer.children.length === 0) {
-                displayCatalog();
-            }
-            
-            // Highlight the color and scroll to it
-            setTimeout(() => {
-                highlightColorInCatalog(colorCode);
-            }, 100);
-        }
-
-        function highlightColorInCatalog(colorCode) {
-            // Remove previous highlight
-            document.querySelectorAll('.catalog-card.highlighted').forEach(card => {
-                card.classList.remove('highlighted');
-            });
-            
-            // Add new highlight
-            const cardId = `color-${colorCode.replace(/\s+/g, '-')}`;
-            const card = document.getElementById(cardId);
-            
-            if (card) {
-                card.classList.add('highlighted');
-                colorData.currentHighlight = colorCode;
-                
-                // Scroll to the card
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        function setColorAsInput(color) {
-            // Switch to matcher page
-            elements.navTabs.forEach(tab => tab.classList.remove('active'));
-            document.querySelector('.nav-tab[data-page="matcher"]').classList.add('active');
-            elements.pages.forEach(page => page.classList.remove('active'));
-            elements.matcherPage.classList.add('active');
-            
-            // Set the color as input values
-            updateRgbInputs(color.rgb);
-            updateColorPreview();
-            
-            // Find matching colors for this new input
-            findMatchingColors();
         }
 
         // Initialize the application
