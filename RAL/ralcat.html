@@ -1912,17 +1912,19 @@
             updateBreadcrumb(elements.catalogHistoryBreadcrumb);
         }
         
-        function updateBreadcrumb(breadcrumbElement) {
+        function updateBreadcrumb(breadcrumbElement, items, isPinned) {
+            if (!breadcrumbElement) return;
+            
             breadcrumbElement.innerHTML = '';
             
-            // Add history items
-            colorData.copyHistory.forEach(ralCode => {
+            items.forEach(ralCode => {
                 const color = colorData.ralColors.find(c => c.code === ralCode);
                 const rgb = color ? color.rgb : { r: 128, g: 128, b: 128 };
                 
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-swatch';
-                historyItem.title = `Click to copy ${ralCode}`;
+                
+                // THIS IS WHERE YOU ADD THE PIN BUTTONS:
                 historyItem.innerHTML = `
                     <div class="history-color" style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b})"></div>
                     <span>${ralCode}</span>
@@ -1932,26 +1934,34 @@
                     }
                 `;
                 
+                // Click to copy
                 historyItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('pin-btn') && !e.target.classList.contains('unpin-btn')) {
+                        copyToClipboard(ralCode);
+                    }
+                });
+                
+                // Pin/unpin button handler
+                const pinBtn = historyItem.querySelector(isPinned ? '.unpin-btn' : '.pin-btn');
+                pinBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    copyToClipboard(ralCode);
+                    toggleHistoryPin(ralCode);
                 });
                 
                 breadcrumbElement.appendChild(historyItem);
             });
             
-            // Add "Copy All" button to BOTH
-            const copyAllButton = document.createElement('button');
-            copyAllButton.className = 'history-copy-all';
-            copyAllButton.textContent = 'Copy All';
-            copyAllButton.title = 'Copy all RAL codes as comma-separated list';
-            
-            copyAllButton.addEventListener('click', () => {
-                const allCodes = colorData.copyHistory.join(', ');
-                copyToClipboard(allCodes);
-            });
-            
-            breadcrumbElement.appendChild(copyAllButton);
+            // Add "Copy All" button for main history (not pinned)
+            if (!isPinned && items.length > 0) {
+                const copyAllButton = document.createElement('button');
+                copyAllButton.className = 'history-copy-all';
+                copyAllButton.textContent = 'Copy All';
+                copyAllButton.addEventListener('click', () => {
+                    const allCodes = items.join(', ');
+                    copyToClipboard(allCodes);
+                });
+                breadcrumbElement.appendChild(copyAllButton);
+            }
         }
         
         // function updateCatalogHistoryDisplay() {
