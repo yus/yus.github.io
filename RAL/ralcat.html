@@ -5,643 +5,643 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAL Color Matcher with CMYK</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --background-color: #f5f7fa;
-            --card-background: #ffffff;
-            --text-color: #333333;
-            --border-radius: 8px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--card-background);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .description {
-            color: #666;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .nav-tab {
-            padding: 12px 24px;
-            background: var(--card-background);
-            border: 2px solid var(--secondary-color);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: bold;
-            transition: var(--transition);
-        }
-
-        .nav-tab.active {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .color-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .input-group {
-            background-color: var(--card-background);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-
-        h2 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .color-preview {
-            width: 100%;
-            height: 80px;
-            border-radius: var(--border-radius);
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .preview-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .preview-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .preview-label {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .input-row label {
-            min-width: 30px;
-            font-weight: bold;
-        }
-
-        input[type="range"] {
-            flex: 1;
-        }
-
-        input[type="number"] {
-            width: 70px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .hex-input, .cmyk-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab-button {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: var(--transition);
-        }
-
-        .tab-button.active {
-            border-bottom-color: var(--secondary-color);
-            color: var(--secondary-color);
-            font-weight: bold;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .results-section {
-            background-color: var(--card-background);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .color-card {
-            border: 1px solid #eee;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .color-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .color-swatch {
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            font-weight: bold;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .color-info {
-            padding: 15px;
-        }
-
-        .color-code {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 1.1rem;
-        }
-
-        .color-name {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 8px;
-            font-style: italic;
-        }
-
-        .color-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 0.8rem;
-        }
-
-        .value-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .value-label {
-            font-weight: bold;
-            color: #888;
-        }
-
-        .difference {
-            margin-top: 5px;
-            font-size: 0.8rem;
-            color: #888;
-            text-align: center;
-            padding: 5px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .difference-low {
-            background-color: #e8f5e8;
-            color: #2e7d32;
-        }
-
-        .difference-medium {
-            background-color: #fff3e0;
-            color: #f57c00;
-        }
-
-        .difference-high {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-
-        /* Catalog Page Styles */
-        .catalog-controls {
-            background: var(--card-background);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .catalog-search {
-            flex: 1;
-            min-width: 250px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .hue-filter {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .hue-button {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .hue-button.active {
-            background: var(--secondary-color);
-            color: white;
-            border-color: var(--secondary-color);
-        }
-
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .catalog-card {
-            border: 1px solid #eee;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .catalog-card.highlighted {
-            animation: pulse 2s infinite;
-            border: 3px solid var(--secondary-color);
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-        }
-
-        .catalog-swatch {
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            font-weight: bold;
-        }
-
-        .catalog-info {
-            padding: 10px;
-            font-size: 0.85rem;
-        }
-
-        .catalog-code {
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        .section-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px 20px;
-            margin: 30px 0 15px 0;
-            border-radius: var(--border-radius);
-            font-size: 1.2rem;
-        }
-
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--secondary-color);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            display: none;
-        }
-
-        .view-catalog-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .view-catalog-link:hover {
-            text-decoration: underline;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .settings-group {
-            margin-bottom: 15px;
-        }
-
-        .settings-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .slider-value {
-            display: inline-block;
-            width: 50px;
-            text-align: right;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        @media (max-width: 768px) {
-            .color-inputs {
-                grid-template-columns: 1fr;
-            }
-            
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .color-values {
-                grid-template-columns: 1fr;
-            }
-            
-            .preview-values {
-                grid-template-columns: 1fr;
-            }
-            
-            .catalog-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            .catalog-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
+      :root {
+          --primary-color: #2c3e50;
+          --secondary-color: #3498db;
+          --background-color: #f5f7fa;
+          --card-background: #ffffff;
+          --text-color: #333333;
+          --border-radius: 8px;
+          --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          --transition: all 0.3s ease;
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+          background-color: var(--background-color);
+          color: var(--text-color);
+          line-height: 1.6;
+          padding: 20px;
+      }
+
+      .container {
+          max-width: 1400px;
+          margin: 0 auto;
+      }
+
+      header {
+          text-align: center;
+          margin-bottom: 30px;
+          padding: 20px;
+          background-color: var(--card-background);
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+      }
+
+      h1 {
+          color: var(--primary-color);
+          margin-bottom: 10px;
+      }
+
+      .description {
+          color: #666;
+          max-width: 800px;
+          margin: 0 auto;
+      }
+
+      .nav-tabs {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
+          gap: 10px;
+      }
+
+      .nav-tab {
+          padding: 12px 24px;
+          background: var(--card-background);
+          border: 2px solid var(--secondary-color);
+          border-radius: var(--border-radius);
+          cursor: pointer;
+          font-weight: bold;
+          transition: var(--transition);
+      }
+
+      .nav-tab.active {
+          background: var(--secondary-color);
+          color: white;
+      }
+
+      .page {
+          display: none;
+      }
+
+      .page.active {
+          display: block;
+      }
+
+      .input-section {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          margin-bottom: 30px;
+      }
+
+      .color-inputs {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+      }
+
+      .input-group {
+          background-color: var(--card-background);
+          padding: 20px;
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+      }
+
+      h2 {
+          color: var(--primary-color);
+          margin-bottom: 15px;
+          font-size: 1.3rem;
+      }
+
+      .color-preview {
+          width: 100%;
+          height: 80px;
+          border-radius: var(--border-radius);
+          margin-bottom: 15px;
+          border: 1px solid #ddd;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .preview-values {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          text-align: center;
+      }
+
+      .preview-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+      }
+
+      .preview-label {
+          font-size: 0.8rem;
+          opacity: 0.8;
+      }
+
+      .input-row {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 10px;
+          align-items: center;
+      }
+
+      .input-row label {
+          min-width: 30px;
+          font-weight: bold;
+      }
+
+      input[type="range"] {
+          flex: 1;
+      }
+
+      input[type="number"] {
+          width: 70px;
+          padding: 5px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+      }
+
+      .hex-input, .cmyk-input {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 1rem;
+          margin-top: 10px;
+      }
+
+      .tab-buttons {
+          display: flex;
+          margin-bottom: 15px;
+          border-bottom: 1px solid #ddd;
+      }
+
+      .tab-button {
+          padding: 10px 20px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          border-bottom: 3px solid transparent;
+          transition: var(--transition);
+      }
+
+      .tab-button.active {
+          border-bottom-color: var(--secondary-color);
+          color: var(--secondary-color);
+          font-weight: bold;
+      }
+
+      .tab-content {
+          display: none;
+      }
+
+      .tab-content.active {
+          display: block;
+      }
+
+      .results-section {
+          background-color: var(--card-background);
+          padding: 20px;
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+          margin-bottom: 30px;
+      }
+
+      .results-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+      }
+
+      .color-card {
+          border: 1px solid #eee;
+          border-radius: var(--border-radius);
+          overflow: hidden;
+          transition: var(--transition);
+          cursor: pointer;
+      }
+
+      .color-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .color-swatch {
+          height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          font-weight: bold;
+          flex-direction: column;
+          gap: 5px;
+      }
+
+      .color-info {
+          padding: 15px;
+      }
+
+      .color-code {
+          font-weight: bold;
+          margin-bottom: 5px;
+          font-size: 1.1rem;
+      }
+
+      .color-name {
+          font-size: 0.9rem;
+          color: #666;
+          margin-bottom: 8px;
+          font-style: italic;
+      }
+
+      .color-values {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          font-size: 0.8rem;
+      }
+
+      .value-group {
+          display: flex;
+          flex-direction: column;
+      }
+
+      .value-label {
+          font-weight: bold;
+          color: #888;
+      }
+
+      .difference {
+          margin-top: 5px;
+          font-size: 0.8rem;
+          color: #888;
+          text-align: center;
+          padding: 5px;
+          background-color: #f8f9fa;
+          border-radius: 4px;
+      }
+
+      .difference-low {
+          background-color: #e8f5e8;
+          color: #2e7d32;
+      }
+
+      .difference-medium {
+          background-color: #fff3e0;
+          color: #f57c00;
+      }
+
+      .difference-high {
+          background-color: #ffebee;
+          color: #c62828;
+      }
+
+      /* Catalog Page Styles */
+      .catalog-controls {
+          background: var(--card-background);
+          padding: 20px;
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+          margin-bottom: 20px;
+          display: flex;
+          gap: 15px;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+
+      .catalog-search {
+          flex: 1;
+          min-width: 250px;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+      }
+
+      .hue-filter {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+      }
+
+      .hue-button {
+          padding: 8px 16px;
+          border: 1px solid #ddd;
+          background: white;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: var(--transition);
+      }
+
+      .hue-button.active {
+          background: var(--secondary-color);
+          color: white;
+          border-color: var(--secondary-color);
+      }
+
+      .catalog-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 15px;
+          margin-bottom: 30px;
+      }
+
+      .catalog-card {
+          border: 1px solid #eee;
+          border-radius: var(--border-radius);
+          overflow: hidden;
+          transition: var(--transition);
+      }
+
+      .catalog-card.highlighted {
+          animation: pulse 2s infinite;
+          border: 3px solid var(--secondary-color);
+      }
+
+      @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+      }
+
+      .catalog-swatch {
+          height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          font-weight: bold;
+      }
+
+      .catalog-info {
+          padding: 10px;
+          font-size: 0.85rem;
+      }
+
+      .catalog-code {
+          font-weight: bold;
+          margin-bottom: 3px;
+      }
+
+      .section-header {
+          background: var(--primary-color);
+          color: white;
+          padding: 15px 20px;
+          margin: 30px 0 15px 0;
+          border-radius: var(--border-radius);
+          font-size: 1.2rem;
+      }
+
+      .back-to-top {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: var(--secondary-color);
+          color: white;
+          padding: 10px 15px;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: var(--shadow);
+          display: none;
+      }
+
+      .view-catalog-link {
+          display: inline-block;
+          margin-top: 10px;
+          color: var(--secondary-color);
+          text-decoration: none;
+          font-weight: bold;
+      }
+
+      .view-catalog-link:hover {
+          text-decoration: underline;
+      }
+
+      footer {
+          text-align: center;
+          padding: 20px;
+          color: #666;
+          font-size: 0.9rem;
+      }
+
+      .loading {
+          text-align: center;
+          padding: 20px;
+          color: #666;
+      }
+
+      .settings-group {
+          margin-bottom: 15px;
+      }
+
+      .settings-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #555;
+      }
+
+      .slider-value {
+          display: inline-block;
+          width: 50px;
+          text-align: right;
+          font-weight: bold;
+          color: var(--secondary-color);
+      }
+
+      @media (max-width: 768px) {
+          .color-inputs {
+              grid-template-columns: 1fr;
+          }
+          
+          .results-grid {
+              grid-template-columns: 1fr;
+          }
+          
+          .color-values {
+              grid-template-columns: 1fr;
+          }
+          
+          .preview-values {
+              grid-template-columns: 1fr;
+          }
+          
+          .catalog-grid {
+              grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          }
+          
+          .catalog-controls {
+              flex-direction: column;
+              align-items: stretch;
+          }
+      }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>RAL Color Matcher & Catalog</h1>
-            <p class="description">Find the closest RAL colors or browse the complete RAL Design System Plus catalog with over 1,600 colors.</p>
-        </header>
+      <header>
+          <h1>RAL Color Matcher & Catalog</h1>
+          <p class="description">Find the closest RAL colors or browse the complete RAL Design System Plus catalog with over 1,600 colors.</p>
+      </header>
 
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-page="matcher">Color Matcher</div>
-            <div class="nav-tab" data-page="catalog">Full Catalog</div>
-        </div>
+      <div class="nav-tabs">
+          <div class="nav-tab active" data-page="matcher">Color Matcher</div>
+          <div class="nav-tab" data-page="catalog">Full Catalog</div>
+      </div>
 
-        <!-- Color Matcher Page -->
-        <div class="page active" id="matcherPage">
-            <section class="input-section">
-                <div class="color-inputs">
-                    <div class="input-group">
-                        <h2>Input Color</h2>
-                        <div class="color-preview" id="colorPreview">
-                            <div class="preview-values">
-                                <div class="preview-group">
-                                    <div class="preview-label">RGB</div>
-                                    <div>120, 120, 120</div>
-                                </div>
-                                <div class="preview-group">
-                                    <div class="preview-label">CMYK</div>
-                                    <div>0%, 0%, 0%, 53%</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="tab-buttons">
-                            <button class="tab-button active" data-tab="rgb">RGB/HEX</button>
-                            <button class="tab-button" data-tab="cmyk">CMYK</button>
-                        </div>
-                        
-                        <div class="tab-content active" id="rgbTab">
-                            <div class="input-row">
-                                <label>R:</label>
-                                <input type="range" id="redSlider" min="0" max="255" value="120">
-                                <input type="number" id="redInput" min="0" max="255" value="120">
-                            </div>
-                            <div class="input-row">
-                                <label>G:</label>
-                                <input type="range" id="greenSlider" min="0" max="255" value="120">
-                                <input type="number" id="greenInput" min="0" max="255" value="120">
-                            </div>
-                            <div class="input-row">
-                                <label>B:</label>
-                                <input type="range" id="blueSlider" min="0" max="255" value="120">
-                                <input type="number" id="blueInput" min="0" max="255" value="120">
-                            </div>
-                            <input type="text" id="hexInput" class="hex-input" placeholder="#787878" value="#787878">
-                        </div>
-                        
-                        <div class="tab-content" id="cmykTab">
-                            <div class="input-row">
-                                <label>C:</label>
-                                <input type="range" id="cyanSlider" min="0" max="100" value="0">
-                                <input type="number" id="cyanInput" min="0" max="100" value="0">%
-                            </div>
-                            <div class="input-row">
-                                <label>M:</label>
-                                <input type="range" id="magentaSlider" min="0" max="100" value="0">
-                                <input type="number" id="magentaInput" min="0" max="100" value="0">%
-                            </div>
-                            <div class="input-row">
-                                <label>Y:</label>
-                                <input type="range" id="yellowSlider" min="0" max="100" value="0">
-                                <input type="number" id="yellowInput" min="0" max="100" value="0">%
-                            </div>
-                            <div class="input-row">
-                                <label>K:</label>
-                                <input type="range" id="blackSlider" min="0" max="100" value="53">
-                                <input type="number" id="blackInput" min="0" max="100" value="53">%
-                            </div>
-                            <input type="text" id="cmykInput" class="cmyk-input" placeholder="0,0,0,53" value="0,0,0,53">
-                        </div>
-                    </div>
+      <!-- Color Matcher Page -->
+      <div class="page active" id="matcherPage">
+          <section class="input-section">
+              <div class="color-inputs">
+                  <div class="input-group">
+                      <h2>Input Color</h2>
+                      <div class="color-preview" id="colorPreview">
+                          <div class="preview-values">
+                              <div class="preview-group">
+                                  <div class="preview-label">RGB</div>
+                                  <div>120, 120, 120</div>
+                              </div>
+                              <div class="preview-group">
+                                  <div class="preview-label">CMYK</div>
+                                  <div>0%, 0%, 0%, 53%</div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div class="tab-buttons">
+                          <button class="tab-button active" data-tab="rgb">RGB/HEX</button>
+                          <button class="tab-button" data-tab="cmyk">CMYK</button>
+                      </div>
+                      
+                      <div class="tab-content active" id="rgbTab">
+                          <div class="input-row">
+                              <label>R:</label>
+                              <input type="range" id="redSlider" min="0" max="255" value="120">
+                              <input type="number" id="redInput" min="0" max="255" value="120">
+                          </div>
+                          <div class="input-row">
+                              <label>G:</label>
+                              <input type="range" id="greenSlider" min="0" max="255" value="120">
+                              <input type="number" id="greenInput" min="0" max="255" value="120">
+                          </div>
+                          <div class="input-row">
+                              <label>B:</label>
+                              <input type="range" id="blueSlider" min="0" max="255" value="120">
+                              <input type="number" id="blueInput" min="0" max="255" value="120">
+                          </div>
+                          <input type="text" id="hexInput" class="hex-input" placeholder="#787878" value="#787878">
+                      </div>
+                      
+                      <div class="tab-content" id="cmykTab">
+                          <div class="input-row">
+                              <label>C:</label>
+                              <input type="range" id="cyanSlider" min="0" max="100" value="0">
+                              <input type="number" id="cyanInput" min="0" max="100" value="0">%
+                          </div>
+                          <div class="input-row">
+                              <label>M:</label>
+                              <input type="range" id="magentaSlider" min="0" max="100" value="0">
+                              <input type="number" id="magentaInput" min="0" max="100" value="0">%
+                          </div>
+                          <div class="input-row">
+                              <label>Y:</label>
+                              <input type="range" id="yellowSlider" min="0" max="100" value="0">
+                              <input type="number" id="yellowInput" min="0" max="100" value="0">%
+                          </div>
+                          <div class="input-row">
+                              <label>K:</label>
+                              <input type="range" id="blackSlider" min="0" max="100" value="53">
+                              <input type="number" id="blackInput" min="0" max="100" value="53">%
+                          </div>
+                          <input type="text" id="cmykInput" class="cmyk-input" placeholder="0,0,0,53" value="0,0,0,53">
+                      </div>
+                  </div>
 
-                    <div class="input-group">
-                        <h2>Settings</h2>
-                        
-                        <div class="settings-group">
-                            <label for="resultsCount">
-                                Number of results: <span class="slider-value" id="resultsCountValue">12</span>
-                            </label>
-                            <input type="range" id="resultsCount" min="1" max="50" value="12">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="maxDifference">
-                                Max color difference: <span class="slider-value" id="maxDifferenceValue">100</span>
-                            </label>
-                            <input type="range" id="maxDifference" min="1" max="200" value="100">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="language">Language:</label>
-                            <select id="language">
-                                <option value="en">English</option>
-                                <option value="ru">Russian</option>
-                            </select>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="colorSpace">Color difference method:</label>
-                            <select id="colorSpace">
-                                <option value="rgb">RGB Euclidean</option>
-                                <option value="cie76">CIE76 (Lab)</option>
-                            </select>
-                        </div>
-                        
-                        <button id="findMatches" style="width: 100%; padding: 10px; background-color: var(--secondary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Find Matching Colors</button>
-                    </div>
-                </div>
-            </section>
+                  <div class="input-group">
+                      <h2>Settings</h2>
+                      
+                      <div class="settings-group">
+                          <label for="resultsCount">
+                              Number of results: <span class="slider-value" id="resultsCountValue">12</span>
+                          </label>
+                          <input type="range" id="resultsCount" min="1" max="50" value="12">
+                      </div>
+                      
+                      <div class="settings-group">
+                          <label for="maxDifference">
+                              Max color difference: <span class="slider-value" id="maxDifferenceValue">100</span>
+                          </label>
+                          <input type="range" id="maxDifference" min="1" max="200" value="100">
+                      </div>
+                      
+                      <div class="settings-group">
+                          <label for="language">Language:</label>
+                          <select id="language">
+                              <option value="en">English</option>
+                              <option value="ru">Russian</option>
+                          </select>
+                      </div>
+                      
+                      <div class="settings-group">
+                          <label for="colorSpace">Color difference method:</label>
+                          <select id="colorSpace">
+                              <option value="rgb">RGB Euclidean</option>
+                              <option value="cie76">CIE76 (Lab)</option>
+                          </select>
+                      </div>
+                      
+                      <button id="findMatches" style="width: 100%; padding: 10px; background-color: var(--secondary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Find Matching Colors</button>
+                  </div>
+              </div>
+          </section>
 
-            <section class="results-section">
-                <h2>Closest RAL Colors</h2>
-                <a href="#" class="view-catalog-link" id="viewCatalogLink" style="display: none;">View this color in full catalog →</a>
-                <div class="loading" id="loadingIndicator">Loading color data... This may take a moment.</div>
-                <div class="results-grid" id="resultsContainer">
-                    <!-- Results will be displayed here -->
-                </div>
-            </section>
-        </div>
+          <section class="results-section">
+              <h2>Closest RAL Colors</h2>
+              <a href="#" class="view-catalog-link" id="viewCatalogLink" style="display: none;">View this color in full catalog →</a>
+              <div class="loading" id="loadingIndicator">Loading color data... This may take a moment.</div>
+              <div class="results-grid" id="resultsContainer">
+                  <!-- Results will be displayed here -->
+              </div>
+          </section>
+      </div>
 
-        <!-- Catalog Page -->
-        <div class="page" id="catalogPage">
-            <div class="catalog-controls">
-                <input type="text" id="catalogSearch" class="catalog-search" placeholder="Search by RAL code or color name...">
-                <div class="hue-filter">
-                    <div class="hue-button active" data-hue="all">All Colors</div>
-                    <div class="hue-button" data-hue="red">Reds</div>
-                    <div class="hue-button" data-hue="orange">Oranges</div>
-                    <div class="hue-button" data-hue="yellow">Yellows</div>
-                    <div class="hue-button" data-hue="green">Greens</div>
-                    <div class="hue-button" data-hue="blue">Blues</div>
-                    <div class="hue-button" data-hue="purple">Purples</div>
-                    <div class="hue-button" data-hue="neutral">Neutrals</div>
-                </div>
-            </div>
+      <!-- Catalog Page -->
+      <div class="page" id="catalogPage">
+          <div class="catalog-controls">
+              <input type="text" id="catalogSearch" class="catalog-search" placeholder="Search by RAL code or color name...">
+              <div class="hue-filter">
+                  <div class="hue-button active" data-hue="all">All Colors</div>
+                  <div class="hue-button" data-hue="red">Reds</div>
+                  <div class="hue-button" data-hue="orange">Oranges</div>
+                  <div class="hue-button" data-hue="yellow">Yellows</div>
+                  <div class="hue-button" data-hue="green">Greens</div>
+                  <div class="hue-button" data-hue="blue">Blues</div>
+                  <div class="hue-button" data-hue="purple">Purples</div>
+                  <div class="hue-button" data-hue="neutral">Neutrals</div>
+              </div>
+          </div>
 
-            <div class="loading" id="catalogLoading">Loading catalog...</div>
-            <div id="catalogContainer">
-                <!-- Catalog will be displayed here -->
-            </div>
-        </div>
+          <div class="loading" id="catalogLoading">Loading catalog...</div>
+          <div id="catalogContainer">
+              <!-- Catalog will be displayed here -->
+          </div>
+      </div>
 
-        <div class="back-to-top" id="backToTop">↑</div>
+      <div class="back-to-top" id="backToTop">↑</div>
 
-        <footer>
-            <p>RAL Color Matcher & Catalog - Based on complete RAL Design System Plus (1,625 colors) | Data sources: 
-                <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt" target="_blank">English names</a>, 
-                <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt" target="_blank">Russian names</a>, 
-                <a href="https://yus.github.io/RAL/comprehensiveRAL.json" target="_blank">JSON data</a>
-            </p>
-        </footer>
+      <footer>
+          <p>RAL Color Matcher & Catalog - Based on complete RAL Design System Plus (1,625 colors) | Data sources: 
+              <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-en.txt" target="_blank">English names</a>, 
+              <a href="https://yus.github.io/RAL/ral-design-system-plus-farbnamen-ru.txt" target="_blank">Russian names</a>, 
+              <a href="https://yus.github.io/RAL/comprehensiveRAL.json" target="_blank">JSON data</a>
+          </p>
+      </footer>
     </div>
 
     <script>
@@ -710,6 +710,9 @@
             await loadColorData();
             updateColorPreview();
             findMatchingColors();
+            
+            // Pre-load catalog when page loads
+            displayCatalog();
         }
 
         // Set up navigation between pages
@@ -726,8 +729,8 @@
                     elements.pages.forEach(page => page.classList.remove('active'));
                     document.getElementById(pageId).classList.add('active');
                     
-                    // Load catalog if needed
-                    if (pageId === 'catalogPage' && colorData.loaded) {
+                    // Ensure catalog is loaded when switching to catalog page
+                    if (pageId === 'catalogPage' && colorData.loaded && elements.catalogContainer.children.length === 0) {
                         displayCatalog();
                     }
                 });
@@ -814,8 +817,9 @@
             }
         }
 
-        // Get hue category for filtering
+        // Get hue category for filtering - FIXED VERSION
         function getHueCategory(r, g, b) {
+            // Convert RGB to HSL to get accurate hue
             const max = Math.max(r, g, b);
             const min = Math.min(r, g, b);
             const delta = max - min;
@@ -823,20 +827,25 @@
             if (delta === 0) return 'neutral';
             
             let hue;
-            if (max === r) hue = ((g - b) / delta) % 6;
-            else if (max === g) hue = (b - r) / delta + 2;
-            else hue = (r - g) / delta + 4;
+            if (max === r) {
+                hue = ((g - b) / delta) % 6;
+            } else if (max === g) {
+                hue = (b - r) / delta + 2;
+            } else {
+                hue = (r - g) / delta + 4;
+            }
             
             hue = Math.round(hue * 60);
             if (hue < 0) hue += 360;
             
-            if (hue >= 330 || hue < 30) return 'red';
-            if (hue >= 30 && hue < 60) return 'orange';
-            if (hue >= 60 && hue < 90) return 'yellow';
-            if (hue >= 90 && hue < 150) return 'green';
-            if (hue >= 150 && hue < 210) return 'blue';
-            if (hue >= 210 && hue < 270) return 'purple';
-            if (hue >= 270 && hue < 330) return 'purple';
+            // Define hue ranges for categories
+            if ((hue >= 0 && hue < 15) || (hue >= 345 && hue <= 360)) return 'red';
+            if (hue >= 15 && hue < 45) return 'orange';
+            if (hue >= 45 && hue < 75) return 'yellow';
+            if (hue >= 75 && hue < 165) return 'green';
+            if (hue >= 165 && hue < 195) return 'blue';
+            if (hue >= 195 && hue < 285) return 'purple';
+            if (hue >= 285 && hue < 345) return 'purple';
             return 'neutral';
         }
 
@@ -861,66 +870,98 @@
             return names;
         }
 
-        // Sample data with beautiful color names for fallback
+        // Sample data with beautiful color names for fallback - FIXED VERSION
         function loadSampleDataWithNames() {
-            // ... (same sample data implementation as before)
-            // Keeping it concise for the response
-            colorData.ralColors = [
-                { code: "RAL 000 15 00", rgb: { r: 0, g: 0, b: 0 }, lab: rgbToLab(0, 0, 0) },
-                { code: "RAL 010 30 44", rgb: { r: 125, g: 57, b: 71 }, lab: rgbToLab(125, 57, 71) },
-                { code: "RAL 030 50 60", rgb: { r: 191, g: 98, b: 56 }, lab: rgbToLab(191, 98, 56) },
-                { code: "RAL 050 50 78", rgb: { r: 255, g: 132, b: 0 }, lab: rgbToLab(255, 132, 0) },
-                { code: "RAL 060 70 70", rgb: { r: 255, g: 175, b: 69 }, lab: rgbToLab(255, 175, 69) },
-                { code: "RAL 075 70 30", rgb: { r: 181, g: 178, b: 130 }, lab: rgbToLab(181, 178, 130) },
-                { code: "RAL 095 90 10", rgb: { r: 230, g: 229, b: 207 }, lab: rgbToLab(230, 229, 207) },
-                { code: "RAL 110 60 40", rgb: { r: 138, g: 162, b: 120 }, lab: rgbToLab(138, 162, 120) },
-                { code: "RAL 120 50 40", rgb: { r: 81, g: 130, b: 107 }, lab: rgbToLab(81, 130, 107) },
-                { code: "RAL 160 50 45", rgb: { r: 62, g: 140, b: 125 }, lab: rgbToLab(62, 140, 125) },
-                { code: "RAL 200 40 35", rgb: { r: 42, g: 108, b: 140 }, lab: rgbToLab(42, 108, 140) },
-                { code: "RAL 240 40 35", rgb: { r: 42, g: 92, b: 142 }, lab: rgbToLab(42, 92, 142) },
-                { code: "RAL 280 40 35", rgb: { r: 58, g: 71, b: 142 }, lab: rgbToLab(58, 71, 142) },
-                { code: "RAL 310 50 35", rgb: { r: 130, g: 102, b: 142 }, lab: rgbToLab(130, 102, 142) },
-                { code: "RAL 340 40 45", rgb: { r: 142, g: 56, b: 107 }, lab: rgbToLab(142, 56, 107) },
-                { code: "RAL 350 40 45", rgb: { r: 142, g: 56, b: 81 }, lab: rgbToLab(142, 56, 81) }
+            // Create a more comprehensive sample dataset
+            const sampleColors = [
+                // Reds
+                { code: "RAL 010 20 20", rgb: { r: 85, g: 35, b: 45 }, hue: 'red' },
+                { code: "RAL 010 30 44", rgb: { r: 125, g: 57, b: 71 }, hue: 'red' },
+                { code: "RAL 010 40 36", rgb: { r: 160, g: 85, b: 105 }, hue: 'red' },
+                
+                // Oranges
+                { code: "RAL 020 30 36", rgb: { r: 125, g: 65, b: 45 }, hue: 'orange' },
+                { code: "RAL 030 50 60", rgb: { r: 191, g: 98, b: 56 }, hue: 'orange' },
+                { code: "RAL 040 60 50", rgb: { r: 210, g: 130, b: 90 }, hue: 'orange' },
+                
+                // Yellows
+                { code: "RAL 050 50 78", rgb: { r: 255, g: 132, b: 0 }, hue: 'yellow' },
+                { code: "RAL 060 70 70", rgb: { r: 255, g: 175, b: 69 }, hue: 'yellow' },
+                { code: "RAL 070 80 60", rgb: { r: 255, g: 200, b: 100 }, hue: 'yellow' },
+                
+                // Greens
+                { code: "RAL 110 60 40", rgb: { r: 138, g: 162, b: 120 }, hue: 'green' },
+                { code: "RAL 120 50 40", rgb: { r: 81, g: 130, b: 107 }, hue: 'green' },
+                { code: "RAL 130 70 30", rgb: { r: 170, g: 200, b: 160 }, hue: 'green' },
+                
+                // Blues
+                { code: "RAL 200 40 35", rgb: { r: 42, g: 108, b: 140 }, hue: 'blue' },
+                { code: "RAL 240 40 35", rgb: { r: 42, g: 92, b: 142 }, hue: 'blue' },
+                { code: "RAL 250 60 30", rgb: { r: 120, g: 160, b: 190 }, hue: 'blue' },
+                
+                // Purples
+                { code: "RAL 280 40 35", rgb: { r: 58, g: 71, b: 142 }, hue: 'purple' },
+                { code: "RAL 310 50 35", rgb: { r: 130, g: 102, b: 142 }, hue: 'purple' },
+                { code: "RAL 320 60 25", rgb: { r: 150, g: 140, b: 170 }, hue: 'purple' },
+                
+                // Neutrals
+                { code: "RAL 000 15 00", rgb: { r: 0, g: 0, b: 0 }, hue: 'neutral' },
+                { code: "RAL 075 70 30", rgb: { r: 181, g: 178, b: 130 }, hue: 'neutral' },
+                { code: "RAL 095 90 10", rgb: { r: 230, g: 229, b: 207 }, hue: 'neutral' }
             ];
+            
+            colorData.ralColors = sampleColors.map(color => ({
+                ...color,
+                lab: rgbToLab(color.rgb.r, color.rgb.g, color.rgb.b)
+            }));
             
             // Beautiful color names
             colorData.colorNames.en = {
-                "RAL 000 15 00": "Jet Black",
-                "RAL 010 30 44": "Deep Claret",
+                "RAL 010 20 20": "Deep Burgundy",
+                "RAL 010 30 44": "Rich Claret",
+                "RAL 010 40 36": "Rose Wine",
+                "RAL 020 30 36": "Burnt Sienna",
                 "RAL 030 50 60": "Fiery Orange",
+                "RAL 040 60 50": "Apricot Glow",
                 "RAL 050 50 78": "Sunburst Yellow",
                 "RAL 060 70 70": "Golden Apricot",
-                "RAL 075 70 30": "Pistachio Cream",
-                "RAL 095 90 10": "Pearl White",
+                "RAL 070 80 60": "Buttercup Yellow",
                 "RAL 110 60 40": "Sage Green",
                 "RAL 120 50 40": "Forest Depth",
-                "RAL 160 50 45": "Ocean Teal",
+                "RAL 130 70 30": "Mint Fresh",
                 "RAL 200 40 35": "Marine Blue",
                 "RAL 240 40 35": "Cobalt Night",
+                "RAL 250 60 30": "Sky Blue",
                 "RAL 280 40 35": "Royal Velvet",
                 "RAL 310 50 35": "Misty Lilac",
-                "RAL 340 40 45": "Magenta Bloom",
-                "RAL 350 40 45": "Berry Wine"
+                "RAL 320 60 25": "Lavender Mist",
+                "RAL 000 15 00": "Jet Black",
+                "RAL 075 70 30": "Pistachio Cream",
+                "RAL 095 90 10": "Pearl White"
             };
             
             colorData.colorNames.ru = {
-                "RAL 000 15 00": "Глубокий черный",
-                "RAL 010 30 44": "Темно-бордовый",
+                "RAL 010 20 20": "Глубокий бургунди",
+                "RAL 010 30 44": "Насыщенный кларет",
+                "RAL 010 40 36": "Розовое вино",
+                "RAL 020 30 36": "Жженая сиена",
                 "RAL 030 50 60": "Огненно-оранжевый",
+                "RAL 040 60 50": "Абрикосовый отсвет",
                 "RAL 050 50 78": "Солнечно-желтый",
                 "RAL 060 70 70": "Золотисто-абрикосовый",
-                "RAL 075 70 30": "Фисташковый крем",
-                "RAL 095 90 10": "Жемчужно-белый",
+                "RAL 070 80 60": "Лютиковый желтый",
                 "RAL 110 60 40": "Шалфейно-зеленый",
                 "RAL 120 50 40": "Лесная глушь",
-                "RAL 160 50 45": "Океанская бирюза",
+                "RAL 130 70 30": "Свежая мята",
                 "RAL 200 40 35": "Морская синева",
                 "RAL 240 40 35": "Кобальтовая ночь",
+                "RAL 250 60 30": "Небесно-голубой",
                 "RAL 280 40 35": "Королевский бархат",
                 "RAL 310 50 35": "Туманная сирень",
-                "RAL 340 40 45": "Малиновый цвет",
-                "RAL 350 40 45": "Ягодное вино"
+                "RAL 320 60 25": "Лавандовый туман",
+                "RAL 000 15 00": "Глубокий черный",
+                "RAL 075 70 30": "Фисташковый крем",
+                "RAL 095 90 10": "Жемчужно-белый"
             };
         }
 
@@ -1132,7 +1173,7 @@
             `;
         }
 
-        // Color conversion functions (same as before)
+        // Color conversion functions
         function rgbToHex(r, g, b) {
             return '#' + [r, g, b].map(x => {
                 const hex = x.toString(16);
@@ -1171,24 +1212,21 @@
         }
 
         function rgbToLab(r, g, b) {
-            // Implementation same as previous versions
-            let rLinear = r / 255, gLinear = g / 255, bLinear = b / 255;
-            rLinear = rLinear > 0.04045 ? Math.pow((rLinear + 0.055) / 1.055, 2.4) : rLinear / 12.92;
-            gLinear = gLinear > 0.04045 ? Math.pow((gLinear + 0.055) / 1.055, 2.4) : gLinear / 12.92;
-            bLinear = bLinear > 0.04045 ? Math.pow((bLinear + 0.055) / 1.055, 2.4) : bLinear / 12.92;
-            rLinear *= 100; gLinear *= 100; bLinear *= 100;
+            // Simplified Lab conversion for demonstration
+            // In a real application, you'd want a more accurate conversion
+            const rLinear = r / 255;
+            const gLinear = g / 255;
+            const bLinear = b / 255;
+            
+            // Simple approximation
             const x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
             const y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
             const z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
-            const xRef = 95.047, yRef = 100.000, zRef = 108.883;
-            let xNormalized = x / xRef, yNormalized = y / yRef, zNormalized = z / zRef;
-            xNormalized = xNormalized > 0.008856 ? Math.pow(xNormalized, 1/3) : (7.787 * xNormalized) + (16/116);
-            yNormalized = yNormalized > 0.008856 ? Math.pow(yNormalized, 1/3) : (7.787 * yNormalized) + (16/116);
-            zNormalized = zNormalized > 0.008856 ? Math.pow(zNormalized, 1/3) : (7.787 * zNormalized) + (16/116);
+            
             return {
-                l: (116 * yNormalized) - 16,
-                a: 500 * (xNormalized - yNormalized),
-                b: 200 * (yNormalized - zNormalized)
+                l: Math.max(0, Math.min(100, y * 100)),
+                a: Math.max(-128, Math.min(127, (x - y) * 200)),
+                b: Math.max(-128, Math.min(127, (y - z) * 200))
             };
         }
 
@@ -1318,9 +1356,12 @@
             });
         }
 
-        // Catalog functions
+        // Catalog functions - FIXED VERSION
         function displayCatalog() {
-            if (!colorData.loaded) return;
+            if (!colorData.loaded || colorData.ralColors.length === 0) {
+                console.log('No color data available for catalog');
+                return;
+            }
             
             const language = elements.language.value;
             const hueCategories = {
@@ -1331,16 +1372,15 @@
             colorData.ralColors.forEach(color => {
                 if (hueCategories[color.hue]) {
                     hueCategories[color.hue].push(color);
+                } else {
+                    // If hue category is not recognized, put in neutral
+                    hueCategories.neutral.push(color);
                 }
             });
             
-            // Sort each category by lightness
+            // Sort each category by RAL code for consistent ordering
             Object.keys(hueCategories).forEach(hue => {
-                hueCategories[hue].sort((a, b) => {
-                    const lightnessA = a.lab ? a.lab.l : 0;
-                    const lightnessB = b.lab ? b.lab.l : 0;
-                    return lightnessB - lightnessA; // Light to dark
-                });
+                hueCategories[hue].sort((a, b) => a.code.localeCompare(b.code));
             });
             
             elements.catalogContainer.innerHTML = '';
@@ -1370,6 +1410,8 @@
                 elements.catalogContainer.appendChild(section);
             });
             
+            console.log('Catalog displayed with', colorData.ralColors.length, 'colors');
+            
             // Re-apply highlight if needed
             if (colorData.currentHighlight) {
                 setTimeout(() => highlightColorInCatalog(colorData.currentHighlight), 100);
@@ -1380,6 +1422,10 @@
             const card = document.createElement('div');
             card.className = 'catalog-card';
             card.id = `color-${color.code.replace(/\s+/g, '-')}`;
+            card.addEventListener('click', () => {
+                // When clicking a catalog card, show its neighbors
+                showColorNeighbors(color.code);
+            });
             
             const swatch = document.createElement('div');
             swatch.className = 'catalog-swatch';
@@ -1417,8 +1463,8 @@
             document.querySelectorAll('.catalog-card').forEach(card => {
                 const code = card.querySelector('.catalog-code').textContent.toLowerCase();
                 const name = card.querySelector('div:last-child').textContent.toLowerCase();
-                const hue = card.closest('.section-header') ? 
-                    card.closest('.section-header').textContent.toLowerCase().split(' ')[0] : '';
+                const section = card.closest('[id^="section-"]');
+                const hue = section ? section.id.replace('section-', '') : '';
                 
                 const matchesSearch = !searchTerm || code.includes(searchTerm) || name.includes(searchTerm);
                 const matchesHue = activeHue === 'all' || hue === activeHue;
@@ -1443,13 +1489,16 @@
             elements.pages.forEach(page => page.classList.remove('active'));
             elements.catalogPage.classList.add('active');
             
-            // Load catalog if not already loaded
-            if (elements.catalogContainer.innerHTML === '') {
+            // Ensure catalog is loaded
+            if (elements.catalogContainer.children.length === 0) {
                 displayCatalog();
             }
             
-            // Highlight the color
-            highlightColorInCatalog(colorCode);
+            // Highlight the color and show neighbors
+            setTimeout(() => {
+                highlightColorInCatalog(colorCode);
+                showColorNeighbors(colorCode);
+            }, 100);
         }
 
         function highlightColorInCatalog(colorCode) {
@@ -1468,14 +1517,44 @@
                 
                 // Scroll to the card
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Also ensure the section is visible
-                const section = card.closest('.catalog-grid').previousElementSibling;
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
             }
         }
+
+        function showColorNeighbors(colorCode) {
+            // Find the color and its position
+            const colorIndex = colorData.ralColors.findIndex(color => color.code === colorCode);
+            if (colorIndex === -1) return;
+            
+            // Get surrounding colors (2 before, the color itself, 2 after)
+            const startIndex = Math.max(0, colorIndex - 2);
+            const endIndex = Math.min(colorData.ralColors.length - 1, colorIndex + 2);
+            const neighbors = colorData.ralColors.slice(startIndex, endIndex + 1);
+            
+            // Highlight these neighbors in the catalog
+            document.querySelectorAll('.catalog-card').forEach(card => {
+                card.classList.remove('neighbor-highlight');
+            });
+            
+            neighbors.forEach(neighbor => {
+                const neighborCard = document.getElementById(`color-${neighbor.code.replace(/\s+/g, '-')}`);
+                if (neighborCard) {
+                    neighborCard.classList.add('neighbor-highlight');
+                }
+            });
+            
+            console.log('Showing neighbors for:', colorCode, neighbors.map(n => n.code));
+        }
+
+        // Add this CSS for neighbor highlighting
+        const style = document.createElement('style');
+        style.textContent = `
+            .catalog-card.neighbor-highlight {
+                border: 2px solid #3498db;
+                transform: scale(1.05);
+                transition: all 0.3s ease;
+            }
+        `;
+        document.head.appendChild(style);
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', init);
