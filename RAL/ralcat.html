@@ -11,8 +11,8 @@
             --background-color: #f5f7fa;
             --card-background: #ffffff;
             --text-color: #333333;
-            --border-radius: 8px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 4px;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
 
@@ -404,11 +404,23 @@
             right: 20px;
             background: var(--secondary-color);
             color: white;
-            padding: 10px 15px;
-            border-radius: 50%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px; /* Square corners */
             cursor: pointer;
             box-shadow: var(--shadow);
             display: none;
+            font-size: 16px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-to-top:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
         }
 
         .view-catalog-link {
@@ -529,7 +541,7 @@
             gap: 5px;
             padding: 5px 10px;
             background: var(--background-color);
-            border-radius: 20px;
+            border-radius: 8px;
             border: 1px solid #ddd;
             cursor: pointer;
             transition: var(--transition);
@@ -727,6 +739,25 @@
         .retry-button:hover {
             background: var(--primary-color);
         }
+
+        [data-theme="dark"] {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #1a1a1a;
+            --card-background: #2d2d2d;
+            --text-color: #ffffff;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -734,6 +765,7 @@
         <header>
             <h1>RAL Color Matcher & Catalog</h1>
             <p class="description">Find the closest RAL colors or browse the complete RAL Design System Plus catalog with names in English and Russian.</p>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
         </header>
 
         <div class="nav-tabs">
@@ -975,7 +1007,10 @@
             catalogSearch: document.getElementById('catalogSearch'),
             catalogLoading: document.getElementById('catalogLoading'),
             catalogContainer: document.getElementById('catalogContainer'),
-            hueButtons: document.querySelectorAll('.hue-button')
+            hueButtons: document.querySelectorAll('.hue-button'),
+
+            // Dark Mode
+            themeToggle: document.getElementById('themeToggle') // Add this line
         };
 
         // Save/load from localStorage
@@ -999,7 +1034,23 @@
                 }
             }
         }
+
+        // JavaScript for theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', newTheme);
+        });
         
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+      
         // Call loadFromLocalStorage in init()
         // Initialize the application
         async function init() {
@@ -1438,27 +1489,39 @@
             elements.clearHistory.addEventListener('click', clearHistory);
             elements.catalogClearHistory.addEventListener('click', clearHistory);
             
-            // Catalog hue filter buttons
+            // Update hue button click handler
             elements.hueButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     const hue = button.getAttribute('data-hue');
                     
+                    // Update active button
+                    elements.hueButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
                     if (hue === 'all') {
-                        // Scroll to top
+                        // Scroll to top AND reset search
                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                        elements.catalogSearch.value = '';
+                        filterCatalog(); // Reset search
                     } else {
-                        // Scroll to the specific hue section
+                        // Scroll to specific hue section
                         const section = document.getElementById(`section-${hue}`);
                         if (section) {
                             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     }
-                    
-                    // Update active button for visual feedback
-                    elements.hueButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
                 });
+            });
+            
+            // Also reset hue filter when using search
+            elements.catalogSearch.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    // If searching, reset hue filter to "All Colors"
+                    elements.hueButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelector('.hue-button[data-hue="all"]').classList.add('active');
+                }
+                filterCatalog();
             });
             
             // Catalog search
@@ -1867,34 +1930,6 @@
                 elements.copyNotification.classList.remove('show');
             }, 2000);
         }
-        
-        // // Add RAL code to history
-        // function copyToClipboard(text) {
-        //     navigator.clipboard.writeText(text).then(() => {
-        //         showCopyNotification();
-                
-        //         // Add to history if it's a RAL code
-        //         if (text.startsWith('RAL')) {
-        //             console.log('Adding to history:', text);
-        //             addToHistory(text);
-        //         }
-        //     }).catch(err => {
-        //         console.error('Failed to copy: ', err);
-        //         // Fallback
-        //         const textArea = document.createElement('textarea');
-        //         textArea.value = text;
-        //         document.body.appendChild(textArea);
-        //         textArea.select();
-        //         document.execCommand('copy');
-        //         document.body.removeChild(textArea);
-        //         showCopyNotification();
-                
-        //         if (text.startsWith('RAL')) {
-        //             console.log('Adding to history (fallback):', text);
-        //             addToHistory(text);
-        //         }
-        //     });
-        // }
 
         // Update History
         function updateHistoryDisplay() {
@@ -2264,37 +2299,67 @@
             console.log(`Catalog displayed with ${totalColors} colors across ${categoryOrder.filter(hue => hueCategories[hue].length > 0).length} categories`);
         }
 
+        // Completely rewrite filterCatalog function
         function filterCatalog() {
-            const searchTerm = elements.catalogSearch.value.toLowerCase();
+            const searchTerm = elements.catalogSearch.value.toLowerCase().trim();
+            const catalogContainer = document.getElementById('catalogContainer');
             
+            if (!catalogContainer) return;
+            
+            // Show all if empty search
             if (!searchTerm) {
-                // Show all cards
-                document.querySelectorAll('.color-card').forEach(card => {
+                catalogContainer.querySelectorAll('.color-card').forEach(card => {
                     card.style.display = 'block';
+                });
+                catalogContainer.querySelectorAll('.catalog-section').forEach(section => {
+                    section.style.display = 'block';
                 });
                 return;
             }
             
-            // Filter cards based on search term
-            document.querySelectorAll('.color-card').forEach(card => {
+            let foundAny = false;
+            
+            // Search through ALL catalog cards
+            catalogContainer.querySelectorAll('.color-card').forEach(card => {
                 const codeElement = card.querySelector('.color-code');
-                const nameElements = card.querySelectorAll('.color-name, .color-name-ru');
+                const nameEnElement = card.querySelector('.color-name');
+                const nameRuElement = card.querySelector('.color-name-ru');
                 
                 if (!codeElement) return;
                 
                 const code = codeElement.textContent.toLowerCase();
-                let nameMatch = false;
+                const nameEn = nameEnElement ? nameEnElement.textContent.toLowerCase() : '';
+                const nameRu = nameRuElement ? nameRuElement.textContent.toLowerCase() : '';
                 
-                nameElements.forEach(nameEl => {
-                    if (nameEl.textContent.toLowerCase().includes(searchTerm)) {
-                        nameMatch = true;
-                    }
-                });
+                const matches = code.includes(searchTerm) || nameEn.includes(searchTerm) || nameRu.includes(searchTerm);
                 
-                const matchesSearch = code.includes(searchTerm) || nameMatch;
-                card.style.display = matchesSearch ? 'block' : 'none';
+                if (matches) {
+                    card.style.display = 'block';
+                    foundAny = true;
+                    
+                    // Highlight the matching card
+                    card.classList.add('search-highlight');
+                    setTimeout(() => card.classList.remove('search-highlight'), 2000);
+                } else {
+                    card.style.display = 'none';
+                }
             });
+            
+            // Auto-scroll to first match
+            if (foundAny) {
+                const firstVisible = catalogContainer.querySelector('.color-card[style="display: block;"], .color-card:not([style])');
+                if (firstVisible) {
+                    firstVisible.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
         }
+        
+        // Make search work on Enter key too
+        elements.catalogSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                filterCatalog();
+            }
+        });
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', init);
