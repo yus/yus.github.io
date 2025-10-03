@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAL Color Matcher & Catalogs</title>
+    <style>
+        /* Compact, professional styling */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f7fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-radius: 4px;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #1a1a1a;
+            --card-background: #2d2d2d;
+            --text-color: #ffffff;
+        }
+
+        /* Compact header */
+        header {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        .description {
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: var(--card-background);
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .nav-tab.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Matcher page with fixed controls */
+        #matcherPage {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+        }
+
+        .input-section {
+            flex-shrink: 0;
+            margin-bottom: 15px;
+        }
+
+        .results-section {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Catalog pages with full scroll */
+        #catalogPage, #classicPage {
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .catalog-controls {
+            position: sticky;
+            top: 0;
+            background: var(--card-background);
+            z-index: 100;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Square back-to-top */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: none;
+            font-size: 16px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* History sections */
+        .history-section {
+            background: var(--card-background);
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 15px;
+        }
+
+        .history-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .history-breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .history-swatch {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            background: var(--background-color);
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.75rem;
+        }
+
+        .history-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+
+        .history-copy-all, .clear-history {
+            padding: 4px 8px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+
+        .clear-history {
+            background: #e74c3c;
+        }
+
+        .clear-history:hover {
+            background: #c0392b;
+        }
+
+        /* Catalog checkboxes */
+        .catalog-checkboxes {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        /* Color cards */
+        .color-card {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .color-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-swatch {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .color-info {
+            padding: 12px;
+        }
+
+        .color-code {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .color-name {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 4px;
+            font-style: italic;
+        }
+
+        .color-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.75rem;
+        }
+
+        .catalog-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            z-index: 5;
+        }
+
+        .lrv-value {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RAL Color Matcher & Catalogs</h1>
+            <p class="description">Match colors across RAL Design System Plus and RAL Classic catalogs</p>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-page="matcher">Color Matcher</div>
+            <div class="nav-tab" data-page="catalog">RAL Design System Plus</div>
+            <div class="nav-tab" data-page="classic">RAL Classic</div>
+        </div>
+
+        <!-- Copy Notification -->
+        <div class="copy-notification" id="copyNotification">RAL code copied to clipboard!</div>
+
+        <!-- Color Matcher Page -->
+        <div class="page active" id="matcherPage">
+            <section class="input-section">
+                <!-- Your existing color input controls -->
+                <div class="color-inputs">
+                    <div class="input-group">
+                        <h2>Input Color</h2>
+                        <!-- Your RGB/CMYK inputs -->
+                    </div>
+                    <div class="input-group">
+                        <h2>Settings</h2>
+                        <!-- Your existing sliders -->
+
+                        <!-- NEW: Catalog Selection -->
+                        <div class="settings-group">
+                            <label>Search in catalogs:</label>
+                            <div class="catalog-checkboxes">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="searchRALDS" checked> RAL Design System Plus
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="searchRALClassic" checked> RAL Classic
+                                </label>
+                            </div>
+                        </div>
+
+                        <button id="findMatches">Find Matching Colors</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History -->
+            <div class="history-section" id="historySection" style="display: none;">
+                <div class="history-title">
+                    <span>Recently Copied RAL Colors</span>
+                    <button class="clear-history" id="clearHistory" style="display: none;">Clear</button>
+                </div>
+                <div class="history-breadcrumb" id="historyBreadcrumb"></div>
+            </div>
+
+            <section class="results-section">
+                <h2>Closest RAL Colors</h2>
+                <div class="loading" id="loadingIndicator">Loading RAL color data...</div>
+                <div id="errorContainer"></div>
+                <div class="results-grid" id="resultsContainer"></div>
+            </section>
+        </div>
+
+        <!-- RAL Design System Plus Catalog -->
+        <div class="page" id="catalogPage">
+            <div class="history-section" id="catalogHistorySection" style="display: none;">
+                <div class="history-title">
+                    <span>Recently Copied RAL Colors</span>
+                    <button class="clear-history" id="catalogClearHistory" style="display: none;">Clear</button>
+                </div>
+                <div class="history-breadcrumb" id="catalogHistoryBreadcrumb"></div>
+            </div>
+
+            <div class="catalog-controls">
+                <input type="text" id="catalogSearch" class="catalog-search" placeholder="Search RAL Design System Plus...">
+                <div class="hue-filter">
+                    <div class="hue-button active" data-hue="all">All Colors</div>
+                    <div class="hue-button" data-hue="red">Reds</div>
+                    <div class="hue-button" data-hue="orange">Oranges</div>
+                    <div class="hue-button" data-hue="yellow">Yellows</div>
+                    <div class="hue-button" data-hue="green">Greens</div>
+                    <div class="hue-button" data-hue="blue">Blues</div>
+                    <div class="hue-button" data-hue="purple">Purples</div>
+                    <div class="hue-button" data-hue="neutral">Neutrals</div>
+                </div>
+            </div>
+
+            <div class="loading" id="catalogLoading">Loading RAL Design System Plus...</div>
+            <div id="catalogErrorContainer"></div>
+            <div id="catalogContainer"></div>
+        </div>
+
+        <!-- RAL Classic Catalog -->
+        <div class="page" id="classicPage">
+            <div class="history-section" id="classicHistorySection" style="display: none;">
+                <div class="history-title">
+                    <span>Recently Copied RAL Colors</span>
+                    <button class="clear-history" id="classicClearHistory" style="display: none;">Clear</button>
+                </div>
+                <div class="history-breadcrumb" id="classicHistoryBreadcrumb"></div>
+            </div>
+
+            <div class="catalog-controls">
+                <input type="text" id="classicSearch" class="catalog-search" placeholder="Search RAL Classic...">
+                <div class="hue-filter">
+                    <div class="hue-button active" data-hue="all">All Colors</div>
+                    <div class="hue-button" data-hue="yellow">Yellows</div>
+                    <div class="hue-button" data-hue="orange">Oranges</div>
+                    <div class="hue-button" data-hue="red">Reds</div>
+                    <div class="hue-button" data-hue="blue">Blues</div>
+                    <div class="hue-button" data-hue="green">Greens</div>
+                    <div class="hue-button" data-hue="gray">Grays</div>
+                </div>
+            </div>
+
+            <div class="loading" id="classicLoading">Loading RAL Classic...</div>
+            <div id="classicErrorContainer"></div>
+            <div id="classicContainer"></div>
+        </div>
+
+        <div class="back-to-top" id="backToTop">↑</div>
+    </div>
+    <script src="ral.js"></script>
+</body>
+</html>
