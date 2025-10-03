@@ -87,16 +87,16 @@ function initializeElements() {
     elements.searchRALDS = document.getElementById('searchRALDS');
     elements.searchRALClassic = document.getElementById('searchRALClassic');
 
-    // Catalog page elements
-    elements.catalogSearch = document.getElementById('catalogSearch');
-    elements.catalogLoading = document.getElementById('catalogLoading');
-    elements.catalogContainer = document.getElementById('catalogContainer');
-    elements.hueButtons = document.querySelectorAll('.hue-button');
-
-    // Classic page elements
-    elements.classicSearch = document.getElementById('classicSearch');
-    elements.classicLoading = document.getElementById('classicLoading');
-    elements.classicContainer = document.getElementById('classicContainer');
+    
+    // Catalog page elements - FIX THESE:
+    elements.catalogSearch = document.getElementById('catalogSearch') || document.getElementById('searchCatalog');
+    elements.catalogLoading = document.getElementById('catalogLoading') || document.getElementById('loadingCatalog');
+    elements.catalogContainer = document.getElementById('catalogContainer') || document.getElementById('containerCatalog');
+    
+    // Classic page elements - FIX THESE:
+    elements.classicSearch = document.getElementById('classicSearch') || document.getElementById('searchClassic');
+    elements.classicLoading = document.getElementById('classicLoading') || document.getElementById('loadingClassic');
+    elements.classicContainer = document.getElementById('classicContainer') || document.getElementById('containerClassic');
 }
 
 // Theme management
@@ -361,32 +361,68 @@ function setupEventListeners() {
     elements.catalogClearHistory.addEventListener('click', clearHistory);
     elements.classicClearHistory.addEventListener('click', clearHistory);
 
-    // Catalog search and filters
-    elements.catalogSearch.addEventListener('input', () => filterCatalog('designPlus'));
-    elements.classicSearch.addEventListener('input', () => filterCatalog('classic'));
+    // // Catalog search and filters
+    // elements.catalogSearch.addEventListener('input', () => filterCatalog('designPlus'));
+    // elements.classicSearch.addEventListener('input', () => filterCatalog('classic'));
 
-    elements.hueButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const hue = button.getAttribute('data-hue');
+    // elements.hueButtons.forEach(button => {
+    //     button.addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         const hue = button.getAttribute('data-hue');
 
-            elements.hueButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+    //         elements.hueButtons.forEach(btn => btn.classList.remove('active'));
+    //         button.classList.add('active');
 
-            if (hue === 'all') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                elements.catalogSearch.value = '';
-                elements.classicSearch.value = '';
-                filterCatalog('designPlus');
-                filterCatalog('classic');
-            } else {
-                const section = document.getElementById(`section-${hue}`);
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    //         if (hue === 'all') {
+    //             window.scrollTo({ top: 0, behavior: 'smooth' });
+    //             elements.catalogSearch.value = '';
+    //             elements.classicSearch.value = '';
+    //             filterCatalog('designPlus');
+    //             filterCatalog('classic');
+    //         } else {
+    //             const section = document.getElementById(`section-${hue}`);
+    //             if (section) {
+    //                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    //             }
+    //         }
+    //     });
+    // });
+    // Catalog search - ONLY if element exists
+    if (elements.catalogSearch) {
+        elements.catalogSearch.addEventListener('input', () => filterCatalog('designPlus'));
+    }
+
+    // Classic search - ONLY if element exists  
+    if (elements.classicSearch) {
+        elements.classicSearch.addEventListener('input', () => filterCatalog('classic'));
+    }
+
+    // Hue buttons - ONLY if they exist
+    if (elements.hueButtons && elements.hueButtons.length > 0) {
+        elements.hueButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                // ... your existing hue button code ...
+                e.preventDefault();
+                const hue = button.getAttribute('data-hue');
+    
+                elements.hueButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+    
+                if (hue === 'all') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    elements.catalogSearch.value = '';
+                    elements.classicSearch.value = '';
+                    filterCatalog('designPlus');
+                    filterCatalog('classic');
+                } else {
+                    const section = document.getElementById(`section-${hue}`);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
-            }
+            });
         });
-    });
+    }
 }
 
 function toggleTheme() {
