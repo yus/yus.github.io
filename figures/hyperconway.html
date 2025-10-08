@@ -3,115 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4D Conway - Hyperdimensional Rotation</title>
+    <title>4D Conway</title>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
             overflow: hidden;
             background: #000;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            touch-action: manipulation;
         }
         canvas {
             display: block;
         }
-        .info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 300px;
-        }
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        button {
-            background: linear-gradient(to bottom, #444, #222);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 12px;
-        }
-        button:hover {
-            background: linear-gradient(to bottom, #555, #333);
-            transform: translateY(-2px);
-        }
-        .slider-container {
-            grid-column: 1 / -1;
-            margin: 5px 0;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #ccc;
-        }
-        input[type="range"] {
-            width: 100%;
-        }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: #7fffd4;
+        .ui-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            z-index: 1000;
         }
         .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
             font-size: 12px;
-        }
-        .stat-value {
             color: #7fffd4;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 36px;
+        }
+        button:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.95);
+        }
+        .sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slider-container label {
+            color: #ccc;
+            font-size: 11px;
+            min-width: 80px;
+        }
+        input[type="range"] {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #7fffd4;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .value {
+            color: #7fffd4;
+            font-size: 11px;
+            min-width: 35px;
+            text-align: right;
+        }
+        @media (max-width: 480px) {
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div class="info">
-        <h1>4D Conway - Hyper Rotation</h1>
+    
+    <div class="ui-container">
         <div class="stats">
-            <div>Generation: <span id="generation" class="stat-value">0</span></div>
-            <div>Living Cells: <span id="livingCells" class="stat-value">0</span></div>
-            <div>Time Slice (W): <span id="timeSlice" class="stat-value">0</span></div>
-            <div>Active Figures: <span id="activeFigures" class="stat-value">0</span></div>
-            <div>Rotation Speed: <span id="rotationSpeed" class="stat-value">0.5</span></div>
-            <div>Cycle Complexity: <span id="complexity" class="stat-value">0</span></div>
+            <div class="stat">Gen: <span id="generation">0</span></div>
+            <div class="stat">Cells: <span id="livingCells">0</span></div>
+            <div class="stat">W-Slice: <span id="timeSlice">0</span></div>
+            <div class="stat">Figures: <span id="activeFigures">0</span></div>
         </div>
-    </div>
-    <div class="controls">
-        <button id="playPause">Pause</button>
-        <button id="reset">Reset</button>
-        <button id="randomize">Randomize</button>
-        <button id="addFigure">Add Figure</button>
-        <div class="slider-container">
-            <label for="speedControl">Simulation Speed: <span id="speedValue">0.05</span></label>
-            <input type="range" id="speedControl" min="0.01" max="0.2" step="0.01" value="0.05">
+        
+        <div class="controls">
+            <button id="playPause">⏸️ Pause</button>
+            <button id="reset">🔄 Reset</button>
+            <button id="randomize">🎲 Random</button>
+            <button id="addFigure">✨ Add</button>
         </div>
-        <div class="slider-container">
-            <label for="rotationControl">Rotation Speed: <span id="rotationValue">0.5</span></label>
-            <input type="range" id="rotationControl" min="0.1" max="2.0" step="0.1" value="0.5">
-        </div>
-        <div class="slider-container">
-            <label for="complexityControl">Pattern Complexity: <span id="complexityValue">5</span></label>
-            <input type="range" id="complexityControl" min="1" max="10" step="1" value="5">
+        
+        <div class="sliders">
+            <div class="slider-container">
+                <label>Speed</label>
+                <input type="range" id="speedControl" min="0.01" max="0.3" step="0.01" value="0.08">
+                <div class="value" id="speedValue">0.08</div>
+            </div>
+            <div class="slider-container">
+                <label>Rotation</label>
+                <input type="range" id="rotationControl" min="0.1" max="2.0" step="0.1" value="0.8">
+                <div class="value" id="rotationValue">0.8</div>
+            </div>
         </div>
     </div>
 
@@ -119,12 +147,12 @@
         // Canvas setup
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // UI elements
         const generationElement = document.getElementById('generation');
         const livingCellsElement = document.getElementById('livingCells');
         const timeSliceElement = document.getElementById('timeSlice');
         const activeFiguresElement = document.getElementById('activeFigures');
-        const rotationSpeedElement = document.getElementById('rotationSpeed');
-        const complexityElement = document.getElementById('complexity');
         const playPauseButton = document.getElementById('playPause');
         const resetButton = document.getElementById('reset');
         const randomizeButton = document.getElementById('randomize');
@@ -133,23 +161,24 @@
         const speedValue = document.getElementById('speedValue');
         const rotationControl = document.getElementById('rotationControl');
         const rotationValue = document.getElementById('rotationValue');
-        const complexityControl = document.getElementById('complexityControl');
-        const complexityValue = document.getElementById('complexityValue');
 
         // Set canvas size
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
 
-        // 4D grid parameters
-        const GRID_SIZE = 16;
-        const CELL_SIZE = 12;
-        const MAX_DISTANCE = 2.5;
+        // 4D grid parameters - optimized for mobile
+        const GRID_SIZE = 14;
+        const CELL_SIZE = 10;
+        const MAX_DISTANCE = 2.2;
 
         // 4D grid
         let grid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
         let nextGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
 
-        // Hyperfigures - each with its own rotation and position
+        // Hyperfigures
         let hyperfigures = [];
         let nextFigureId = 0;
 
@@ -158,18 +187,17 @@
         let generation = 0;
         let animationId;
         let lastUpdateTime = 0;
-        let speed = 0.05;
-        let rotationSpeed = 0.5;
-        let patternComplexity = 5;
+        let speed = 0.08;
+        let rotationSpeed = 0.8;
 
-        // Global camera parameters
+        // Global camera
         let cameraAngleX = 0;
         let cameraAngleY = 0;
         let cameraAngleZ = 0;
 
         // Hyperfigure class
         class Hyperfigure {
-            constructor(x, y, z, w, pattern, complexity) {
+            constructor(x, y, z, w, pattern) {
                 this.id = nextFigureId++;
                 this.x = x;
                 this.y = y;
@@ -180,127 +208,85 @@
                 this.localRotationY = Math.random() * Math.PI * 2;
                 this.localRotationZ = Math.random() * Math.PI * 2;
                 this.localRotationW = Math.random() * Math.PI * 2;
-                this.rotationSpeedX = (Math.random() - 0.5) * rotationSpeed * 0.01;
-                this.rotationSpeedY = (Math.random() - 0.5) * rotationSpeed * 0.01;
-                this.rotationSpeedZ = (Math.random() - 0.5) * rotationSpeed * 0.01;
-                this.rotationSpeedW = (Math.random() - 0.5) * rotationSpeed * 0.01;
+                this.rotationSpeedX = (Math.random() - 0.5) * rotationSpeed * 0.008;
+                this.rotationSpeedY = (Math.random() - 0.5) * rotationSpeed * 0.008;
+                this.rotationSpeedZ = (Math.random() - 0.5) * rotationSpeed * 0.008;
+                this.rotationSpeedW = (Math.random() - 0.5) * rotationSpeed * 0.008;
                 this.age = 0;
-                this.complexity = complexity;
-                this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
-                this.applyToGrid();
+                this.color = `hsl(${Math.random() * 360}, 80%, 65%)`;
             }
 
-            // Apply this figure to the grid
+            // Apply to grid with current rotation
             applyToGrid() {
                 for (let point of this.pattern) {
                     const [px, py, pz, pw] = this.rotateLocal(point);
-                    const gx = (this.x + px + GRID_SIZE) % GRID_SIZE;
-                    const gy = (this.y + py + GRID_SIZE) % GRID_SIZE;
-                    const gz = (this.z + pz + GRID_SIZE) % GRID_SIZE;
-                    const gw = (this.w + pw + GRID_SIZE) % GRID_SIZE;
+                    const gx = (this.x + Math.round(px) + GRID_SIZE) % GRID_SIZE;
+                    const gy = (this.y + Math.round(py) + GRID_SIZE) % GRID_SIZE;
+                    const gz = (this.z + Math.round(pz) + GRID_SIZE) % GRID_SIZE;
+                    const gw = (this.w + Math.round(pw) + GRID_SIZE) % GRID_SIZE;
                     setCell(gx, gy, gz, gw, 1);
                 }
             }
 
-            // Rotate a point in local 4D space
+            // 4D rotation
             rotateLocal([x, y, z, w]) {
-                // Simple 4D rotation - two independent 2D rotations
                 const cosW = Math.cos(this.localRotationW);
                 const sinW = Math.sin(this.localRotationW);
                 const cosZ = Math.cos(this.localRotationZ);
                 const sinZ = Math.sin(this.localRotationZ);
                 
-                // Rotate in XW plane
                 const x1 = x * cosW - w * sinW;
                 const w1 = x * sinW + w * cosW;
-                
-                // Rotate in YZ plane
                 const y1 = y * cosZ - z * sinZ;
                 const z1 = y * sinZ + z * cosZ;
                 
                 return [x1, y1, z1, w1];
             }
 
-            // Update rotation
             update() {
                 this.age++;
                 this.localRotationX += this.rotationSpeedX;
                 this.localRotationY += this.rotationSpeedY;
                 this.localRotationZ += this.rotationSpeedZ;
                 this.localRotationW += this.rotationSpeedW;
-                
-                // Gradually change rotation speeds for more dynamic behavior
-                if (this.age % 100 === 0) {
-                    this.rotationSpeedX += (Math.random() - 0.5) * 0.002;
-                    this.rotationSpeedY += (Math.random() - 0.5) * 0.002;
-                    this.rotationSpeedZ += (Math.random() - 0.5) * 0.002;
-                    this.rotationSpeedW += (Math.random() - 0.5) * 0.002;
-                }
             }
         }
 
-        // 4D pattern generators
+        // Pattern generators - simplified for better Conway behavior
         const patternGenerators = {
-            glider: (complexity) => {
-                const size = Math.max(2, Math.floor(complexity / 2));
-                const pattern = [];
-                for (let i = 0; i < size; i++) {
-                    pattern.push([i, 0, 0, 0]);
-                    pattern.push([0, i, 0, 0]);
-                    pattern.push([0, 0, i, 0]);
-                    pattern.push([0, 0, 0, i]);
-                }
-                return pattern;
-            },
+            glider: () => [
+                [0,0,0,0], [1,0,0,0], [2,0,0,0], [0,1,0,0], [1,2,0,0],
+                [0,0,1,0], [1,0,1,0], [0,0,0,1]
+            ],
             
-            oscillator: (complexity) => {
-                const pattern = [];
-                const radius = Math.max(1, Math.floor(complexity / 3));
-                for (let w = -radius; w <= radius; w++) {
-                    for (let z = -radius; z <= radius; z++) {
-                        for (let y = -radius; y <= radius; y++) {
-                            for (let x = -radius; x <= radius; x++) {
-                                if (Math.abs(x) + Math.abs(y) + Math.abs(z) + Math.abs(w) === radius) {
-                                    pattern.push([x, y, z, w]);
-                                }
-                            }
-                        }
-                    }
-                }
-                return pattern;
-            },
+            oscillator: () => [
+                [-1,0,0,0], [0,0,0,0], [1,0,0,0],
+                [0,-1,0,0], [0,1,0,0],
+                [0,0,-1,0], [0,0,1,0],
+                [0,0,0,-1], [0,0,0,1]
+            ],
             
-            random: (complexity) => {
+            random: () => {
                 const pattern = [];
-                const count = Math.max(5, complexity * 3);
+                const count = 8 + Math.floor(Math.random() * 8);
                 for (let i = 0; i < count; i++) {
                     pattern.push([
-                        Math.floor(Math.random() * 5) - 2,
-                        Math.floor(Math.random() * 5) - 2,
-                        Math.floor(Math.random() * 5) - 2,
-                        Math.floor(Math.random() * 5) - 2
+                        Math.floor(Math.random() * 3) - 1,
+                        Math.floor(Math.random() * 3) - 1,
+                        Math.floor(Math.random() * 3) - 1,
+                        Math.floor(Math.random() * 3) - 1
                     ]);
                 }
                 return pattern;
             },
             
-            hypercube: (complexity) => {
-                const pattern = [];
-                const size = Math.max(1, Math.floor(complexity / 4));
-                for (let w = -size; w <= size; w += size * 2) {
-                    for (let z = -size; z <= size; z += size * 2) {
-                        for (let y = -size; y <= size; y += size * 2) {
-                            for (let x = -size; x <= size; x += size * 2) {
-                                pattern.push([x, y, z, w]);
-                            }
-                        }
-                    }
-                }
-                return pattern;
-            }
+            cube: () => [
+                [-1,-1,-1,-1], [1,-1,-1,-1], [-1,1,-1,-1], [1,1,-1,-1],
+                [-1,-1,1,-1], [1,-1,1,-1], [-1,1,1,-1], [1,1,1,-1]
+            ]
         };
 
-        // Convert 4D coordinates to array index
+        // Grid functions
         function getIndex(x, y, z, w) {
             x = (x + GRID_SIZE) % GRID_SIZE;
             y = (y + GRID_SIZE) % GRID_SIZE;
@@ -309,17 +295,14 @@
             return x + (y * GRID_SIZE) + (z * GRID_SIZE * GRID_SIZE) + (w * GRID_SIZE * GRID_SIZE * GRID_SIZE);
         }
 
-        // Get cell state
         function getCell(x, y, z, w) {
             return grid[getIndex(x, y, z, w)];
         }
 
-        // Set cell state
         function setCell(x, y, z, w, state) {
             grid[getIndex(x, y, z, w)] = state;
         }
 
-        // Count living neighbors in 4D
         function countNeighbors(x, y, z, w) {
             let count = 0;
             for (let dw = -1; dw <= 1; dw++) {
@@ -337,15 +320,14 @@
             return count;
         }
 
-        // Update the grid according to Conway's rules
+        // Update grid with Conway's rules - FIXED living cells counter
         function updateGrid() {
             let livingCells = 0;
-            grid.fill(0);
             
-            // Re-apply all hyperfigures with their current rotations
-            for (let figure of hyperfigures) {
-                figure.applyToGrid();
-                figure.update();
+            // Clear next grid and count current living cells
+            nextGrid.fill(0);
+            for (let i = 0; i < grid.length; i++) {
+                if (grid[i] === 1) livingCells++;
             }
             
             // Apply Conway's rules
@@ -358,18 +340,12 @@
                             const cell = grid[index];
                             
                             if (cell === 1) {
-                                if (neighbors < 2 || neighbors > 3) {
-                                    nextGrid[index] = 0;
-                                } else {
+                                if (neighbors === 2 || neighbors === 3) {
                                     nextGrid[index] = 1;
-                                    livingCells++;
                                 }
                             } else {
                                 if (neighbors === 3) {
                                     nextGrid[index] = 1;
-                                    livingCells++;
-                                } else {
-                                    nextGrid[index] = 0;
                                 }
                             }
                         }
@@ -377,93 +353,96 @@
                 }
             }
             
-            [grid, nextGrid] = [nextGrid, grid];
-            generation++;
+            // Update hyperfigures and re-apply them
+            for (let figure of hyperfigures) {
+                figure.update();
+            }
             
-            // Update UI
+            // Clear grid and re-apply figures
+            grid.fill(0);
+            for (let figure of hyperfigures) {
+                figure.applyToGrid();
+            }
+            
+            // Apply Conway evolution
+            for (let i = 0; i < grid.length; i++) {
+                if (nextGrid[i] === 1) {
+                    grid[i] = 1;
+                }
+            }
+            
+            // Count actual living cells after all operations
+            livingCells = 0;
+            for (let i = 0; i < grid.length; i++) {
+                if (grid[i] === 1) livingCells++;
+            }
+            
+            generation++;
             generationElement.textContent = generation;
             livingCellsElement.textContent = livingCells;
             activeFiguresElement.textContent = hyperfigures.length;
-            rotationSpeedElement.textContent = rotationSpeed.toFixed(1);
-            complexityElement.textContent = Math.round(calculateComplexity());
         }
 
-        // Calculate pattern complexity
-        function calculateComplexity() {
-            let complexity = 0;
-            for (let w = 0; w < GRID_SIZE; w++) {
-                for (let z = 0; z < GRID_SIZE; z++) {
-                    for (let y = 0; y < GRID_SIZE; y++) {
-                        for (let x = 0; x < GRID_SIZE; x++) {
-                            if (getCell(x, y, z, w)) {
-                                complexity += countNeighbors(x, y, z, w);
-                            }
-                        }
-                    }
-                }
-            }
-            return complexity / 100;
-        }
-
-        // Initialize with random hyperfigures
+        // Initialize with good starting patterns
         function initializeGrid() {
             grid.fill(0);
             nextGrid.fill(0);
             hyperfigures = [];
             
-            // Add initial figures
-            for (let i = 0; i < 3; i++) {
-                addRandomFigure();
+            // Add diverse starting figures
+            const types = Object.keys(patternGenerators);
+            for (let i = 0; i < 4; i++) {
+                const type = types[i % types.length];
+                const pattern = patternGenerators[type]();
+                const x = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+                const y = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+                const z = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+                const w = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+                hyperfigures.push(new Hyperfigure(x, y, z, w, pattern));
             }
             
             generation = 0;
             updateUI();
         }
 
-        // Add a random hyperfigure
         function addRandomFigure() {
             const types = Object.keys(patternGenerators);
             const type = types[Math.floor(Math.random() * types.length)];
-            const pattern = patternGenerators[type](patternComplexity);
+            const pattern = patternGenerators[type]();
             
-            const x = Math.floor(Math.random() * GRID_SIZE);
-            const y = Math.floor(Math.random() * GRID_SIZE);
-            const z = Math.floor(Math.random() * GRID_SIZE);
-            const w = Math.floor(Math.random() * GRID_SIZE);
+            const x = 2 + Math.floor(Math.random() * (GRID_SIZE - 4));
+            const y = 2 + Math.floor(Math.random() * (GRID_SIZE - 4));
+            const z = 2 + Math.floor(Math.random() * (GRID_SIZE - 4));
+            const w = 2 + Math.floor(Math.random() * (GRID_SIZE - 4));
             
-            hyperfigures.push(new Hyperfigure(x, y, z, w, pattern, patternComplexity));
+            hyperfigures.push(new Hyperfigure(x, y, z, w, pattern));
         }
 
-        // Randomize the entire grid
         function randomizeGrid() {
             hyperfigures = [];
-            for (let i = 0; i < 5 + patternComplexity; i++) {
+            for (let i = 0; i < 6; i++) {
                 addRandomFigure();
             }
             generation = 0;
             updateUI();
         }
 
-        // Update UI elements
         function updateUI() {
             generationElement.textContent = generation;
             activeFiguresElement.textContent = hyperfigures.length;
         }
 
-        // Rotate a 3D point
+        // 3D rotation for projection
         function rotatePoint(x, y, z, angleX, angleY, angleZ) {
-            const cosX = Math.cos(angleX);
-            const sinX = Math.sin(angleX);
+            const cosX = Math.cos(angleX), sinX = Math.sin(angleX);
             let y1 = y * cosX - z * sinX;
             let z1 = y * sinX + z * cosX;
             
-            const cosY = Math.cos(angleY);
-            const sinY = Math.sin(angleY);
+            const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
             let x1 = x * cosY + z1 * sinY;
             let z2 = -x * sinY + z1 * cosY;
             
-            const cosZ = Math.cos(angleZ);
-            const sinZ = Math.sin(angleZ);
+            const cosZ = Math.cos(angleZ), sinZ = Math.sin(angleZ);
             let x2 = x1 * cosZ - y1 * sinZ;
             let y2 = x1 * sinZ + y1 * cosZ;
             
@@ -472,7 +451,7 @@
 
         // Project 4D to 3D
         function project4DTo3D(x, y, z, w) {
-            const timeSlice = Math.floor(generation / 15) % GRID_SIZE;
+            const timeSlice = Math.floor(generation / 12) % GRID_SIZE;
             timeSliceElement.textContent = timeSlice;
             
             const wDistance = Math.min(
@@ -483,38 +462,31 @@
             
             if (wDistance > 2) return null;
             
-            const scale = 1 - (wDistance * 0.15);
+            const scale = 1 - (wDistance * 0.2);
             const centeredX = (x - GRID_SIZE/2) * scale * CELL_SIZE;
             const centeredY = (y - GRID_SIZE/2) * scale * CELL_SIZE;
             const centeredZ = (z - GRID_SIZE/2) * scale * CELL_SIZE;
             
             const rotated = rotatePoint(centeredX, centeredY, centeredZ, cameraAngleX, cameraAngleY, cameraAngleZ);
-            const perspective = 1 + rotated.z / 800;
+            const perspective = 1 + rotated.z / 600;
             const screenX = rotated.x / perspective;
             const screenY = rotated.y / perspective;
             
             return {
-                x: screenX,
-                y: screenY,
-                z: rotated.z,
-                wDistance: wDistance,
-                alpha: 1 - wDistance * 0.3,
-                originalX: x,
-                originalY: y,
-                originalZ: z,
-                originalW: w
+                x: screenX, y: screenY, z: rotated.z,
+                wDistance, alpha: 1 - wDistance * 0.4,
+                originalX: x, originalY: y, originalZ: z, originalW: w
             };
         }
 
-        // Draw connections between cells
+        // Draw connections
         function drawConnections(cells) {
-            ctx.strokeStyle = 'rgba(100, 200, 255, 0.08)';
-            ctx.lineWidth = 0.3;
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
+            ctx.lineWidth = 0.4;
             
             for (let i = 0; i < cells.length; i++) {
                 const cell1 = cells[i];
-                
-                for (let j = i + 1; j < cells.length; j++) {
+                for (let j = i + 1; j < Math.min(cells.length, i + 20); j++) {
                     const cell2 = cells[j];
                     
                     const dx = Math.abs(cell1.originalX - cell2.originalX);
@@ -530,7 +502,7 @@
                     const distance = Math.sqrt(distX*distX + distY*distY + distZ*distZ + distW*distW);
                     
                     if (distance <= MAX_DISTANCE) {
-                        const alpha = 0.08 * (1 - distance / MAX_DISTANCE);
+                        const alpha = 0.15 * (1 - distance / MAX_DISTANCE);
                         ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
                         
                         ctx.beginPath();
@@ -542,49 +514,50 @@
             }
         }
 
-        // Draw the grid
+        // Draw grid
         function drawGrid() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             
             const visibleCells = [];
+            let cellCount = 0;
             
-            for (let w = 0; w < GRID_SIZE; w++) {
-                for (let z = 0; z < GRID_SIZE; z++) {
-                    for (let y = 0; y < GRID_SIZE; y++) {
-                        for (let x = 0; x < GRID_SIZE; x++) {
+            for (let w = 0; w < GRID_SIZE && cellCount < 500; w++) {
+                for (let z = 0; z < GRID_SIZE && cellCount < 500; z++) {
+                    for (let y = 0; y < GRID_SIZE && cellCount < 500; y++) {
+                        for (let x = 0; x < GRID_SIZE && cellCount < 500; x++) {
                             if (getCell(x, y, z, w) === 1) {
                                 const projected = project4DTo3D(x, y, z, w);
                                 if (projected) {
-                                    // Find which hyperfigure this cell belongs to
-                                    let figureColor = '#7fffd4';
+                                    let color = '#7fffd4';
                                     for (let figure of hyperfigures) {
                                         for (let point of figure.pattern) {
                                             const [px, py, pz, pw] = figure.rotateLocal(point);
-                                            const gx = (figure.x + px + GRID_SIZE) % GRID_SIZE;
-                                            const gy = (figure.y + py + GRID_SIZE) % GRID_SIZE;
-                                            const gz = (figure.z + pz + GRID_SIZE) % GRID_SIZE;
-                                            const gw = (figure.w + pw + GRID_SIZE) % GRID_SIZE;
+                                            const gx = (figure.x + Math.round(px) + GRID_SIZE) % GRID_SIZE;
+                                            const gy = (figure.y + Math.round(py) + GRID_SIZE) % GRID_SIZE;
+                                            const gz = (figure.z + Math.round(pz) + GRID_SIZE) % GRID_SIZE;
+                                            const gw = (figure.w + Math.round(pw) + GRID_SIZE) % GRID_SIZE;
                                             
                                             if (gx === x && gy === y && gz === z && gw === w) {
-                                                figureColor = figure.color;
+                                                color = figure.color;
                                                 break;
                                             }
                                         }
                                     }
                                     
-                                    const radius = CELL_SIZE * 0.25 * (1 - projected.wDistance * 0.2);
+                                    const radius = Math.max(1, CELL_SIZE * 0.2 * (1 - projected.wDistance * 0.3));
                                     
                                     ctx.globalAlpha = projected.alpha;
-                                    ctx.fillStyle = figureColor;
+                                    ctx.fillStyle = color;
                                     ctx.beginPath();
                                     ctx.arc(projected.x, projected.y, radius, 0, Math.PI * 2);
                                     ctx.fill();
                                     
                                     visibleCells.push(projected);
+                                    cellCount++;
                                 }
                             }
                         }
@@ -592,7 +565,10 @@
                 }
             }
             
-            drawConnections(visibleCells);
+            if (visibleCells.length > 0) {
+                drawConnections(visibleCells);
+            }
+            
             ctx.restore();
         }
 
@@ -603,10 +579,8 @@
                 lastUpdateTime = currentTime;
             }
             
-            // Update global camera
             cameraAngleY += 0.001 * rotationSpeed;
-            cameraAngleX += 0.0005 * rotationSpeed;
-            cameraAngleZ += 0.0003 * rotationSpeed;
+            cameraAngleX += 0.0007 * rotationSpeed;
             
             drawGrid();
             animationId = requestAnimationFrame(animate);
@@ -615,12 +589,12 @@
         // Event listeners
         playPauseButton.addEventListener('click', () => {
             isPlaying = !isPlaying;
-            playPauseButton.textContent = isPlaying ? 'Pause' : 'Play';
+            playPauseButton.textContent = isPlaying ? '⏸️ Pause' : '▶️ Play';
         });
 
         resetButton.addEventListener('click', initializeGrid);
         randomizeButton.addEventListener('click', randomizeGrid);
-        addFigureButton.addEventListener('click', () => addRandomFigure());
+        addFigureButton.addEventListener('click', addRandomFigure);
 
         speedControl.addEventListener('input', () => {
             speed = parseFloat(speedControl.value);
@@ -630,25 +604,16 @@
         rotationControl.addEventListener('input', () => {
             rotationSpeed = parseFloat(rotationControl.value);
             rotationValue.textContent = rotationSpeed.toFixed(1);
-            
-            // Update all existing figures
-            for (let figure of hyperfigures) {
-                figure.rotationSpeedX *= (rotationSpeed / parseFloat(rotationControl.defaultValue));
-                figure.rotationSpeedY *= (rotationSpeed / parseFloat(rotationControl.defaultValue));
-                figure.rotationSpeedZ *= (rotationSpeed / parseFloat(rotationControl.defaultValue));
-                figure.rotationSpeedW *= (rotationSpeed / parseFloat(rotationControl.defaultValue));
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Prevent touch scroll
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                e.preventDefault();
             }
-        });
-
-        complexityControl.addEventListener('input', () => {
-            patternComplexity = parseInt(complexityControl.value);
-            complexityValue.textContent = patternComplexity;
-        });
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+        }, { passive: false });
 
         // Initialize and start
         initializeGrid();
