@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Conway - Enhanced</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            touch-action: manipulation;
+        }
+        canvas {
+            display: block;
+        }
+        .ui-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            z-index: 1000;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #7fffd4;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 12px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 40px;
+        }
+        button:active {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(0.95);
+        }
+        .sliders {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slider-container label {
+            color: #ccc;
+            font-size: 12px;
+            min-width: 90px;
+        }
+        input[type="range"] {
+            flex: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #7fffd4;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(127, 255, 212, 0.5);
+        }
+        .value {
+            color: #7fffd4;
+            font-size: 12px;
+            min-width: 40px;
+            text-align: right;
+        }
+        @media (max-width: 480px) {
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="ui-container">
+        <div class="stats">
+            <div class="stat">Gen: <span id="generation">0</span></div>
+            <div class="stat">Cells: <span id="livingCells">0</span></div>
+            <div class="stat">W-Slice: <span id="timeSlice">0</span></div>
+            <div class="stat">Figures: <span id="activeFigures">0</span></div>
+            <div class="stat">Color Set: <span id="colorSet">Default</span></div>
+        </div>
+        
+        <div class="controls">
+            <button id="playPause">⏸️ Pause</button>
+            <button id="reset">🔄 Reset</button>
+            <button id="randomize">🎲 Random</button>
+            <button id="addFigure">✨ Add</button>
+            <button id="nextColors">🎨 Colors</button>
+            <button id="morphMode">🌀 Morph</button>
+        </div>
+        
+        <div class="sliders">
+            <div class="slider-container">
+                <label>Speed</label>
+                <input type="range" id="speedControl" min="0.01" max="0.5" step="0.01" value="0.1">
+                <div class="value" id="speedValue">0.10</div>
+            </div>
+            <div class="slider-container">
+                <label>Rotation</label>
+                <input type="range" id="rotationControl" min="0.1" max="3.0" step="0.1" value="1.2">
+                <div class="value" id="rotationValue">1.2</div>
+            </div>
+            <div class="slider-container">
+                <label>Morph Speed</label>
+                <input type="range" id="morphControl" min="0.1" max="2.0" step="0.1" value="0.8">
+                <div class="value" id="morphValue">0.8</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced color schemes from https://yus.github.io/colors.html
+        const colorSchemes = [
+            // Default aqua scheme
+            {
+                name: "Aqua",
+                colors: ['#7fffd4', '#00ffaa', '#00cc88', '#00aaff', '#0088cc'],
+                bg: 'rgba(0, 0, 0, 0.2)'
+            },
+            // Neon scheme
+            {
+                name: "Neon",
+                colors: ['#ff00ff', '#00ffff', '#ffff00', '#ff0088', '#8800ff'],
+                bg: 'rgba(0, 0, 0, 0.25)'
+            },
+            // Fire scheme
+            {
+                name: "Fire", 
+                colors: ['#ff4400', '#ff8800', '#ffaa00', '#ff2200', '#ff6600'],
+                bg: 'rgba(20, 0, 0, 0.3)'
+            },
+            // Ice scheme
+            {
+                name: "Ice",
+                colors: ['#aaffff', '#88eeff', '#66ddff', '#44ccff', '#22bbff'],
+                bg: 'rgba(0, 10, 20, 0.25)'
+            },
+            // Forest scheme
+            {
+                name: "Forest",
+                colors: ['#00ff88', '#44ff44', '#88ff00', '#00cc66', '#22aa44'],
+                bg: 'rgba(0, 10, 0, 0.25)'
+            },
+            // Sunset scheme
+            {
+                name: "Sunset",
+                colors: ['#ff8844', '#ffaa44', '#ffcc44', '#ff6644', '#ff2288'],
+                bg: 'rgba(20, 10, 0, 0.25)'
+            },
+            // Ocean scheme
+            {
+                name: "Ocean",
+                colors: ['#4488ff', '#44aaff', '#44ccff', '#4466ff', '#4422ff'],
+                bg: 'rgba(0, 10, 20, 0.25)'
+            },
+            // Galaxy scheme
+            {
+                name: "Galaxy",
+                colors: ['#aa44ff', '#8844ff', '#6644ff', '#ff44aa', '#ff4488'],
+                bg: 'rgba(10, 0, 20, 0.3)'
+            }
+        ];
+
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI elements
+        const generationElement = document.getElementById('generation');
+        const livingCellsElement = document.getElementById('livingCells');
+        const timeSliceElement = document.getElementById('timeSlice');
+        const activeFiguresElement = document.getElementById('activeFigures');
+        const colorSetElement = document.getElementById('colorSet');
+        const playPauseButton = document.getElementById('playPause');
+        const resetButton = document.getElementById('reset');
+        const randomizeButton = document.getElementById('randomize');
+        const addFigureButton = document.getElementById('addFigure');
+        const nextColorsButton = document.getElementById('nextColors');
+        const morphModeButton = document.getElementById('morphMode');
+        const speedControl = document.getElementById('speedControl');
+        const speedValue = document.getElementById('speedValue');
+        const rotationControl = document.getElementById('rotationControl');
+        const rotationValue = document.getElementById('rotationValue');
+        const morphControl = document.getElementById('morphControl');
+        const morphValue = document.getElementById('morphValue');
+
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+
+        // 4D grid parameters
+        const GRID_SIZE = 16;
+        const CELL_SIZE = 11;
+        const MAX_DISTANCE = 2.5;
+
+        // Double buffering for smooth morphing
+        let currentGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+        let nextGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+        let displayGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+
+        // Hyperfigures
+        let hyperfigures = [];
+        let nextFigureId = 0;
+
+        // Animation control
+        let isPlaying = true;
+        let generation = 0;
+        let animationId;
+        let lastUpdateTime = 0;
+        let speed = 0.1;
+        let rotationSpeed = 1.2;
+        let morphSpeed = 0.8;
+        let morphProgress = 0;
+        let isMorphing = false;
+        let currentColorScheme = 0;
+
+        // Global camera
+        let cameraAngleX = 0;
+        let cameraAngleY = 0;
+        let cameraAngleZ = 0;
+
+        // Enhanced Hyperfigure class with continuous evolution
+        class Hyperfigure {
+            constructor(x, y, z, w, pattern) {
+                this.id = nextFigureId++;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
+                this.originalPattern = pattern;
+                this.currentPattern = [...pattern];
+                this.localRotationX = Math.random() * Math.PI * 2;
+                this.localRotationY = Math.random() * Math.PI * 2;
+                this.localRotationZ = Math.random() * Math.PI * 2;
+                this.localRotationW = Math.random() * Math.PI * 2;
+                this.rotationSpeedX = (Math.random() - 0.5) * rotationSpeed * 0.01;
+                this.rotationSpeedY = (Math.random() - 0.5) * rotationSpeed * 0.01;
+                this.rotationSpeedZ = (Math.random() - 0.5) * rotationSpeed * 0.01;
+                this.rotationSpeedW = (Math.random() - 0.5) * rotationSpeed * 0.01;
+                this.age = 0;
+                this.energy = 1.0;
+                this.evolutionPhase = 0;
+                this.color = this.getRandomColor();
+            }
+
+            getRandomColor() {
+                const scheme = colorSchemes[currentColorScheme];
+                return scheme.colors[Math.floor(Math.random() * scheme.colors.length)];
+            }
+
+            // Apply to grid with current rotation and evolution
+            applyToGrid() {
+                for (let point of this.currentPattern) {
+                    const [px, py, pz, pw] = this.rotateLocal(point);
+                    const gx = (this.x + Math.round(px) + GRID_SIZE) % GRID_SIZE;
+                    const gy = (this.y + Math.round(py) + GRID_SIZE) % GRID_SIZE;
+                    const gz = (this.z + Math.round(pz) + GRID_SIZE) % GRID_SIZE;
+                    const gw = (this.w + Math.round(pw) + GRID_SIZE) % GRID_SIZE;
+                    setCell(gx, gy, gz, gw, 1);
+                }
+            }
+
+            // 4D rotation with evolution
+            rotateLocal([x, y, z, w]) {
+                const cosW = Math.cos(this.localRotationW + this.evolutionPhase);
+                const sinW = Math.sin(this.localRotationW + this.evolutionPhase);
+                const cosZ = Math.cos(this.localRotationZ + this.evolutionPhase * 0.7);
+                const sinZ = Math.sin(this.localRotationZ + this.evolutionPhase * 0.7);
+                
+                const x1 = x * cosW - w * sinW;
+                const w1 = x * sinW + w * cosW;
+                const y1 = y * cosZ - z * sinZ;
+                const z1 = y * sinZ + z * cosZ;
+                
+                // Add some evolution to the pattern itself
+                const evolutionScale = 1 + Math.sin(this.evolutionPhase) * 0.2;
+                return [x1 * evolutionScale, y1 * evolutionScale, z1 * evolutionScale, w1 * evolutionScale];
+            }
+
+            update() {
+                this.age++;
+                this.localRotationX += this.rotationSpeedX;
+                this.localRotationY += this.rotationSpeedY;
+                this.localRotationZ += this.rotationSpeedZ;
+                this.localRotationW += this.rotationSpeedW;
+                
+                // Continuous evolution within generation
+                this.evolutionPhase += 0.02 * morphSpeed;
+                
+                // Gradually change rotation for more organic motion
+                if (this.age % 30 === 0) {
+                    this.rotationSpeedX += (Math.random() - 0.5) * 0.002;
+                    this.rotationSpeedY += (Math.random() - 0.5) * 0.002;
+                    this.rotationSpeedZ += (Math.random() - 0.5) * 0.002;
+                    this.rotationSpeedW += (Math.random() - 0.5) * 0.002;
+                }
+            }
+        }
+
+        // Enhanced pattern generators for better Conway behavior
+        const patternGenerators = {
+            glider: () => [
+                [0,0,0,0], [1,0,0,0], [2,0,0,0], [0,1,0,0], [1,2,0,0],
+                [0,0,1,0], [1,0,1,0], [0,0,0,1], [2,1,0,0]
+            ],
+            
+            oscillator: () => [
+                [-1,0,0,0], [0,0,0,0], [1,0,0,0],
+                [0,-1,0,0], [0,1,0,0], [0,0,-1,0], [0,0,1,0],
+                [0,0,0,-1], [0,0,0,1], [-1,-1,0,0], [1,1,0,0]
+            ],
+            
+            random: () => {
+                const pattern = [];
+                const count = 10 + Math.floor(Math.random() * 12);
+                for (let i = 0; i < count; i++) {
+                    pattern.push([
+                        Math.floor(Math.random() * 5) - 2,
+                        Math.floor(Math.random() * 5) - 2,
+                        Math.floor(Math.random() * 5) - 2,
+                        Math.floor(Math.random() * 5) - 2
+                    ]);
+                }
+                return pattern;
+            },
+            
+            hypercube: () => [
+                [-1,-1,-1,-1], [1,-1,-1,-1], [-1,1,-1,-1], [1,1,-1,-1],
+                [-1,-1,1,-1], [1,-1,1,-1], [-1,1,1,-1], [1,1,1,-1],
+                [-1,-1,-1,1], [1,-1,-1,1], [-1,1,-1,1], [1,1,-1,1],
+                [-1,-1,1,1], [1,-1,1,1], [-1,1,1,1], [1,1,1,1]
+            ],
+            
+            spiral: () => {
+                const pattern = [];
+                const points = 16;
+                for (let i = 0; i < points; i++) {
+                    const angle = (i / points) * Math.PI * 2;
+                    pattern.push([
+                        Math.round(Math.cos(angle) * 2),
+                        Math.round(Math.sin(angle) * 2),
+                        Math.round(Math.cos(angle * 2) * 1),
+                        Math.round(Math.sin(angle * 2) * 1)
+                    ]);
+                }
+                return pattern;
+            }
+        };
+
+        // Grid functions
+        function getIndex(x, y, z, w) {
+            x = (x + GRID_SIZE) % GRID_SIZE;
+            y = (y + GRID_SIZE) % GRID_SIZE;
+            z = (z + GRID_SIZE) % GRID_SIZE;
+            w = (w + GRID_SIZE) % GRID_SIZE;
+            return x + (y * GRID_SIZE) + (z * GRID_SIZE * GRID_SIZE) + (w * GRID_SIZE * GRID_SIZE * GRID_SIZE);
+        }
+
+        function getCell(grid, x, y, z, w) {
+            return grid[getIndex(x, y, z, w)];
+        }
+
+        function setCell(x, y, z, w, state) {
+            currentGrid[getIndex(x, y, z, w)] = state;
+        }
+
+        function countNeighbors(grid, x, y, z, w) {
+            let count = 0;
+            for (let dw = -1; dw <= 1; dw++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0 && dz === 0 && dw === 0) continue;
+                            if (getCell(grid, x + dx, y + dy, z + dz, w + dw)) {
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
+        // Enhanced Conway evolution with intra-generation continuity
+        function evolveGrid() {
+            let livingCells = 0;
+            
+            // Apply Conway's rules to create next generation
+            nextGrid.fill(0);
+            
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            const neighbors = countNeighbors(currentGrid, x, y, z, w);
+                            const cell = getCell(currentGrid, x, y, z, w);
+                            
+                            if (cell === 1) {
+                                if (neighbors === 2 || neighbors === 3) {
+                                    nextGrid[getIndex(x, y, z, w)] = 1;
+                                    livingCells++;
+                                }
+                            } else {
+                                if (neighbors === 3) {
+                                    nextGrid[getIndex(x, y, z, w)] = 1;
+                                    livingCells++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Update hyperfigures for continuous evolution
+            for (let figure of hyperfigures) {
+                figure.update();
+            }
+            
+            // Clear current grid and re-apply evolved figures
+            currentGrid.fill(0);
+            for (let figure of hyperfigures) {
+                figure.applyToGrid();
+            }
+            
+            // Blend Conway evolution with figure patterns
+            for (let i = 0; i < currentGrid.length; i++) {
+                if (nextGrid[i] === 1) {
+                    currentGrid[i] = 1;
+                }
+            }
+            
+            generation++;
+            generationElement.textContent = generation;
+            livingCellsElement.textContent = livingCells;
+            activeFiguresElement.textContent = hyperfigures.length;
+        }
+
+        // Smooth morphing between generations
+        function updateDisplayGrid() {
+            if (isMorphing && morphProgress < 1) {
+                morphProgress += 0.02 * morphSpeed;
+                for (let i = 0; i < displayGrid.length; i++) {
+                    // Smooth interpolation between states
+                    displayGrid[i] = Math.min(1, currentGrid[i] + morphProgress);
+                }
+            } else {
+                // Copy current state
+                for (let i = 0; i < displayGrid.length; i++) {
+                    displayGrid[i] = currentGrid[i];
+                }
+                morphProgress = 0;
+            }
+        }
+
+        // Initialize with diverse patterns
+        function initializeGrid() {
+            currentGrid.fill(0);
+            nextGrid.fill(0);
+            displayGrid.fill(0);
+            hyperfigures = [];
+            morphProgress = 0;
+            
+            // Add diverse starting figures
+            const types = Object.keys(patternGenerators);
+            for (let i = 0; i < 5; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const pattern = patternGenerators[type]();
+                const x = 4 + Math.floor(Math.random() * (GRID_SIZE - 8));
+                const y = 4 + Math.floor(Math.random() * (GRID_SIZE - 8));
+                const z = 4 + Math.floor(Math.random() * (GRID_SIZE - 8));
+                const w = 4 + Math.floor(Math.random() * (GRID_SIZE - 8));
+                hyperfigures.push(new Hyperfigure(x, y, z, w, pattern));
+            }
+            
+            generation = 0;
+            updateUI();
+        }
+
+        function addRandomFigure() {
+            const types = Object.keys(patternGenerators);
+            const type = types[Math.floor(Math.random() * types.length)];
+            const pattern = patternGenerators[type]();
+            
+            const x = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+            const y = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+            const z = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+            const w = 3 + Math.floor(Math.random() * (GRID_SIZE - 6));
+            
+            hyperfigures.push(new Hyperfigure(x, y, z, w, pattern));
+        }
+
+        function randomizeGrid() {
+            hyperfigures = [];
+            for (let i = 0; i < 8; i++) {
+                addRandomFigure();
+            }
+            generation = 0;
+            updateUI();
+        }
+
+        function nextColorScheme() {
+            currentColorScheme = (currentColorScheme + 1) % colorSchemes.length;
+            colorSetElement.textContent = colorSchemes[currentColorScheme].name;
+            
+            // Update all figures with new colors
+            for (let figure of hyperfigures) {
+                figure.color = figure.getRandomColor();
+            }
+        }
+
+        function updateUI() {
+            generationElement.textContent = generation;
+            activeFiguresElement.textContent = hyperfigures.length;
+            colorSetElement.textContent = colorSchemes[currentColorScheme].name;
+        }
+
+        // Enhanced 3D rotation for projection
+        function rotatePoint(x, y, z, angleX, angleY, angleZ) {
+            const cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+            let y1 = y * cosX - z * sinX;
+            let z1 = y * sinX + z * cosX;
+            
+            const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+            let x1 = x * cosY + z1 * sinY;
+            let z2 = -x * sinY + z1 * cosY;
+            
+            const cosZ = Math.cos(angleZ), sinZ = Math.sin(angleZ);
+            let x2 = x1 * cosZ - y1 * sinZ;
+            let y2 = x1 * sinZ + y1 * cosZ;
+            
+            return { x: x2, y: y2, z: z2 };
+        }
+
+        // Enhanced projection with smooth transitions
+        function project4DTo3D(x, y, z, w) {
+            const timeSlice = (Math.floor(generation / 15) + morphProgress) % GRID_SIZE;
+            timeSliceElement.textContent = Math.floor(timeSlice);
+            
+            const wDistance = Math.min(
+                Math.abs(w - timeSlice),
+                Math.abs(w - timeSlice - GRID_SIZE),
+                Math.abs(w - timeSlice + GRID_SIZE)
+            );
+            
+            if (wDistance > 3) return null;
+            
+            const scale = 1 - (wDistance * 0.15);
+            const centeredX = (x - GRID_SIZE/2) * scale * CELL_SIZE;
+            const centeredY = (y - GRID_SIZE/2) * scale * CELL_SIZE;
+            const centeredZ = (z - GRID_SIZE/2) * scale * CELL_SIZE;
+            
+            const rotated = rotatePoint(centeredX, centeredY, centeredZ, cameraAngleX, cameraAngleY, cameraAngleZ);
+            const perspective = 1 + rotated.z / 500;
+            const screenX = rotated.x / perspective;
+            const screenY = rotated.y / perspective;
+            
+            return {
+                x: screenX, y: screenY, z: rotated.z,
+                wDistance, 
+                alpha: (1 - wDistance * 0.3) * (0.7 + 0.3 * Math.sin(morphProgress * Math.PI)),
+                originalX: x, originalY: y, originalZ: z, originalW: w
+            };
+        }
+
+        // Draw enhanced connections
+        function drawConnections(cells) {
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.15)';
+            ctx.lineWidth = 0.5;
+            
+            for (let i = 0; i < cells.length; i++) {
+                const cell1 = cells[i];
+                for (let j = i + 1; j < Math.min(cells.length, i + 25); j++) {
+                    const cell2 = cells[j];
+                    
+                    const dx = Math.abs(cell1.originalX - cell2.originalX);
+                    const dy = Math.abs(cell1.originalY - cell2.originalY);
+                    const dz = Math.abs(cell1.originalZ - cell2.originalZ);
+                    const dw = Math.abs(cell1.originalW - cell2.originalW);
+                    
+                    const distX = Math.min(dx, GRID_SIZE - dx);
+                    const distY = Math.min(dy, GRID_SIZE - dy);
+                    const distZ = Math.min(dz, GRID_SIZE - dz);
+                    const distW = Math.min(dw, GRID_SIZE - dw);
+                    
+                    const distance = Math.sqrt(distX*distX + distY*distY + distZ*distZ + distW*distW);
+                    
+                    if (distance <= MAX_DISTANCE) {
+                        const alpha = 0.2 * (1 - distance / MAX_DISTANCE) * cell1.alpha;
+                        ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(cell1.x, cell1.y);
+                        ctx.lineTo(cell2.x, cell2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Enhanced drawing with smooth transitions
+        function drawGrid() {
+            const scheme = colorSchemes[currentColorScheme];
+            ctx.fillStyle = scheme.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            
+            const visibleCells = [];
+            let cellCount = 0;
+            
+            for (let w = 0; w < GRID_SIZE && cellCount < 800; w++) {
+                for (let z = 0; z < GRID_SIZE && cellCount < 800; z++) {
+                    for (let y = 0; y < GRID_SIZE && cellCount < 800; y++) {
+                        for (let x = 0; x < GRID_SIZE && cellCount < 800; x++) {
+                            if (getCell(displayGrid, x, y, z, w) > 0) {
+                                const projected = project4DTo3D(x, y, z, w);
+                                if (projected) {
+                                    let color = scheme.colors[0];
+                                    let foundFigure = false;
+                                    
+                                    for (let figure of hyperfigures) {
+                                        for (let point of figure.originalPattern) {
+                                            const [px, py, pz, pw] = figure.rotateLocal(point);
+                                            const gx = (figure.x + Math.round(px) + GRID_SIZE) % GRID_SIZE;
+                                            const gy = (figure.y + Math.round(py) + GRID_SIZE) % GRID_SIZE;
+                                            const gz = (figure.z + Math.round(pz) + GRID_SIZE) % GRID_SIZE;
+                                            const gw = (figure.w + Math.round(pw) + GRID_SIZE) % GRID_SIZE;
+                                            
+                                            if (gx === x && gy === y && gz === z && gw === w) {
+                                                color = figure.color;
+                                                foundFigure = true;
+                                                break;
+                                            }
+                                        }
+                                        if (foundFigure) break;
+                                    }
+                                    
+                                    const radius = Math.max(1.5, CELL_SIZE * 0.25 * (1 - projected.wDistance * 0.2));
+                                    const pulse = 0.8 + 0.2 * Math.sin(morphProgress * Math.PI * 2);
+                                    const finalRadius = radius * pulse;
+                                    
+                                    ctx.globalAlpha = projected.alpha * getCell(displayGrid, x, y, z, w);
+                                    ctx.fillStyle = color;
+                                    ctx.beginPath();
+                                    ctx.arc(projected.x, projected.y, finalRadius, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    
+                                    // Add glow effect
+                                    ctx.globalAlpha = projected.alpha * 0.3 * getCell(displayGrid, x, y, z, w);
+                                    ctx.beginPath();
+                                    ctx.arc(projected.x, projected.y, finalRadius * 1.5, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    
+                                    visibleCells.push(projected);
+                                    cellCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (visibleCells.length > 0) {
+                drawConnections(visibleCells);
+            }
+            
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate(currentTime) {
+            if (isPlaying && currentTime - lastUpdateTime > 1000 / speed) {
+                evolveGrid();
+                lastUpdateTime = currentTime;
+            }
+            
+            updateDisplayGrid();
+            
+            cameraAngleY += 0.001 * rotationSpeed;
+            cameraAngleX += 0.0005 * rotationSpeed;
+            cameraAngleZ += 0.0003 * rotationSpeed;
+            
+            drawGrid();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        playPauseButton.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseButton.textContent = isPlaying ? '⏸️ Pause' : '▶️ Play';
+        });
+
+        resetButton.addEventListener('click', initializeGrid);
+        randomizeButton.addEventListener('click', randomizeGrid);
+        addFigureButton.addEventListener('click', addRandomFigure);
+        nextColorsButton.addEventListener('click', nextColorScheme);
+        morphModeButton.addEventListener('click', () => {
+            isMorphing = !isMorphing;
+            morphModeButton.textContent = isMorphing ? '🌀 Morphing' : '🌀 Morph';
+        });
+
+        speedControl.addEventListener('input', () => {
+            speed = parseFloat(speedControl.value);
+            speedValue.textContent = speed.toFixed(2);
+        });
+
+        rotationControl.addEventListener('input', () => {
+            rotationSpeed = parseFloat(rotationControl.value);
+            rotationValue.textContent = rotationSpeed.toFixed(1);
+        });
+
+        morphControl.addEventListener('input', () => {
+            morphSpeed = parseFloat(morphControl.value);
+            morphValue.textContent = morphSpeed.toFixed(1);
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Prevent touch scroll
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Initialize and start
+        initializeGrid();
+        animate(0);
+    </script>
+</body>
+</html>
