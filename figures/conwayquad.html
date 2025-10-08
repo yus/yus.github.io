@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Conway - Slow Motion Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        button {
+            background: linear-gradient(to bottom, #444, #222);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(to bottom, #555, #333);
+            transform: translateY(-2px);
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #7fffd4;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="info">
+        <h1>4D Conway's Game of Life</h1>
+        <div>Generation: <span id="generation">0</span></div>
+        <div>Living Cells: <span id="livingCells">0</span></div>
+        <div>Time Slice (W): <span id="timeSlice">0</span></div>
+    </div>
+    <div class="controls">
+        <button id="playPause">Pause</button>
+        <button id="reset">Reset</button>
+        <button id="randomize">Randomize</button>
+        <div class="slider-container">
+            <label for="speedControl">Speed: <span id="speedValue">0.05</span></label>
+            <input type="range" id="speedControl" min="0.01" max="0.2" step="0.01" value="0.05">
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const generationElement = document.getElementById('generation');
+        const livingCellsElement = document.getElementById('livingCells');
+        const timeSliceElement = document.getElementById('timeSlice');
+        const playPauseButton = document.getElementById('playPause');
+        const resetButton = document.getElementById('reset');
+        const randomizeButton = document.getElementById('randomize');
+        const speedControl = document.getElementById('speedControl');
+        const speedValue = document.getElementById('speedValue');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 4D grid parameters
+        const GRID_SIZE = 12; // Smaller grid for better visibility
+        const CELL_SIZE = 15; // Smaller cells as requested
+        const MAX_DISTANCE = 3; // Maximum distance to show connections
+
+        // 4D grid - using a flat array for performance
+        let grid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+        let nextGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+
+        // Animation control
+        let isPlaying = true;
+        let generation = 0;
+        let animationId;
+        let lastUpdateTime = 0;
+        let speed = 0.05; // Very slow as requested
+
+        // Orbital camera parameters
+        let cameraAngleX = 0;
+        let cameraAngleY = 0;
+        let cameraAngleZ = 0;
+        let cameraRadius = 500;
+
+        // Convert 4D coordinates to array index
+        function getIndex(x, y, z, w) {
+            x = (x + GRID_SIZE) % GRID_SIZE;
+            y = (y + GRID_SIZE) % GRID_SIZE;
+            z = (z + GRID_SIZE) % GRID_SIZE;
+            w = (w + GRID_SIZE) % GRID_SIZE;
+            return x + (y * GRID_SIZE) + (z * GRID_SIZE * GRID_SIZE) + (w * GRID_SIZE * GRID_SIZE * GRID_SIZE);
+        }
+
+        // Get cell state
+        function getCell(x, y, z, w) {
+            return grid[getIndex(x, y, z, w)];
+        }
+
+        // Set cell state
+        function setCell(x, y, z, w, state) {
+            grid[getIndex(x, y, z, w)] = state;
+        }
+
+        // Count living neighbors in 4D
+        function countNeighbors(x, y, z, w) {
+            let count = 0;
+            for (let dw = -1; dw <= 1; dw++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0 && dz === 0 && dw === 0) continue;
+                            if (getCell(x + dx, y + dy, z + dz, w + dw)) {
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
+        // Update the grid according to Conway's rules
+        function updateGrid() {
+            let livingCells = 0;
+            
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            const neighbors = countNeighbors(x, y, z, w);
+                            const index = getIndex(x, y, z, w);
+                            const cell = grid[index];
+                            
+                            // Apply Conway's Game of Life rules
+                            if (cell === 1) {
+                                if (neighbors < 2 || neighbors > 3) {
+                                    nextGrid[index] = 0; // Death by underpopulation or overpopulation
+                                } else {
+                                    nextGrid[index] = 1; // Survival
+                                    livingCells++;
+                                }
+                            } else {
+                                if (neighbors === 3) {
+                                    nextGrid[index] = 1; // Birth
+                                    livingCells++;
+                                } else {
+                                    nextGrid[index] = 0; // Stay dead
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Swap grids
+            [grid, nextGrid] = [nextGrid, grid];
+            generation++;
+            generationElement.textContent = generation;
+            livingCellsElement.textContent = livingCells;
+        }
+
+        // Initialize with a 4D pattern
+        function initializeGrid() {
+            grid.fill(0);
+            
+            // Create a more complex 4D pattern
+            const center = Math.floor(GRID_SIZE / 2);
+            
+            // 4D cross pattern
+            for (let i = -1; i <= 1; i++) {
+                setCell(center+i, center, center, center, 1);
+                setCell(center, center+i, center, center, 1);
+                setCell(center, center, center+i, center, 1);
+                setCell(center, center, center, center+i, 1);
+            }
+            
+            generation = 0;
+            generationElement.textContent = generation;
+        }
+
+        // Randomize the grid
+        function randomizeGrid() {
+            for (let i = 0; i < grid.length; i++) {
+                grid[i] = Math.random() > 0.85 ? 1 : 0;
+            }
+            generation = 0;
+            generationElement.textContent = generation;
+        }
+
+        // Rotate a 3D point around the origin
+        function rotatePoint(x, y, z, angleX, angleY, angleZ) {
+            // Rotate around X axis
+            const cosX = Math.cos(angleX);
+            const sinX = Math.sin(angleX);
+            let y1 = y * cosX - z * sinX;
+            let z1 = y * sinX + z * cosX;
+            
+            // Rotate around Y axis
+            const cosY = Math.cos(angleY);
+            const sinY = Math.sin(angleY);
+            let x1 = x * cosY + z1 * sinY;
+            let z2 = -x * sinY + z1 * cosY;
+            
+            // Rotate around Z axis
+            const cosZ = Math.cos(angleZ);
+            const sinZ = Math.sin(angleZ);
+            let x2 = x1 * cosZ - y1 * sinZ;
+            let y2 = x1 * sinZ + y1 * cosZ;
+            
+            return { x: x2, y: y2, z: z2 };
+        }
+
+        // Project 4D coordinates to 3D for visualization
+        function project4DTo3D(x, y, z, w) {
+            // Get current time slice (cycles through w dimension)
+            const timeSlice = Math.floor(generation / 10) % GRID_SIZE;
+            timeSliceElement.textContent = timeSlice;
+            
+            // Calculate distance from current time slice
+            const wDistance = Math.min(
+                Math.abs(w - timeSlice),
+                Math.abs(w - timeSlice - GRID_SIZE),
+                Math.abs(w - timeSlice + GRID_SIZE)
+            );
+            
+            // Only show cells within a certain distance of the time slice
+            if (wDistance > 2) return null;
+            
+            // Apply perspective based on w-distance
+            const scale = 1 - (wDistance * 0.15);
+            
+            // Center coordinates
+            const centeredX = (x - GRID_SIZE/2) * scale * CELL_SIZE;
+            const centeredY = (y - GRID_SIZE/2) * scale * CELL_SIZE;
+            const centeredZ = (z - GRID_SIZE/2) * scale * CELL_SIZE;
+            
+            // Apply orbital camera rotation
+            const rotated = rotatePoint(centeredX, centeredY, centeredZ, cameraAngleX, cameraAngleY, cameraAngleZ);
+            
+            // Simple perspective projection
+            const perspective = 1 + rotated.z / 1000;
+            const screenX = rotated.x / perspective;
+            const screenY = rotated.y / perspective;
+            
+            return {
+                x: screenX,
+                y: screenY,
+                z: rotated.z,
+                wDistance: wDistance,
+                alpha: 1 - wDistance * 0.3,
+                originalX: x,
+                originalY: y,
+                originalZ: z,
+                originalW: w
+            };
+        }
+
+        // Draw connecting lines between nearby cells
+        function drawConnections(cells) {
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
+            ctx.lineWidth = 0.5;
+            
+            for (let i = 0; i < cells.length; i++) {
+                const cell1 = cells[i];
+                
+                for (let j = i + 1; j < cells.length; j++) {
+                    const cell2 = cells[j];
+                    
+                    // Calculate distance in 4D space
+                    const dx = Math.abs(cell1.originalX - cell2.originalX);
+                    const dy = Math.abs(cell1.originalY - cell2.originalY);
+                    const dz = Math.abs(cell1.originalZ - cell2.originalZ);
+                    const dw = Math.abs(cell1.originalW - cell2.originalW);
+                    
+                    // Wrap around distances for toroidal space
+                    const distX = Math.min(dx, GRID_SIZE - dx);
+                    const distY = Math.min(dy, GRID_SIZE - dy);
+                    const distZ = Math.min(dz, GRID_SIZE - dz);
+                    const distW = Math.min(dw, GRID_SIZE - dw);
+                    
+                    // Total 4D distance
+                    const distance = Math.sqrt(distX*distX + distY*distY + distZ*distZ + distW*distW);
+                    
+                    // Draw line if cells are close enough
+                    if (distance <= MAX_DISTANCE) {
+                        // Adjust alpha based on distance
+                        const alpha = 0.1 * (1 - distance / MAX_DISTANCE);
+                        ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(cell1.x, cell1.y);
+                        ctx.lineTo(cell2.x, cell2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Draw the grid
+        function drawGrid() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Center the visualization
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            
+            // Collect all visible cells
+            const visibleCells = [];
+            
+            // Draw cells
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            if (getCell(x, y, z, w) === 1) {
+                                const projected = project4DTo3D(x, y, z, w);
+                                if (projected) {
+                                    // Calculate color based on position and generation
+                                    const hue = (projected.originalX * 20 + projected.originalY * 30 + 
+                                                projected.originalZ * 40 + projected.originalW * 50 + 
+                                                generation * 2) % 360;
+                                    
+                                    // Calculate size based on distance
+                                    const radius = CELL_SIZE * 0.3 * (1 - projected.wDistance * 0.2);
+                                    
+                                    // Draw cell
+                                    ctx.globalAlpha = projected.alpha;
+                                    ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${projected.alpha})`;
+                                    ctx.beginPath();
+                                    ctx.arc(projected.x, projected.y, radius, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    
+                                    // Store for connection drawing
+                                    visibleCells.push(projected);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Draw connections between cells
+            drawConnections(visibleCells);
+            
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate(currentTime) {
+            // Slow down the simulation as requested
+            if (isPlaying && currentTime - lastUpdateTime > 1000 / speed) {
+                updateGrid();
+                lastUpdateTime = currentTime;
+            }
+            
+            // Update orbital camera
+            cameraAngleY += 0.002;
+            cameraAngleX += 0.001;
+            cameraAngleZ += 0.0005;
+            
+            drawGrid();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        playPauseButton.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseButton.textContent = isPlaying ? 'Pause' : 'Play';
+        });
+
+        resetButton.addEventListener('click', () => {
+            initializeGrid();
+        });
+
+        randomizeButton.addEventListener('click', () => {
+            randomizeGrid();
+        });
+
+        speedControl.addEventListener('input', () => {
+            speed = parseFloat(speedControl.value);
+            speedValue.textContent = speed.toFixed(2);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Initialize and start animation
+        initializeGrid();
+        animate(0);
+    </script>
+</body>
+</html>
