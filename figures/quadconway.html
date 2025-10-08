@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4D Conway's Game of Life</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="info">
+        <div>4D Conway's Game of Life</div>
+        <div>Generation: <span id="generation">0</span></div>
+        <div>Living Cells: <span id="livingCells">0</span></div>
+    </div>
+    <div class="controls">
+        <button id="playPause">Pause</button>
+        <button id="reset">Reset</button>
+        <button id="randomize">Randomize</button>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const generationElement = document.getElementById('generation');
+        const livingCellsElement = document.getElementById('livingCells');
+        const playPauseButton = document.getElementById('playPause');
+        const resetButton = document.getElementById('reset');
+        const randomizeButton = document.getElementById('randomize');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 4D grid parameters
+        const GRID_SIZE = 16; // Size of each dimension
+        const CELL_SIZE = 20; // Visual size of each cell in pixels
+        const MARGIN = 50; // Margin from edges
+
+        // 4D grid - using a flat array for performance
+        let grid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+        let nextGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
+
+        // Animation control
+        let isPlaying = true;
+        let generation = 0;
+        let animationId;
+
+        // Convert 4D coordinates to array index
+        function getIndex(x, y, z, w) {
+            x = (x + GRID_SIZE) % GRID_SIZE;
+            y = (y + GRID_SIZE) % GRID_SIZE;
+            z = (z + GRID_SIZE) % GRID_SIZE;
+            w = (w + GRID_SIZE) % GRID_SIZE;
+            return x + (y * GRID_SIZE) + (z * GRID_SIZE * GRID_SIZE) + (w * GRID_SIZE * GRID_SIZE * GRID_SIZE);
+        }
+
+        // Get cell state
+        function getCell(x, y, z, w) {
+            return grid[getIndex(x, y, z, w)];
+        }
+
+        // Set cell state
+        function setCell(x, y, z, w, state) {
+            grid[getIndex(x, y, z, w)] = state;
+        }
+
+        // Count living neighbors in 4D
+        function countNeighbors(x, y, z, w) {
+            let count = 0;
+            for (let dw = -1; dw <= 1; dw++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0 && dz === 0 && dw === 0) continue;
+                            if (getCell(x + dx, y + dy, z + dz, w + dw)) {
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
+        // Update the grid according to Conway's rules
+        function updateGrid() {
+            let livingCells = 0;
+            
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            const neighbors = countNeighbors(x, y, z, w);
+                            const index = getIndex(x, y, z, w);
+                            const cell = grid[index];
+                            
+                            // Apply Conway's Game of Life rules
+                            if (cell === 1) {
+                                if (neighbors < 2 || neighbors > 3) {
+                                    nextGrid[index] = 0; // Death by underpopulation or overpopulation
+                                } else {
+                                    nextGrid[index] = 1; // Survival
+                                    livingCells++;
+                                }
+                            } else {
+                                if (neighbors === 3) {
+                                    nextGrid[index] = 1; // Birth
+                                    livingCells++;
+                                } else {
+                                    nextGrid[index] = 0; // Stay dead
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Swap grids
+            [grid, nextGrid] = [nextGrid, grid];
+            generation++;
+            generationElement.textContent = generation;
+            livingCellsElement.textContent = livingCells;
+        }
+
+        // Initialize with a glider pattern in 4D
+        function initializeGrid() {
+            grid.fill(0);
+            
+            // Create a 4D glider-like pattern
+            const center = Math.floor(GRID_SIZE / 2);
+            
+            // Simple 4D pattern
+            setCell(center, center, center, center, 1);
+            setCell(center+1, center, center, center, 1);
+            setCell(center-1, center, center, center, 1);
+            setCell(center, center+1, center, center, 1);
+            setCell(center, center, center+1, center, 1);
+            setCell(center, center, center, center+1, 1);
+            
+            generation = 0;
+            generationElement.textContent = generation;
+        }
+
+        // Randomize the grid
+        function randomizeGrid() {
+            for (let i = 0; i < grid.length; i++) {
+                grid[i] = Math.random() > 0.85 ? 1 : 0;
+            }
+            generation = 0;
+            generationElement.textContent = generation;
+        }
+
+        // Project 4D coordinates to 3D for visualization
+        function project4DTo3D(x, y, z, w) {
+            // Simple projection: treat w as a time dimension and show a slice
+            const currentW = Math.floor(generation / 5) % GRID_SIZE;
+            const distance = Math.abs(w - currentW);
+            
+            // Only show cells close to the current w-slice
+            if (distance > 2) return null;
+            
+            // Apply perspective based on w-distance
+            const scale = 1 - (distance * 0.2);
+            
+            return {
+                x: (x - GRID_SIZE/2) * scale * CELL_SIZE,
+                y: (y - GRID_SIZE/2) * scale * CELL_SIZE,
+                z: (z - GRID_SIZE/2) * scale * CELL_SIZE,
+                alpha: 1 - distance * 0.3
+            };
+        }
+
+        // Draw the grid
+        function drawGrid() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Center the visualization
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            
+            // Draw cells
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            if (getCell(x, y, z, w) === 1) {
+                                const projected = project4DTo3D(x, y, z, w);
+                                if (projected) {
+                                    // Simple 3D projection with perspective
+                                    const scale = 500 / (500 + projected.z);
+                                    const screenX = projected.x * scale;
+                                    const screenY = projected.y * scale;
+                                    const radius = CELL_SIZE * scale * 0.5;
+                                    
+                                    // Draw cell
+                                    ctx.globalAlpha = projected.alpha;
+                                    ctx.fillStyle = `hsl(${(w * 15 + generation) % 360}, 100%, 70%)`;
+                                    ctx.beginPath();
+                                    ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                                    ctx.fill();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate() {
+            if (isPlaying) {
+                updateGrid();
+            }
+            drawGrid();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        playPauseButton.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playPauseButton.textContent = isPlaying ? 'Pause' : 'Play';
+        });
+
+        resetButton.addEventListener('click', () => {
+            initializeGrid();
+        });
+
+        randomizeButton.addEventListener('click', () => {
+            randomizeGrid();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Initialize and start animation
+        initializeGrid();
+        animate();
+    </script>
+</body>
+</html>
