@@ -132,10 +132,10 @@
         </div>
         
         <div class="controls">
-            <button id="playPause">⏸️</button>
-            <button id="reset">🔄</button>
-            <button id="randomize">🎲</button>
-            <button id="nextColors">🎨</button>
+            <button id="playPause">Pause</button>
+            <button id="reset">Reset</button>
+            <button id="randomize">Random</button>
+            <button id="nextColors">Colors</button>
         </div>
         
         <div class="sliders">
@@ -196,7 +196,7 @@
         const CELL_SIZE = 10;
         const MAX_DISTANCE = 2.2;
 
-        // Grids
+        // Grids - using proper double buffering for Conway
         let currentGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
         let nextGrid = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(0);
         let cellColors = new Array(GRID_SIZE * GRID_SIZE * GRID_SIZE * GRID_SIZE).fill(null);
@@ -234,14 +234,17 @@
             grid[getIndex(x, y, z, w)] = state;
         }
 
-        function countNeighbors(grid, x, y, z, w) {
+        // Count living neighbors in 4D space (all 80 neighbors in 4D)
+        function countNeighbors(x, y, z, w) {
             let count = 0;
             for (let dw = -1; dw <= 1; dw++) {
                 for (let dz = -1; dz <= 1; dz++) {
                     for (let dy = -1; dy <= 1; dy++) {
                         for (let dx = -1; dx <= 1; dx++) {
+                            // Skip the center cell itself
                             if (dx === 0 && dy === 0 && dz === 0 && dw === 0) continue;
-                            if (getCell(grid, x + dx, y + dy, z + dz, w + dw)) {
+                            
+                            if (getCell(currentGrid, x + dx, y + dy, z + dz, w + dw)) {
                                 count++;
                             }
                         }
@@ -251,39 +254,46 @@
             return count;
         }
 
-        // Pure Conway evolution
+        // Proper Conway evolution with 4D rules
         function evolveGrid() {
             let livingCells = 0;
+            
+            // Clear next grid
             nextGrid.fill(0);
             
-            // Apply Conway's rules
+            // Apply Conway's Game of Life rules to each cell
             for (let w = 0; w < GRID_SIZE; w++) {
                 for (let z = 0; z < GRID_SIZE; z++) {
                     for (let y = 0; y < GRID_SIZE; y++) {
                         for (let x = 0; x < GRID_SIZE; x++) {
-                            const neighbors = countNeighbors(currentGrid, x, y, z, w);
-                            const cell = getCell(currentGrid, x, y, z, w);
+                            const neighbors = countNeighbors(x, y, z, w);
+                            const isAlive = getCell(currentGrid, x, y, z, w);
                             const index = getIndex(x, y, z, w);
                             
-                            if (cell === 1) {
+                            // Conway's rules:
+                            // 1. Any live cell with 2 or 3 live neighbors survives
+                            // 2. Any dead cell with exactly 3 live neighbors becomes alive
+                            // 3. All other live cells die, dead cells stay dead
+                            
+                            if (isAlive) {
                                 if (neighbors === 2 || neighbors === 3) {
+                                    // Cell survives
                                     nextGrid[index] = 1;
                                     livingCells++;
-                                    // Keep existing color or assign new one
+                                    // Keep existing color
                                     if (!cellColors[index]) {
                                         cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
                                     }
                                 } else {
+                                    // Cell dies
                                     cellColors[index] = null;
                                 }
                             } else {
                                 if (neighbors === 3) {
+                                    // Cell is born
                                     nextGrid[index] = 1;
                                     livingCells++;
-                                    // Assign random color from current palette
                                     cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
-                                } else {
-                                    cellColors[index] = null;
                                 }
                             }
                         }
@@ -291,13 +301,13 @@
                 }
             }
             
-            // Update rotation for next generation
+            // Update 4D rotation for visual effect
             rotationW += 0.02 * rotationSpeed;
             rotationZ += 0.015 * rotationSpeed;
             rotationY += 0.01 * rotationSpeed;
             rotationX += 0.005 * rotationSpeed;
             
-            // Swap grids
+            // Swap buffers for next generation
             [currentGrid, nextGrid] = [nextGrid, currentGrid];
             
             generation++;
@@ -305,20 +315,25 @@
             livingCellsElement.textContent = livingCells;
         }
 
-        // Initialize with random patterns
+        // Initialize with random patterns that will evolve
         function initializeGrid() {
             currentGrid.fill(0);
             cellColors.fill(null);
             
-            // Create some random living cells
-            for (let i = 0; i < GRID_SIZE * GRID_SIZE * 2; i++) {
-                const x = Math.floor(Math.random() * GRID_SIZE);
-                const y = Math.floor(Math.random() * GRID_SIZE);
-                const z = Math.floor(Math.random() * GRID_SIZE);
-                const w = Math.floor(Math.random() * GRID_SIZE);
-                const index = getIndex(x, y, z, w);
-                currentGrid[index] = 1;
-                cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
+            // Create random living cells with some density
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            // 25% chance for a cell to be alive initially
+                            if (Math.random() < 0.25) {
+                                const index = getIndex(x, y, z, w);
+                                currentGrid[index] = 1;
+                                cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
+                            }
+                        }
+                    }
+                }
             }
             
             generation = 0;
@@ -330,16 +345,18 @@
             currentGrid.fill(0);
             cellColors.fill(null);
             
-            // More dense randomization
-            for (let i = 0; i < GRID_SIZE * GRID_SIZE * GRID_SIZE; i++) {
-                const x = Math.floor(Math.random() * GRID_SIZE);
-                const y = Math.floor(Math.random() * GRID_SIZE);
-                const z = Math.floor(Math.random() * GRID_SIZE);
-                const w = Math.floor(Math.random() * GRID_SIZE);
-                if (Math.random() > 0.7) {
-                    const index = getIndex(x, y, z, w);
-                    currentGrid[index] = 1;
-                    cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
+            // Create new random pattern
+            for (let w = 0; w < GRID_SIZE; w++) {
+                for (let z = 0; z < GRID_SIZE; z++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        for (let x = 0; x < GRID_SIZE; x++) {
+                            if (Math.random() < 0.3) {
+                                const index = getIndex(x, y, z, w);
+                                currentGrid[index] = 1;
+                                cellColors[index] = currentColors[Math.floor(Math.random() * currentColors.length)];
+                            }
+                        }
+                    }
                 }
             }
             
@@ -351,9 +368,9 @@
             currentPalette = (currentPalette + 1) % colorPalettes.length;
             currentColors = [...colorPalettes[currentPalette]];
             
-            // Recolor all living cells with new palette
+            // Recolor all living cells with new random colors from palette
             for (let i = 0; i < cellColors.length; i++) {
-                if (cellColors[i]) {
+                if (currentGrid[i] === 1) {
                     cellColors[i] = currentColors[Math.floor(Math.random() * currentColors.length)];
                 }
             }
@@ -376,7 +393,7 @@
             
             if (wDistance > 2) return null;
             
-            // Apply 4D rotation
+            // Apply 4D rotation to the coordinates
             const cosW = Math.cos(rotationW);
             const sinW = Math.sin(rotationW);
             const cosZ = Math.cos(rotationZ);
@@ -393,20 +410,24 @@
             const centeredY = (y1 - GRID_SIZE/2) * scale * CELL_SIZE;
             const centeredZ = (z1 - GRID_SIZE/2) * scale * CELL_SIZE;
             
-            // Simple 3D perspective
+            // Simple 3D perspective projection
             const perspective = 1 + centeredZ / 600;
             const screenX = centeredX / perspective;
             const screenY = centeredY / perspective;
             
             return {
-                x: screenX, y: screenY,
+                x: screenX, 
+                y: screenY,
                 wDistance, 
                 alpha: 1 - wDistance * 0.4,
-                originalX: x, originalY: y, originalZ: z, originalW: w
+                originalX: x, 
+                originalY: y, 
+                originalZ: z, 
+                originalW: w
             };
         }
 
-        // Draw connections between nearby cells
+        // Draw connections between nearby cells to show structure
         function drawConnections(cells) {
             ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
             ctx.lineWidth = 0.4;
@@ -416,11 +437,13 @@
                 for (let j = i + 1; j < Math.min(cells.length, i + 20); j++) {
                     const cell2 = cells[j];
                     
+                    // Calculate 4D distance between cells
                     const dx = Math.abs(cell1.originalX - cell2.originalX);
                     const dy = Math.abs(cell1.originalY - cell2.originalY);
                     const dz = Math.abs(cell1.originalZ - cell2.originalZ);
                     const dw = Math.abs(cell1.originalW - cell2.originalW);
                     
+                    // Account for toroidal space (wrap-around)
                     const distX = Math.min(dx, GRID_SIZE - dx);
                     const distY = Math.min(dy, GRID_SIZE - dy);
                     const distZ = Math.min(dz, GRID_SIZE - dz);
@@ -428,6 +451,7 @@
                     
                     const distance = Math.sqrt(distX*distX + distY*distY + distZ*distZ + distW*distW);
                     
+                    // Draw line if cells are close in 4D space
                     if (distance <= MAX_DISTANCE) {
                         const alpha = 0.15 * (1 - distance / MAX_DISTANCE);
                         ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
@@ -441,7 +465,7 @@
             }
         }
 
-        // Draw grid with colored cells
+        // Draw the current state of the grid
         function drawGrid() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -451,6 +475,7 @@
             
             const visibleCells = [];
             
+            // Draw all living cells
             for (let w = 0; w < GRID_SIZE; w++) {
                 for (let z = 0; z < GRID_SIZE; z++) {
                     for (let y = 0; y < GRID_SIZE; y++) {
@@ -476,6 +501,7 @@
                 }
             }
             
+            // Draw connections between nearby cells
             if (visibleCells.length > 0) {
                 drawConnections(visibleCells);
             }
@@ -497,7 +523,7 @@
         // Event listeners
         playPauseButton.addEventListener('click', () => {
             isPlaying = !isPlaying;
-            playPauseButton.textContent = isPlaying ? '⏸️' : '▶️';
+            playPauseButton.textContent = isPlaying ? 'Pause' : 'Play';
         });
 
         resetButton.addEventListener('click', initializeGrid);
