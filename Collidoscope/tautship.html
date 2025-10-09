@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collidoscope</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .scroll-container {
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Particle Field - Fixed at top */
+        .particle-section {
+            position: sticky;
+            top: 0;
+            background: #000;
+            border-bottom: 1px solid #333;
+            z-index: 10;
+        }
+
+        .particle-field {
+            width: 100%;
+            height: 100px;
+            background: #000;
+        }
+
+        #particleCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Controls - Minimal */
+        .controls {
+            padding: 8px 12px;
+            background: #111;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            background: #222;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            min-height: 32px;
+        }
+
+        .control-btn.active {
+            background: #4CAF50;
+        }
+
+        /* Main Content - Scrollable */
+        .main-content {
+            padding: 12px;
+        }
+
+        /* Plugin Graph */
+        .plugin-section {
+            margin-bottom: 20px;
+        }
+
+        .plugin-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        .graph-editor {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 120px;
+            position: relative;
+        }
+
+        #graphCanvas {
+            width: 100%;
+            height: 120px;
+            display: block;
+        }
+
+        /* Node Styles */
+        .node {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background: #333;
+            border-radius: 6px;
+            border: 2px solid #444;
+            cursor: move;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            user-select: none;
+        }
+
+        .node.input {
+            background: #2d5a2d;
+            border-color: #4CAF50;
+        }
+
+        .node.output {
+            background: #5a2d2d;
+            border-color: #f44336;
+        }
+
+        .node.effect {
+            background: #2d4a5a;
+            border-color: #2196F3;
+        }
+
+        .connection {
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Audio Output */
+        .output-section {
+            margin-top: 20px;
+        }
+
+        .waveform {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        #waveformCanvas {
+            width: 100%;
+            height: 40px;
+            background: #000;
+            border-radius: 4px;
+        }
+
+        /* Hidden scrubber - accessible via overflow */
+        .scrubber-overflow {
+            height: 0;
+            overflow: visible;
+            position: relative;
+        }
+
+        .scrubber-mini {
+            position: absolute;
+            top: -20px;
+            right: 12px;
+            width: 120px;
+            height: 20px;
+            background: #222;
+            border-radius: 10px;
+            opacity: 0.7;
+        }
+
+        .scrubber-handle {
+            width: 16px;
+            height: 16px;
+            background: #4CAF50;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 0;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <!-- Fixed Particle Field -->
+        <div class="particle-section">
+            <div class="particle-field">
+                <canvas id="particleCanvas"></canvas>
+            </div>
+            
+            <!-- Minimal Controls -->
+            <div class="controls">
+                <button class="control-btn" id="playBtn">▶</button>
+                <button class="control-btn" id="stopBtn">■</button>
+                <button class="control-btn" id="recordBtn">●</button>
+                <button class="control-btn" id="generateBtn">✨</button>
+                <button class="control-btn" id="clearBtn">🗑️</button>
+            </div>
+        </div>
+
+        <!-- Scrollable Main Content -->
+        <div class="main-content">
+            <!-- Hidden Scrubber -->
+            <div class="scrubber-overflow">
+                <div class="scrubber-mini" id="miniScrubber">
+                    <div class="scrubber-handle" id="miniHandle"></div>
+                </div>
+            </div>
+
+            <!-- Plugin Graph -->
+            <div class="plugin-section">
+                <div class="plugin-title">AUDIO GRAPH</div>
+                <div class="graph-editor" id="graphEditor">
+                    <canvas id="graphCanvas"></canvas>
+                    <!-- Nodes will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Audio Output -->
+            <div class="output-section">
+                <div class="plugin-title">OUTPUT</div>
+                <div class="waveform">
+                    <canvas id="waveformCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Empty space for scrolling -->
+            <div style="height: 100px"></div>
+        </div>
+    </div>
+
+    <script>
+        class HyperCollidoscope {
+            constructor() {
+                this.audioContext = null;
+                this.isPlaying = false;
+                this.particles = [];
+                this.nodes = [];
+                this.connections = [];
+                this.selectedNode = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.initCanvases();
+                this.initAudio();
+                this.initEventListeners();
+                this.initGraph();
+                this.startAnimation();
+            }
+
+            initCanvases() {
+                this.particleCanvas = document.getElementById('particleCanvas');
+                this.particleCtx = this.particleCanvas.getContext('2d');
+                
+                this.waveformCanvas = document.getElementById('waveformCanvas');
+                this.waveformCtx = this.waveformCanvas.getContext('2d');
+                
+                this.graphCanvas = document.getElementById('graphCanvas');
+                this.graphCtx = this.graphCanvas.getContext('2d');
+                
+                this.resizeCanvases();
+                window.addEventListener('resize', () => this.resizeCanvases());
+            }
+
+            resizeCanvases() {
+                this.particleCanvas.width = this.particleCanvas.clientWidth;
+                this.particleCanvas.height = this.particleCanvas.clientHeight;
+
+                this.waveformCanvas.width = this.waveformCanvas.clientWidth;
+                this.waveformCanvas.height = this.waveformCanvas.clientHeight;
+
+                this.graphCanvas.width = this.graphCanvas.clientWidth;
+                this.graphCanvas.height = this.graphCanvas.clientHeight;
+            }
+
+            async initAudio() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            initEventListeners() {
+                // Transport controls
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stop());
+                document.getElementById('recordBtn').addEventListener('click', () => this.toggleRecord());
+                document.getElementById('generateBtn').addEventListener('click', () => this.generate());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+
+                // Mini scrubber
+                this.setupMiniScrubber();
+
+                // Graph interaction
+                this.setupGraphInteraction();
+            }
+
+            setupMiniScrubber() {
+                const scrubber = document.getElementById('miniScrubber');
+                const handle = document.getElementById('miniHandle');
+                
+                let isDragging = false;
+
+                const startDrag = (e) => {
+                    e.preventDefault();
+                    isDragging = true;
+                };
+
+                const doDrag = (e) => {
+                    if (!isDragging) return;
+                    
+                    const rect = scrubber.getBoundingClientRect();
+                    const x = Math.max(0, Math.min(rect.width - 16, 
+                        (e.clientX || e.touches[0].clientX) - rect.left));
+                    
+                    handle.style.left = x + 'px';
+                };
+
+                const endDrag = () => {
+                    isDragging = false;
+                };
+
+                scrubber.addEventListener('mousedown', startDrag);
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('mouseup', endDrag);
+
+                scrubber.addEventListener('touchstart', startDrag);
+                document.addEventListener('touchmove', doDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            setupGraphInteraction() {
+                const editor = document.getElementById('graphEditor');
+                
+                // Double-click to add node
+                editor.addEventListener('dblclick', (e) => {
+                    const rect = editor.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    this.addNode(x, y);
+                });
+
+                // Node dragging
+                editor.addEventListener('mousedown', (e) => {
+                    const node = e.target.closest('.node');
+                    if (node) {
+                        this.selectedNode = node;
+                        this.startDragNode(e);
+                    }
+                });
+            }
+
+            addNode(x, y) {
+                const nodeTypes = ['input', 'effect', 'output'];
+                const type = nodeTypes[Math.floor(Math.random() * nodeTypes.length)];
+                const names = {
+                    'input': ['OSC1', 'NOISE', 'IMPULSE'],
+                    'effect': ['FILTER', 'DELAY', 'REVERB', 'DISTORT'],
+                    'output': ['OUT', 'MASTER', 'SPEAKER']
+                };
+
+                const node = document.createElement('div');
+                node.className = `node ${type}`;
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                node.textContent = names[type][Math.floor(Math.random() * names[type].length)];
+                
+                node.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    this.selectedNode = node;
+                    this.startDragNode(e);
+                });
+
+                document.getElementById('graphEditor').appendChild(node);
+                this.nodes.push(node);
+            }
+
+            startDragNode(e) {
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startLeft = parseInt(this.selectedNode.style.left);
+                const startTop = parseInt(this.selectedNode.style.top);
+
+                const doDrag = (e) => {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    this.selectedNode.style.left = (startLeft + dx) + 'px';
+                    this.selectedNode.style.top = (startTop + dy) + 'px';
+                    
+                    this.drawConnections();
+                };
+
+                const endDrag = () => {
+                    document.removeEventListener('mousemove', doDrag);
+                    document.removeEventListener('mouseup', endDrag);
+                };
+
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('mouseup', endDrag);
+            }
+
+            drawConnections() {
+                // Clear previous connections
+                document.querySelectorAll('.connection').forEach(conn => conn.remove());
+                
+                // Draw connections between close nodes
+                for (let i = 0; i < this.nodes.length; i++) {
+                    for (let j = i + 1; j < this.nodes.length; j++) {
+                        const nodeA = this.nodes[i];
+                        const nodeB = this.nodes[j];
+                        
+                        const rectA = nodeA.getBoundingClientRect();
+                        const rectB = nodeB.getBoundingClientRect();
+                        const editorRect = document.getElementById('graphEditor').getBoundingClientRect();
+                        
+                        const distance = Math.sqrt(
+                            Math.pow(rectA.left - rectB.left, 2) + 
+                            Math.pow(rectA.top - rectB.top, 2)
+                        );
+                        
+                        if (distance < 150) { // Connect if nodes are close
+                            this.drawConnection(nodeA, nodeB);
+                        }
+                    }
+                }
+            }
+
+            drawConnection(nodeA, nodeB) {
+                const editor = document.getElementById('graphEditor');
+                const rectA = nodeA.getBoundingClientRect();
+                const rectB = nodeB.getBoundingClientRect();
+                const editorRect = editor.getBoundingClientRect();
+                
+                const x1 = rectA.left + rectA.width/2 - editorRect.left;
+                const y1 = rectA.top + rectA.height/2 - editorRect.top;
+                const x2 = rectB.left + rectB.width/2 - editorRect.left;
+                const y2 = rectB.top + rectB.height/2 - editorRect.top;
+                
+                const connection = document.createElement('div');
+                connection.className = 'connection';
+                
+                // Draw line using SVG
+                connection.innerHTML = `
+                    <svg width="${editorRect.width}" height="${editorRect.height}" style="position:absolute; top:0; left:0;">
+                        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+                              stroke="#4CAF50" stroke-width="2" stroke-dasharray="4,2"/>
+                    </svg>
+                `;
+                
+                editor.appendChild(connection);
+            }
+
+            initGraph() {
+                // Add some initial nodes
+                setTimeout(() => {
+                    this.addNode(30, 30);
+                    this.addNode(120, 60);
+                    this.addNode(200, 30);
+                    this.drawConnections();
+                }, 100);
+            }
+
+            togglePlay() {
+                this.isPlaying = !this.isPlaying;
+                const btn = document.getElementById('playBtn');
+                btn.textContent = this.isPlaying ? '⏸' : '▶';
+                
+                if (this.isPlaying) {
+                    this.startAudio();
+                }
+            }
+
+            startAudio() {
+                // Generate particles based on audio
+                this.addParticles(3);
+                
+                // Visual feedback
+                this.animateWaveform();
+            }
+
+            stop() {
+                this.isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶';
+            }
+
+            toggleRecord() {
+                const btn = document.getElementById('recordBtn');
+                const isRecording = btn.style.background === 'rgb(244, 67, 54)';
+                
+                btn.style.background = isRecording ? '#222' : '#f44336';
+            }
+
+            generate() {
+                // Generate new audio and particles
+                this.addParticles(5);
+                this.animateWaveform();
+                this.drawGraph();
+            }
+
+            clear() {
+                // Clear all nodes
+                this.nodes.forEach(node => node.remove());
+                this.nodes = [];
+                document.querySelectorAll('.connection').forEach(conn => conn.remove());
+            }
+
+            addParticles(count) {
+                for (let i = 0; i < count; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.particleCanvas.width,
+                        y: Math.random() * this.particleCanvas.height,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: (Math.random() - 0.5) * 6,
+                        radius: Math.random() * 8 + 3,
+                        color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                        life: 1.0
+                    });
+                }
+            }
+
+            animateWaveform() {
+                const ctx = this.waveformCtx;
+                const width = this.waveformCanvas.width;
+                const height = this.waveformCanvas.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Animated waveform
+                const animate = () => {
+                    if (!this.isPlaying) return;
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, height / 2);
+                    
+                    for (let x = 0; x < width; x++) {
+                        const time = Date.now() / 1000;
+                        const y = height / 2 + Math.sin(x * 0.1 + time * 5) * height * 0.3 * Math.random();
+                        ctx.lineTo(x, y);
+                    }
+                    
+                    ctx.strokeStyle = '#4CAF50';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+
+            drawGraph() {
+                const ctx = this.graphCtx;
+                const width = this.graphCanvas.width;
+                const height = this.graphCanvas.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw some random signal processing visualization
+                ctx.beginPath();
+                for (let x = 0; x < width; x++) {
+                    const progress = x / width;
+                    const y = height / 2 + Math.sin(progress * Math.PI * 4) * height * 0.4;
+                    
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                
+                ctx.strokeStyle = '#2196F3';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            startAnimation() {
+                const animateParticles = () => {
+                    // Clear with trail effect
+                    this.particleCtx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                    this.particleCtx.fillRect(0, 0, this.particleCanvas.width, this.particleCanvas.height);
+                    
+                    // Update and draw particles
+                    this.particles = this.particles.filter(particle => {
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        particle.life -= 0.005;
+                        
+                        // Bounce off walls
+                        if (particle.x <= particle.radius || particle.x >= this.particleCanvas.width - particle.radius) {
+                            particle.vx = -particle.vx;
+                        }
+                        if (particle.y <= particle.radius || particle.y >= this.particleCanvas.height - particle.radius) {
+                            particle.vy = -particle.vy;
+                        }
+                        
+                        // Draw if alive
+                        if (particle.life > 0) {
+                            this.particleCtx.beginPath();
+                            this.particleCtx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                            this.particleCtx.fillStyle = particle.color;
+                            this.particleCtx.globalAlpha = particle.life;
+                            this.particleCtx.fill();
+                            return true;
+                        }
+                        return false;
+                    });
+                    
+                    this.particleCtx.globalAlpha = 1.0;
+                    requestAnimationFrame(animateParticles);
+                };
+                
+                animateParticles();
+                
+                // Initial drawings
+                this.animateWaveform();
+                this.drawGraph();
+            }
+        }
+
+        // Initialize when ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new HyperCollidoscope();
+        });
+    </script>
+</body>
+</html>
