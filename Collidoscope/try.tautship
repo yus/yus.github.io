@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collidoscope Audio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header - File focused */
+        .header {
+            padding: 8px 12px;
+            background: #111;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .file-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #222;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Main workspace */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Visualization area */
+        .visualization {
+            flex: 1;
+            background: #000;
+            position: relative;
+            border-bottom: 1px solid #333;
+            min-height: 0;
+        }
+
+        #visualizationCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Audio controls */
+        .audio-controls {
+            padding: 8px 12px;
+            background: #111;
+            border-bottom: 1px solid #333;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .transport-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #222;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .transport-btn.play {
+            background: #4CAF50;
+        }
+
+        .transport-btn.export {
+            background: #2196F3;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #888;
+            margin-left: auto;
+        }
+
+        /* File processor */
+        .processor {
+            padding: 12px;
+            background: #111;
+            flex-shrink: 0;
+        }
+
+        .processor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .processor-btn {
+            padding: 10px;
+            background: #222;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .processor-btn.active {
+            background: #4CAF50;
+        }
+
+        /* Status bar */
+        .status-bar {
+            padding: 6px 12px;
+            background: #111;
+            border-top: 1px solid #333;
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        /* File drop zone */
+        .drop-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px dashed #444;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .drop-zone.hidden {
+            display: none;
+        }
+
+        /* Progress indicator */
+        .progress {
+            width: 100%;
+            height: 3px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with file info -->
+        <div class="header">
+            <div class="file-info" id="fileInfo">No file loaded</div>
+            <div class="file-controls">
+                <button class="icon-btn" id="loadBtn" title="Load file">📁</button>
+                <button class="icon-btn" id="saveBtn" title="Save file">💾</button>
+                <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Main workspace -->
+        <div class="workspace">
+            <!-- Visualization area -->
+            <div class="visualization">
+                <canvas id="visualizationCanvas"></canvas>
+                
+                <!-- File drop zone -->
+                <div class="drop-zone hidden" id="dropZone">
+                    <div>Drop audio file here</div>
+                    <div style="font-size: 11px; color: #666; margin-top: 8px;">.collido • .wav • .mp3</div>
+                </div>
+            </div>
+
+            <!-- Audio controls -->
+            <div class="audio-controls">
+                <button class="transport-btn" id="playBtn">▶</button>
+                <button class="transport-btn" id="stopBtn">■</button>
+                <button class="transport-btn export" id="exportBtn">📤</button>
+                <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+            </div>
+
+            <!-- File processor -->
+            <div class="processor">
+                <div class="processor-grid">
+                    <button class="processor-btn" data-process="analyze">Analyze</button>
+                    <button class="processor-btn" data-process="generate">Generate</button>
+                    <button class="processor-btn" data-process="collide">Collide</button>
+                    <button class="processor-btn" data-process="export">Export</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status bar -->
+        <div class="status-bar">
+            <div id="statusText">Ready</div>
+            <div id="fileStats">-</div>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="fileInput" accept=".collido,.wav,.mp3,.aiff" style="display: none;">
+
+    <script>
+        class CollidoscopeOptimized {
+            constructor() {
+                this.audioContext = null;
+                this.isPlaying = false;
+                this.currentFile = null;
+                this.audioBuffer = null;
+                this.processors = new Map();
+                
+                this.init();
+            }
+
+            init() {
+                this.initCanvas();
+                this.initAudio();
+                this.initEventListeners();
+                this.initProcessors();
+                this.startVisualization();
+            }
+
+            initCanvas() {
+                this.canvas = document.getElementById('visualizationCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+
+            resizeCanvas() {
+                this.canvas.width = this.canvas.clientWidth;
+                this.canvas.height = this.canvas.clientHeight;
+            }
+
+            async initAudio() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            initEventListeners() {
+                // File operations
+                document.getElementById('loadBtn').addEventListener('click', () => this.openFileDialog());
+                document.getElementById('saveBtn').addEventListener('click', () => this.saveFile());
+                document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Transport controls
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlayback());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopPlayback());
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportAudio());
+                
+                // Processor buttons
+                document.querySelectorAll('.processor-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.runProcessor(e.target.dataset.process));
+                });
+                
+                // Drag and drop
+                this.setupDragAndDrop();
+            }
+
+            setupDragAndDrop() {
+                const dropZone = document.getElementById('dropZone');
+                const visualization = document.querySelector('.visualization');
+                
+                visualization.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('hidden');
+                });
+                
+                visualization.addEventListener('dragleave', (e) => {
+                    if (!visualization.contains(e.relatedTarget)) {
+                        dropZone.classList.add('hidden');
+                    }
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('hidden');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFile(files[0]);
+                    }
+                });
+                
+                dropZone.addEventListener('click', () => {
+                    dropZone.classList.add('hidden');
+                });
+            }
+
+            openFileDialog() {
+                document.getElementById('fileInput').click();
+            }
+
+            async handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    await this.handleFile(file);
+                }
+            }
+
+            async handleFile(file) {
+                this.showProgress(10);
+                this.updateStatus('Loading file...');
+                
+                this.currentFile = file;
+                document.getElementById('fileInfo').textContent = file.name;
+                document.getElementById('fileStats').textContent = this.formatFileSize(file.size);
+                
+                // Simulate file processing
+                await this.simulateProcessing();
+                
+                this.showProgress(100);
+                this.updateStatus('File loaded successfully');
+                
+                // Generate visualization based on file
+                this.generateFileVisualization();
+            }
+
+            async simulateProcessing() {
+                return new Promise(resolve => {
+                    let progress = 10;
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 15;
+                        this.showProgress(progress);
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(resolve, 300);
+                        }
+                    }, 200);
+                });
+            }
+
+            generateFileVisualization() {
+                // Create particle system based on file
+                this.createParticleField();
+                
+                // Generate waveform visualization
+                this.drawWaveform();
+            }
+
+            createParticleField() {
+                // Clear existing particles and create new ones based on file
+                this.particles = [];
+                const particleCount = Math.min(50, Math.max(10, this.currentFile.size / 10000));
+                
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        radius: Math.random() * 6 + 2,
+                        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                        mass: Math.random() + 0.5
+                    });
+                }
+            }
+
+            drawWaveform() {
+                // Draw initial waveform representation
+                const ctx = this.ctx;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Background
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Draw some random audio data visualization
+                ctx.beginPath();
+                for (let x = 0; x < width; x += 2) {
+                    const y = height / 2 + Math.sin(x * 0.05) * height * 0.3 * Math.random();
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = '#4CAF50';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            initProcessors() {
+                // Initialize audio processors
+                this.processors.set('analyze', this.analyzeAudio.bind(this));
+                this.processors.set('generate', this.generateAudio.bind(this));
+                this.processors.set('collide', this.collideAudio.bind(this));
+                this.processors.set('export', this.exportAudio.bind(this));
+            }
+
+            async runProcessor(processorName) {
+                if (!this.currentFile) {
+                    this.updateStatus('Please load a file first');
+                    return;
+                }
+                
+                const processor = this.processors.get(processorName);
+                if (processor) {
+                    this.updateStatus(`Running ${processorName}...`);
+                    this.showProgress(30);
+                    
+                    // Simulate processing
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    await processor();
+                    this.showProgress(100);
+                    this.updateStatus(`${processorName} completed`);
+                }
+            }
+
+            async analyzeAudio() {
+                // Simulate audio analysis
+                this.createAnalysisVisualization();
+            }
+
+            async generateAudio() {
+                // Generate new audio from collisions
+                this.createParticleField();
+                this.updateStatus('Audio generated from collisions');
+            }
+
+            async collideAudio() {
+                // Process audio collisions
+                this.animateCollisions();
+                this.updateStatus('Processing audio collisions');
+            }
+
+            async exportAudio() {
+                if (!this.currentFile) {
+                    this.updateStatus('No file to export');
+                    return;
+                }
+                
+                // Simulate export process
+                this.showProgress(50);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                this.showProgress(100);
+                
+                this.updateStatus(`Exported: ${this.currentFile.name}.collido`);
+            }
+
+            saveFile() {
+                if (!this.currentFile) {
+                    this.updateStatus('No file to save');
+                    return;
+                }
+                
+                // Simulate save operation
+                this.updateStatus(`Saved: ${this.currentFile.name}`);
+            }
+
+            togglePlayback() {
+                this.isPlaying = !this.isPlaying;
+                const btn = document.getElementById('playBtn');
+                
+                if (this.isPlaying) {
+                    btn.classList.add('play');
+                    btn.textContent = '⏸';
+                    this.startPlayback();
+                } else {
+                    btn.classList.remove('play');
+                    btn.textContent = '▶';
+                    this.stopPlayback();
+                }
+            }
+
+            startPlayback() {
+                if (!this.currentFile) {
+                    this.updateStatus('No file to play');
+                    this.isPlaying = false;
+                    return;
+                }
+                
+                this.updateStatus('Playing...');
+                this.animatePlayback();
+            }
+
+            stopPlayback() {
+                this.updateStatus('Stopped');
+            }
+
+            animatePlayback() {
+                if (!this.isPlaying) return;
+                
+                const ctx = this.ctx;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                
+                // Animated playback visualization
+                const time = Date.now() / 1000;
+                
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Moving waveform
+                ctx.beginPath();
+                for (let x = 0; x < width; x += 2) {
+                    const y = height / 2 + Math.sin(x * 0.05 + time * 3) * height * 0.4;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = '#2196F3';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                requestAnimationFrame(() => this.animatePlayback());
+            }
+
+            animateCollisions() {
+                // Animate particle collisions
+                const animate = () => {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.particles.forEach(particle => {
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        
+                        // Bounce off walls
+                        if (particle.x <= particle.radius || particle.x >= this.canvas.width - particle.radius) {
+                            particle.vx = -particle.vx;
+                        }
+                        if (particle.y <= particle.radius || particle.y >= this.canvas.height - particle.radius) {
+                            particle.vy = -particle.vy;
+                        }
+                        
+                        // Draw particle
+                        this.ctx.beginPath();
+                        this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                        this.ctx.fillStyle = particle.color;
+                        this.ctx.fill();
+                    });
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+
+            createAnalysisVisualization() {
+                // Create spectral analysis visualization
+                const ctx = this.ctx;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw frequency spectrum
+                for (let i = 0; i < width; i += 3) {
+                    const freq = i / width;
+                    const magnitude = Math.sin(freq * Math.PI * 10) * height * 0.4;
+                    
+                    ctx.fillStyle = `hsl(${freq * 360}, 70%, 60%)`;
+                    ctx.fillRect(i, height - magnitude, 2, magnitude);
+                }
+            }
+
+            startVisualization() {
+                // Initial static visualization
+                this.drawWaveform();
+            }
+
+            showProgress(percent) {
+                document.getElementById('progressBar').style.width = percent + '%';
+            }
+
+            updateStatus(message) {
+                document.getElementById('statusText').textContent = message;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            new CollidoscopeOptimized();
+        });
+    </script>
+</body>
+</html>
