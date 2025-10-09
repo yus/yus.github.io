@@ -1,0 +1,578 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spatial Mesh Computing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+            color: #e0e1dd;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: rgba(13, 27, 42, 0.9);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(64, 121, 140, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #mesh-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #compute-canvas {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            border: 2px solid rgba(76, 201, 240, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            background: rgba(13, 27, 42, 0.9);
+            padding: 15px 20px;
+            border-top: 1px solid rgba(64, 121, 140, 0.3);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        button {
+            background: linear-gradient(90deg, #4361ee, #3a0ca3);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(13, 27, 42, 0.8);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(64, 121, 140, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(13, 27, 42, 0.8);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(64, 121, 140, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 200px;
+        }
+        
+        .info-title {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #4cc9f0;
+        }
+        
+        .info-content {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #c0c0c0;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .controls {
+                padding: 12px 15px;
+            }
+            
+            button {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .status, .info-panel {
+                padding: 10px 12px;
+            }
+            
+            #compute-canvas {
+                width: 120px;
+                height: 120px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+            
+            .controls {
+                gap: 8px;
+            }
+            
+            button {
+                padding: 7px 12px;
+                font-size: 0.8rem;
+            }
+            
+            #compute-canvas {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Spatial Mesh Computing</h1>
+        <div class="subtitle">Non-von Neumann Architecture Visualization</div>
+    </div>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="mesh-canvas"></canvas>
+            <canvas id="compute-canvas"></canvas>
+            
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-indicator pulse"></div>
+                    <span>Computing Active</span>
+                </div>
+                <div class="status-item">
+                    <span>Nodes: 125</span>
+                </div>
+                <div class="status-item">
+                    <span>Activation: 42%</span>
+                </div>
+            </div>
+            
+            <div class="info-panel">
+                <div class="info-title">Architecture</div>
+                <div class="info-content">
+                    Distributed computation across a 3D mesh of interconnected nodes with local processing and emergent behaviors.
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="pattern-wave">Wave Pattern</button>
+            <button id="pattern-random">Random Pattern</button>
+            <button id="pattern-spiral">Spiral Pattern</button>
+            <button id="reset-mesh">Reset Mesh</button>
+            <button id="toggle-computation">Pause Computation</button>
+        </div>
+    </div>
+
+    <script>
+        // Main visualization code
+        document.addEventListener('DOMContentLoaded', function() {
+            const meshCanvas = document.getElementById('mesh-canvas');
+            const computeCanvas = document.getElementById('compute-canvas');
+            const meshCtx = meshCanvas.getContext('2d');
+            const computeCtx = computeCanvas.getContext('2d');
+            
+            // Set canvas sizes
+            function resizeCanvases() {
+                meshCanvas.width = window.innerWidth;
+                meshCanvas.height = window.innerHeight - 120; // Account for header and controls
+                
+                computeCanvas.width = 150;
+                computeCanvas.height = 150;
+                
+                if (window.innerWidth <= 768) {
+                    computeCanvas.width = 120;
+                    computeCanvas.height = 120;
+                }
+                
+                if (window.innerWidth <= 480) {
+                    computeCanvas.width = 100;
+                    computeCanvas.height = 100;
+                }
+            }
+            
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+            
+            // Mesh parameters
+            const gridSize = 5;
+            const nodes = [];
+            let computing = true;
+            let orbitAngle = 0;
+            let animationId;
+            
+            // Initialize nodes
+            function initializeMesh() {
+                nodes.length = 0;
+                const spacing = 70;
+                
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            nodes.push({
+                                x: (x - gridSize/2) * spacing,
+                                y: (y - gridSize/2) * spacing,
+                                z: (z - gridSize/2) * spacing,
+                                value: 0,
+                                activation: 0,
+                                color: '#6495ed'
+                            });
+                        }
+                    }
+                }
+                
+                // Add some initial activation
+                injectComputation(0, 0, 0, 1.0);
+                injectComputation(4, 4, 4, -0.8);
+                injectComputation(2, 2, 2, 0.6);
+            }
+            
+            // Compute step for the mesh
+            function computeStep() {
+                // Simple diffusion computation
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    // Find neighbors (simplified for performance)
+                    const neighbors = nodes.filter(n => {
+                        const dx = n.x - node.x;
+                        const dy = n.y - node.y;
+                        const dz = n.z - node.z;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        return dist < 85 && dist > 0; // Within spacing but not itself
+                    });
+                    
+                    if (neighbors.length > 0) {
+                        const sum = neighbors.reduce((acc, n) => acc + n.value, 0);
+                        node.value = 0.8 * (sum / neighbors.length) + 0.2 * (Math.random() - 0.5) * 0.2;
+                    }
+                    
+                    // Update activation and color
+                    node.activation = Math.abs(node.value);
+                    const blue = Math.floor(100 + node.activation * 155);
+                    const red = Math.floor(100 + node.activation * 155);
+                    node.color = `rgb(${red}, 100, ${blue})`;
+                }
+            }
+            
+            // Render the mesh
+            function renderMesh() {
+                meshCtx.clearRect(0, 0, meshCanvas.width, meshCanvas.height);
+                
+                // Set background
+                meshCtx.fillStyle = '#0d1b2a';
+                meshCtx.fillRect(0, 0, meshCanvas.width, meshCanvas.height);
+                
+                // Center of canvas
+                const centerX = meshCanvas.width / 2;
+                const centerY = meshCanvas.height / 2;
+                
+                // Calculate camera position for orbiting
+                const cameraRadius = 400;
+                const cameraX = centerX + Math.cos(orbitAngle) * cameraRadius;
+                const cameraY = centerY + 100;
+                const cameraZ = Math.sin(orbitAngle) * cameraRadius;
+                
+                // Sort nodes by Z for proper rendering
+                const sortedNodes = [...nodes].sort((a, b) => {
+                    const aZ = a.z + Math.sin(orbitAngle) * 50;
+                    const bZ = b.z + Math.sin(orbitAngle) * 50;
+                    return bZ - aZ;
+                });
+                
+                // Draw connections first (behind nodes)
+                meshCtx.strokeStyle = 'rgba(100, 150, 255, 0.2)';
+                meshCtx.lineWidth = 0.5;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    // Simple 3D projection
+                    const scale = 300 / (300 + node.z + cameraZ);
+                    const x = centerX + (node.x - cameraX) * scale;
+                    const y = centerY + (node.y - cameraY) * scale;
+                    
+                    // Draw connections to nearby nodes
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const other = nodes[j];
+                        const dx = other.x - node.x;
+                        const dy = other.y - node.y;
+                        const dz = other.z - node.z;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        
+                        if (dist < 85) { // Connection threshold
+                            const otherScale = 300 / (300 + other.z + cameraZ);
+                            const otherX = centerX + (other.x - cameraX) * otherScale;
+                            const otherY = centerY + (other.y - cameraY) * otherScale;
+                            
+                            meshCtx.beginPath();
+                            meshCtx.moveTo(x, y);
+                            meshCtx.lineTo(otherX, otherY);
+                            meshCtx.stroke();
+                        }
+                    }
+                }
+                
+                // Draw nodes
+                for (let i = 0; i < sortedNodes.length; i++) {
+                    const node = sortedNodes[i];
+                    
+                    // Simple 3D projection
+                    const scale = 300 / (300 + node.z + cameraZ);
+                    const x = centerX + (node.x - cameraX) * scale;
+                    const y = centerY + (node.y - cameraY) * scale;
+                    const radius = 5 + node.activation * 12;
+                    
+                    // Draw node as circle
+                    meshCtx.fillStyle = node.color;
+                    meshCtx.beginPath();
+                    meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                    meshCtx.fill();
+                    
+                    // Add glow effect for activated nodes
+                    if (node.activation > 0.3) {
+                        meshCtx.shadowColor = node.color;
+                        meshCtx.shadowBlur = 15;
+                        meshCtx.beginPath();
+                        meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                        meshCtx.fill();
+                        meshCtx.shadowBlur = 0;
+                    }
+                }
+                
+                // Update orbit angle for automatic rotation
+                orbitAngle += 0.005;
+            }
+            
+            // Compute canvas rendering (2D pixel array)
+            function renderComputeCanvas() {
+                const width = computeCanvas.width;
+                const height = computeCanvas.height;
+                
+                // Create image data for pixel manipulation
+                const imageData = computeCtx.createImageData(width, height);
+                const data = imageData.data;
+                
+                // Fill with computed patterns
+                for (let i = 0; i < data.length; i += 4) {
+                    const x = (i / 4) % width;
+                    const y = Math.floor((i / 4) / width);
+                    
+                    // Different patterns based on current state
+                    const time = Date.now() / 1000;
+                    let r, g, b;
+                    
+                    // Create an interesting visual pattern
+                    const value = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time) + 
+                                 Math.sin(x * 0.05) * Math.cos(y * 0.05) * 0.5;
+                    
+                    r = Math.floor(100 + value * 155);
+                    g = Math.floor(150 + Math.sin(time) * 100);
+                    b = Math.floor(200 + value * 55);
+                    
+                    data[i] = r;     // Red
+                    data[i+1] = g;   // Green
+                    data[i+2] = b;   // Blue
+                    data[i+3] = 255; // Alpha
+                }
+                
+                computeCtx.putImageData(imageData, 0, 0);
+            }
+            
+            // Animation loop
+            function animate() {
+                if (computing) {
+                    computeStep();
+                    renderComputeCanvas();
+                }
+                
+                renderMesh();
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Initialize and start animation
+            initializeMesh();
+            animate();
+            
+            // Interaction functions
+            function injectComputation(x, y, z, strength) {
+                // Find the node at the specified grid position
+                const index = x * gridSize * gridSize + y * gridSize + z;
+                if (nodes[index]) {
+                    nodes[index].value += strength;
+                    
+                    // Propagate to neighbors
+                    for (let i = 0; i < nodes.length; i++) {
+                        const dx = nodes[i].x - nodes[index].x;
+                        const dy = nodes[i].y - nodes[index].y;
+                        const dz = nodes[i].z - nodes[index].z;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        
+                        if (dist < 85 && dist > 0) {
+                            nodes[i].value += strength * 0.3;
+                        }
+                    }
+                }
+            }
+            
+            function injectWavePattern() {
+                for (let x = 0; x < gridSize; x++) {
+                    const wave = Math.sin(x * 0.8) * 0.7;
+                    injectComputation(x, 2, 2, wave);
+                }
+            }
+            
+            function injectRandomPattern() {
+                for (let i = 0; i < 10; i++) {
+                    injectComputation(
+                        Math.floor(Math.random() * gridSize),
+                        Math.floor(Math.random() * gridSize),
+                        Math.floor(Math.random() * gridSize),
+                        Math.random() * 2 - 1
+                    );
+                }
+            }
+            
+            function injectSpiralPattern() {
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    const dist = Math.sqrt(node.x*node.x + node.y*node.y + node.z*node.z);
+                    const spiral = Math.sin(dist * 0.05 + orbitAngle * 5) * 0.5;
+                    node.value += spiral;
+                }
+            }
+            
+            // Set up button interactions
+            document.getElementById('pattern-wave').addEventListener('click', injectWavePattern);
+            document.getElementById('pattern-random').addEventListener('click', injectRandomPattern);
+            document.getElementById('pattern-spiral').addEventListener('click', injectSpiralPattern);
+            document.getElementById('reset-mesh').addEventListener('click', initializeMesh);
+            
+            document.getElementById('toggle-computation').addEventListener('click', function() {
+                computing = !computing;
+                this.textContent = computing ? 'Pause Computation' : 'Resume Computation';
+                
+                // Update status indicator
+                const indicator = document.querySelector('.status-indicator');
+                if (computing) {
+                    indicator.classList.add('pulse');
+                    indicator.style.background = '#4ade80';
+                } else {
+                    indicator.classList.remove('pulse');
+                    indicator.style.background = '#f59e0b';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
