@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OEIS Sequence Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.4;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 0;
+        }
+        
+        /* Header */
+        .header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 16px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-weight: 600;
+            font-size: 16px;
+            color: #f0f6fc;
+        }
+        
+        /* Canvas Section */
+        .canvas-section {
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        #mainCanvas {
+            width: 100%;
+            height: 270px;
+            display: block;
+        }
+        
+        /* Input Section */
+        .input-section {
+            background: #0d1117;
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .input-group {
+            display: flex;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            background: #010409;
+            border: 1px solid #30363d;
+            border-radius: 6px 0 0 6px;
+            color: #e6edf3;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #1f6feb;
+            box-shadow: 0 0 0 2px #1f6feb40;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 0 6px 6px 0;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            background: #2ea043;
+        }
+        
+        button:disabled {
+            background: #30363d;
+            border-color: #484f58;
+            cursor: not-allowed;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #7d8590;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #30363d;
+            border-top: 2px solid #1f6feb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Info Section */
+        .info-section {
+            background: #0d1117;
+            padding: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .sequence-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        
+        .sequence-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .sequence-id {
+            font-weight: 600;
+            color: #2f81f7;
+            font-size: 14px;
+        }
+        
+        .sequence-badge {
+            background: #1f6feb;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .sequence-description {
+            color: #7d8590;
+            font-size: 13px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .sequence-formula {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #e6edf3;
+            margin-bottom: 12px;
+        }
+        
+        .sequence-link {
+            color: #2f81f7;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .sequence-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        footer {
+            background: #0d1117;
+            border-top: 1px solid #30363d;
+            padding: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #7d8590;
+        }
+        
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .footer-link {
+            color: #7d8590;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .footer-link:hover {
+            color: #2f81f7;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">OEIS Sequence Visualizer</div>
+            </div>
+        </header>
+        
+        <!-- Canvas Section -->
+        <section class="canvas-section">
+            <div id="mainCanvas"></div>
+        </section>
+        
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-group">
+                <input type="text" id="functionInput" placeholder="log(70280^(1/n))" value="log(70280^(1/n))">
+                <button id="searchButton" onclick="searchOEIS()">Search</button>
+            </div>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <span>Searching OEIS database...</span>
+            </div>
+        </section>
+        
+        <!-- Info Section -->
+        <section class="info-section">
+            <div id="infoGrid" class="info-grid">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </section>
+        
+        <footer>
+            <div class="footer-content">
+                <div>OEIS Sequence Visualizer</div>
+                <div class="footer-links">
+                    <a href="https://github.com" class="footer-link">GitHub</a>
+                    <a href="https://oeis.org" class="footer-link">OEIS</a>
+                    <a href="#" class="footer-link">Docs</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let mainCanvas;
+        let sequenceData = [];
+        let oeisSequences = [];
+        
+        function setup() {
+            const canvasWidth = windowWidth;
+            const canvasHeight = 270;
+            mainCanvas = createCanvas(canvasWidth, canvasHeight);
+            mainCanvas.parent('mainCanvas');
+            
+            // Load initial data
+            updateVisualization();
+            
+            window.addEventListener('resize', function() {
+                resizeCanvas(windowWidth, 270);
+                updateVisualization();
+            });
+        }
+        
+        async function searchOEIS() {
+            const input = document.getElementById('functionInput').value;
+            const button = document.getElementById('searchButton');
+            const loading = document.getElementById('loading');
+            
+            // Show loading state
+            button.disabled = true;
+            loading.style.display = 'flex';
+            
+            try {
+                // Generate sequence from function
+                const compiled = math.compile(input);
+                sequenceData = [];
+                
+                for (let n = 1; n <= 20; n++) {
+                    try {
+                        const scope = { n: n };
+                        const value = compiled.evaluate(scope);
+                        sequenceData.push(Math.round(value * 1000) / 1000); // Round to 3 decimals
+                    } catch (e) {
+                        sequenceData.push(0);
+                    }
+                }
+                
+                // Search OEIS with the generated sequence
+                await searchOEISBySequence(sequenceData);
+                
+                // Update visualization
+                updateVisualization();
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                showError('Failed to search OEIS database');
+            } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function searchOEISBySequence(sequence) {
+            // Convert sequence to OEIS search format
+            const sequenceString = sequence.slice(0, 10).join(',');
+            
+            try {
+                // Use OEIS API to search by sequence
+                const response = await fetch(`https://oeis.org/search?q=${sequenceString}&fmt=json`);
+                const data = await response.json();
+                
+                oeisSequences = data.results ? data.results.slice(0, 3) : [];
+                
+                // Update UI with search results
+                updateSequenceCards();
+                
+            } catch (error) {
+                console.error('OEIS API error:', error);
+                // Fallback to mock data if API fails
+                useMockData();
+            }
+        }
+        
+        function useMockData() {
+            // Mock data for demonstration
+            oeisSequences = [
+                {
+                    number: 'A002162',
+                    name: 'Decimal expansion of the natural logarithm of 2.',
+                    data: '0,6,9,3,1,4,7,1,8,0,5,5,9,9,4,5,3,0,9,4,1,7,2,3,2,1,2,0,9,8,6,2,3,7,3,6,2,1,8,7,5,4,2,3,8,9,0,4,5,2',
+                    formula: 'log(2)'
+                },
+                {
+                    number: 'A016738',
+                    name: 'Continued fraction for log(50).',
+                    data: '3,1,1,8,1,1,2,1,1,1,2,1,2,1,4,1,1,1,1,3,2,8,1,2,2,1,7,1,1,2,1,1,1,3,5,1,1,1,1,2,1,1,1,1,1,1,1,2,3,2',
+                    formula: 'log(50)'
+                },
+                {
+                    number: 'A000027',
+                    name: 'The positive integers. Also called the natural numbers.',
+                    data: '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20',
+                    formula: 'n'
+                }
+            ];
+            
+            updateSequenceCards();
+        }
+        
+        function updateSequenceCards() {
+            const infoGrid = document.getElementById('infoGrid');
+            infoGrid.innerHTML = '';
+            
+            oeisSequences.forEach(seq => {
+                const sequenceValues = seq.data.split(',').slice(0, 20).map(Number);
+                
+                const card = document.createElement('div');
+                card.className = 'sequence-card';
+                card.innerHTML = `
+                    <div class="sequence-header">
+                        <div class="sequence-id">${seq.number}</div>
+                        <div class="sequence-badge">Math</div>
+                    </div>
+                    <div class="sequence-description">${seq.name}</div>
+                    <div class="sequence-formula">${seq.formula || 'No formula available'}</div>
+                    <div class="sequence-data" style="font-size: 11px; color: #7d8590; margin-bottom: 8px;">
+                        First terms: [${sequenceValues.slice(0, 8).join(', ')}...]
+                    </div>
+                    <a href="https://oeis.org/${seq.number}" target="_blank" class="sequence-link">
+                        View on OEIS
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 2.5h-5A1.5 1.5 0 0 0 4 4v8a1.5 1.5 0 0 0 1.5 1.5h5A1.5 1.5 0 0 0 12 12V4a1.5 1.5 0 0 0-1.5-1.5zM11 12a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 12V4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v8z"/>
+                            <path d="M7.5 5.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1z"/>
+                        </svg>
+                    </a>
+                `;
+                infoGrid.appendChild(card);
+            });
+            
+            // If no results found
+            if (oeisSequences.length === 0) {
+                infoGrid.innerHTML = `
+                    <div class="sequence-card">
+                        <div class="sequence-description">No matching sequences found in OEIS database.</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function updateVisualization() {
+            drawCanvas();
+        }
+        
+        function drawCanvas() {
+            background(13, 17, 23);
+            
+            const mainSectionHeight = height * 0.8;
+            const previewSectionHeight = height * 0.2;
+            const previewWidth = width / 3;
+            
+            drawMainSection(mainSectionHeight);
+            
+            // Draw preview sections for OEIS sequences
+            if (oeisSequences.length > 0) {
+                drawPreviewSection(mainSectionHeight, previewSectionHeight, previewWidth);
+            }
+        }
+        
+        function drawMainSection(sectionHeight) {
+            push();
+            
+            if (sequenceData.length === 0) return;
+            
+            drawGrid(width, sectionHeight, 20);
+            
+            let minVal = Math.min(...sequenceData);
+            let maxVal = Math.max(...sequenceData);
+            let range = maxVal - minVal;
+            if (range === 0) range = 1;
+            
+            drawAxes(width, sectionHeight);
+            
+            stroke(47, 129, 247);
+            strokeWeight(1.5);
+            noFill();
+            
+            beginShape();
+            for (let i = 0; i < sequenceData.length; i++) {
+                let x = map(i, 0, sequenceData.length - 1, 40, width - 40);
+                let y = map(sequenceData[i], minVal, maxVal, sectionHeight - 30, 30);
+                vertex(x, y);
+                
+                if (i % 3 === 0) {
+                    fill(13, 17, 23);
+                    stroke(47, 129, 247);
+                    ellipse(x, y, 4, 4);
+                    noFill();
+                }
+            }
+            endShape();
+            
+            fill(230, 237, 243);
+            noStroke();
+            textSize(11);
+            textAlign(LEFT, TOP);
+            text("f(n) = " + document.getElementById('functionInput').value, 45, 25);
+            
+            pop();
+        }
+        
+        function drawPreviewSection(sectionTop, sectionHeight, previewWidth) {
+            for (let i = 0; i < Math.min(3, oeisSequences.length); i++) {
+                const seq = oeisSequences[i];
+                const sequenceValues = seq.data.split(',').slice(0, 15).map(Number);
+                
+                push();
+                translate(i * previewWidth, sectionTop);
+                
+                drawGrid(previewWidth, sectionHeight, 10);
+                drawAxes(previewWidth, sectionHeight);
+                
+                let minVal = Math.min(...sequenceValues);
+                let maxVal = Math.max(...sequenceValues);
+                let range = maxVal - minVal;
+                if (range === 0) range = 1;
+                
+                stroke(47, 129, 247);
+                strokeWeight(1);
+                noFill();
+                
+                beginShape();
+                for (let j = 0; j < sequenceValues.length; j++) {
+                    let x = map(j, 0, sequenceValues.length - 1, 15, previewWidth - 15);
+                    let y = map(sequenceValues[j], minVal, maxVal, sectionHeight - 12, 12);
+                    vertex(x, y);
+                    
+                    if (j % 2 === 0) {
+                        fill(13, 17, 23);
+                        stroke(47, 129, 247);
+                        ellipse(x, y, 2.5, 2.5);
+                        noFill();
+                    }
+                }
+                endShape();
+                
+                fill(230, 237, 243);
+                noStroke();
+                textSize(9);
+                textAlign(LEFT, TOP);
+                text(seq.number, 18, 10);
+                
+                pop();
+            }
+        }
+        
+        function drawGrid(gridWidth, gridHeight, spacing) {
+            stroke(48, 54, 61);
+            strokeWeight(0.5);
+            
+            for (let x = 0; x <= gridWidth; x += spacing) {
+                drawingContext.setLineDash([1, 3]);
+                line(x, 0, x, gridHeight);
+            }
+            
+            for (let y = 0; y <= gridHeight; y += spacing) {
+                drawingContext.setLineDash([1, 3]);
+                line(0, y, gridWidth, y);
+            }
+            
+            drawingContext.setLineDash([]);
+        }
+        
+        function drawAxes(axesWidth, axesHeight) {
+            stroke(139, 148, 158);
+            strokeWeight(1);
+            
+            line(0, axesHeight/2, axesWidth, axesHeight/2);
+            line(axesWidth/2, 0, axesWidth/2, axesHeight);
+        }
+        
+        function showError(message) {
+            const infoGrid = document.getElementById('infoGrid');
+            infoGrid.innerHTML = `
+                <div class="sequence-card">
+                    <div class="sequence-description" style="color: #f85149;">${message}</div>
+                </div>
+            `;
+        }
+        
+        // Initialize
+        document.getElementById('functionInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchOEIS();
+            }
+        });
+        
+        // Load initial mock data
+        useMockData();
+    </script>
+</body>
+</html>
