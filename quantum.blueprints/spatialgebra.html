@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPATIAL MESH COMPUTING</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        @font-face {
+            font-family: 'Cyroglyph';
+            src: url('https://yus.github.io/quantum.blueprints/cyroglyph.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            background: #0d1b2a;
+            color: #e0e1dd;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            font-family: 'Cyroglyph', monospace;
+            font-size: 8px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(13, 27, 42, 0.95);
+            border-bottom: 1px solid rgba(64, 121, 140, 0.3);
+            z-index: 10;
+            height: 40px;
+        }
+        
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .info-toggle {
+            background: rgba(67, 97, 238, 0.3);
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #mesh-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 45px;
+            right: 12px;
+            background: rgba(13, 27, 42, 0.98);
+            border: 1px solid rgba(64, 121, 140, 0.5);
+            border-radius: 4px;
+            padding: 12px;
+            width: 85%;
+            max-width: 280px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            display: none;
+        }
+        
+        .info-panel.active {
+            display: block;
+        }
+        
+        .panel-title {
+            margin-bottom: 8px;
+            color: #4cc9f0;
+            text-align: center;
+        }
+        
+        .panel-section {
+            margin-bottom: 8px;
+        }
+        
+        .section-title {
+            margin-bottom: 4px;
+            color: #4cc9f0;
+        }
+        
+        .panel-content {
+            line-height: 1.2;
+            color: #c0c0c0;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(13, 27, 42, 0.95);
+            border-top: 1px solid rgba(64, 121, 140, 0.3);
+            z-index: 10;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .controls-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 12px;
+            background: rgba(67, 97, 238, 0.3);
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 15;
+        }
+        
+        button {
+            background: rgba(67, 97, 238, 0.3);
+            color: white;
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            padding: 6px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 70px;
+            font-family: 'Cyroglyph', monospace;
+            font-size: 8px;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: rgba(67, 97, 238, 0.5);
+        }
+        
+        button:active {
+            background: rgba(67, 97, 238, 0.7);
+        }
+        
+        .compute-display {
+            position: absolute;
+            bottom: 70px;
+            left: 12px;
+            width: 80px;
+            height: 80px;
+            border: 1px solid rgba(76, 201, 240, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            z-index: 5;
+        }
+        
+        .compute-info {
+            position: absolute;
+            bottom: 70px;
+            left: 100px;
+            color: #4cc9f0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 8px;
+        }
+        
+        li {
+            margin-bottom: 2px;
+            position: relative;
+        }
+        
+        li:before {
+            content: "■";
+            color: #4cc9f0;
+            position: absolute;
+            left: -8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="status-panel">
+                <div class="status-item">
+                    <div class="status-indicator pulse"></div>
+                    <span>COMPUTING ACTIVE</span>
+                </div>
+                <div class="status-item">
+                    <span>NODES: 125</span>
+                </div>
+                <div class="status-item">
+                    <span>ACTIVATION: 42%</span>
+                </div>
+                <div class="status-item">
+                    <span>CYCLE: 128</span>
+                </div>
+            </div>
+            
+            <div class="info-toggle" id="info-toggle">i</div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="mesh-canvas"></canvas>
+            <canvas class="compute-display" id="compute-canvas"></canvas>
+            <div class="compute-info" id="compute-info">
+                <div>PIXEL GROUPS: 0</div>
+                <div>ACTIVE: 0%</div>
+                <div>DENSITY: 0</div>
+            </div>
+            
+            <div class="info-panel" id="info-panel">
+                <div class="panel-title">SPATIAL MESH COMPUTING</div>
+                
+                <div class="panel-section">
+                    <div class="section-title">ARCHITECTURE OVERVIEW</div>
+                    <div class="panel-content">
+                        A NON-VON NEUMANN ARCHITECTURE BLUEPRINT WITH DISTRIBUTED COMPUTATION ACROSS A 3D MESH OF INTERCONNECTED NODES. EACH NODE PROCESSES INFORMATION LOCALLY AND COMMUNICATES WITH NEIGHBORS.
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">NODE PROPERTIES</div>
+                    <div class="panel-content">
+                        <ul>
+                            <li>LOCAL COMPUTATION UNIT</li>
+                            <li>6-WAY CONNECTIVITY</li>
+                            <li>DYNAMIC ACTIVATION STATE</li>
+                            <li>VISUAL FEEDBACK SYSTEM</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">DATA FLOW</div>
+                    <div class="panel-content">
+                        INFORMATION PROPAGATES THROUGH LOCAL NEIGHBORHOOD DIFFUSION, EMERGENT WAVE PATTERNS, PARALLEL PROCESSING, AND NON-LINEAR INTERACTIONS.
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">CONTROLS</div>
+                    <div class="panel-content">
+                        WAVE PATTERN: CREATES SINUSOIDAL ACTIVATION
+                        RANDOM PATTERN: INJECTS RANDOM COMPUTATION
+                        SPIRAL PATTERN: CREATES SPIRAL ACTIVATION
+                        RESET MESH: REINITIALIZES VISUALIZATION
+                        PAUSE/RESUME: TOGGLES COMPUTATION
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls" id="controls">
+            <button id="pattern-wave">WAVE</button>
+            <button id="pattern-random">RANDOM</button>
+            <button id="pattern-spiral">SPIRAL</button>
+            <button id="reset-mesh">RESET</button>
+            <button id="toggle-computation">PAUSE</button>
+        </div>
+        
+        <div class="controls-toggle" id="controls-toggle">⌄</div>
+    </div>
+
+    <script>
+        // Main visualization code
+        document.addEventListener('DOMContentLoaded', function() {
+            const meshCanvas = document.getElementById('mesh-canvas');
+            const computeCanvas = document.getElementById('compute-canvas');
+            const meshCtx = meshCanvas.getContext('2d');
+            const computeCtx = computeCanvas.getContext('2d');
+            const computeInfo = document.getElementById('compute-info');
+            
+            // UI elements
+            const infoToggle = document.getElementById('info-toggle');
+            const infoPanel = document.getElementById('info-panel');
+            const controlsToggle = document.getElementById('controls-toggle');
+            const controls = document.getElementById('controls');
+            
+            // Set canvas sizes
+            function resizeCanvases() {
+                meshCanvas.width = window.innerWidth;
+                meshCanvas.height = window.innerHeight - 120;
+                
+                computeCanvas.width = computeCanvas.offsetWidth;
+                computeCanvas.height = computeCanvas.offsetHeight;
+            }
+            
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+            
+            // Toggle info panel
+            infoToggle.addEventListener('click', function() {
+                infoPanel.classList.toggle('active');
+            });
+            
+            // Toggle controls
+            let controlsVisible = true;
+            controlsToggle.addEventListener('click', function() {
+                controlsVisible = !controlsVisible;
+                controls.style.display = controlsVisible ? 'flex' : 'none';
+                controlsToggle.textContent = controlsVisible ? '⌄' : '⌃';
+            });
+            
+            // Mesh parameters
+            const gridSize = 5;
+            const nodes = [];
+            let computing = true;
+            let orbitAngleX = 0;
+            let orbitAngleY = 0;
+            let userOrbitX = 0;
+            let userOrbitY = 0;
+            let isDragging = false;
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            let computeCounter = 0;
+            let animationId;
+            let patternActive = false;
+            let patternProgress = 0;
+            let currentPattern = null;
+            let zoomLevel = 1.0;
+            
+            // Compute display parameters
+            let pixelGroups = [];
+            let activePixels = 0;
+            let pixelDensity = 0;
+            
+            // Initialize nodes
+            function initializeMesh() {
+                nodes.length = 0;
+                const spacing = 40;
+                
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            nodes.push({
+                                x: (x - gridSize/2) * spacing,
+                                y: (y - gridSize/2) * spacing,
+                                z: (z - gridSize/2) * spacing,
+                                value: 0,
+                                activation: 0,
+                                color: '#6495ed'
+                            });
+                        }
+                    }
+                }
+                
+                // Initialize compute display
+                initializeComputeDisplay();
+                
+                computeCounter = 0;
+                patternActive = false;
+                patternProgress = 0;
+                currentPattern = null;
+                zoomLevel = 1.0;
+                updateStatus();
+            }
+            
+            // Initialize compute display with sharp square
+            function initializeComputeDisplay() {
+                pixelGroups = [];
+                activePixels = 0;
+                pixelDensity = 0;
+                
+                // Create initial pixel groups
+                for (let i = 0; i < 5; i++) {
+                    createPixelGroup();
+                }
+            }
+            
+            // Create a group of 5-9 pixels randomly spread
+            function createPixelGroup() {
+                const groupSize = Math.floor(Math.random() * 5) + 5; // 5-9 pixels
+                const group = [];
+                
+                for (let i = 0; i < groupSize; i++) {
+                    group.push({
+                        x: Math.floor(Math.random() * computeCanvas.width),
+                        y: Math.floor(Math.random() * computeCanvas.height),
+                        active: Math.random() > 0.3
+                    });
+                }
+                
+                pixelGroups.push(group);
+            }
+            
+            // Compute step for the mesh
+            function computeStep() {
+                // Handle pattern progression - SLOWER
+                if (patternActive && currentPattern) {
+                    patternProgress += 0.008; // Much slower pattern progression
+                    if (patternProgress >= 1) {
+                        patternActive = false;
+                        patternProgress = 0;
+                    } else {
+                        currentPattern(patternProgress);
+                        updateComputeDisplay();
+                        return;
+                    }
+                }
+                
+                // Normal diffusion computation
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    // Find neighbors
+                    const neighbors = nodes.filter(n => {
+                        const dx = n.x - node.x;
+                        const dy = n.y - node.y;
+                        const dz = n.z - node.z;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        return dist < 55 && dist > 0;
+                    });
+                    
+                    if (neighbors.length > 0) {
+                        const sum = neighbors.reduce((acc, n) => acc + n.value, 0);
+                        node.value = 0.9 * (sum / neighbors.length) + 0.1 * (Math.random() - 0.5) * 0.1;
+                    }
+                    
+                    // Update activation and color
+                    node.activation = Math.abs(node.value);
+                    const blue = Math.floor(100 + node.activation * 155);
+                    const red = Math.floor(100 + node.activation * 155);
+                    node.color = `rgb(${red}, 100, ${blue})`;
+                }
+                
+                // Update compute display
+                updateComputeDisplay();
+                
+                computeCounter++;
+                if (computeCounter % 10 === 0) {
+                    updateStatus();
+                }
+            }
+            
+            // Update compute display with sharp square
+            function updateComputeDisplay() {
+                // Clear with sharp edges
+                computeCtx.fillStyle = '#0d1b2a';
+                computeCtx.fillRect(0, 0, computeCanvas.width, computeCanvas.height);
+                
+                // Update pixel groups
+                activePixels = 0;
+                let totalPixels = 0;
+                
+                for (let group of pixelGroups) {
+                    for (let pixel of group) {
+                        totalPixels++;
+                        // Randomly toggle some pixels
+                        if (Math.random() < 0.1) {
+                            pixel.active = !pixel.active;
+                        }
+                        
+                        if (pixel.active) {
+                            activePixels++;
+                            // Draw sharp pixel
+                            computeCtx.fillStyle = `rgb(${100 + Math.random() * 155}, 100, ${150 + Math.random() * 105})`;
+                            computeCtx.fillRect(pixel.x, pixel.y, 1, 1);
+                        }
+                    }
+                }
+                
+                // Occasionally add/remove groups
+                if (Math.random() < 0.05 && pixelGroups.length < 15) {
+                    createPixelGroup();
+                }
+                if (Math.random() < 0.02 && pixelGroups.length > 3) {
+                    pixelGroups.shift();
+                }
+                
+                // Update compute info
+                pixelDensity = Math.round((activePixels / totalPixels) * 100);
+                computeInfo.innerHTML = `
+                    <div>PIXEL GROUPS: ${pixelGroups.length}</div>
+                    <div>ACTIVE: ${Math.round((activePixels / totalPixels) * 100)}%</div>
+                    <div>DENSITY: ${pixelDensity}</div>
+                `;
+            }
+            
+            // Update status display
+            function updateStatus() {
+                const statusItems = document.querySelectorAll('.status-item');
+                const activeNodes = nodes.filter(n => n.activation > 0.1).length;
+                const activationLevel = Math.round((activeNodes / nodes.length) * 100);
+                
+                statusItems[1].innerHTML = `<span>NODES: ${nodes.length}</span>`;
+                statusItems[2].innerHTML = `<span>ACTIVATION: ${activationLevel}%</span>`;
+                statusItems[3].innerHTML = `<span>CYCLE: ${computeCounter}</span>`;
+            }
+            
+            // Render the mesh with user orbiting
+            function renderMesh() {
+                meshCtx.clearRect(0, 0, meshCanvas.width, meshCanvas.height);
+                
+                // Set background
+                meshCtx.fillStyle = '#0d1b2a';
+                meshCtx.fillRect(0, 0, meshCanvas.width, meshCanvas.height);
+                
+                // Center of canvas
+                const centerX = meshCanvas.width / 2;
+                const centerY = meshCanvas.height / 2;
+                
+                // Combine auto orbit with user orbit
+                const totalOrbitX = orbitAngleX + userOrbitX;
+                const totalOrbitY = orbitAngleY + userOrbitY;
+                
+                // Auto orbiting - FASTER
+                orbitAngleX += 0.008;
+                orbitAngleY += 0.005;
+                
+                // Camera position with zoom
+                const baseRadius = 180;
+                const cameraRadius = baseRadius * zoomLevel;
+                const cameraX = centerX + Math.cos(totalOrbitX) * cameraRadius;
+                const cameraY = centerY;
+                const cameraZ = Math.sin(totalOrbitY) * cameraRadius;
+                
+                // Sort nodes by Z for proper rendering
+                const sortedNodes = [...nodes].sort((a, b) => b.z - a.z);
+                
+                // Draw connections
+                meshCtx.strokeStyle = 'rgba(100, 150, 255, 0.1)';
+                meshCtx.lineWidth = 0.5;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    // 3D projection with zoom
+                    const scale = Math.min(0.8, 250 / (250 + Math.abs(node.z) + Math.abs(cameraZ))) * zoomLevel;
+                    const x = centerX + node.x * scale;
+                    const y = centerY + node.y * scale;
+                    
+                    // Skip nodes outside bounds
+                    if (x < 0 || x > meshCanvas.width || y < 0 || y > meshCanvas.height) continue;
+                    
+                    // Draw connections
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const other = nodes[j];
+                        const dx = other.x - node.x;
+                        const dy = other.y - node.y;
+                        const dz = other.z - node.z;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        
+                        if (dist < 55) {
+                            const otherScale = Math.min(0.8, 250 / (250 + Math.abs(other.z) + Math.abs(cameraZ))) * zoomLevel;
+                            const otherX = centerX + other.x * otherScale;
+                            const otherY = centerY + other.y * otherScale;
+                            
+                            if (otherX >= 0 && otherX <= meshCanvas.width && otherY >= 0 && otherY <= meshCanvas.height) {
+                                meshCtx.beginPath();
+                                meshCtx.moveTo(x, y);
+                                meshCtx.lineTo(otherX, otherY);
+                                meshCtx.stroke();
+                            }
+                        }
+                    }
+                }
+                
+                // Draw nodes
+                for (let i = 0; i < sortedNodes.length; i++) {
+                    const node = sortedNodes[i];
+                    
+                    const scale = Math.min(0.8, 250 / (250 + Math.abs(node.z) + Math.abs(cameraZ))) * zoomLevel;
+                    const x = centerX + node.x * scale;
+                    const y = centerY + node.y * scale;
+                    
+                    if (x < 0 || x > meshCanvas.width || y < 0 || y > meshCanvas.height) continue;
+                    
+                    const radius = (2 + node.activation * 6) * zoomLevel;
+                    
+                    meshCtx.fillStyle = node.color;
+                    meshCtx.beginPath();
+                    meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                    meshCtx.fill();
+                    
+                    if (node.activation > 0.3) {
+                        meshCtx.shadowColor = node.color;
+                        meshCtx.shadowBlur = 6;
+                        meshCtx.beginPath();
+                        meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                        meshCtx.fill();
+                        meshCtx.shadowBlur = 0;
+                    }
+                }
+            }
+            
+            // Mouse/touch events for orbiting
+            function handleMouseDown(e) {
+                isDragging = true;
+                lastMouseX = e.clientX || e.touches[0].clientX;
+                lastMouseY = e.clientY || e.touches[0].clientY;
+                e.preventDefault();
+            }
+            
+            function handleMouseMove(e) {
+                if (!isDragging) return;
+                
+                const currentX = e.clientX || e.touches[0].clientX;
+                const currentY = e.clientY || e.touches[0].clientY;
+                
+                const deltaX = currentX - lastMouseX;
+                const deltaY = currentY - lastMouseY;
+                
+                userOrbitX += deltaX * 0.01;
+                userOrbitY += deltaY * 0.01;
+                
+                lastMouseX = currentX;
+                lastMouseY = currentY;
+                e.preventDefault();
+            }
+            
+            function handleMouseUp() {
+                isDragging = false;
+            }
+            
+            // Add event listeners
+            meshCanvas.addEventListener('mousedown', handleMouseDown);
+            meshCanvas.addEventListener('mousemove', handleMouseMove);
+            meshCanvas.addEventListener('mouseup', handleMouseUp);
+            meshCanvas.addEventListener('mouseleave', handleMouseUp);
+            
+            meshCanvas.addEventListener('touchstart', handleMouseDown);
+            meshCanvas.addEventListener('touchmove', handleMouseMove);
+            meshCanvas.addEventListener('touchend', handleMouseUp);
+            
+            // Animation loop
+            function animate() {
+                if (computing) {
+                    computeStep();
+                }
+                
+                renderMesh();
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Initialize and start animation
+            initializeMesh();
+            animate();
+            
+            // Pattern functions - SLOWER
+            function wavePattern(progress) {
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            const index = x * gridSize * gridSize + y * gridSize + z;
+                            const wave = Math.sin(x * 0.8 + progress * 6) * 0.7 * progress;
+                            nodes[index].value = wave;
+                        }
+                    }
+                }
+            }
+            
+            function randomPattern(progress) {
+                if (progress < 0.1) {
+                    for (let i = 0; i < nodes.length; i++) {
+                        nodes[i].value = 0;
+                    }
+                }
+                
+                const intensity = progress * 1.2;
+                for (let i = 0; i < nodes.length * progress * 0.5; i++) {
+                    const randomIndex = Math.floor(Math.random() * nodes.length);
+                    nodes[randomIndex].value = (Math.random() - 0.5) * intensity;
+                }
+            }
+            
+            function spiralPattern(progress) {
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    const dist = Math.sqrt(node.x*node.x + node.y*node.y) / 40;
+                    const angle = Math.atan2(node.y, node.x);
+                    const spiral = Math.sin(dist * 1.5 - angle + progress * 6) * 0.7 * progress;
+                    node.value = spiral;
+                }
+            }
+            
+            // Set up button interactions
+            document.getElementById('pattern-wave').addEventListener('click', function() {
+                patternActive = true;
+                patternProgress = 0;
+                currentPattern = wavePattern;
+            });
+            
+            document.getElementById('pattern-random').addEventListener('click', function() {
+                patternActive = true;
+                patternProgress = 0;
+                currentPattern = randomPattern;
+            });
+            
+            document.getElementById('pattern-spiral').addEventListener('click', function() {
+                patternActive = true;
+                patternProgress = 0;
+                currentPattern = spiralPattern;
+            });
+            
+            document.getElementById('reset-mesh').addEventListener('click', initializeMesh);
+            
+            document.getElementById('toggle-computation').addEventListener('click', function() {
+                computing = !computing;
+                this.textContent = computing ? 'PAUSE' : 'RESUME';
+                
+                const indicator = document.querySelector('.status-indicator');
+                if (computing) {
+                    indicator.classList.add('pulse');
+                    indicator.style.background = '#4ade80';
+                } else {
+                    indicator.classList.remove('pulse');
+                    indicator.style.background = '#f59e0b';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
