@@ -427,10 +427,13 @@
                 
                 // Update visualization
                 updateVisualization();
+
+                // Update sequence cards
+                updateSequenceCards();
                 
             } catch (error) {
                 console.error('Search error:', error);
-                showError('Failed to process function');
+                showError('Failed to process function.');
             } finally {
                 button.disabled = false;
                 loading.style.display = 'none';
