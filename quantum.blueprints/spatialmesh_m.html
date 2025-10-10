@@ -27,7 +27,7 @@
             position: fixed;
             width: 100%;
             font-family: 'Cyroglyph', monospace;
-            font-size: 8px;
+            font-size: 12px;
             line-height: 1;
             text-transform: uppercase;
         }
@@ -182,7 +182,7 @@
             transition: all 0.3s ease;
             min-width: 70px;
             font-family: 'Cyroglyph', monospace;
-            font-size: 8px;
+            font-size: 12px;
             text-transform: uppercase;
         }
         
@@ -628,7 +628,7 @@
                 }
                 
                 // Very slow orbit
-                orbitAngle += 0.0008;
+                orbitAngle += 0.008;
             }
             
             // Animation loop
@@ -651,7 +651,7 @@
                     for (let y = 0; y < gridSize; y++) {
                         for (let z = 0; z < gridSize; z++) {
                             const index = x * gridSize * gridSize + y * gridSize + z;
-                            const wave = Math.sin(x * 0.8 + progress * 8) * 0.7 * progress;
+                            const wave = Math.sin(x * 0.08 + progress * 8) * 0.07 * progress;
                             nodes[index].value = wave;
                         }
                     }
@@ -677,7 +677,7 @@
                     const node = nodes[i];
                     const dist = Math.sqrt(node.x*node.x + node.y*node.y) / 40;
                     const angle = Math.atan2(node.y, node.x);
-                    const spiral = Math.sin(dist * 1.5 - angle + progress * 8) * 0.7 * progress;
+                    const spiral = Math.sin(dist * 1.5 - angle + progress * 8) * 0.07 * progress;
                     node.value = spiral;
                 }
             }
