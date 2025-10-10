@@ -19,11 +19,11 @@
             color: #e0e0ff;
             line-height: 1.4;
             overflow-x: hidden;
+            padding: 10px;
         }
         
         .container {
             max-width: 100%;
-            padding: 0 10px;
         }
         
         /* Canvas Section */
@@ -34,22 +34,7 @@
         
         #mainCanvas {
             width: 100%;
-            height: 108px; /* 1/5 of 1080p */
-            background: #0a0a12;
-            border: 1px solid #33334d;
-            border-radius: 4px;
-        }
-        
-        .previews-container {
-            display: flex;
-            width: 100%;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        
-        .preview-canvas {
-            flex: 1;
-            height: 54px; /* 1/20 of 1080p */
+            height: 270px; /* 1/5 + 1/20 of 1080p = 216 + 54 = 270px */
             background: #0a0a12;
             border: 1px solid #33334d;
             border-radius: 4px;
@@ -171,28 +156,10 @@
             margin-top: 15px;
         }
         
-        /* Labels */
-        .canvas-label {
-            position: absolute;
-            font-size: 10px;
-            color: #a0a0ff;
-            background: rgba(10, 10, 18, 0.7);
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-        
         /* Mobile optimization */
         @media (max-width: 480px) {
             .input-group {
                 min-width: 100%;
-            }
-            
-            .previews-container {
-                flex-direction: column;
-            }
-            
-            .preview-canvas {
-                height: 40px;
             }
         }
     </style>
@@ -202,18 +169,13 @@
         <!-- Canvas Section -->
         <section class="canvas-section">
             <div id="mainCanvas"></div>
-            <div class="previews-container">
-                <div id="preview0" class="preview-canvas"></div>
-                <div id="preview1" class="preview-canvas"></div>
-                <div id="preview2" class="preview-canvas"></div>
-            </div>
         </section>
         
         <!-- Input Section -->
         <section class="input-section">
             <div class="input-group">
                 <input type="text" id="functionInput" placeholder="log(70280^(1/n))" value="log(70280^(1/n))">
-                <button onclick="updateVisualization()">Search & Visualize</button>
+                <button onclick="updateVisualization()">Search</button>
             </div>
         </section>
         
@@ -250,30 +212,21 @@
 
     <script>
         let mainCanvas;
-        let previewCanvases = [];
         let sequenceData = [];
         
         function setup() {
             // Create main canvas with WEBGL
-            mainCanvas = createCanvas(windowWidth - 20, 108, WEBGL);
+            const canvasWidth = windowWidth - 20;
+            const canvasHeight = 270; // 1/5 + 1/20 of 1080p
+            mainCanvas = createCanvas(canvasWidth, canvasHeight, WEBGL);
             mainCanvas.parent('mainCanvas');
-            
-            // Create preview canvases
-            for (let i = 0; i < 3; i++) {
-                let preview = createCanvas((windowWidth - 36) / 3, 54, WEBGL);
-                preview.parent(`preview${i}`);
-                previewCanvases.push(preview);
-            }
             
             // Initial visualization
             updateVisualization();
             
             // Handle window resize
             window.addEventListener('resize', function() {
-                resizeCanvas(windowWidth - 20, 108);
-                for (let i = 0; i < 3; i++) {
-                    previewCanvases[i].resize((windowWidth - 36) / 3, 54);
-                }
+                resizeCanvas(windowWidth - 20, 270);
                 updateVisualization();
             });
         }
@@ -297,26 +250,40 @@
                     }
                 }
                 
-                // Draw all visualizations
-                drawMainGraph();
-                drawPreviews();
+                // Draw visualization
+                drawCanvas();
                 
             } catch (error) {
                 console.error('Error parsing function:', error);
             }
         }
         
-        function drawMainGraph() {
-            // Set main canvas
-            setMainCanvas();
-            
+        function drawCanvas() {
             // Clear with dark background
             background(10, 10, 18);
+            
+            // Calculate dimensions for the sections
+            const mainSectionHeight = height * 0.8; // 4/5 of canvas (216px)
+            const previewSectionHeight = height * 0.2; // 1/5 of canvas (54px)
+            const previewWidth = width / 3;
+            
+            // Draw main section (top 4/5)
+            drawMainSection(mainSectionHeight);
+            
+            // Draw preview section (bottom 1/5)
+            drawPreviewSection(mainSectionHeight, previewSectionHeight, previewWidth);
+        }
+        
+        function drawMainSection(sectionHeight) {
+            push();
+            
+            // Translate to main section
+            translate(-width/2, -sectionHeight/2);
             
             if (sequenceData.length === 0) return;
             
             // Draw dark dotted grid
-            drawGrid();
+            drawGrid(width, sectionHeight);
             
             // Find data range for scaling
             let minVal = Math.min(...sequenceData);
@@ -325,7 +292,7 @@
             if (range === 0) range = 1;
             
             // Draw axes with hairline
-            drawAxes();
+            drawAxes(width, sectionHeight);
             
             // Draw the sequence
             stroke(160, 160, 255);
@@ -334,8 +301,8 @@
             
             beginShape();
             for (let i = 0; i < sequenceData.length; i++) {
-                let x = map(i, 0, sequenceData.length - 1, -width/2 + 20, width/2 - 20);
-                let y = map(sequenceData[i], minVal, maxVal, height/2 - 20, -height/2 + 20);
+                let x = map(i, 0, sequenceData.length - 1, 20, width - 20);
+                let y = map(sequenceData[i], minVal, maxVal, sectionHeight - 20, 20);
                 vertex(x, y);
                 
                 // Draw ultra-tiny empty dots at data points
@@ -349,10 +316,16 @@
             endShape();
             
             // Draw label
-            drawLabel("Input: " + document.getElementById('functionInput').value, -width/2 + 25, -height/2 + 20);
+            fill(160, 160, 255);
+            noStroke();
+            textSize(10);
+            textAlign(LEFT, TOP);
+            text("Input: " + document.getElementById('functionInput').value, 25, 20);
+            
+            pop();
         }
         
-        function drawPreviews() {
+        function drawPreviewSection(sectionTop, sectionHeight, previewWidth) {
             // Mock data for previews
             const previewData = [
                 Array.from({length: 20}, (_, i) => Math.log(2) / (i+1)),
@@ -361,26 +334,24 @@
             ];
             
             const previewTitles = [
-                "A002162: log(2)/n",
-                "A016738: log(50)/n", 
-                "A000027: n"
+                "A002162",
+                "A016738", 
+                "A000027"
             ];
             
             // Draw each preview
             for (let i = 0; i < 3; i++) {
-                let preview = previewCanvases[i];
+                push();
                 
-                // Set this canvas as current
-                setPreviewCanvas(preview);
+                // Translate to this preview section
+                const previewX = -width/2 + i * previewWidth;
+                translate(previewX, sectionTop);
                 
-                // Clear with dark background
-                background(10, 10, 18);
-                
-                // Draw dark dotted grid
-                drawGrid();
+                // Draw dark dotted grid for this preview
+                drawGrid(previewWidth, sectionHeight);
                 
                 // Draw axes with hairline
-                drawAxes();
+                drawAxes(previewWidth, sectionHeight);
                 
                 // Find data range for scaling
                 let minVal = Math.min(...previewData[i]);
@@ -395,8 +366,8 @@
                 
                 beginShape();
                 for (let j = 0; j < previewData[i].length; j++) {
-                    let x = map(j, 0, previewData[i].length - 1, -width/2 + 10, width/2 - 10);
-                    let y = map(previewData[i][j], minVal, maxVal, height/2 - 10, -height/2 + 10);
+                    let x = map(j, 0, previewData[i].length - 1, 10, previewWidth - 10);
+                    let y = map(previewData[i][j], minVal, maxVal, sectionHeight - 10, 10);
                     vertex(x, y);
                     
                     // Draw ultra-tiny empty dots at data points
@@ -410,64 +381,45 @@
                 endShape();
                 
                 // Draw label
-                drawLabel(previewTitles[i], -width/2 + 12, -height/2 + 12);
+                fill(160, 160, 255);
+                noStroke();
+                textSize(8);
+                textAlign(LEFT, TOP);
+                text(previewTitles[i], 12, 10);
+                
+                pop();
             }
         }
         
-        function drawGrid() {
+        function drawGrid(gridWidth, gridHeight) {
             stroke(40, 40, 60);
             strokeWeight(0.5);
             
             // Vertical lines
-            for (let x = -width/2; x <= width/2; x += 20) {
+            for (let x = 0; x <= gridWidth; x += 20) {
                 drawingContext.setLineDash([2, 4]);
-                line(x, -height/2, x, height/2);
+                line(x, 0, x, gridHeight);
             }
             
             // Horizontal lines
-            for (let y = -height/2; y <= height/2; y += 20) {
+            for (let y = 0; y <= gridHeight; y += 20) {
                 drawingContext.setLineDash([2, 4]);
-                line(-width/2, y, width/2, y);
+                line(0, y, gridWidth, y);
             }
             
             // Reset line dash
             drawingContext.setLineDash([]);
         }
         
-        function drawAxes() {
+        function drawAxes(axesWidth, axesHeight) {
             stroke(100, 100, 150);
             strokeWeight(1);
             
             // X-axis
-            line(-width/2, 0, width/2, 0);
+            line(0, axesHeight/2, axesWidth, axesHeight/2);
             
             // Y-axis
-            line(0, -height/2, 0, height/2);
-        }
-        
-        function drawLabel(text, x, y) {
-            push();
-            resetMatrix();
-            fill(160, 160, 255, 200);
-            noStroke();
-            textSize(10);
-            textAlign(LEFT, TOP);
-            text(text, x + width/2, y + height/2);
-            pop();
-        }
-        
-        function setMainCanvas() {
-            drawingContext = mainCanvas.drawingContext;
-            _renderer = mainCanvas._renderer;
-            width = mainCanvas.width;
-            height = mainCanvas.height;
-        }
-        
-        function setPreviewCanvas(preview) {
-            drawingContext = preview.drawingContext;
-            _renderer = preview._renderer;
-            width = preview.width;
-            height = preview.height;
+            line(axesWidth/2, 0, axesWidth/2, axesHeight);
         }
         
         // Handle Enter key in input field
