@@ -14,132 +14,167 @@
         }
         
         body {
-            font-family: 'Courier New', monospace;
-            background-color: #0a0a12;
-            color: #e0e0ff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
             line-height: 1.4;
-            overflow-x: hidden;
-            padding: 10px;
+            padding: 0;
         }
         
         .container {
             max-width: 100%;
+            padding: 0;
+        }
+        
+        /* Header */
+        .header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 16px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-weight: 600;
+            font-size: 16px;
+            color: #f0f6fc;
         }
         
         /* Canvas Section */
         .canvas-section {
-            width: 100%;
-            margin-bottom: 15px;
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
         }
         
         #mainCanvas {
             width: 100%;
-            height: 270px; /* 1/5 + 1/20 of 1080p = 216 + 54 = 270px */
-            background: #0a0a12;
-            border: 1px solid #33334d;
-            border-radius: 4px;
+            height: 270px;
+            display: block;
         }
         
         /* Input Section */
         .input-section {
-            background: #0f0f1a;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #33334d;
-            margin-bottom: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
+            background: #0d1117;
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
         }
         
         .input-group {
             display: flex;
-            flex: 1;
-            min-width: 250px;
+            max-width: 1280px;
+            margin: 0 auto;
         }
         
         input[type="text"] {
             flex: 1;
             padding: 8px 12px;
-            background: #0a0a12;
-            border: 1px solid #444466;
-            border-radius: 4px 0 0 4px;
-            color: #e0e0ff;
-            font-family: 'Courier New', monospace;
+            background: #010409;
+            border: 1px solid #30363d;
+            border-radius: 6px 0 0 6px;
+            color: #e6edf3;
+            font-family: inherit;
             font-size: 14px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #1f6feb;
+            box-shadow: 0 0 0 2px #1f6feb40;
         }
         
         button {
             padding: 8px 16px;
-            background: #222244;
-            border: 1px solid #444466;
-            border-radius: 0 4px 4px 0;
-            color: #a0a0ff;
-            font-family: 'Courier New', monospace;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 0 6px 6px 0;
+            color: white;
+            font-family: inherit;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
             white-space: nowrap;
         }
         
         button:hover {
-            background: #333355;
+            background: #2ea043;
         }
         
         /* Info Section */
         .info-section {
-            background: #0f0f1a;
-            padding: 12px;
+            background: #0d1117;
+            padding: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .sequence-card {
+            background: #161b22;
+            border: 1px solid #30363d;
             border-radius: 6px;
-            border: 1px solid #33334d;
-            margin-bottom: 15px;
+            padding: 16px;
         }
         
-        .info-title {
-            font-size: 14px;
-            color: #a0a0ff;
+        .sequence-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 8px;
-            border-bottom: 1px solid #33334d;
-            padding-bottom: 4px;
-        }
-        
-        .sequence-item {
-            margin-bottom: 10px;
-            padding: 8px;
-            background: #0a0a12;
-            border-radius: 4px;
-            border-left: 2px solid #444466;
         }
         
         .sequence-id {
-            font-weight: bold;
-            color: #a0a0ff;
-            font-size: 13px;
+            font-weight: 600;
+            color: #2f81f7;
+            font-size: 14px;
+        }
+        
+        .sequence-badge {
+            background: #1f6feb;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
         }
         
         .sequence-description {
-            color: #b0b0d0;
-            font-size: 12px;
-            margin: 4px 0;
+            color: #7d8590;
+            font-size: 13px;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
         
         .sequence-formula {
-            font-family: 'Courier New', monospace;
-            background: #0a0a12;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            color: #e0e0ff;
-            margin: 4px 0;
-            border: 1px solid #222233;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #e6edf3;
+            margin-bottom: 12px;
         }
         
         .sequence-link {
-            color: #8080ff;
+            color: #2f81f7;
             text-decoration: none;
-            font-size: 11px;
-            display: inline-block;
-            margin-top: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .sequence-link:hover {
@@ -148,24 +183,59 @@
         
         /* Footer */
         footer {
+            background: #0d1117;
+            border-top: 1px solid #30363d;
+            padding: 16px;
             text-align: center;
-            padding: 10px;
-            font-size: 11px;
-            color: #666688;
-            border-top: 1px solid #222233;
-            margin-top: 15px;
+            font-size: 12px;
+            color: #7d8590;
+        }
+        
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .footer-link {
+            color: #7d8590;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .footer-link:hover {
+            color: #2f81f7;
         }
         
         /* Mobile optimization */
-        @media (max-width: 480px) {
-            .input-group {
-                min-width: 100%;
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">OEIS Sequence Visualizer</div>
+            </div>
+        </header>
+        
         <!-- Canvas Section -->
         <section class="canvas-section">
             <div id="mainCanvas"></div>
@@ -181,32 +251,66 @@
         
         <!-- Info Section -->
         <section class="info-section">
-            <h3 class="info-title">Related OEIS Sequences</h3>
-            
-            <div class="sequence-item">
-                <div class="sequence-id">A002162</div>
-                <div class="sequence-description">Decimal expansion of the natural logarithm of 2.</div>
-                <div class="sequence-formula">a(n) = log(2)/n</div>
-                <a href="https://oeis.org/A002162" target="_blank" class="sequence-link">View on OEIS →</a>
-            </div>
-            
-            <div class="sequence-item">
-                <div class="sequence-id">A016738</div>
-                <div class="sequence-description">Continued fraction for log(50).</div>
-                <div class="sequence-formula">a(n) = log(50)/n</div>
-                <a href="https://oeis.org/A016738" target="_blank" class="sequence-link">View on OEIS →</a>
-            </div>
-            
-            <div class="sequence-item">
-                <div class="sequence-id">A000027</div>
-                <div class="sequence-description">The positive integers.</div>
-                <div class="sequence-formula">a(n) = n</div>
-                <a href="https://oeis.org/A000027" target="_blank" class="sequence-link">View on OEIS →</a>
+            <div class="info-grid">
+                <div class="sequence-card">
+                    <div class="sequence-header">
+                        <div class="sequence-id">A002162</div>
+                        <div class="sequence-badge">Math</div>
+                    </div>
+                    <div class="sequence-description">Decimal expansion of the natural logarithm of 2.</div>
+                    <div class="sequence-formula">a(n) = log(2)/n</div>
+                    <a href="https://oeis.org/A002162" target="_blank" class="sequence-link">
+                        View on OEIS
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 2.5h-5A1.5 1.5 0 0 0 4 4v8a1.5 1.5 0 0 0 1.5 1.5h5A1.5 1.5 0 0 0 12 12V4a1.5 1.5 0 0 0-1.5-1.5zM11 12a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 12V4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v8z"/>
+                            <path d="M7.5 5.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="sequence-card">
+                    <div class="sequence-header">
+                        <div class="sequence-id">A016738</div>
+                        <div class="sequence-badge">Math</div>
+                    </div>
+                    <div class="sequence-description">Continued fraction for log(50).</div>
+                    <div class="sequence-formula">a(n) = log(50)/n</div>
+                    <a href="https://oeis.org/A016738" target="_blank" class="sequence-link">
+                        View on OEIS
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 2.5h-5A1.5 1.5 0 0 0 4 4v8a1.5 1.5 0 0 0 1.5 1.5h5A1.5 1.5 0 0 0 12 12V4a1.5 1.5 0 0 0-1.5-1.5zM11 12a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 12V4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v8z"/>
+                            <path d="M7.5 5.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="sequence-card">
+                    <div class="sequence-header">
+                        <div class="sequence-id">A000027</div>
+                        <div class="sequence-badge">Core</div>
+                    </div>
+                    <div class="sequence-description">The positive integers. Also called the natural numbers.</div>
+                    <div class="sequence-formula">a(n) = n</div>
+                    <a href="https://oeis.org/A000027" target="_blank" class="sequence-link">
+                        View on OEIS
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 2.5h-5A1.5 1.5 0 0 0 4 4v8a1.5 1.5 0 0 0 1.5 1.5h5A1.5 1.5 0 0 0 12 12V4a1.5 1.5 0 0 0-1.5-1.5zM11 12a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 12V4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v8z"/>
+                            <path d="M7.5 5.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1zm0 2h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1z"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
         </section>
         
         <footer>
-            OEIS Sequence Visualizer | Processed by AI Assistant | Data from OEIS
+            <div class="footer-content">
+                <div>OEIS Sequence Visualizer</div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">OEIS</a>
+                    <a href="#" class="footer-link">Docs</a>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -215,18 +319,15 @@
         let sequenceData = [];
         
         function setup() {
-            // Create main canvas with WEBGL
-            const canvasWidth = windowWidth - 20;
-            const canvasHeight = 270; // 1/5 + 1/20 of 1080p
-            mainCanvas = createCanvas(canvasWidth, canvasHeight, WEBGL);
+            const canvasWidth = windowWidth;
+            const canvasHeight = 270;
+            mainCanvas = createCanvas(canvasWidth, canvasHeight);
             mainCanvas.parent('mainCanvas');
             
-            // Initial visualization
             updateVisualization();
             
-            // Handle window resize
             window.addEventListener('resize', function() {
-                resizeCanvas(windowWidth - 20, 270);
+                resizeCanvas(windowWidth, 270);
                 updateVisualization();
             });
         }
@@ -235,11 +336,9 @@
             const input = document.getElementById('functionInput').value;
             
             try {
-                // Parse and evaluate the function
                 const compiled = math.compile(input);
                 sequenceData = [];
                 
-                // Generate sequence values for n=1 to 50
                 for (let n = 1; n <= 50; n++) {
                     try {
                         const scope = { n: n };
@@ -250,7 +349,6 @@
                     }
                 }
                 
-                // Draw visualization
                 drawCanvas();
                 
             } catch (error) {
@@ -259,170 +357,133 @@
         }
         
         function drawCanvas() {
-            // Clear with dark background
-            background(10, 10, 18);
+            background(13, 17, 23);
             
-            // Calculate dimensions for the sections
-            const mainSectionHeight = height * 0.8; // 4/5 of canvas (216px)
-            const previewSectionHeight = height * 0.2; // 1/5 of canvas (54px)
+            const mainSectionHeight = height * 0.8;
+            const previewSectionHeight = height * 0.2;
             const previewWidth = width / 3;
             
-            // Draw main section (top 4/5)
             drawMainSection(mainSectionHeight);
-            
-            // Draw preview section (bottom 1/5)
             drawPreviewSection(mainSectionHeight, previewSectionHeight, previewWidth);
         }
         
         function drawMainSection(sectionHeight) {
             push();
             
-            // Translate to main section
-            translate(-width/2, -sectionHeight/2);
-            
             if (sequenceData.length === 0) return;
             
-            // Draw dark dotted grid
-            drawGrid(width, sectionHeight);
+            drawGrid(width, sectionHeight, 20);
             
-            // Find data range for scaling
             let minVal = Math.min(...sequenceData);
             let maxVal = Math.max(...sequenceData);
             let range = maxVal - minVal;
             if (range === 0) range = 1;
             
-            // Draw axes with hairline
             drawAxes(width, sectionHeight);
             
-            // Draw the sequence
-            stroke(160, 160, 255);
-            strokeWeight(1);
+            stroke(47, 129, 247);
+            strokeWeight(1.5);
             noFill();
             
             beginShape();
             for (let i = 0; i < sequenceData.length; i++) {
-                let x = map(i, 0, sequenceData.length - 1, 20, width - 20);
-                let y = map(sequenceData[i], minVal, maxVal, sectionHeight - 20, 20);
+                let x = map(i, 0, sequenceData.length - 1, 40, width - 40);
+                let y = map(sequenceData[i], minVal, maxVal, sectionHeight - 30, 30);
                 vertex(x, y);
                 
-                // Draw ultra-tiny empty dots at data points
                 if (i % 5 === 0) {
-                    fill(10, 10, 18);
-                    stroke(160, 160, 255);
-                    ellipse(x, y, 3, 3);
+                    fill(13, 17, 23);
+                    stroke(47, 129, 247);
+                    ellipse(x, y, 4, 4);
                     noFill();
                 }
             }
             endShape();
             
-            // Draw label
-            fill(160, 160, 255);
+            fill(230, 237, 243);
             noStroke();
-            textSize(10);
+            textSize(11);
             textAlign(LEFT, TOP);
-            text("Input: " + document.getElementById('functionInput').value, 25, 20);
+            text("f(n) = " + document.getElementById('functionInput').value, 45, 25);
             
             pop();
         }
         
         function drawPreviewSection(sectionTop, sectionHeight, previewWidth) {
-            // Mock data for previews
             const previewData = [
-                Array.from({length: 20}, (_, i) => Math.log(2) / (i+1)),
-                Array.from({length: 20}, (_, i) => Math.log(50) / (i+1)),
-                Array.from({length: 20}, (_, i) => i+1)
+                Array.from({length: 15}, (_, i) => Math.log(2) / (i+1)),
+                Array.from({length: 15}, (_, i) => Math.log(50) / (i+1)),
+                Array.from({length: 15}, (_, i) => i+1)
             ];
             
-            const previewTitles = [
-                "A002162",
-                "A016738", 
-                "A000027"
-            ];
+            const previewTitles = ["A002162", "A016738", "A000027"];
             
-            // Draw each preview
             for (let i = 0; i < 3; i++) {
                 push();
+                translate(i * previewWidth, sectionTop);
                 
-                // Translate to this preview section
-                const previewX = -width/2 + i * previewWidth;
-                translate(previewX, sectionTop);
-                
-                // Draw dark dotted grid for this preview
-                drawGrid(previewWidth, sectionHeight);
-                
-                // Draw axes with hairline
+                drawGrid(previewWidth, sectionHeight, 10);
                 drawAxes(previewWidth, sectionHeight);
                 
-                // Find data range for scaling
                 let minVal = Math.min(...previewData[i]);
                 let maxVal = Math.max(...previewData[i]);
                 let range = maxVal - minVal;
                 if (range === 0) range = 1;
                 
-                // Draw the sequence
-                stroke(160, 160, 255);
+                stroke(47, 129, 247);
                 strokeWeight(1);
                 noFill();
                 
                 beginShape();
                 for (let j = 0; j < previewData[i].length; j++) {
-                    let x = map(j, 0, previewData[i].length - 1, 10, previewWidth - 10);
-                    let y = map(previewData[i][j], minVal, maxVal, sectionHeight - 10, 10);
+                    let x = map(j, 0, previewData[i].length - 1, 15, previewWidth - 15);
+                    let y = map(previewData[i][j], minVal, maxVal, sectionHeight - 12, 12);
                     vertex(x, y);
                     
-                    // Draw ultra-tiny empty dots at data points
-                    if (j % 3 === 0) {
-                        fill(10, 10, 18);
-                        stroke(160, 160, 255);
-                        ellipse(x, y, 2, 2);
+                    if (j % 2 === 0) {
+                        fill(13, 17, 23);
+                        stroke(47, 129, 247);
+                        ellipse(x, y, 2.5, 2.5);
                         noFill();
                     }
                 }
                 endShape();
                 
-                // Draw label
-                fill(160, 160, 255);
+                fill(230, 237, 243);
                 noStroke();
-                textSize(8);
+                textSize(9);
                 textAlign(LEFT, TOP);
-                text(previewTitles[i], 12, 10);
+                text(previewTitles[i], 18, 10);
                 
                 pop();
             }
         }
         
-        function drawGrid(gridWidth, gridHeight) {
-            stroke(40, 40, 60);
+        function drawGrid(gridWidth, gridHeight, spacing) {
+            stroke(48, 54, 61);
             strokeWeight(0.5);
             
-            // Vertical lines
-            for (let x = 0; x <= gridWidth; x += 20) {
-                drawingContext.setLineDash([2, 4]);
+            for (let x = 0; x <= gridWidth; x += spacing) {
+                drawingContext.setLineDash([1, 3]);
                 line(x, 0, x, gridHeight);
             }
             
-            // Horizontal lines
-            for (let y = 0; y <= gridHeight; y += 20) {
-                drawingContext.setLineDash([2, 4]);
+            for (let y = 0; y <= gridHeight; y += spacing) {
+                drawingContext.setLineDash([1, 3]);
                 line(0, y, gridWidth, y);
             }
             
-            // Reset line dash
             drawingContext.setLineDash([]);
         }
         
         function drawAxes(axesWidth, axesHeight) {
-            stroke(100, 100, 150);
+            stroke(139, 148, 158);
             strokeWeight(1);
             
-            // X-axis
             line(0, axesHeight/2, axesWidth, axesHeight/2);
-            
-            // Y-axis
             line(axesWidth/2, 0, axesWidth/2, axesHeight);
         }
         
-        // Handle Enter key in input field
         document.getElementById('functionInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 updateVisualization();
