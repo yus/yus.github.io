@@ -47,6 +47,82 @@
             color: #f0f6fc;
         }
         
+        /* Help Section */
+        .help-section {
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+            padding: 16px;
+        }
+        
+        .help-toggle {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: #7d8590;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        
+        .help-toggle:hover {
+            background: #1f2937;
+        }
+        
+        .help-content {
+            display: none;
+            margin-top: 12px;
+            padding: 16px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+        }
+        
+        .help-content.show {
+            display: block;
+        }
+        
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .help-category {
+            background: #0d1117;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+        
+        .help-category h4 {
+            color: #2f81f7;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .help-examples {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #7d8590;
+        }
+        
+        .help-examples div {
+            margin-bottom: 4px;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        
+        .help-examples div:hover {
+            background: #1f2937;
+            color: #e6edf3;
+        }
+        
         /* Canvas Section */
         .canvas-section {
             background: #0d1117;
@@ -188,6 +264,15 @@
             font-weight: 500;
         }
         
+        .function-type-badge {
+            background: #db6d28;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
         .sequence-description {
             color: #7d8590;
             font-size: 13px;
@@ -204,6 +289,17 @@
             font-size: 12px;
             color: #e6edf3;
             margin-bottom: 12px;
+        }
+        
+        .sequence-explanation {
+            color: #7d8590;
+            font-size: 12px;
+            font-style: italic;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #0d1117;
+            border-radius: 4px;
+            border-left: 2px solid #30363d;
         }
         
         .sequence-link {
@@ -263,6 +359,10 @@
                 flex-direction: column;
                 gap: 8px;
             }
+            
+            .help-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -274,6 +374,57 @@
                 <div class="logo">OEIS Sequence Visualizer</div>
             </div>
         </header>
+        
+        <!-- Help Section -->
+        <section class="help-section">
+            <div class="help-toggle" onclick="toggleHelp()">
+                <span>📚 Math Input Help & Examples</span>
+                <span id="helpArrow">▼</span>
+            </div>
+            <div class="help-content" id="helpContent">
+                <div class="help-grid">
+                    <div class="help-category">
+                        <h4>Basic Arithmetic</h4>
+                        <div class="help-examples">
+                            <div onclick="setExample('n')">n (natural numbers)</div>
+                            <div onclick="setExample('n^2')">n^2 (squares)</div>
+                            <div onclick="setExample('n*(n+1)/2')">n*(n+1)/2 (triangular)</div>
+                            <div onclick="setExample('2*n+1')">2*n+1 (odd numbers)</div>
+                        </div>
+                    </div>
+                    <div class="help-category">
+                        <h4>Exponential & Powers</h4>
+                        <div class="help-examples">
+                            <div onclick="setExample('2^n')">2^n (powers of 2)</div>
+                            <div onclick="setExample('3^n')">3^n (powers of 3)</div>
+                            <div onclick="setExample('n^3')">n^3 (cubes)</div>
+                            <div onclick="setExample('2^(n-1)')">2^(n-1)</div>
+                        </div>
+                    </div>
+                    <div class="help-category">
+                        <h4>Logarithmic</h4>
+                        <div class="help-examples">
+                            <div onclick="setExample('log(2)/n')">log(2)/n</div>
+                            <div onclick="setExample('log(70280^(1/n))')">log(70280^(1/n))</div>
+                            <div onclick="setExample('log(n+1)')">log(n+1)</div>
+                        </div>
+                    </div>
+                    <div class="help-category">
+                        <h4>Trigonometric</h4>
+                        <div class="help-examples">
+                            <div onclick="setExample('sin(n)')">sin(n)</div>
+                            <div onclick="setExample('cos(n*PI/4)')">cos(n*PI/4)</div>
+                            <div onclick="setExample('tan(n/2)')">tan(n/2)</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #7d8590;">
+                    <strong>Available constants:</strong> PI, E<br>
+                    <strong>Available functions:</strong> sin, cos, tan, log, exp, sqrt, abs<br>
+                    <strong>Use 'n' as the sequence variable</strong>
+                </div>
+            </div>
+        </section>
         
         <!-- Canvas Section -->
         <section class="canvas-section">
@@ -315,65 +466,122 @@
         let mainCanvas;
         let sequenceData = [];
         let oeisSequences = [];
+        let currentFunctionType = '';
         
-        // Enhanced OEIS sequence database with different function types
+        // Enhanced OEIS sequence database with function types and explanations
         const oeisDatabase = {
-            logarithmic: [
-                {
-                    number: 'A002162',
-                    name: 'Decimal expansion of the natural logarithm of 2.',
-                    data: '0,6,9,3,1,4,7,1,8,0,5,5,9,9,4,5,3,0,9,4,1,7,2,3,2,1,2,0,9,8,6,2,3,7,3,6,2,1,8,7,5,4,2,3,8,9,0,4,5,2',
-                    formula: 'log(2)'
-                },
-                {
-                    number: 'A016738',
-                    name: 'Continued fraction for log(50).',
-                    data: '3,1,1,8,1,1,2,1,1,1,2,1,2,1,4,1,1,1,1,3,2,8,1,2,2,1,7,1,1,2,1,1,1,3,5,1,1,1,1,2,1,1,1,1,1,1,1,2,3,2',
-                    formula: 'log(50)'
-                }
-            ],
-            polynomial: [
-                {
-                    number: 'A000027',
-                    name: 'The positive integers.',
-                    data: '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20',
-                    formula: 'n'
-                },
-                {
-                    number: 'A000290',
-                    name: 'The squares.',
-                    data: '0,1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,289,324,361',
-                    formula: 'n^2'
-                },
-                {
-                    number: 'A000217',
-                    name: 'Triangular numbers.',
-                    data: '0,1,3,6,10,15,21,28,36,45,55,66,78,91,105,120,136,153,171,190',
-                    formula: 'n(n+1)/2'
-                }
-            ],
-            exponential: [
-                {
-                    number: 'A000079',
-                    name: 'Powers of 2.',
-                    data: '1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288',
-                    formula: '2^n'
-                },
-                {
-                    number: 'A000244',
-                    name: 'Powers of 3.',
-                    data: '1,3,9,27,81,243,729,2187,6561,19683,59049,177147,531441,1594323,4782969,14348907,43046721,129140163,387420489,1162261467',
-                    formula: '3^n'
-                }
-            ],
-            trigonometric: [
-                {
-                    number: 'A010050',
-                    name: 'Factorial numbers.',
-                    data: '1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000,355687428096000,6402373705728000,121645100408832000',
-                    formula: 'n!'
-                }
-            ]
+            logarithmic: {
+                name: "Logarithmic Sequences",
+                description: "Sequences involving logarithmic growth or decay patterns",
+                color: [70, 130, 180], // Steel blue
+                sequences: [
+                    {
+                        number: 'A002162',
+                        name: 'Decimal expansion of the natural logarithm of 2.',
+                        data: '0,6,9,3,1,4,7,1,8,0,5,5,9,9,4,5,3,0,9,4,1,7,2,3,2,1,2,0,9,8,6,2,3,7,3,6,2,1,8,7,5,4,2,3,8,9,0,4,5,2',
+                        formula: 'log(2)',
+                        explanation: 'The natural logarithm of 2 appears in many mathematical contexts including compound interest and information theory.'
+                    },
+                    {
+                        number: 'A016738',
+                        name: 'Continued fraction for log(50).',
+                        data: '3,1,1,8,1,1,2,1,1,1,2,1,2,1,4,1,1,1,1,3,2,8,1,2,2,1,7,1,1,2,1,1,1,3,5,1,1,1,1,2,1,1,1,1,1,1,1,2,3,2',
+                        formula: 'log(50)',
+                        explanation: 'Logarithmic constants often have interesting continued fraction expansions.'
+                    }
+                ]
+            },
+            polynomial: {
+                name: "Polynomial Sequences", 
+                description: "Sequences following polynomial growth patterns",
+                color: [50, 205, 50], // Lime green
+                sequences: [
+                    {
+                        number: 'A000027',
+                        name: 'The positive integers.',
+                        data: '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20',
+                        formula: 'n',
+                        explanation: 'The most fundamental sequence in mathematics - the natural numbers.'
+                    },
+                    {
+                        number: 'A000290',
+                        name: 'The squares.',
+                        data: '0,1,4,9,16,25,36,49,64,81,100,121,144,169,196,225,256,289,324,361',
+                        formula: 'n^2',
+                        explanation: 'Perfect squares grow quadratically, forming the basis for many geometric patterns.'
+                    },
+                    {
+                        number: 'A000217',
+                        name: 'Triangular numbers.',
+                        data: '0,1,3,6,10,15,21,28,36,45,55,66,78,91,105,120,136,153,171,190',
+                        formula: 'n(n+1)/2',
+                        explanation: 'Triangular numbers represent the number of objects in an equilateral triangle.'
+                    }
+                ]
+            },
+            exponential: {
+                name: "Exponential Sequences",
+                description: "Sequences with exponential growth or decay",
+                color: [255, 140, 0], // Dark orange
+                sequences: [
+                    {
+                        number: 'A000079',
+                        name: 'Powers of 2.',
+                        data: '1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288',
+                        formula: '2^n',
+                        explanation: 'Powers of 2 are fundamental in computer science and combinatorics.'
+                    },
+                    {
+                        number: 'A000244',
+                        name: 'Powers of 3.',
+                        data: '1,3,9,27,81,243,729,2187,6561,19683,59049,177147,531441,1594323,4782969,14348907,43046721,129140163,387420489,1162261467',
+                        formula: '3^n',
+                        explanation: 'Powers of 3 appear in many mathematical contexts including fractal geometry.'
+                    }
+                ]
+            },
+            trigonometric: {
+                name: "Trigonometric Sequences",
+                description: "Sequences involving trigonometric functions",
+                color: [148, 0, 211], // Dark violet
+                sequences: [
+                    {
+                        number: 'A010050',
+                        name: 'Factorial numbers.',
+                        data: '1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000,355687428096000,6402373705728000,121645100408832000',
+                        formula: 'n!',
+                        explanation: 'Factorials grow faster than exponential functions and appear in combinatorics.'
+                    },
+                    {
+                        number: 'A000045',
+                        name: 'Fibonacci numbers.',
+                        data: '0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181',
+                        formula: 'F(n) = F(n-1) + F(n-2)',
+                        explanation: 'The Fibonacci sequence appears in nature, art, and many mathematical contexts.'
+                    }
+                ]
+            },
+            rational: {
+                name: "Rational Sequences",
+                description: "Sequences involving rational functions",
+                color: [220, 20, 60], // Crimson
+                sequences: [
+                    {
+                        number: 'A001477',
+                        name: 'The nonnegative integers.',
+                        data: '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19',
+                        formula: 'n',
+                        explanation: 'The simplest integer sequence starting from zero.'
+                    },
+                    {
+                        number: 'A000012',
+                        name: 'The simplest sequence of positive numbers.',
+                        data: '1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1',
+                        formula: '1',
+                        explanation: 'The constant sequence - every term is 1.'
+                    }
+                ]
+            }
         };
 
         function setup() {
@@ -382,13 +590,29 @@
             mainCanvas = createCanvas(canvasWidth, canvasHeight);
             mainCanvas.parent('mainCanvas');
             
-            // Load initial data
-            updateVisualization();
+            // Load initial data immediately
+            setTimeout(() => {
+                searchOEIS();
+            }, 100);
             
             window.addEventListener('resize', function() {
                 resizeCanvas(windowWidth, 270);
                 updateVisualization();
             });
+        }
+        
+        function toggleHelp() {
+            const helpContent = document.getElementById('helpContent');
+            const helpArrow = document.getElementById('helpArrow');
+            
+            helpContent.classList.toggle('show');
+            helpArrow.textContent = helpContent.classList.contains('show') ? '▲' : '▼';
+        }
+        
+        function setExample(example) {
+            document.getElementById('functionInput').value = example;
+            searchOEIS();
+            toggleHelp(); // Close help after selection
         }
         
         async function searchOEIS() {
@@ -407,7 +631,7 @@
                 
                 for (let n = 1; n <= 20; n++) {
                     try {
-                        const scope = { n: n };
+                        const scope = { n: n, PI: Math.PI, E: Math.E };
                         const value = compiled.evaluate(scope);
                         // Store both raw and normalized values for comparison
                         sequenceData.push({
@@ -427,13 +651,10 @@
                 
                 // Update visualization
                 updateVisualization();
-
-                // Update sequence cards
-                updateSequenceCards();
                 
             } catch (error) {
                 console.error('Search error:', error);
-                showError('Failed to process function.');
+                showError('Failed to process function: ' + error.message);
             } finally {
                 button.disabled = false;
                 loading.style.display = 'none';
@@ -457,26 +678,33 @@
             }
         }
         
+        function detectFunctionType(input) {
+            const lowerInput = input.toLowerCase();
+            
+            if (lowerInput.includes('log')) return 'logarithmic';
+            if (lowerInput.includes('^') || lowerInput.includes('**') || lowerInput.includes('exp')) return 'exponential';
+            if (lowerInput.includes('sin') || lowerInput.includes('cos') || lowerInput.includes('tan')) return 'trigonometric';
+            if (lowerInput.includes('/') || lowerInput.includes('1/')) return 'rational';
+            return 'polynomial';
+        }
+        
         function findSimilarSequences() {
-            const inputFunction = document.getElementById('functionInput').value.toLowerCase();
+            const inputFunction = document.getElementById('functionInput').value;
+            currentFunctionType = detectFunctionType(inputFunction);
+            
             let allSequences = [];
             
-            // Determine function type and get relevant sequences
-            if (inputFunction.includes('log')) {
-                allSequences = [...oeisDatabase.logarithmic, ...oeisDatabase.polynomial];
-            } else if (inputFunction.includes('^') || inputFunction.includes('**')) {
-                allSequences = [...oeisDatabase.exponential, ...oeisDatabase.polynomial];
-            } else if (inputFunction.includes('sin') || inputFunction.includes('cos')) {
-                allSequences = [...oeisDatabase.trigonometric];
-            } else {
-                // Default: include all sequence types
-                allSequences = [
-                    ...oeisDatabase.logarithmic,
-                    ...oeisDatabase.polynomial,
-                    ...oeisDatabase.exponential,
-                    ...oeisDatabase.trigonometric
-                ];
+            // Get sequences from the detected type first, then others
+            if (oeisDatabase[currentFunctionType]) {
+                allSequences = [...oeisDatabase[currentFunctionType].sequences];
             }
+            
+            // Add sequences from other categories
+            Object.keys(oeisDatabase).forEach(type => {
+                if (type !== currentFunctionType) {
+                    allSequences = [...allSequences, ...oeisDatabase[type].sequences.slice(0, 1)];
+                }
+            });
             
             // Calculate similarity scores for each sequence
             const sequencesWithScores = allSequences.map(seq => {
@@ -487,7 +715,10 @@
                 return {
                     ...seq,
                     similarity: similarity,
-                    normalizedValues: normalizedSeq
+                    normalizedValues: normalizedSeq,
+                    type: Object.keys(oeisDatabase).find(type => 
+                        oeisDatabase[type].sequences.some(s => s.number === seq.number)
+                    )
                 };
             });
             
@@ -527,20 +758,42 @@
             const infoGrid = document.getElementById('infoGrid');
             infoGrid.innerHTML = '';
             
+            // Add function type detection info
+            const typeInfo = document.createElement('div');
+            typeInfo.className = 'sequence-card';
+            typeInfo.innerHTML = `
+                <div class="sequence-header">
+                    <div class="sequence-id">Function Analysis</div>
+                    <div class="function-type-badge">${currentFunctionType}</div>
+                </div>
+                <div class="sequence-description">
+                    Your function appears to be <strong>${currentFunctionType}</strong>.
+                    ${oeisDatabase[currentFunctionType]?.description || 'This type of function shows characteristic growth patterns.'}
+                </div>
+                <div class="sequence-explanation">
+                    We're comparing your sequence with similar mathematical patterns from the OEIS database.
+                    Higher similarity scores indicate closer matches to known sequences.
+                </div>
+            `;
+            infoGrid.appendChild(typeInfo);
+            
+            // Add sequence cards
             oeisSequences.forEach(seq => {
                 const sequenceValues = seq.data.split(',').slice(0, 20).map(Number);
                 const similarityPercent = Math.round(seq.similarity * 100);
+                const typeColor = oeisDatabase[seq.type]?.color || [100, 100, 100];
                 
                 const card = document.createElement('div');
                 card.className = 'sequence-card';
                 card.innerHTML = `
                     <div class="sequence-header">
                         <div class="sequence-id">${seq.number}</div>
-                        <div class="sequence-badge">Math</div>
+                        <div class="sequence-badge">${seq.type}</div>
                         <div class="similarity-badge">${similarityPercent}% match</div>
                     </div>
                     <div class="sequence-description">${seq.name}</div>
-                    <div class="sequence-formula">${seq.formula || 'No formula available'}</div>
+                    <div class="sequence-formula">${seq.formula}</div>
+                    <div class="sequence-explanation">${seq.explanation}</div>
                     <div class="sequence-data" style="font-size: 11px; color: #7d8590; margin-bottom: 8px;">
                         First terms: [${sequenceValues.slice(0, 6).join(', ')}...]
                     </div>
@@ -554,15 +807,6 @@
                 `;
                 infoGrid.appendChild(card);
             });
-            
-            // If no results found
-            if (oeisSequences.length === 0) {
-                infoGrid.innerHTML = `
-                    <div class="sequence-card">
-                        <div class="sequence-description">No similar sequences found.</div>
-                    </div>
-                `;
-            }
         }
         
         function updateVisualization() {
@@ -599,8 +843,11 @@
             
             drawAxes(width, sectionHeight);
             
+            // Get color for current function type
+            const typeColor = oeisDatabase[currentFunctionType]?.color || [47, 129, 247];
+            
             // Draw user's function
-            stroke(47, 129, 247);
+            stroke(typeColor[0], typeColor[1], typeColor[2]);
             strokeWeight(2);
             noFill();
             
@@ -612,7 +859,7 @@
                 
                 if (i % 2 === 0) {
                     fill(13, 17, 23);
-                    stroke(47, 129, 247);
+                    stroke(typeColor[0], typeColor[1], typeColor[2]);
                     ellipse(x, y, 5, 5);
                     noFill();
                 }
@@ -623,7 +870,7 @@
             noStroke();
             textSize(11);
             textAlign(LEFT, TOP);
-            text("Your function: " + document.getElementById('functionInput').value, 45, 25);
+            text("Your " + currentFunctionType + " function: " + document.getElementById('functionInput').value, 45, 25);
             
             pop();
         }
@@ -632,6 +879,7 @@
             for (let i = 0; i < Math.min(3, oeisSequences.length); i++) {
                 const seq = oeisSequences[i];
                 const sequenceValues = seq.data.split(',').slice(0, 15).map(Number);
+                const typeColor = oeisDatabase[seq.type]?.color || [100, 100, 100];
                 
                 push();
                 translate(i * previewWidth, sectionTop);
@@ -644,11 +892,10 @@
                 let range = maxVal - minVal;
                 if (range === 0) range = 1;
                 
-                // Color based on similarity
-                const similarity = seq.similarity;
-                const r = Math.round(47 + (208 * (1 - similarity)));
-                const g = Math.round(129 + (126 * similarity));
-                const b = Math.round(247);
+                // Color based on type
+                const r = typeColor[0];
+                const g = typeColor[1];
+                const b = typeColor[2];
                 
                 stroke(r, g, b);
                 strokeWeight(1.5);
@@ -673,7 +920,7 @@
                 noStroke();
                 textSize(9);
                 textAlign(LEFT, TOP);
-                text(seq.number + ` (${Math.round(similarity * 100)}%)`, 18, 10);
+                text(seq.number + ` (${Math.round(seq.similarity * 100)}%)`, 18, 10);
                 
                 pop();
             }
@@ -719,9 +966,6 @@
                 searchOEIS();
             }
         });
-        
-        // Load initial data
-        searchOEIS();
     </script>
 </body>
 </html>
