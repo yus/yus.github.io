@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANTUM BRAILLE VIBRA COMPUTING</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        @font-face {
+            font-family: 'Cyroglyph';
+            src: url('https://yus.github.io/quantum.blueprints/cyroglyph.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            background: #0d1b2a;
+            color: #e0e1dd;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            font-family: 'Cyroglyph', monospace;
+            font-size: 12px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(13, 27, 42, 0.95);
+            border-bottom: 1px solid rgba(64, 121, 140, 0.3);
+            z-index: 10;
+            height: 50px;
+        }
+        
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .info-toggle {
+            background: rgba(67, 97, 238, 0.3);
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #mesh-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .braille-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .braille-cell {
+            position: absolute;
+            width: 24px;
+            height: 36px;
+            background: rgba(76, 201, 240, 0.1);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            border-radius: 2px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 2px;
+            padding: 3px;
+        }
+        
+        .braille-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4cc9f0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .braille-dot.active {
+            opacity: 1;
+            transform: scale(1.2);
+            box-shadow: 0 0 8px #4cc9f0;
+        }
+        
+        .vibra-indicator {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ff2966;
+            border-radius: 50%;
+            display: none;
+            z-index: 6;
+            animation: vibraPulse 0.5s infinite alternate;
+        }
+        
+        @keyframes vibraPulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.3); opacity: 0.7; }
+        }
+        
+        .drag-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ff2966;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 5;
+        }
+        
+        .drag-indicator.active {
+            display: block;
+            animation: dragPulse 0.5s infinite alternate;
+        }
+        
+        @keyframes dragPulse {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(3); }
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 55px;
+            right: 16px;
+            background: rgba(13, 27, 42, 0.98);
+            border: 1px solid rgba(64, 121, 140, 0.5);
+            border-radius: 4px;
+            padding: 16px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            display: none;
+        }
+        
+        .info-panel.active {
+            display: block;
+        }
+        
+        .panel-title {
+            margin-bottom: 12px;
+            color: #4cc9f0;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .panel-section {
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            margin-bottom: 6px;
+            color: #4cc9f0;
+            font-size: 12px;
+        }
+        
+        .panel-content {
+            line-height: 1.3;
+            color: #c0c0c0;
+            font-size: 11px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            background: rgba(13, 27, 42, 0.95);
+            border-top: 1px solid rgba(64, 121, 140, 0.3);
+            z-index: 10;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 150px;
+        }
+        
+        .controls-toggle {
+            position: absolute;
+            bottom: 160px;
+            right: 16px;
+            background: rgba(67, 97, 238, 0.3);
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 15;
+            font-size: 14px;
+        }
+        
+        button {
+            background: rgba(67, 97, 238, 0.3);
+            color: white;
+            border: 1px solid rgba(67, 97, 238, 0.7);
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 90px;
+            font-family: 'Cyroglyph', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: rgba(67, 97, 238, 0.5);
+        }
+        
+        button:active {
+            background: rgba(67, 97, 238, 0.7);
+        }
+        
+        .compute-display {
+            position: absolute;
+            bottom: 80px;
+            left: 16px;
+            width: 100px;
+            height: 100px;
+            border: 1px solid rgba(76, 201, 240, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            z-index: 5;
+        }
+        
+        .compute-info {
+            position: absolute;
+            bottom: 80px;
+            left: 125px;
+            color: #4cc9f0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .braille-info {
+            position: absolute;
+            top: 65px;
+            left: 16px;
+            color: #4cc9f0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 12px;
+        }
+        
+        li {
+            margin-bottom: 3px;
+            position: relative;
+            font-size: 11px;
+        }
+        
+        li:before {
+            content: "■";
+            color: #4cc9f0;
+            position: absolute;
+            left: -12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="status-panel">
+                <div class="status-item">
+                    <div class="status-indicator pulse"></div>
+                    <span>QUANTUM BRAILLE ACTIVE</span>
+                </div>
+                <div class="status-item">
+                    <span>NODES: 125</span>
+                </div>
+                <div class="status-item">
+                    <span>BRAILLE CELLS: 16</span>
+                </div>
+                <div class="status-item">
+                    <span>VIBRA FREQ: 42HZ</span>
+                </div>
+            </div>
+            
+            <div class="info-toggle" id="info-toggle">i</div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="mesh-canvas"></canvas>
+            <div class="braille-overlay" id="braille-overlay"></div>
+            <div class="vibra-indicator" id="vibra-indicator"></div>
+            <div class="drag-indicator" id="drag-indicator"></div>
+            <canvas class="compute-display" id="compute-canvas"></canvas>
+            <div class="compute-info" id="compute-info">
+                <div>PIXEL GROUPS: 0</div>
+                <div>ACTIVE: 0%</div>
+                <div>DENSITY: 0</div>
+            </div>
+            <div class="braille-info" id="braille-info">
+                <div>ACTIVE CELLS: 0</div>
+                <div>PATTERN: NONE</div>
+                <div>INTENSITY: 0</div>
+            </div>
+            
+            <div class="info-panel" id="info-panel">
+                <div class="panel-title">QUANTUM BRAILLE VIBRA COMPUTING</div>
+                
+                <div class="panel-section">
+                    <div class="section-title">TACTILE COMPUTING INTERFACE</div>
+                    <div class="panel-content">
+                        COMBINES SPATIAL MESH COMPUTING WITH QUANTUM-INSPIRED BRAILLE PATTERNS FOR ENHANCED ACCESSIBILITY AND TACTILE FEEDBACK.
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">BRAILLE ENCODING</div>
+                    <div class="panel-content">
+                        <ul>
+                            <li>6-DOT BRAILLE CELLS MAPPED TO MESH NODES</li>
+                            <li>QUANTUM SUPERPOSITION OF DOT STATES</li>
+                            <li>VIBRA-TACTILE FEEDBACK PATTERNS</li>
+                            <li>REAL-TIME PATTERN RECOGNITION</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">ACCESSIBILITY FEATURES</div>
+                    <div class="panel-content">
+                        HIGH CONTRAST VISUALS, TACTILE PATTERN FEEDBACK, AUDIO CUE SYNCHRONIZATION, AND SIMPLIFIED NAVIGATION FOR WEAK SIGHTED USERS.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls" id="controls">
+            <button id="braille-mode">BRAILLE MODE</button>
+            <button id="vibra-pattern">VIBRA PATTERN</button>
+            <button id="quantum-sync">QUANTUM SYNC</button>
+            <button id="reset-mesh">RESET MESH</button>
+            <button id="toggle-computation">PAUSE COMPUTE</button>
+        </div>
+        
+        <div class="controls-toggle" id="controls-toggle">⌄</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const meshCanvas = document.getElementById('mesh-canvas');
+            const computeCanvas = document.getElementById('compute-canvas');
+            const brailleOverlay = document.getElementById('braille-overlay');
+            const vibraIndicator = document.getElementById('vibra-indicator');
+            const meshCtx = meshCanvas.getContext('2d');
+            const computeCtx = computeCanvas.getContext('2d');
+            const computeInfo = document.getElementById('compute-info');
+            const brailleInfo = document.getElementById('braille-info');
+            const dragIndicator = document.getElementById('drag-indicator');
+            
+            // UI elements
+            const infoToggle = document.getElementById('info-toggle');
+            const infoPanel = document.getElementById('info-panel');
+            const controlsToggle = document.getElementById('controls-toggle');
+            const controls = document.getElementById('controls');
+            
+            // Set canvas sizes
+            function resizeCanvases() {
+                meshCanvas.width = window.innerWidth;
+                meshCanvas.height = window.innerHeight - 200;
+                computeCanvas.width = computeCanvas.offsetWidth;
+                computeCanvas.height = computeCanvas.offsetHeight;
+                createBrailleGrid();
+            }
+            
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+            
+            // Toggle info panel
+            infoToggle.addEventListener('click', function() {
+                infoPanel.classList.toggle('active');
+            });
+            
+            // Toggle controls
+            let controlsVisible = true;
+            controlsToggle.addEventListener('click', function() {
+                controlsVisible = !controlsVisible;
+                controls.style.display = controlsVisible ? 'flex' : 'none';
+                controlsToggle.textContent = controlsVisible ? '⌄' : '⌃';
+            });
+            
+            // Quantum Braille parameters
+            const brailleCells = [];
+            let activeBrailleCells = 0;
+            let brailleMode = true;
+            let vibraPatternActive = false;
+            let quantumSyncActive = false;
+            let lastVibraTime = 0;
+            
+            // Mesh parameters
+            const gridSize = 5;
+            const nodes = [];
+            let computing = true;
+            let computeCounter = 0;
+            let animationId;
+            
+            // Auto rotation and orbiting parameters
+            let autoRotationX = 0;
+            let autoRotationY = 0;
+            let autoOrbitX = 0;
+            let autoOrbitY = 0;
+            let frustrumOffsetX = 0;
+            let frustrumOffsetY = 0;
+            
+            // Auto pattern parameters
+            let autoWaveActive = false;
+            let autoRandomActive = false;
+            let autoSpiralActive = false;
+            let autoPatternTime = 0;
+            
+            // Drag computation parameters
+            let isDragging = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let dragEnergy = 0;
+            let dragPattern = 'NONE';
+            let dragIntensity = 0;
+            let dragDirection = 0;
+            let dragHistory = [];
+            let activeDragPatterns = [];
+            
+            // Compute display parameters
+            let pixelGroups = [];
+            let activePixels = 0;
+            let pixelDensity = 0;
+            
+            // Create braille grid
+            function createBrailleGrid() {
+                brailleOverlay.innerHTML = '';
+                brailleCells.length = 0;
+                
+                const cols = 4;
+                const rows = 4;
+                const cellWidth = meshCanvas.width / (cols + 1);
+                const cellHeight = meshCanvas.height / (rows + 1);
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'braille-cell';
+                        cell.style.left = `${(col + 0.5) * cellWidth - 12}px`;
+                        cell.style.top = `${(row + 0.5) * cellHeight - 18}px`;
+                        
+                        // Create 6 dots for braille cell
+                        for (let i = 0; i < 6; i++) {
+                            const dot = document.createElement('div');
+                            dot.className = 'braille-dot';
+                            dot.dataset.index = i;
+                            cell.appendChild(dot);
+                        }
+                        
+                        brailleOverlay.appendChild(cell);
+                        brailleCells.push({
+                            element: cell,
+                            dots: cell.children,
+                            x: (col + 0.5) * cellWidth,
+                            y: (row + 0.5) * cellHeight,
+                            active: false,
+                            pattern: [0, 0, 0, 0, 0, 0]
+                        });
+                    }
+                }
+            }
+            
+            // Update braille cells based on mesh state
+            function updateBrailleCells() {
+                activeBrailleCells = 0;
+                let totalIntensity = 0;
+                
+                for (let i = 0; i < brailleCells.length; i++) {
+                    const cell = brailleCells[i];
+                    let cellIntensity = 0;
+                    
+                    // Find nearest nodes to this braille cell
+                    const nearbyNodes = nodes.filter(node => {
+                        const scale = 250 / (250 + Math.abs(node.z));
+                        const nodeX = meshCanvas.width / 2 + node.x * scale;
+                        const nodeY = meshCanvas.height / 2 + node.y * scale;
+                        const dist = Math.sqrt((nodeX - cell.x) ** 2 + (nodeY - cell.y) ** 2);
+                        return dist < 80;
+                    });
+                    
+                    if (nearbyNodes.length > 0) {
+                        cell.active = true;
+                        activeBrailleCells++;
+                        
+                        // Calculate average activation from nearby nodes
+                        const avgActivation = nearbyNodes.reduce((sum, node) => sum + node.activation, 0) / nearbyNodes.length;
+                        cellIntensity = avgActivation;
+                        totalIntensity += avgActivation;
+                        
+                        // Generate braille pattern based on activation and quantum state
+                        if (brailleMode) {
+                            const pattern = generateBraillePattern(avgActivation, i, autoPatternTime);
+                            updateBrailleDots(cell, pattern);
+                        }
+                    } else {
+                        cell.active = false;
+                        updateBrailleDots(cell, [0, 0, 0, 0, 0, 0]);
+                    }
+                }
+                
+                // Update vibra feedback
+                updateVibraFeedback(totalIntensity / brailleCells.length);
+                
+                // Update braille info
+                brailleInfo.innerHTML = `
+                    <div>ACTIVE CELLS: ${activeBrailleCells}</div>
+                    <div>PATTERN: ${getDominantPattern()}</div>
+                    <div>INTENSITY: ${Math.round(totalIntensity * 100)}</div>
+                `;
+            }
+            
+            function generateBraillePattern(activation, cellIndex, time) {
+                const pattern = [0, 0, 0, 0, 0, 0];
+                const basePattern = Math.floor(activation * 63); // 6 bits for 64 possible patterns
+                
+                // Quantum superposition: dots can be in multiple states
+                for (let i = 0; i < 6; i++) {
+                    const quantumState = Math.sin(time * 2 + cellIndex * 0.5 + i) * 0.5 + 0.5;
+                    const dotProbability = ((basePattern >> i) & 1) * activation * quantumState;
+                    
+                    // Dot activates based on probability (quantum uncertainty)
+                    pattern[i] = dotProbability > 0.3 ? 1 : 0;
+                    
+                    // Quantum sync creates entanglement between dots
+                    if (quantumSyncActive) {
+                        const entangledDot = (i + 3) % 6;
+                        if (pattern[i] && Math.random() < 0.7) {
+                            pattern[entangledDot] = 1;
+                        }
+                    }
+                }
+                
+                return pattern;
+            }
+            
+            function updateBrailleDots(cell, pattern) {
+                for (let i = 0; i < 6; i++) {
+                    const dot = cell.dots[i];
+                    if (pattern[i]) {
+                        dot.classList.add('active');
+                        // Vibra pattern adds pulsing to active dots
+                        if (vibraPatternActive) {
+                            const pulsePhase = (Date.now() * 0.01 + i * 100) % 1000;
+                            dot.style.opacity = 0.3 + 0.7 * Math.sin(pulsePhase * 0.01);
+                        }
+                    } else {
+                        dot.classList.remove('active');
+                        dot.style.opacity = '0';
+                    }
+                }
+                cell.pattern = pattern;
+            }
+            
+            function updateVibraFeedback(intensity) {
+                if (intensity > 0.2 && Date.now() - lastVibraTime > 500) {
+                    vibraIndicator.style.display = 'block';
+                    vibraIndicator.style.left = `${meshCanvas.width / 2}px`;
+                    vibraIndicator.style.top = `${meshCanvas.height / 2}px`;
+                    
+                    // Calculate vibra frequency based on intensity
+                    const frequency = 20 + intensity * 80;
+                    vibraIndicator.style.animationDuration = `${1000 / frequency}ms`;
+                    
+                    lastVibraTime = Date.now();
+                    
+                    // Hide after pulse
+                    setTimeout(() => {
+                        vibraIndicator.style.display = 'none';
+                    }, 200);
+                }
+            }
+            
+            function getDominantPattern() {
+                if (activeBrailleCells === 0) return 'NONE';
+                
+                // Count pattern frequencies
+                const patternCount = {};
+                brailleCells.forEach(cell => {
+                    if (cell.active) {
+                        const patternKey = cell.pattern.join('');
+                        patternCount[patternKey] = (patternCount[patternKey] || 0) + 1;
+                    }
+                });
+                
+                // Find most common pattern
+                let maxCount = 0;
+                let dominantPattern = 'MIXED';
+                Object.keys(patternCount).forEach(key => {
+                    if (patternCount[key] > maxCount) {
+                        maxCount = patternCount[key];
+                        dominantPattern = `PAT${parseInt(key, 2)}`;
+                    }
+                });
+                
+                return dominantPattern;
+            }
+            
+            // Initialize nodes
+            function initializeMesh() {
+                nodes.length = 0;
+                activeDragPatterns = [];
+                dragHistory = [];
+                autoRotationX = 0;
+                autoRotationY = 0;
+                autoOrbitX = 0;
+                autoOrbitY = 0;
+                frustrumOffsetX = 0;
+                frustrumOffsetY = 0;
+                autoWaveActive = true;
+                autoRandomActive = false;
+                autoSpiralActive = false;
+                autoPatternTime = 0;
+                
+                const spacing = 40;
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            nodes.push({
+                                x: (x - gridSize/2) * spacing,
+                                y: (y - gridSize/2) * spacing,
+                                z: (z - gridSize/2) * spacing,
+                                value: 0,
+                                activation: 0,
+                                color: '#6495ed',
+                                dragInfluence: 0,
+                                autoInfluence: 0
+                            });
+                        }
+                    }
+                }
+                
+                initializeComputeDisplay();
+                computeCounter = 0;
+                updateStatus();
+            }
+            
+            function initializeComputeDisplay() {
+                pixelGroups = [];
+                for (let i = 0; i < 5; i++) createPixelGroup();
+            }
+            
+            function createPixelGroup() {
+                const groupSize = Math.floor(Math.random() * 5) + 5;
+                const group = [];
+                for (let i = 0; i < groupSize; i++) {
+                    group.push({
+                        x: Math.floor(Math.random() * computeCanvas.width),
+                        y: Math.floor(Math.random() * computeCanvas.height),
+                        active: Math.random() > 0.3
+                    });
+                }
+                pixelGroups.push(group);
+            }
+            
+            // Compute step with combined motions
+            function computeStep() {
+                autoPatternTime += 0.02;
+                
+                // Update auto motions
+                updateAutoMotions();
+                
+                // Apply auto patterns
+                applyAutoPatterns();
+                
+                // Process drag patterns
+                processDragPatterns();
+                
+                // Combined computation with all influences
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    // Find neighbors
+                    const neighbors = nodes.filter(n => {
+                        const dx = n.x - node.x;
+                        const dy = n.y - node.y;
+                        const dz = n.z - node.z;
+                        return Math.sqrt(dx*dx + dy*dy + dz*dz) < 55 && dx*dx + dy*dy + dz*dz > 0;
+                    });
+                    
+                    if (neighbors.length > 0) {
+                        const sum = neighbors.reduce((acc, n) => acc + n.value, 0);
+                        // Enhanced computation with all influences
+                        node.value = 0.8 * (sum / neighbors.length) + 
+                                   0.05 * (Math.random() - 0.5) * 0.1 +
+                                   0.1 * node.dragInfluence +
+                                   0.05 * node.autoInfluence;
+                    }
+                    
+                    // Decay influences
+                    node.dragInfluence *= 0.95;
+                    node.autoInfluence *= 0.97;
+                    
+                    // Update activation and color
+                    node.activation = Math.abs(node.value);
+                    const intensity = Math.floor(100 + node.activation * 155);
+                    // Color shifts based on combined influences
+                    const r = Math.min(255, intensity + (node.dragInfluence + node.autoInfluence) * 80);
+                    const b = Math.min(255, intensity - (node.dragInfluence + node.autoInfluence) * 40);
+                    node.color = `rgb(${r}, 100, ${b})`;
+                }
+                
+                // Update braille interface
+                updateBrailleCells();
+                
+                updateComputeDisplay();
+                computeCounter++;
+                if (computeCounter % 10 === 0) updateStatus();
+            }
+            
+            // [Rest of the existing mesh computation functions remain the same...]
+            function updateAutoMotions() {
+                autoRotationX += 0.008;
+                autoRotationY += 0.006;
+                autoOrbitX += 0.005;
+                autoOrbitY += 0.004;
+                frustrumOffsetX = Math.sin(autoPatternTime * 0.3) * 20;
+                frustrumOffsetY = Math.cos(autoPatternTime * 0.4) * 15;
+            }
+            
+            function applyAutoPatterns() {
+                const centerX = meshCanvas.width / 2;
+                const centerY = meshCanvas.height / 2;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    const scale = 250 / (250 + Math.abs(node.z));
+                    const x = centerX + node.x * scale;
+                    const y = centerY + node.y * scale;
+                    
+                    let autoInfluence = 0;
+                    
+                    if (autoWaveActive) {
+                        const wave = Math.sin(node.x * 0.1 + autoPatternTime * 2) * 
+                                   Math.cos(node.y * 0.1 + autoPatternTime * 1.5) * 0.3;
+                        autoInfluence += wave;
+                    }
+                    
+                    if (autoRandomActive) {
+                        if (Math.random() < 0.02) {
+                            autoInfluence += (Math.random() - 0.5) * 0.4;
+                        }
+                    }
+                    
+                    if (autoSpiralActive) {
+                        const dist = Math.sqrt(node.x*node.x + node.y*node.y) / 40;
+                        const angle = Math.atan2(node.y, node.x);
+                        const spiral = Math.sin(dist * 2 - angle + autoPatternTime * 3) * 0.25;
+                        autoInfluence += spiral;
+                    }
+                    
+                    const motionInfluence = (Math.sin(autoRotationX) + Math.cos(autoOrbitY)) * 0.1;
+                    autoInfluence += motionInfluence;
+                    
+                    node.autoInfluence += autoInfluence;
+                }
+            }
+            
+            function processDragPatterns() {
+                for (let i = activeDragPatterns.length - 1; i >= 0; i--) {
+                    const pattern = activeDragPatterns[i];
+                    pattern.progress += 0.02;
+                    pattern.intensity *= 0.98;
+                    
+                    if (pattern.progress >= 1 || pattern.intensity < 0.01) {
+                        activeDragPatterns.splice(i, 1);
+                        continue;
+                    }
+                    
+                    applyDragPattern(pattern);
+                }
+            }
+            
+            function applyDragPattern(pattern) {
+                const centerX = meshCanvas.width / 2;
+                const centerY = meshCanvas.height / 2;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    const scale = 250 / (250 + Math.abs(node.z));
+                    const x = centerX + node.x * scale;
+                    const y = centerY + node.y * scale;
+                    
+                    let influence = 0;
+                    
+                    switch (pattern.type) {
+                        case 'CIRCULAR':
+                            const angle = Math.atan2(y - pattern.cy, x - pattern.cx);
+                            const timeOffset = pattern.progress * Math.PI * 2;
+                            influence = Math.sin(angle + timeOffset) * pattern.intensity;
+                            break;
+                            
+                        case 'LINEAR':
+                            const projX = (x - pattern.cx) * Math.cos(pattern.direction);
+                            const projY = (y - pattern.cy) * Math.sin(pattern.direction);
+                            influence = Math.sin(projX + projY + pattern.progress * 10) * pattern.intensity;
+                            break;
+                            
+                        case 'SPIRAL':
+                            const dist = Math.sqrt((x - pattern.cx) ** 2 + (y - pattern.cy) ** 2);
+                            const spiralAngle = Math.atan2(y - pattern.cy, x - pattern.cx);
+                            influence = Math.sin(spiralAngle * 3 + dist * 0.1 + pattern.progress * 8) * pattern.intensity;
+                            break;
+                            
+                        case 'CHAOTIC':
+                            influence = (Math.sin(x * 0.1) * Math.cos(y * 0.1) + 
+                                       Math.sin(pattern.progress * 15)) * pattern.intensity * 0.5;
+                            break;
+                    }
+                    
+                    node.dragInfluence += influence;
+                    node.value += influence * 0.1;
+                }
+            }
+            
+            // [Mouse event handlers and rendering functions remain the same...]
+            function handleMouseDown(e) {
+                isDragging = true;
+                const rect = meshCanvas.getBoundingClientRect();
+                dragStartX = (e.clientX || e.touches[0].clientX) - rect.left;
+                dragStartY = (e.clientY || e.touches[0].clientY) - rect.top;
+                dragHistory = [{x: dragStartX, y: dragStartY}];
+                dragIndicator.classList.add('active');
+                dragIndicator.style.left = dragStartX + 'px';
+                dragIndicator.style.top = dragStartY + 'px';
+                e.preventDefault();
+            }
+            
+            function handleMouseMove(e) {
+                if (!isDragging) return;
+                
+                const rect = meshCanvas.getBoundingClientRect();
+                const currentX = (e.clientX || e.touches[0].clientX) - rect.left;
+                const currentY = (e.clientY || e.touches[0].clientY) - rect.top;
+                
+                const dx = currentX - dragStartX;
+                const dy = currentY - dragStartY;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                const speed = distance / (Date.now() - (dragHistory[0]?.time || Date.now()));
+                
+                dragEnergy = Math.min(1, speed * 0.1 + distance * 0.001);
+                dragDirection = Math.atan2(dy, dx);
+                
+                dragHistory.push({
+                    x: currentX,
+                    y: currentY,
+                    time: Date.now()
+                });
+                
+                if (dragHistory.length > 20) dragHistory.shift();
+                
+                dragIndicator.style.left = currentX + 'px';
+                dragIndicator.style.top = currentY + 'px';
+                
+                e.preventDefault();
+            }
+            
+            function handleMouseUp() {
+                if (!isDragging) return;
+                isDragging = false;
+                dragEnergy = 0;
+                dragIndicator.classList.remove('active');
+            }
+            
+            meshCanvas.addEventListener('mousedown', handleMouseDown);
+            meshCanvas.addEventListener('mousemove', handleMouseMove);
+            meshCanvas.addEventListener('mouseup', handleMouseUp);
+            meshCanvas.addEventListener('mouseleave', handleMouseUp);
+            meshCanvas.addEventListener('touchstart', handleMouseDown);
+            meshCanvas.addEventListener('touchmove', handleMouseMove);
+            meshCanvas.addEventListener('touchend', handleMouseUp);
+            
+            function updateComputeDisplay() {
+                computeCtx.fillStyle = '#0d1b2a';
+                computeCtx.fillRect(0, 0, computeCanvas.width, computeCanvas.height);
+                
+                activePixels = 0;
+                let totalPixels = 0;
+                
+                for (let group of pixelGroups) {
+                    for (let pixel of group) {
+                        totalPixels++;
+                        if (Math.random() < 0.1) pixel.active = !pixel.active;
+                        if (pixel.active) {
+                            activePixels++;
+                            computeCtx.fillStyle = `rgb(${100 + Math.random() * 155}, 100, ${150 + Math.random() * 105})`;
+                            computeCtx.fillRect(pixel.x, pixel.y, 1, 1);
+                        }
+                    }
+                }
+                
+                if (Math.random() < 0.05 && pixelGroups.length < 15) createPixelGroup();
+                if (Math.random() < 0.02 && pixelGroups.length > 3) pixelGroups.shift();
+                
+                pixelDensity = Math.round((activePixels / totalPixels) * 100);
+                computeInfo.innerHTML = `
+                    <div>PIXEL GROUPS: ${pixelGroups.length}</div>
+                    <div>ACTIVE: ${Math.round((activePixels / totalPixels) * 100)}%</div>
+                    <div>DENSITY: ${pixelDensity}</div>
+                `;
+            }
+            
+            function updateStatus() {
+                const statusItems = document.querySelectorAll('.status-item');
+                const activeNodes = nodes.filter(n => n.activation > 0.1).length;
+                const activationLevel = Math.round((activeNodes / nodes.length) * 100);
+                
+                statusItems[1].innerHTML = `<span>NODES: ${nodes.length}</span>`;
+                statusItems[2].innerHTML = `<span>BRAILLE CELLS: ${brailleCells.length}</span>`;
+                statusItems[3].innerHTML = `<span>VIBRA FREQ: ${Math.round((activeBrailleCells / brailleCells.length) * 100)}HZ</span>`;
+            }
+            
+            function renderMesh() {
+                meshCtx.clearRect(0, 0, meshCanvas.width, meshCanvas.height);
+                meshCtx.fillStyle = '#0d1b2a';
+                meshCtx.fillRect(0, 0, meshCanvas.width, meshCanvas.height);
+                
+                const centerX = meshCanvas.width / 2 + frustrumOffsetX;
+                const centerY = meshCanvas.height / 2 + frustrumOffsetY;
+                
+                const combinedRotationX = autoRotationX;
+                const combinedRotationY = autoRotationY;
+                const cameraRadius = 180;
+                const cameraX = centerX + Math.cos(autoOrbitX) * cameraRadius;
+                const cameraY = centerY;
+                const cameraZ = Math.sin(autoOrbitY) * cameraRadius;
+                
+                meshCtx.strokeStyle = 'rgba(100, 150, 255, 0.1)';
+                meshCtx.lineWidth = 0.5;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    const rotatedX = node.x * Math.cos(combinedRotationY) - node.z * Math.sin(combinedRotationY);
+                    const rotatedZ = node.x * Math.sin(combinedRotationY) + node.z * Math.cos(combinedRotationY);
+                    const rotatedY = node.y * Math.cos(combinedRotationX) - rotatedZ * Math.sin(combinedRotationX);
+                    const finalZ = node.y * Math.sin(combinedRotationX) + rotatedZ * Math.cos(combinedRotationX);
+                    
+                    const scale = 250 / (250 + Math.abs(finalZ) + Math.abs(cameraZ));
+                    const x = centerX + rotatedX * scale;
+                    const y = centerY + rotatedY * scale;
+                    
+                    if (x < 0 || x > meshCanvas.width || y < 0 || y > meshCanvas.height) continue;
+                    
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const other = nodes[j];
+                        const otherRotatedX = other.x * Math.cos(combinedRotationY) - other.z * Math.sin(combinedRotationY);
+                        const otherRotatedZ = other.x * Math.sin(combinedRotationY) + other.z * Math.cos(combinedRotationY);
+                        const otherRotatedY = other.y * Math.cos(combinedRotationX) - otherRotatedZ * Math.sin(combinedRotationX);
+                        const otherFinalZ = other.y * Math.sin(combinedRotationX) + otherRotatedZ * Math.cos(combinedRotationX);
+                        
+                        const otherScale = 250 / (250 + Math.abs(otherFinalZ) + Math.abs(cameraZ));
+                        const otherX = centerX + otherRotatedX * otherScale;
+                        const otherY = centerY + otherRotatedY * otherScale;
+                        
+                        const dx = otherRotatedX - rotatedX;
+                        const dy = otherRotatedY - rotatedY;
+                        const dz = otherFinalZ - finalZ;
+                        
+                        if (Math.sqrt(dx*dx + dy*dy + dz*dz) < 55) {
+                            if (otherX >= 0 && otherX <= meshCanvas.width && otherY >= 0 && otherY <= meshCanvas.height) {
+                                meshCtx.beginPath();
+                                meshCtx.moveTo(x, y);
+                                meshCtx.lineTo(otherX, otherY);
+                                meshCtx.stroke();
+                            }
+                        }
+                    }
+                }
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    
+                    const rotatedX = node.x * Math.cos(combinedRotationY) - node.z * Math.sin(combinedRotationY);
+                    const rotatedZ = node.x * Math.sin(combinedRotationY) + node.z * Math.cos(combinedRotationY);
+                    const rotatedY = node.y * Math.cos(combinedRotationX) - rotatedZ * Math.sin(combinedRotationX);
+                    const finalZ = node.y * Math.sin(combinedRotationX) + rotatedZ * Math.cos(combinedRotationX);
+                    
+                    const scale = 250 / (250 + Math.abs(finalZ) + Math.abs(cameraZ));
+                    const x = centerX + rotatedX * scale;
+                    const y = centerY + rotatedY * scale;
+                    
+                    if (x < 0 || x > meshCanvas.width || y < 0 || y > meshCanvas.height) continue;
+                    
+                    const radius = 2 + node.activation * 6;
+                    
+                    meshCtx.fillStyle = node.color;
+                    meshCtx.beginPath();
+                    meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                    meshCtx.fill();
+                    
+                    if (node.activation > 0.3 || node.dragInfluence > 0.2 || node.autoInfluence > 0.2) {
+                        let glowColor = node.color;
+                        if (node.dragInfluence > 0.2) glowColor = '#ff2966';
+                        else if (node.autoInfluence > 0.2) glowColor = '#4cc9f0';
+                        
+                        meshCtx.shadowColor = glowColor;
+                        meshCtx.shadowBlur = 8;
+                        meshCtx.beginPath();
+                        meshCtx.arc(x, y, radius, 0, Math.PI * 2);
+                        meshCtx.fill();
+                        meshCtx.shadowBlur = 0;
+                    }
+                }
+            }
+            
+            function animate() {
+                if (computing) computeStep();
+                renderMesh();
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Initialize and start
+            initializeMesh();
+            animate();
+            
+            // Control handlers
+            document.getElementById('braille-mode').addEventListener('click', function() {
+                brailleMode = !brailleMode;
+                this.style.background = brailleMode ? 
+                    'rgba(76, 201, 240, 0.7)' : 'rgba(67, 97, 238, 0.3)';
+            });
+            
+            document.getElementById('vibra-pattern').addEventListener('click', function() {
+                vibraPatternActive = !vibraPatternActive;
+                this.style.background = vibraPatternActive ? 
+                    'rgba(76, 201, 240, 0.7)' : 'rgba(67, 97, 238, 0.3)';
+            });
+            
+            document.getElementById('quantum-sync').addEventListener('click', function() {
+                quantumSyncActive = !quantumSyncActive;
+                this.style.background = quantumSyncActive ? 
+                    'rgba(76, 201, 240, 0.7)' : 'rgba(67, 97, 238, 0.3)';
+            });
+            
+            document.getElementById('reset-mesh').addEventListener('click', initializeMesh);
+            
+            document.getElementById('toggle-computation').addEventListener('click', function() {
+                computing = !computing;
+                this.textContent = computing ? 'PAUSE COMPUTE' : 'RESUME COMPUTE';
+                const indicator = document.querySelector('.status-indicator');
+                if (computing) {
+                    indicator.classList.add('pulse');
+                    indicator.style.background = '#4ade80';
+                } else {
+                    indicator.classList.remove('pulse');
+                    indicator.style.background = '#f59e0b';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
