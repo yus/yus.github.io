@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAL Color Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.4;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #222;
+        }
+        
+        .description {
+            font-size: 0.85rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .color-card {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .color-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .color-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 150px;
+            z-index: 100;
+            display: none;
+            font-size: 0.8rem;
+        }
+        
+        .color-popup.show {
+            display: block;
+        }
+        
+        .color-popup .name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .color-popup .hex {
+            color: #666;
+            font-family: monospace;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 6px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .description {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .color-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                gap: 4px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RAL Classic Color Chart</h1>
+            <p class="description">Hover or click on color swatches to see details. Use filters to find specific colors.</p>
+        </header>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Search by name or code...">
+            </div>
+            <div class="search-box">
+                <select id="category">
+                    <option value="all">All Categories</option>
+                    <option value="yellow">Yellow and Beige</option>
+                    <option value="orange">Orange</option>
+                    <option value="red">Red</option>
+                    <option value="violet">Violet</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="grey">Grey</option>
+                    <option value="brown">Brown</option>
+                    <option value="white">White and Black</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="color-grid" id="colorGrid">
+            <!-- Color cards will be generated by JavaScript -->
+        </div>
+        
+        <footer>
+            <p>RAL Color Catalog | Based on RAL CLASSIC color system</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample RAL color data (in a real implementation, this would be more comprehensive)
+        const ralColors = [
+            { code: "RAL 1000", name: "Green beige", hex: "#BEBD7F", category: "yellow" },
+            { code: "RAL 1001", name: "Beige", hex: "#C2B078", category: "yellow" },
+            { code: "RAL 1002", name: "Sand yellow", hex: "#C6A664", category: "yellow" },
+            { code: "RAL 1003", name: "Signal yellow", hex: "#E5BE01", category: "yellow" },
+            { code: "RAL 1004", name: "Golden yellow", hex: "#CDA434", category: "yellow" },
+            { code: "RAL 1005", name: "Honey yellow", hex: "#A98307", category: "yellow" },
+            { code: "RAL 1006", name: "Maize yellow", hex: "#E4A010", category: "yellow" },
+            { code: "RAL 1007", name: "Daffodil yellow", hex: "#DC9D00", category: "yellow" },
+            { code: "RAL 1011", name: "Brown beige", hex: "#8A6642", category: "brown" },
+            { code: "RAL 1012", name: "Lemon yellow", hex: "#C7B446", category: "yellow" },
+            { code: "RAL 1013", name: "Oyster white", hex: "#EAE6CA", category: "white" },
+            { code: "RAL 1014", name: "Ivory", hex: "#E1CC4F", category: "yellow" },
+            { code: "RAL 1015", name: "Light ivory", hex: "#E6D690", category: "yellow" },
+            { code: "RAL 1016", name: "Sulfur yellow", hex: "#EDFF21", category: "yellow" },
+            { code: "RAL 1017", name: "Saffron yellow", hex: "#F5D033", category: "yellow" },
+            { code: "RAL 1018", name: "Zinc yellow", hex: "#F8F32B", category: "yellow" },
+            { code: "RAL 1019", name: "Grey beige", hex: "#9E9764", category: "grey" },
+            { code: "RAL 1020", name: "Olive yellow", hex: "#999950", category: "yellow" },
+            { code: "RAL 1021", name: "Rape yellow", hex: "#F3DA0B", category: "yellow" },
+            { code: "RAL 1023", name: "Traffic yellow", hex: "#FAD201", category: "yellow" },
+            { code: "RAL 1024", name: "Ochre yellow", hex: "#AEA04B", category: "yellow" },
+            { code: "RAL 1026", name: "Luminous yellow", hex: "#FFFF00", category: "yellow" },
+            { code: "RAL 1027", name: "Curry", hex: "#9D9101", category: "yellow" },
+            { code: "RAL 1028", name: "Melon yellow", hex: "#F4A900", category: "yellow" },
+            { code: "RAL 1032", name: "Broom yellow", hex: "#D6AE01", category: "yellow" },
+            { code: "RAL 1033", name: "Dahlia yellow", hex: "#F3A505", category: "yellow" },
+            { code: "RAL 1034", name: "Pastel yellow", hex: "#EFA94A", category: "yellow" },
+            { code: "RAL 2000", name: "Yellow orange", hex: "#ED760E", category: "orange" },
+            { code: "RAL 2001", name: "Red orange", hex: "#C93C20", category: "orange" },
+            { code: "RAL 2002", name: "Vermilion", hex: "#CB2821", category: "orange" },
+            { code: "RAL 2003", name: "Pastel orange", hex: "#FF7514", category: "orange" },
+            { code: "RAL 2004", name: "Pure orange", hex: "#F44611", category: "orange" },
+            { code: "RAL 2005", name: "Luminous orange", hex: "#FF2301", category: "orange" },
+            { code: "RAL 2007", name: "Luminous bright orange", hex: "#FFA420", category: "orange" },
+            { code: "RAL 2008", name: "Bright red orange", hex: "#F75E25", category: "orange" },
+            { code: "RAL 2009", name: "Traffic orange", hex: "#F54021", category: "orange" },
+            { code: "RAL 2010", name: "Signal orange", hex: "#D84B20", category: "orange" },
+            { code: "RAL 2011", name: "Deep orange", hex: "#EC7C26", category: "orange" },
+            { code: "RAL 2012", name: "Salmon orange", hex: "#E55137", category: "orange" },
+            { code: "RAL 2013", name: "Pearl orange", hex: "#C35831", category: "orange" },
+            { code: "RAL 3000", name: "Flame red", hex: "#AF2B1E", category: "red" },
+            { code: "RAL 3001", name: "Signal red", hex: "#A52019", category: "red" },
+            { code: "RAL 3002", name: "Carmine red", hex: "#A2231D", category: "red" },
+            { code: "RAL 3003", name: "Ruby red", hex: "#9B111E", category: "red" },
+            { code: "RAL 3004", name: "Purple red", hex: "#75151E", category: "red" },
+            { code: "RAL 3005", name: "Wine red", hex: "#5E2129", category: "red" },
+            { code: "RAL 3007", name: "Black red", hex: "#412227", category: "red" },
+            { code: "RAL 3009", name: "Oxide red", hex: "#642424", category: "red" },
+            { code: "RAL 3011", name: "Brown red", hex: "#781F19", category: "red" },
+            { code: "RAL 3012", name: "Beige red", hex: "#C1876B", category: "red" },
+            { code: "RAL 3013", name: "Tomato red", hex: "#A12312", category: "red" },
+            { code: "RAL 3014", name: "Antique pink", hex: "#D36E70", category: "red" },
+            { code: "RAL 3015", name: "Light pink", hex: "#EA899A", category: "red" },
+            { code: "RAL 3016", name: "Coral red", hex: "#B32821", category: "red" },
+            { code: "RAL 3017", name: "Rose", hex: "#E63244", category: "red" },
+            { code: "RAL 3018", name: "Strawberry red", hex: "#D53032", category: "red" },
+            { code: "RAL 3020", name: "Traffic red", hex: "#CC0605", category: "red" },
+            { code: "RAL 3022", name: "Salmon pink", hex: "#D95030", category: "red" },
+            { code: "RAL 3024", name: "Luminous red", hex: "#F80000", category: "red" },
+            { code: "RAL 3026", name: "Luminous bright red", hex: "#FE0000", category: "red" },
+            { code: "RAL 3027", name: "Raspberry red", hex: "#C51D34", category: "red" },
+            { code: "RAL 3028", name: "Pure red", hex: "#CB3234", category: "red" },
+            { code: "RAL 3031", name: "Orient red", hex: "#B32428", category: "red" },
+            { code: "RAL 4001", name: "Red lilac", hex: "#721422", category: "violet" },
+            { code: "RAL 4002", name: "Red violet", hex: "#B44C43", category: "violet" },
+            { code: "RAL 4003", name: "Heather violet", hex: "#6D3F5B", category: "violet" },
+            { code: "RAL 4004", name: "Claret violet", hex: "#922B3E", category: "violet" },
+            { code: "RAL 4005", name: "Blue lilac", hex: "#DE4C8A", category: "violet" },
+            { code: "RAL 4006", name: "Traffic purple", hex: "#641C34", category: "violet" },
+            { code: "RAL 4007", name: "Purple violet", hex: "#6C4675", category: "violet" },
+            { code: "RAL 4008", name: "Signal violet", hex: "#A03472", category: "violet" },
+            { code: "RAL 4009", name: "Pastel violet", hex: "#8673A1", category: "violet" },
+            { code: "RAL 5000", name: "Violet blue", hex: "#354D73", category: "blue" },
+            { code: "RAL 5001", name: "Green blue", hex: "#1F3438", category: "blue" },
+            { code: "RAL 5002", name: "Ultramarine blue", hex: "#20214F", category: "blue" },
+            { code: "RAL 5003", name: "Sapphire blue", hex: "#1D1E33", category: "blue" },
+            { code: "RAL 5004", name: "Black blue", hex: "#18171C", category: "blue" },
+            { code: "RAL 5005", name: "Signal blue", hex: "#1E2460", category: "blue" },
+            { code: "RAL 5007", name: "Brilliant blue", hex: "#3E5F8A", category: "blue" },
+            { code: "RAL 5008", name: "Grey blue", hex: "#26252D", category: "blue" },
+            { code: "RAL 5009", name: "Azure blue", hex: "#025669", category: "blue" },
+            { code: "RAL 5010", name: "Gentian blue", hex: "#0E294B", category: "blue" },
+            { code: "RAL 5011", name: "Steel blue", hex: "#231A24", category: "blue" },
+            { code: "RAL 5012", name: "Light blue", hex: "#3B83BD", category: "blue" },
+            { code: "RAL 5013", name: "Cobalt blue", hex: "#1E213D", category: "blue" },
+            { code: "RAL 5014", name: "Pigeon blue", hex: "#606E8C", category: "blue" },
+            { code: "RAL 5015", name: "Sky blue", hex: "#2271B3", category: "blue" },
+            { code: "RAL 5017", name: "Traffic blue", hex: "#063971", category: "blue" },
+            { code: "RAL 5018", name: "Turquoise blue", hex: "#3F888F", category: "blue" },
+            { code: "RAL 5019", name: "Capri blue", hex: "#1B5583", category: "blue" },
+            { code: "RAL 5020", name: "Ocean blue", hex: "#1D334A", category: "blue" },
+            { code: "RAL 5021", name: "Water blue", hex: "#256D7B", category: "blue" },
+            { code: "RAL 5022", name: "Night blue", hex: "#252850", category: "blue" },
+            { code: "RAL 5023", name: "Distant blue", hex: "#49678D", category: "blue" },
+            { code: "RAL 5024", name: "Pastel blue", hex: "#5D9B9B", category: "blue" },
+            { code: "RAL 5025", name: "Pearl gentian blue", hex: "#2A6478", category: "blue" },
+            { code: "RAL 5026", name: "Pearl night blue", hex: "#102C54", category: "blue" },
+            { code: "RAL 6000", name: "Patina green", hex: "#316650", category: "green" },
+            { code: "RAL 6001", name: "Emerald green", hex: "#287233", category: "green" },
+            { code: "RAL 6002", name: "Leaf green", hex: "#2D572C", category: "green" },
+            { code: "RAL 6003", name: "Olive green", hex: "#424632", category: "green" },
+            { code: "RAL 6004", name: "Blue green", hex: "#1F3A3D", category: "green" },
+            { code: "RAL 6005", name: "Moss green", hex: "#2F4538", category: "green" },
+            { code: "RAL 6006", name: "Grey olive", hex: "#3E3B32", category: "green" },
+            { code: "RAL 6007", name: "Bottle green", hex: "#343B29", category: "green" },
+            { code: "RAL 6008", name: "Brown green", hex: "#39352A", category: "green" },
+            { code: "RAL 6009", name: "Fir green", hex: "#31372B", category: "green" },
+            { code: "RAL 6010", name: "Grass green", hex: "#35682D", category: "green" },
+            { code: "RAL 6011", name: "Reseda green", hex: "#587246", category: "green" },
+            { code: "RAL 6012", name: "Black green", hex: "#343E40", category: "green" },
+            { code: "RAL 6013", name: "Reed green", hex: "#6C7156", category: "green" },
+            { code: "RAL 6014", name: "Yellow olive", hex: "#47402E", category: "green" },
+            { code: "RAL 6015", name: "Black olive", hex: "#3B3C36", category: "green" },
+            { code: "RAL 6016", name: "Turquoise green", hex: "#1E5945", category: "green" },
+            { code: "RAL 6017", name: "May green", hex: "#4C9141", category: "green" },
+            { code: "RAL 6018", name: "Yellow green", hex: "#57A639", category: "green" },
+            { code: "RAL 6019", name: "Pastel green", hex: "#BDECB6", category: "green" },
+            { code: "RAL 6020", name: "Chrome green", hex: "#2E3A23", category: "green" },
+            { code: "RAL 6021", name: "Pale green", hex: "#89AC76", category: "green" },
+            { code: "RAL 6022", name: "Olive drab", hex: "#25221B", category: "green" },
+            { code: "RAL 6024", name: "Traffic green", hex: "#308446", category: "green" },
+            { code: "RAL 6025", name: "Fern green", hex: "#3D642D", category: "green" },
+            { code: "RAL 6026", name: "Opal green", hex: "#015D52", category: "green" },
+            { code: "RAL 6027", name: "Light green", hex: "#84C3BE", category: "green" },
+            { code: "RAL 6028", name: "Pine green", hex: "#2C5545", category: "green" },
+            { code: "RAL 6029", name: "Mint green", hex: "#20603D", category: "green" },
+            { code: "RAL 6032", name: "Signal green", hex: "#317F43", category: "green" },
+            { code: "RAL 6033", name: "Mint turquoise", hex: "#497E76", category: "green" },
+            { code: "RAL 6034", name: "Pastel turquoise", hex: "#7FB5B5", category: "green" },
+            { code: "RAL 7000", name: "Squirrel grey", hex: "#7E8B92", category: "grey" },
+            { code: "RAL 7001", name: "Silver grey", hex: "#8F999F", category: "grey" },
+            { code: "RAL 7002", name: "Olive grey", hex: "#817F68", category: "grey" },
+            { code: "RAL 7003", name: "Moss grey", hex: "#7A7B6D", category: "grey" },
+            { code: "RAL 7004", name: "Signal grey", hex: "#9EA0A1", category: "grey" },
+            { code: "RAL 7005", name: "Mouse grey", hex: "#6B716F", category: "grey" },
+            { code: "RAL 7006", name: "Beige grey", hex: "#756F61", category: "grey" },
+            { code: "RAL 7008", name: "Khaki grey", hex: "#746C66", category: "grey" },
+            { code: "RAL 7009", name: "Green grey", hex: "#5B6259", category: "grey" },
+            { code: "RAL 7010", name: "Tarpaulin grey", hex: "#575D57", category: "grey" },
+            { code: "RAL 7011", name: "Iron grey", hex: "#555D61", category: "grey" },
+            { code: "RAL 7012", name: "Basalt grey", hex: "#596163", category: "grey" },
+            { code: "RAL 7013", name: "Brown grey", hex: "#555548", category: "grey" },
+            { code: "RAL 7015", name: "Slate grey", hex: "#51565C", category: "grey" },
+            { code: "RAL 7016", name: "Anthracite grey", hex: "#373F43", category: "grey" },
+            { code: "RAL 7021", name: "Black grey", hex: "#2E3234", category: "grey" },
+            { code: "RAL 7022", name: "Umbra grey", hex: "#4B4D46", category: "grey" },
+            { code: "RAL 7023", name: "Concrete grey", hex: "#818479", category: "grey" },
+            { code: "RAL 7024", name: "Graphite grey", hex: "#474A50", category: "grey" },
+            { code: "RAL 7026", name: "Granite grey", hex: "#374447", category: "grey" },
+            { code: "RAL 7030", name: "Stone grey", hex: "#939388", category: "grey" },
+            { code: "RAL 7031", name: "Blue grey", hex: "#5D6970", category: "grey" },
+            { code: "RAL 7032", name: "Pebble grey", hex: "#B9B9A8", category: "grey" },
+            { code: "RAL 7033", name: "Cement grey", hex: "#818979", category: "grey" },
+            { code: "RAL 7034", name: "Yellow grey", hex: "#939176", category: "grey" },
+            { code: "RAL 7035", name: "Light grey", hex: "#CBD0CC", category: "grey" },
+            { code: "RAL 7036", name: "Platinum grey", hex: "#9A9697", category: "grey" },
+            { code: "RAL 7037", name: "Dusty grey", hex: "#7C7F7E", category: "grey" },
+            { code: "RAL 7038", name: "Agate grey", hex: "#B4B8B0", category: "grey" },
+            { code: "RAL 7039", name: "Quartz grey", hex: "#6B695F", category: "grey" },
+            { code: "RAL 7040", name: "Window grey", hex: "#9DA3A6", category: "grey" },
+            { code: "RAL 7042", name: "Traffic grey A", hex: "#8F9695", category: "grey" },
+            { code: "RAL 7043", name: "Traffic grey B", hex: "#4E5451", category: "grey" },
+            { code: "RAL 7044", name: "Silk grey", hex: "#BDBDB2", category: "grey" },
+            { code: "RAL 7045", name: "Telegrey 1", hex: "#91969A", category: "grey" },
+            { code: "RAL 7046", name: "Telegrey 2", hex: "#82898E", category: "grey" },
+            { code: "RAL 7047", name: "Telegrey 4", hex: "#CFD0CF", category: "grey" },
+            { code: "RAL 7048", name: "Pearl mouse grey", hex: "#888175", category: "grey" },
+            { code: "RAL 8000", name: "Green brown", hex: "#887142", category: "brown" },
+            { code: "RAL 8001", name: "Ochre brown", hex: "#9C6B30", category: "brown" },
+            { code: "RAL 8002", name: "Signal brown", hex: "#7B5141", category: "brown" },
+            { code: "RAL 8003", name: "Clay brown", hex: "#80542F", category: "brown" },
+            { code: "RAL 8004", name: "Copper brown", hex: "#8F4E35", category: "brown" },
+            { code: "RAL 8007", name: "Fawn brown", hex: "#6F4F28", category: "brown" },
+            { code: "RAL 8008", name: "Olive brown", hex: "#533F2C", category: "brown" },
+            { code: "RAL 8011", name: "Nut brown", hex: "#4D3B2C", category: "brown" },
+            { code: "RAL 8012", name: "Red brown", hex: "#592321", category: "brown" },
+            { code: "RAL 8014", name: "Sepia brown", hex: "#382C1E", category: "brown" },
+            { code: "RAL 8015", name: "Chestnut brown", hex: "#633A34", category: "brown" },
+            { code: "RAL 8016", name: "Mahogany brown", hex: "#4C2F27", category: "brown" },
+            { code: "RAL 8017", name: "Chocolate brown", hex: "#45322E", category: "brown" },
+            { code: "RAL 8019", name: "Grey brown", hex: "#403A3A", category: "brown" },
+            { code: "RAL 8022", name: "Black brown", hex: "#212121", category: "brown" },
+            { code: "RAL 8023", name: "Orange brown", hex: "#A65E2E", category: "brown" },
+            { code: "RAL 8024", name: "Beige brown", hex: "#79553D", category: "brown" },
+            { code: "RAL 8025", name: "Pale brown", hex: "#755C48", category: "brown" },
+            { code: "RAL 8028", name: "Terra brown", hex: "#4E3B31", category: "brown" },
+            { code: "RAL 8029", name: "Pearl copper", hex: "#773C27", category: "brown" },
+            { code: "RAL 9001", name: "Cream", hex: "#EFEBDC", category: "white" },
+            { code: "RAL 9002", name: "Grey white", hex: "#DDDED4", category: "white" },
+            { code: "RAL 9003", name: "Signal white", hex: "#F4F8F4", category: "white" },
+            { code: "RAL 9004", name: "Signal black", hex: "#2E3032", category: "white" },
+            { code: "RAL 9005", name: "Jet black", hex: "#0A0A0A", category: "white" },
+            { code: "RAL 9006", name: "White aluminium", hex: "#A5A5A5", category: "white" },
+            { code: "RAL 9007", name: "Grey aluminium", hex: "#8F8F8F", category: "white" },
+            { code: "RAL 9010", name: "Pure white", hex: "#F7F9EF", category: "white" },
+            { code: "RAL 9011", name: "Graphite black", hex: "#292C2F", category: "white" },
+            { code: "RAL 9016", name: "Traffic white", hex: "#F7FBF5", category: "white" },
+            { code: "RAL 9017", name: "Traffic black", hex: "#2A2D2F", category: "white" },
+            { code: "RAL 9018", name: "Papyrus white", hex: "#CFD3CD", category: "white" }
+        ];
+
+        // DOM elements
+        const colorGrid = document.getElementById('colorGrid');
+        const searchInput = document.getElementById('search');
+        const categorySelect = document.getElementById('category');
+
+        // Initialize the color grid
+        function renderColors(colors) {
+            colorGrid.innerHTML = '';
+            
+            colors.forEach(color => {
+                const colorCard = document.createElement('div');
+                colorCard.className = 'color-card';
+                colorCard.style.backgroundColor = color.hex;
+                colorCard.setAttribute('data-code', color.code);
+                colorCard.setAttribute('data-name', color.name);
+                colorCard.setAttribute('data-hex', color.hex);
+                
+                const popup = document.createElement('div');
+                popup.className = 'color-popup';
+                popup.innerHTML = `
+                    <div class="name">${color.name}</div>
+                    <div class="code">${color.code}</div>
+                    <div class="hex">${color.hex}</div>
+                `;
+                
+                colorCard.appendChild(popup);
+                colorGrid.appendChild(colorCard);
+                
+                // Add event listeners for hover and click
+                colorCard.addEventListener('mouseenter', showPopup);
+                colorCard.addEventListener('mouseleave', hidePopup);
+                colorCard.addEventListener('click', togglePopup);
+            });
+        }
+
+        // Show popup on hover
+        function showPopup(e) {
+            const popup = this.querySelector('.color-popup');
+            popup.classList.add('show');
+        }
+
+        // Hide popup when not hovering
+        function hidePopup(e) {
+            const popup = this.querySelector('.color-popup');
+            // Only hide if not clicked/toggled
+            if (!popup.classList.contains('persist')) {
+                popup.classList.remove('show');
+            }
+        }
+
+        // Toggle popup on click (for mobile)
+        function togglePopup(e) {
+            const popup = this.querySelector('.color-popup');
+            const isShowing = popup.classList.contains('show');
+            
+            // Remove persist from all other popups
+            document.querySelectorAll('.color-popup.persist').forEach(p => {
+                p.classList.remove('persist', 'show');
+            });
+            
+            if (!isShowing) {
+                popup.classList.add('show', 'persist');
+            } else {
+                popup.classList.remove('show', 'persist');
+            }
+        }
+
+        // Filter colors based on search and category
+        function filterColors() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categorySelect.value;
+            
+            const filteredColors = ralColors.filter(color => {
+                const matchesSearch = color.name.toLowerCase().includes(searchTerm) || 
+                                     color.code.toLowerCase().includes(searchTerm);
+                const matchesCategory = category === 'all' || color.category === category;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            renderColors(filteredColors);
+        }
+
+        // Event listeners for filtering
+        searchInput.addEventListener('input', filterColors);
+        categorySelect.addEventListener('change', filterColors);
+
+        // Close popups when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.color-card')) {
+                document.querySelectorAll('.color-popup.persist').forEach(popup => {
+                    popup.classList.remove('persist', 'show');
+                });
+            }
+        });
+
+        // Initial render
+        renderColors(ralColors);
+    </script>
+</body>
+</html>
