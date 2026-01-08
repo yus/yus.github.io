@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Grid & Permanent Echoes</title>
+    <style>
+        /* UI Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace; /* Monospace for data feel */
+            color: #fff;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+        }
+
+        /* Glass Panels */
+        .panel {
+            background: rgba(0, 10, 20, 0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 1rem;
+            pointer-events: auto;
+            max-width: 320px;
+        }
+
+        header h1 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 0.5rem 0;
+            color: #0ff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #ccc;
+        }
+        .stat-val { color: #fff; font-weight: bold; }
+
+        .user-list {
+            margin-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .user-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* Instructions */
+        .hint {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            text-align: right;
+            opacity: 0.7;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="glCanvas"></canvas>
+    </div>
+
+    <main id="ui-layer">
+        <header>
+            <div class="panel">
+                <h1>Temporal Grid // <span id="clock">00:00:00</span></h1>
+                <div class="stat-line">
+                    <span>Active Users</span>
+                    <span class="stat-val" id="user-count">1</span>
+                </div>
+                <div class="stat-line">
+                    <span>Total Ripples</span>
+                    <span class="stat-val" id="ripple-total">0</span>
+                </div>
+                <div class="stat-line">
+                    <span>Trail Density</span>
+                    <span class="stat-val" id="density-val">0%</span>
+                </div>
+                <div class="user-list" id="user-list-ui">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </header>
+
+        <div class="hint">
+            System Passive<br>
+            Input Accumulated<br>
+            Footprints: Permanent
+        </div>
+    </main>
+
+    <!-- SHADERS -->
+    
+    <!-- 1. Vertex Shader (Shared) -->
+    <script id="vs" type="x-shader/x-vertex">
+        attribute vec2 position;
+        varying vec2 vUv;
+        void main() {
+            vUv = position * 0.5 + 0.5;
+            // Flip Y for WebGL texture coords
+            vUv.y = 1.0 - vUv.y;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <!-- 2. Trail Pass Fragment Shader (Feedback Loop) -->
+    <script id="fs-trail" type="x-shader/x-fragment">
+        precision mediump float;
+        varying vec2 vUv;
+        
+        uniform sampler2D uPrevTrail; // The previous frame's trails
+        uniform vec2 uResolution;
+        
+        // Sprites for users (we draw them here to burn them into the texture)
+        uniform int uSpriteCount;
+        uniform vec2 uSpritePos[20]; 
+        uniform vec3 uSpriteColor[20];
+
+        void main() {
+            vec2 uv = vUv;
+            
+            // 1. Get old trail
+            vec3 trailColor = texture2D(uPrevTrail, uv).rgb;
+            
+            // 2. Add new sprites (footprints) for this frame
+            // We accumulate them. Since we don't clear, they stay "forever"
+            for(int i = 0; i < 20; i++) {
+                if(i >= uSpriteCount) break;
+                
+                float d = distance(uv, uSpritePos[i]);
+                // Soft brush
+                float brush = smoothstep(0.02, 0.0, d);
+                trailColor += uSpriteColor[i] * brush * 0.05; // Low opacity to prevent burnout too fast
+            }
+
+            // 3. Optional: VERY slow fade if you don't want literal forever (uncomment next line)
+            // trailColor *= 0.9995; 
+
+            gl_FragColor = vec4(trailColor, 1.0);
+        }
+    </script>
+
+    <!-- 3. Main Composite Fragment Shader -->
+    <script id="fs-main" type="x-shader/x-fragment">
+        precision highp float;
+        varying vec2 vUv;
+
+        uniform vec2 uResolution;
+        uniform float uTime;
+        uniform sampler2D uTrailTexture;
+
+        // Ripple Data: x, y, startTime, scaleIntensity
+        uniform vec4 uRipples[50]; 
+        uniform int uRippleCount;
+
+        void main() {
+            vec2 uv = vUv;
+            // Correct aspect ratio for grid
+            vec2 gridUv = uv * uResolution;
+            
+            // --- 1. Background & Time Grid ---
+            vec3 color = vec3(0.0, 0.02, 0.05); // Deep dark blue base
+
+            // 10x10 Grid cells logic
+            vec2 cell = fract(gridUv / 100.0); // Assuming min dim is approx 1000, so 10 cells
+            // Or simpler: 10 cells across the screen regardless of resolution
+            vec2 gridPos = fract(uv * 10.0);
+            
+            // Highline Grid Lines (Brighter, thinner)
+            float lineWidth = 0.02; // Thinner line
+            float line = step(1.0 - lineWidth, gridPos.x) + step(gridPos.x, lineWidth) +
+                         step(1.0 - lineWidth, gridPos.y) + step(gridPos.y, lineWidth);
+            
+            // Time Pulsing Effect on Grid
+            float pulse = sin(uTime * 2.0) * 0.5 + 0.5;
+            vec3 gridColor = vec3(0.1, 0.3, 0.4) + (vec3(0.2, 0.6, 1.0) * pulse * 0.3);
+            
+            color = mix(color, gridColor, line * 0.6);
+
+            // --- 2. Summing Ripples (~20x20 density) ---
+            float rippleSum = 0.0;
+            
+            for(int i = 0; i < 50; i++) {
+                if(i >= uRippleCount) break;
+                
+                vec4 r = uRipples[i];
+                float age = uTime - r.z;
+                
+                if(age > 0.0 && age < 10.0) { // Active for 10 seconds
+                    float dist = distance(uv, r.xy);
+                    
+                    // ~20x20 ripple frequency
+                    // We modulate frequency by scale for visual variety
+                    float freq = 20.0 * r.w; 
+                    
+                    // Wave equation
+                    float wave = sin(dist * freq - age * 5.0);
+                    
+                    // Decay: "Decreased by scale"
+                    // Larger waves (lower scale factor) decay differently than small ripples
+                    float attenuation = 1.0 / (dist * 10.0 + age * 2.0 + 1.0);
+                    
+                    rippleSum += wave * attenuation * 0.5;
+                }
+            }
+
+            // Apply ripples to brightness/grid distortion
+            // Visualize ripples as bright distortions on the grid lines
+            color += vec3(0.5, 0.8, 1.0) * rippleSum * 0.4;
+
+            // --- 3. Composite Forever Footprints ---
+            vec3 trails = texture2D(uTrailTexture, uv).rgb;
+            // Additive blending for trails
+            color += trails;
+
+            // Vignette
+            float vig = 1.0 - length(uv - 0.5) * 0.8;
+            color *= vig;
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+
+    <script>
+        /**
+         * System: WebGL Feedback Loop + Multi-Agent Simulation
+         */
+
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
+
+        if (!gl) { alert('WebGL required'); }
+
+        // --- Configuration ---
+        const MAX_USERS = 6; // You + 5 bots
+        const MAX_RIPPLES = 50;
+        const RIPPLE_DECAY = 5.0; // Speed of decay
+
+        // --- State ---
+        let users = [];
+        let ripples = []; // Array of {x, y, time, scale}
+        let startTime = Date.now();
+        let totalRipplesGenerated = 0;
+
+        // --- Initialization ---
+        
+        function init() {
+            // User 0 is the human
+            users.push({ 
+                id: 0, 
+                name: "YOU", 
+                x: 0.5, 
+                y: 0.5, 
+                color: [1.0, 1.0, 1.0], // White
+                vx: 0, vy: 0 
+            });
+
+            // Add bots
+            const botColors = [
+                [1.0, 0.2, 0.2], // Red
+                [0.2, 1.0, 0.2], // Green
+                [0.2, 0.5, 1.0], // Blue
+                [1.0, 0.8, 0.2], // Yellow
+                [1.0, 0.2, 1.0]  // Magenta
+            ];
+
+            for(let i=0; i<MAX_USERS - 1; i++) {
+                users.push({
+                    id: i+1,
+                    name: `USR_${100+i}`,
+                    x: Math.random(),
+                    y: Math.random(),
+                    color: botColors[i % botColors.length],
+                    vx: (Math.random() - 0.5) * 0.005,
+                    vy: (Math.random() - 0.5) * 0.005,
+                    timer: Math.random() * 100
+                });
+            }
+
+            updateUserUI();
+            window.addEventListener('resize', resize);
+            window.addEventListener('mousemove', handleInput);
+            resize();
+            requestAnimationFrame(loop);
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+
+        function handleInput(e) {
+            // Update Human (User 0)
+            users[0].x = e.clientX / canvas.width;
+            users[0].y = 1.0 - (e.clientY / canvas.height); // Flip Y for shader
+            users[0].vx = 0; // Human is direct control
+            users[0].vy = 0;
+        }
+
+        // --- WebGL Setup Helpers ---
+
+        function createShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(s));
+                return null;
+            }
+            return s;
+        }
+
+        function createProgram(gl, vsId, fsId) {
+            const vs = createShader(gl, gl.VERTEX_SHADER, document.getElementById(vsId).text);
+            const fs = createShader(gl, gl.FRAGMENT_SHADER, document.getElementById(fsId).text);
+            const p = gl.createProgram();
+            gl.attachShader(p, vs);
+            gl.attachShader(p, fs);
+            gl.linkProgram(p);
+            return p;
+        }
+
+        // --- FBO (Frame Buffer Object) for Feedback Loop ---
+        
+        // We need two textures to swap (Ping Pong)
+        let trailFBO, trailTexture;
+        let trailWidth = 512; // Lower res for trails is okay, adds nice softness
+        let trailHeight = 512;
+
+        function initFBO() {
+            trailTexture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, trailTexture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, trailWidth, trailHeight, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+            trailFBO = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, trailFBO);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, trailTexture, 0);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        }
+
+        // --- Compiling Programs ---
+
+        const trailProgram = createProgram(gl, 'vs', 'fs-trail');
+        const mainProgram = createProgram(gl, 'vs', 'fs-main');
+
+        // Quad Buffer
+        const quadBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+        // --- Main Loop ---
+
+        function loop() {
+            const now = (Date.now() - startTime) / 1000;
+            
+            updateSimulation(now);
+            updateUI(now);
+
+            // 1. Render Trail Pass (To FBO)
+            gl.bindFramebuffer(gl.FRAMEBUFFER, trailFBO);
+            gl.viewport(0, 0, trailWidth, trailHeight);
+            gl.useProgram(trailProgram);
+
+            // Set Uniforms
+            const posLoc = gl.getAttribLocation(trailProgram, 'position');
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            gl.uniform2f(gl.getUniformLocation(trailProgram, 'uResolution'), trailWidth, trailHeight);
+            
+            // Pass prev texture (bound to unit 0)
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, trailTexture);
+            gl.uniform1i(gl.getUniformLocation(trailProgram, 'uPrevTrail'), 0);
+
+            // Pass Sprites (User positions)
+            const spriteCountLoc = gl.getUniformLocation(trailProgram, 'uSpriteCount');
+            const spritePosLoc = gl.getUniformLocation(trailProgram, 'uSpritePos');
+            const spriteColorLoc = gl.getUniformLocation(trailProgram, 'uSpriteColor');
+
+            // Flatten arrays for WebGL
+            let flatPos = [];
+            let flatCol = [];
+            users.forEach(u => {
+                flatPos.push(u.x, u.y);
+                flatCol.push(...u.color);
+            });
+            
+            gl.uniform1i(spriteCountLoc, users.length);
+            gl.uniform2fv(spritePosLoc, new Float32Array(flatPos));
+            gl.uniform3fv(spriteColorLoc, new Float32Array(flatCol));
+
+            // Draw Quad
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+
+            // 2. Render Main Pass (To Screen)
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.useProgram(mainProgram);
+
+            const mainPosLoc = gl.getAttribLocation(mainProgram, 'position');
+            gl.enableVertexAttribArray(mainPosLoc);
+            gl.vertexAttribPointer(mainPosLoc, 2, gl.FLOAT, false, 0, 0);
+
+            gl.uniform2f(gl.getUniformLocation(mainProgram, 'uResolution'), canvas.width, canvas.height);
+            gl.uniform1f(gl.getUniformLocation(mainProgram, 'uTime'), now);
+            
+            // Bind Trail Texture to unit 0 again
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, trailTexture);
+            gl.uniform1i(gl.getUniformLocation(mainProgram, 'uTrailTexture'), 0);
+
+            // Pass Ripples
+            let flatRipples = [];
+            // Only send valid ripples to shader
+            // Ripples decay in JS logic, but we keep slots filled
+            ripples.forEach(r => {
+                flatRipples.push(r.x, r.y, r.time, r.scale);
+            });
+            
+            // Fill remaining slots with dummy data to avoid shader looping errors if count mismatches
+            while(flatRipples.length < 200) { flatRipples.push(0,0,-1.0, 0); } 
+
+            gl.uniform1i(gl.getUniformLocation(mainProgram, 'uRippleCount'), ripples.length);
+            gl.uniform4fv(gl.getUniformLocation(mainProgram, 'uRipples'), new Float32Array(flatRipples));
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+            requestAnimationFrame(loop);
+        }
+
+        // --- Simulation Logic ---
+
+        function updateSimulation(now) {
+            users.forEach(u => {
+                if (u.id !== 0) { // Bots
+                    // Move
+                    u.x += u.vx;
+                    u.y += u.vy;
+
+                    // Bounce off walls
+                    if (u.x < 0 || u.x > 1) u.vx *= -1;
+                    if (u.y < 0 || u.y > 1) u.vy *= -1;
+
+                    // Random direction change occasionally
+                    u.timer++;
+                    if (u.timer > 100 + Math.random()*200) {
+                        u.vx = (Math.random() - 0.5) * 0.005;
+                        u.vy = (Math.random() - 0.5) * 0.005;
+                        u.timer = 0;
+                        
+                        // Trigger Ripple on direction change
+                        addRipple(u.x, u.y, 1.5);
+                    }
+                }
+            });
+
+            // Update ripples
+            // We don't remove them immediately to allow "summing" effect in shader loop
+            // but we filter old ones out of the active array to keep it small
+            ripples = ripples.filter(r => (now - r.time) < 8.0); 
+        }
+
+        function addRipple(x, y, scale) {
+            // Limit ripples for performance
+            if (ripples.length >= MAX_RIPPLES) {
+                ripples.shift(); // Remove oldest
+            }
+            ripples.push({
+                x: x,
+                y: y,
+                time: (Date.now() - startTime) / 1000,
+                scale: scale
+            });
+            totalRipplesGenerated++;
+        }
+
+        // --- Interaction ---
+
+        let lastX = users[0].x;
+        let lastY = users[0].y;
+
+        // Hook into the existing loop to trigger ripples on human movement
+        const originalLoop = loop;
+        loop = function() {
+            const u = users[0];
+            const dist = Math.hypot(u.x - lastX, u.y - lastY);
+            
+            if (dist > 0.02) {
+                addRipple(u.x, u.y, 1.0 + Math.random());
+                lastX = u.x;
+                lastY = u.y;
+            }
+            
+            originalLoop();
+        };
+
+        // --- UI ---
+
+        function updateUserUI() {
+            const list = document.getElementById('user-list-ui');
+            list.innerHTML = '';
+            users.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'stat-line';
+                div.style.fontSize = '0.7rem';
+                div.innerHTML = `
+                    <div><span class="user-dot" style="background:rgb(${u.color[0]*255},${u.color[1]*255},${u.color[2]*255})"></span>${u.name}</div>
+                `;
+                list.appendChild(div);
+            });
+            document.getElementById('user-count').innerText = users.length;
+        }
+
+        function updateUI(now) {
+            // Clock
+            const d = new Date();
+            document.getElementById('clock').innerText = d.toLocaleTimeString('en-US', {hour12:false});
+
+            // Stats
+            document.getElementById('ripple-total').innerText = totalRipplesGenerated;
+            
+            // Calc fake density based on oldest active ripple
+            const density = Math.min(100, Math.floor((ripples.length / MAX_RIPPLES) * 100));
+            document.getElementById('density-val').innerText = density + '%';
+        }
+
+        // Start
+        initFBO();
+        init();
+
+    </script>
+</body>
+</html> 
