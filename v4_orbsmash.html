@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SP Cube Orbits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+            color: #f1f1f1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff3366, #33ccff, #ffcc00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 51, 102, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .highlight {
+            color: #33ccff;
+            font-weight: bold;
+        }
+        
+        .animation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .svg-wrapper {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(51, 204, 255, 0.1);
+            border: 2px solid rgba(51, 204, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .svg-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(51, 204, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        #svg-container {
+            width: 600px;
+            height: 600px;
+            perspective: 1800px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #animated-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .cube-face {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 1;
+            stroke-dasharray: 5, 5;
+        }
+        
+        .cube-face.front {
+            stroke: rgba(255, 51, 102, 0.6);
+            stroke-dasharray: none;
+        }
+        
+        .cube-face.back {
+            stroke: rgba(51, 204, 255, 0.6);
+        }
+        
+        .cube-face.left {
+            stroke: rgba(51, 255, 153, 0.6);
+        }
+        
+        .cube-face.right {
+            stroke: rgba(255, 204, 51, 0.6);
+        }
+        
+        .cube-face.top {
+            stroke: rgba(204, 51, 255, 0.6);
+        }
+        
+        .cube-face.bottom {
+            stroke: rgba(255, 153, 51, 0.6);
+        }
+        
+        .smash-element {
+            filter: 
+                drop-shadow(0 0 8px currentColor)
+                drop-shadow(0 0 16px rgba(255, 255, 255, 0.3));
+            transition: filter 0.3s ease;
+        }
+        
+        .smash-element:hover {
+            filter: 
+                drop-shadow(0 0 12px currentColor)
+                drop-shadow(0 0 24px rgba(255, 255, 255, 0.5))
+                brightness(1.2);
+        }
+        
+        .face-label {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            fill: white;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            opacity: 0.7;
+        }
+        
+        .controls {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(255, 51, 102, 0.1);
+            border: 2px solid rgba(255, 51, 102, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        h3 {
+            color: #33ccff;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #222244, #333366);
+            outline: none;
+            opacity: 0.9;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffcc00;
+            cursor: pointer;
+            box-shadow: 
+                0 0 10px rgba(255, 204, 0, 0.8),
+                0 0 20px rgba(255, 204, 0, 0.4);
+            transition: all 0.2s;
+        }
+        
+        .slider:hover {
+            opacity: 1;
+        }
+        
+        .slider:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+        
+        .slider-value {
+            display: inline-block;
+            min-width: 50px;
+            text-align: right;
+            color: #ffcc00;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #ff3366, #33ccff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            min-width: 140px;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(51, 204, 255, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button#reset {
+            background: linear-gradient(135deg, #33ccff, #3366ff);
+            box-shadow: 0 4px 10px rgba(51, 102, 255, 0.3);
+        }
+        
+        button#reset:hover {
+            box-shadow: 0 7px 20px rgba(51, 102, 255, 0.5);
+        }
+        
+        button#toggle-cube {
+            background: linear-gradient(135deg, #33ff66, #66ff33);
+            box-shadow: 0 4px 10px rgba(51, 255, 102, 0.3);
+        }
+        
+        button#toggle-cube:hover {
+            box-shadow: 0 7px 20px rgba(51, 255, 102, 0.5);
+        }
+        
+        .rotation-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(20, 20, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .cube-axis, .element-axis {
+            text-align: center;
+        }
+        
+        .axis-name {
+            color: #ff3366;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .axis-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 80px;
+            display: inline-block;
+        }
+        
+        .element-axis .axis-name {
+            color: #33ccff;
+        }
+        
+        .info-panel {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(255, 204, 51, 0.1);
+            border: 2px solid rgba(255, 204, 51, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .info-panel h2 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .info-panel p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .concept {
+            background: rgba(51, 204, 255, 0.1);
+            border-left: 3px solid #33ccff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .concept h3 {
+            color: #33ccff;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 1200px) {
+            .animation-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .svg-wrapper, .controls, .info-panel {
+                max-width: 100%;
+            }
+            
+            #svg-container {
+                width: 500px;
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            #svg-container {
+                width: 350px;
+                height: 350px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SP Cube Orbits</h1>
+            <p class="subtitle">A cube at pseudospace center with <span class="highlight">6 smash elements attached to each face</span>. Cube rotates, elements follow their faces!</p>
+        </header>
+        
+        <div class="animation-container">
+            <div class="svg-wrapper">
+                <div id="svg-container">
+                    <svg id="animated-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+                        <!-- Cube faces and smash elements will be generated via JavaScript -->
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h2>Cube Rotation Controls</h2>
+                
+                <div class="control-group">
+                    <h3>Cube Rotation</h3>
+                    <div class="slider-container">
+                        <label for="cubeRotateX">Cube X-Axis: <span id="cubeRotateX-value" class="slider-value">0°</span></label>
+                        <input type="range" id="cubeRotateX" class="slider" min="-180" max="180" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="cubeRotateY">Cube Y-Axis: <span id="cubeRotateY-value" class="slider-value">0°</span></label>
+                        <input type="range" id="cubeRotateY" class="slider" min="-180" max="180" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="cubeRotateZ">Cube Z-Axis: <span id="cubeRotateZ-value" class="slider-value">0°</span></label>
+                        <input type="range" id="cubeRotateZ" class="slider" min="-180" max="180" value="0">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Element Independent Rotation</h3>
+                    <div class="slider-container">
+                        <label for="elemRotate">Element Spin: <span id="elemRotate-value" class="slider-value">0°</span></label>
+                        <input type="range" id="elemRotate" class="slider" min="0" max="360" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="speed">Rotation Speed: <span id="speed-value" class="slider-value">1.0x</span></label>
+                        <input type="range" id="speed" class="slider" min="0" max="3" step="0.1" value="1">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="start">Start Auto Rotation</button>
+                    <button id="stop">Stop Rotation</button>
+                    <button id="reset">Reset All</button>
+                    <button id="toggle-cube">Toggle Cube Faces</button>
+                </div>
+                
+                <div class="rotation-display">
+                    <div class="cube-axis">
+                        <div class="axis-name">CUBE X</div>
+                        <div id="current-cube-x" class="axis-value">0°</div>
+                    </div>
+                    <div class="cube-axis">
+                        <div class="axis-name">CUBE Y</div>
+                        <div id="current-cube-y" class="axis-value">0°</div>
+                    </div>
+                    <div class="cube-axis">
+                        <div class="axis-name">CUBE Z</div>
+                        <div id="current-cube-z" class="axis-value">0°</div>
+                    </div>
+                    <div class="element-axis">
+                        <div class="axis-name">ELEMENT SPIN</div>
+                        <div id="current-elem-rotate" class="axis-value">0°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>Cubic Pseudospace Concept</h2>
+            
+            <div class="concept">
+                <h3>CUBE AT CENTER</h3>
+                <p>A cube is positioned at the pseudospace center, with edge length slightly larger than the smash element's height.</p>
+            </div>
+            
+            <div class="concept">
+                <h3>FACE-ATTACHED ELEMENTS</h3>
+                <p>Six smash elements are attached to each cube face, maintaining their orientation relative to their respective faces.</p>
+            </div>
+            
+            <div class="concept">
+                <h3>DUAL ROTATION</h3>
+                <p>The cube rotates in 3D space, and each element can also spin independently on its face.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Constants
+            const VIEWBOX_SIZE = 1024;
+            const PSEUDOCUBE_CENTER_X = VIEWBOX_SIZE / 2;  // 512
+            const PSEUDOCUBE_CENTER_Y = VIEWBOX_SIZE / 2;  // 512
+            
+            // Original smash element dimensions and path
+            const SMASH_PATH = "M82.84235294117646 386.25882352941176 57.43058823529411 360.8470588235294 143.8305882352941 274.4470588235294 109.27058823529411 239.8870588235294 51.33176470588235 298.3341176470588 25.919999999999998 272.9223529411765 83.85882352941175 214.47529411764705 25.919999999999998 155.52 51.33176470588235 130.10823529411766 109.27058823529411 188.55529411764707 143.8305882352941 153.99529411764706 57.43058823529411 67.59529411764709 82.84235294117646 42.18352941176471 169.24235294117645 128.58352941176472 256.1505882352941 42.18352941176471 281.5623529411764 67.59529411764709 195.16235294117644 153.99529411764706 229.2141176470588 188.55529411764707 287.6611764705882 130.10823529411766 313.0729411764706 155.52 254.62588235294115 214.47529411764705 313.0729411764706 272.9223529411765 287.6611764705882 298.3341176470588 229.2141176470588 239.8870588235294 195.16235294117644 274.4470588235294 281.5623529411764 360.8470588235294 256.1505882352941 386.25882352941176 169.24235294117645 299.8588235294118ZM169.24235294117645 248.52705882352942 203.2941176470588 214.47529411764705 169.24235294117645 179.91529411764705 135.19058823529411 214.47529411764705Z";
+            
+            // Smash element dimensions (approx)
+            const SMASH_WIDTH = 340;
+            const SMASH_HEIGHT = 340;
+            
+            // Cube size - slightly larger than smash element height
+            const CUBE_SIZE = SMASH_HEIGHT * 1.2; // 20% larger
+            
+            // Colors for different faces
+            const FACE_COLORS = {
+                front: '#ff3366',
+                back: '#33ccff', 
+                left: '#33ff99',
+                right: '#ffcc00',
+                top: '#cc66ff',
+                bottom: '#ff9966'
+            };
+            
+            // Get DOM elements
+            const svg = document.getElementById('animated-svg');
+            const cubeRotateXSlider = document.getElementById('cubeRotateX');
+            const cubeRotateYSlider = document.getElementById('cubeRotateY');
+            const cubeRotateZSlider = document.getElementById('cubeRotateZ');
+            const elemRotateSlider = document.getElementById('elemRotate');
+            const speedSlider = document.getElementById('speed');
+            
+            const cubeRotateXValue = document.getElementById('cubeRotateX-value');
+            const cubeRotateYValue = document.getElementById('cubeRotateY-value');
+            const cubeRotateZValue = document.getElementById('cubeRotateZ-value');
+            const elemRotateValue = document.getElementById('elemRotate-value');
+            const speedValue = document.getElementById('speed-value');
+            
+            const currentCubeX = document.getElementById('current-cube-x');
+            const currentCubeY = document.getElementById('current-cube-y');
+            const currentCubeZ = document.getElementById('current-cube-z');
+            const currentElemRotate = document.getElementById('current-elem-rotate');
+            
+            const startButton = document.getElementById('start');
+            const stopButton = document.getElementById('stop');
+            const resetButton = document.getElementById('reset');
+            const toggleCubeButton = document.getElementById('toggle-cube');
+            
+            // State
+            let cubeRotation = { x: 0, y: 0, z: 0 };
+            let elementRotation = 0;
+            let speed = 1.0;
+            let isRotating = false;
+            let animationId = null;
+            let showCubeFaces = true;
+            
+            // Create cube faces and smash elements
+            function createCubeAndElements() {
+                // Clear SVG
+                svg.innerHTML = '';
+                
+                // Create groups
+                const cubeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                cubeGroup.id = 'cube-group';
+                svg.appendChild(cubeGroup);
+                
+                const elementsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                elementsGroup.id = 'elements-group';
+                svg.appendChild(elementsGroup);
+                
+                // Half cube size for calculations
+                const halfCube = CUBE_SIZE / 2;
+                
+                // Define cube face positions (centered at pseudocube center)
+                const faces = [
+                    // Front face (facing viewer initially)
+                    { 
+                        id: 'front', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X}, ${PSEUDOCUBE_CENTER_Y - halfCube})`,
+                        elementOffset: { x: 0, y: -halfCube - SMASH_HEIGHT/2 },
+                        rotation: { x: 0, y: 0, z: 0 }
+                    },
+                    // Back face
+                    { 
+                        id: 'back', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X}, ${PSEUDOCUBE_CENTER_Y + halfCube}) rotate(180)`,
+                        elementOffset: { x: 0, y: halfCube + SMASH_HEIGHT/2 },
+                        rotation: { x: 0, y: 180, z: 0 }
+                    },
+                    // Left face
+                    { 
+                        id: 'left', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X - halfCube}, ${PSEUDOCUBE_CENTER_Y}) rotate(-90)`,
+                        elementOffset: { x: -halfCube - SMASH_HEIGHT/2, y: 0 },
+                        rotation: { x: 0, y: -90, z: 0 }
+                    },
+                    // Right face
+                    { 
+                        id: 'right', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X + halfCube}, ${PSEUDOCUBE_CENTER_Y}) rotate(90)`,
+                        elementOffset: { x: halfCube + SMASH_HEIGHT/2, y: 0 },
+                        rotation: { x: 0, y: 90, z: 0 }
+                    },
+                    // Top face
+                    { 
+                        id: 'top', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X}, ${PSEUDOCUBE_CENTER_Y - halfCube}) rotate(-90, 0, 0)`,
+                        elementOffset: { x: 0, y: -halfCube - SMASH_HEIGHT/2 },
+                        rotation: { x: -90, y: 0, z: 0 }
+                    },
+                    // Bottom face
+                    { 
+                        id: 'bottom', 
+                        transform: `translate(${PSEUDOCUBE_CENTER_X}, ${PSEUDOCUBE_CENTER_Y + halfCube}) rotate(90, 0, 0)`,
+                        elementOffset: { x: 0, y: halfCube + SMASH_HEIGHT/2 },
+                        rotation: { x: 90, y: 0, z: 0 }
+                    }
+                ];
+                
+                // Create cube faces and elements
+                faces.forEach(face => {
+                    // Create cube face (square)
+                    const cubeFace = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    cubeFace.classList.add('cube-face', face.id);
+                    cubeFace.setAttribute('x', PSEUDOCUBE_CENTER_X - halfCube);
+                    cubeFace.setAttribute('y', PSEUDOCUBE_CENTER_Y - halfCube);
+                    cubeFace.setAttribute('width', CUBE_SIZE);
+                    cubeFace.setAttribute('height', CUBE_SIZE);
+                    cubeFace.setAttribute('fill', 'none');
+                    cubeGroup.appendChild(cubeFace);
+                    
+                    // Create face label
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.classList.add('face-label');
+                    label.textContent = face.id.toUpperCase();
+                    label.setAttribute('x', PSEUDOCUBE_CENTER_X);
+                    label.setAttribute('y', PSEUDOCUBE_CENTER_Y);
+                    cubeGroup.appendChild(label);
+                    
+                    // Create smash element for this face
+                    const smashElement = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    smashElement.id = `smash-${face.id}`;
+                    smashElement.classList.add('smash-element');
+                    
+                    // Create path for smash element
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', SMASH_PATH);
+                    path.setAttribute('fill', FACE_COLORS[face.id]);
+                    path.setAttribute('stroke', 'black');
+                    path.setAttribute('stroke-width', '2');
+                    
+                    // Center the smash element relative to its own coordinate system
+                    const translateX = -SMASH_WIDTH/2;
+                    const translateY = -SMASH_HEIGHT/2;
+                    
+                    // Apply transformations to position element on face
+                    const elementTransform = `
+                        translate(${PSEUDOCUBE_CENTER_X + face.elementOffset.x}, ${PSEUDOCUBE_CENTER_Y + face.elementOffset.y})
+                        rotate(${face.rotation.y}, ${face.rotation.x}, ${face.rotation.z})
+                        translate(${translateX}, ${translateY})
+                    `;
+                    
+                    smashElement.setAttribute('transform', elementTransform);
+                    smashElement.appendChild(path);
+                    elementsGroup.appendChild(smashElement);
+                });
+                
+                // Update visibility
+                updateCubeVisibility();
+            }
+            
+            // Update cube faces visibility
+            function updateCubeVisibility() {
+                const cubeFaces = document.querySelectorAll('.cube-face, .face-label');
+                cubeFaces.forEach(face => {
+                    face.style.display = showCubeFaces ? '' : 'none';
+                });
+                toggleCubeButton.textContent = showCubeFaces ? 'Hide Cube Faces' : 'Show Cube Faces';
+            }
+            
+            // Update all rotations
+            function updateRotations() {
+                // Update cube group rotation
+                const cubeGroup = document.getElementById('cube-group');
+                if (cubeGroup) {
+                    cubeGroup.style.transform = `
+                        rotateX(${cubeRotation.x}deg)
+                        rotateY(${cubeRotation.y}deg)
+                        rotateZ(${cubeRotation.z}deg)
+                    `;
+                    cubeGroup.style.transformOrigin = `${PSEUDOCUBE_CENTER_X}px ${PSEUDOCUBE_CENTER_Y}px`;
+                    cubeGroup.style.transformStyle = 'preserve-3d';
+                }
+                
+                // Update elements group rotation (they follow the cube)
+                const elementsGroup = document.getElementById('elements-group');
+                if (elementsGroup) {
+                    elementsGroup.style.transform = `
+                        rotateX(${cubeRotation.x}deg)
+                        rotateY(${cubeRotation.y}deg)
+                        rotateZ(${cubeRotation.z}deg)
+                    `;
+                    elementsGroup.style.transformOrigin = `${PSEUDOCUBE_CENTER_X}px ${PSEUDOCUBE_CENTER_Y}px`;
+                    elementsGroup.style.transformStyle = 'preserve-3d';
+                }
+                
+                // Apply individual element spin
+                const smashElements = document.querySelectorAll('.smash-element');
+                smashElements.forEach(element => {
+                    const currentTransform = element.getAttribute('transform');
+                    // Extract the base transform without spin
+                    const baseTransform = currentTransform.replace(/rotate\([^)]*\)/g, '').trim();
+                    // Add spin rotation (around element's own center)
+                    const spinTransform = `${baseTransform} rotate(${elementRotation})`;
+                    element.setAttribute('transform', spinTransform);
+                });
+                
+                // Update display values
+                cubeRotateXValue.textContent = `${cubeRotation.x.toFixed(1)}°`;
+                cubeRotateYValue.textContent = `${cubeRotation.y.toFixed(1)}°`;
+                cubeRotateZValue.textContent = `${cubeRotation.z.toFixed(1)}°`;
+                elemRotateValue.textContent = `${elementRotation.toFixed(1)}°`;
+                
+                currentCubeX.textContent = `${cubeRotation.x > 0 ? '+' : ''}${Math.round(cubeRotation.x)}°`;
+                currentCubeY.textContent = `${cubeRotation.y > 0 ? '+' : ''}${Math.round(cubeRotation.y)}°`;
+                currentCubeZ.textContent = `${cubeRotation.z > 0 ? '+' : ''}${Math.round(cubeRotation.z)}°`;
+                currentElemRotate.textContent = `${Math.round(elementRotation)}°`;
+            }
+            
+            // Animation function
+            function animate() {
+                if (!isRotating) return;
+                
+                // Update cube rotation
+                cubeRotation.x = (cubeRotation.x + 0.5 * speed) % 360;
+                cubeRotation.y = (cubeRotation.y + 0.7 * speed) % 360;
+                cubeRotation.z = (cubeRotation.z + 0.3 * speed) % 360;
+                
+                // Update element spin
+                elementRotation = (elementRotation + 1.2 * speed) % 360;
+                
+                // Update sliders (adjusting for -180 to 180 range)
+                const adjustedX = cubeRotation.x > 180 ? cubeRotation.x - 360 : cubeRotation.x;
+                const adjustedY = cubeRotation.y > 180 ? cubeRotation.y - 360 : cubeRotation.y;
+                const adjustedZ = cubeRotation.z > 180 ? cubeRotation.z - 360 : cubeRotation.z;
+                
+                cubeRotateXSlider.value = adjustedX;
+                cubeRotateYSlider.value = adjustedY;
+                cubeRotateZSlider.value = adjustedZ;
+                elemRotateSlider.value = elementRotation;
+                
+                updateRotations();
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // Initialize
+            createCubeAndElements();
+            updateRotations();
+            
+            // Event listeners for sliders
+            cubeRotateXSlider.addEventListener('input', function() {
+                cubeRotation.x = parseInt(this.value);
+                updateRotations();
+            });
+            
+            cubeRotateYSlider.addEventListener('input', function() {
+                cubeRotation.y = parseInt(this.value);
+                updateRotations();
+            });
+            
+            cubeRotateZSlider.addEventListener('input', function() {
+                cubeRotation.z = parseInt(this.value);
+                updateRotations();
+            });
+            
+            elemRotateSlider.addEventListener('input', function() {
+                elementRotation = parseInt(this.value);
+                updateRotations();
+            });
+            
+            speedSlider.addEventListener('input', function() {
+                speed = parseFloat(this.value);
+                speedValue.textContent = `${speed.toFixed(1)}x`;
+            });
+            
+            // Button event listeners
+            startButton.addEventListener('click', function() {
+                if (isRotating) return;
+                isRotating = true;
+                animate();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                startButton.textContent = "Rotating...";
+            });
+            
+            stopButton.addEventListener('click', function() {
+                isRotating = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                startButton.textContent = "Start Auto Rotation";
+            });
+            
+            resetButton.addEventListener('click', function() {
+                isRotating = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                
+                // Reset all values
+                cubeRotation = { x: 0, y: 0, z: 0 };
+                elementRotation = 0;
+                speed = 1.0;
+                
+                // Update sliders
+                cubeRotateXSlider.value = cubeRotation.x;
+                cubeRotateYSlider.value = cubeRotation.y;
+                cubeRotateZSlider.value = cubeRotation.z;
+                elemRotateSlider.value = elementRotation;
+                speedSlider.value = speed;
+                
+                // Update displays
+                speedValue.textContent = `${speed.toFixed(1)}x`;
+                updateRotations();
+                
+                // Enable start button
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                startButton.textContent = "Start Auto Rotation";
+            });
+            
+            toggleCubeButton.addEventListener('click', function() {
+                showCubeFaces = !showCubeFaces;
+                updateCubeVisibility();
+            });
+            
+            // Initialize button states
+            stopButton.disabled = true;
+            
+            // Log configuration
+            console.log('=== CUBIC ORBITAL SMASH CONFIGURATION ===');
+            console.log('Pseudocube Center:', PSEUDOCUBE_CENTER_X, PSEUDOCUBE_CENTER_Y);
+            console.log('Smash Element Size:', SMASH_WIDTH, 'x', SMASH_HEIGHT);
+            console.log('Cube Size:', CUBE_SIZE);
+            console.log('Cube Half Size:', CUBE_SIZE/2);
+            console.log('===============================');
+        });
+    </script>
+</body>
+</html>
