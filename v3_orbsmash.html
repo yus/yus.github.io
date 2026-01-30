@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Smash - Proper Centered 3D Rotation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+            color: #f1f1f1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff3366, #ff6633);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 51, 102, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .highlight {
+            color: #ff3366;
+            font-weight: bold;
+        }
+        
+        .animation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .svg-wrapper {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(255, 51, 102, 0.1);
+            border: 2px solid rgba(255, 51, 102, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .svg-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        #svg-container {
+            width: 500px;
+            height: 500px;
+            perspective: 1500px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #animated-svg {
+            width: 100%;
+            height: 100%;
+            filter: 
+                drop-shadow(0 0 15px rgba(255, 51, 102, 0.5))
+                drop-shadow(0 0 30px rgba(255, 102, 51, 0.3));
+        }
+        
+        .pseudocube-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.5),
+                0 0 30px rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .pseudocube-center.pulsing {
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 1;
+            }
+        }
+        
+        .pseudocube-axes {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        
+        .pseudocube-axes.active {
+            opacity: 0.7;
+        }
+        
+        .axis-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .axis-x {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, transparent, #ff3366, transparent);
+        }
+        
+        .axis-y {
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            transform: translateX(-50%);
+            background: linear-gradient(0deg, transparent, #33ff66, transparent);
+        }
+        
+        .axis-z {
+            top: 50%;
+            left: 50%;
+            width: 1px;
+            height: 200px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            background: linear-gradient(0deg, transparent, #3366ff, transparent);
+        }
+        
+        .controls {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(51, 102, 255, 0.1);
+            border: 2px solid rgba(51, 102, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #33ff66;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #222244, #333366);
+            outline: none;
+            opacity: 0.9;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #33ff66;
+            cursor: pointer;
+            box-shadow: 
+                0 0 10px rgba(51, 255, 102, 0.8),
+                0 0 20px rgba(51, 255, 102, 0.4);
+            transition: all 0.2s;
+        }
+        
+        .slider:hover {
+            opacity: 1;
+        }
+        
+        .slider:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+        
+        .slider-value {
+            display: inline-block;
+            min-width: 50px;
+            text-align: right;
+            color: #33ff66;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #ff3366, #ff6633);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            min-width: 140px;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 51, 102, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button#reset {
+            background: linear-gradient(135deg, #3366ff, #6633ff);
+            box-shadow: 0 4px 10px rgba(51, 102, 255, 0.3);
+        }
+        
+        button#reset:hover {
+            box-shadow: 0 7px 20px rgba(51, 102, 255, 0.5);
+        }
+        
+        button#toggle-axes {
+            background: linear-gradient(135deg, #33ff66, #66ff33);
+            box-shadow: 0 4px 10px rgba(51, 255, 102, 0.3);
+        }
+        
+        button#toggle-axes:hover {
+            box-shadow: 0 7px 20px rgba(51, 255, 102, 0.5);
+        }
+        
+        .rotation-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(20, 20, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .axis {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .axis-name {
+            color: #ff3366;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .axis-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 80px;
+            display: inline-block;
+        }
+        
+        .info-panel {
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                inset 0 0 20px rgba(255, 102, 51, 0.1);
+            border: 2px solid rgba(255, 102, 51, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .info-panel h2 {
+            color: #ff6633;
+            margin-bottom: 15px;
+        }
+        
+        .info-panel p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .concept {
+            background: rgba(255, 51, 102, 0.1);
+            border-left: 3px solid #ff3366;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .concept h3 {
+            color: #ff3366;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 1100px) {
+            .animation-container {
+                flex-direction: column;
+            }
+            
+            .svg-wrapper, .controls, .info-panel {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            #svg-container {
+                width: 350px;
+                height: 350px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Orbital Smash 3D</h1>
+            <p class="subtitle">Fixed pseudocube space with <span class="highlight">immovable center</span> - The "smash" element orbits around a fixed point in 3D space</p>
+        </header>
+        
+        <div class="animation-container">
+            <div class="svg-wrapper">
+                <div id="svg-container">
+                    <div class="pseudocube-center pulsing"></div>
+                    <div class="pseudocube-axes" id="pseudocube-axes">
+                        <div class="axis-line axis-x"></div>
+                        <div class="axis-line axis-y"></div>
+                        <div class="axis-line axis-z"></div>
+                    </div>
+                    <svg id="animated-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+                        <!-- The "smash" element -->
+                        <g id="smash-element">
+                            <!-- We'll apply the original translate via JavaScript to snap to center -->
+                            <path d="M82.84235294117646 386.25882352941176 57.43058823529411 360.8470588235294 143.8305882352941 274.4470588235294 109.27058823529411 239.8870588235294 51.33176470588235 298.3341176470588 25.919999999999998 272.9223529411765 83.85882352941175 214.47529411764705 25.919999999999998 155.52 51.33176470588235 130.10823529411766 109.27058823529411 188.55529411764707 143.8305882352941 153.99529411764706 57.43058823529411 67.59529411764709 82.84235294117646 42.18352941176471 169.24235294117645 128.58352941176472 256.1505882352941 42.18352941176471 281.5623529411764 67.59529411764709 195.16235294117644 153.99529411764706 229.2141176470588 188.55529411764707 287.6611764705882 130.10823529411766 313.0729411764706 155.52 254.62588235294115 214.47529411764705 313.0729411764706 272.9223529411765 287.6611764705882 298.3341176470588 229.2141176470588 239.8870588235294 195.16235294117644 274.4470588235294 281.5623529411764 360.8470588235294 256.1505882352941 386.25882352941176 169.24235294117645 299.8588235294118ZM169.24235294117645 248.52705882352942 203.2941176470588 214.47529411764705 169.24235294117645 179.91529411764705 135.19058823529411 214.47529411764705Z" fill="olive" stroke="black" stroke-width="2"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h2>Orbital Controls</h2>
+                
+                <div class="control-group">
+                    <div class="slider-container">
+                        <label for="rotateX">X-Axis Orbit: <span id="rotateX-value" class="slider-value">0°</span></label>
+                        <input type="range" id="rotateX" class="slider" min="-180" max="180" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="rotateY">Y-Axis Orbit: <span id="rotateY-value" class="slider-value">0°</span></label>
+                        <input type="range" id="rotateY" class="slider" min="-180" max="180" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="rotateZ">Z-Axis Orbit: <span id="rotateZ-value" class="slider-value">0°</span></label>
+                        <input type="range" id="rotateZ" class="slider" min="-180" max="180" value="0">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="speed">Orbital Speed: <span id="speed-value" class="slider-value">1.0x</span></label>
+                        <input type="range" id="speed" class="slider" min="0" max="3" step="0.1" value="1">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="start">Start Orbital Smash</button>
+                    <button id="stop">Stop Orbit</button>
+                    <button id="reset">Reset Position</button>
+                    <button id="toggle-axes">Toggle 3D Axes</button>
+                </div>
+                
+                <div class="rotation-display">
+                    <div class="axis">
+                        <div class="axis-name">X-AXIS</div>
+                        <div id="current-x" class="axis-value">0°</div>
+                    </div>
+                    <div class="axis">
+                        <div class="axis-name">Y-AXIS</div>
+                        <div id="current-y" class="axis-value">0°</div>
+                    </div>
+                    <div class="axis">
+                        <div class="axis-name">Z-AXIS</div>
+                        <div id="current-z" class="axis-value">0°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>Pseudocube Space Concept</h2>
+            <div class="concept">
+                <h3>IMMOVABLE CENTER</h3>
+                <p>The white pulsing dot represents the fixed center of the pseudocube space. The "smash" element's own center is snapped to this point.</p>
+            </div>
+            
+            <div class="concept">
+                <h3>3D ORBITING</h3>
+                <p>The element rotates around all three axes (X, Y, Z) but always maintains its center at the pseudocube space center point.</p>
+            </div>
+            
+            <p>This creates a stable orbital system where the element "smashes" through 3D space while anchored to an immovable central point.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const smashElement = document.getElementById('smash-element');
+            const rotateXSlider = document.getElementById('rotateX');
+            const rotateYSlider = document.getElementById('rotateY');
+            const rotateZSlider = document.getElementById('rotateZ');
+            const speedSlider = document.getElementById('speed');
+            const pseudocubeAxes = document.getElementById('pseudocube-axes');
+            
+            const rotateXValue = document.getElementById('rotateX-value');
+            const rotateYValue = document.getElementById('rotateY-value');
+            const rotateZValue = document.getElementById('rotateZ-value');
+            const speedValue = document.getElementById('speed-value');
+            
+            const currentX = document.getElementById('current-x');
+            const currentY = document.getElementById('current-y');
+            const currentZ = document.getElementById('current-z');
+            
+            const startButton = document.getElementById('start');
+            const stopButton = document.getElementById('stop');
+            const resetButton = document.getElementById('reset');
+            const toggleAxesButton = document.getElementById('toggle-axes');
+            
+            // Constants for pseudocube space
+            const VIEWBOX_SIZE = 1024;
+            const PSEUDOCUBE_CENTER_X = VIEWBOX_SIZE / 2;  // 512
+            const PSEUDOCUBE_CENTER_Y = VIEWBOX_SIZE / 2;  // 512
+            
+            // Original transform from the SVG
+            const ORIGINAL_TRANSLATE_X = 342.50;
+            const ORIGINAL_TRANSLATE_Y = 296.00;
+            
+            // Calculate the element's natural center based on its bounding box
+            // The element is approximately 340x340
+            const ELEMENT_WIDTH = 340;
+            const ELEMENT_HEIGHT = 340;
+            
+            // Element's natural center relative to its own coordinate system
+            const ELEMENT_CENTER_X = ELEMENT_WIDTH / 2;
+            const ELEMENT_CENTER_Y = ELEMENT_HEIGHT / 2;
+            
+            // Calculate how to snap element's center to pseudocube center
+            // Current element position after original translate
+            const currentElementCenterX = ORIGINAL_TRANSLATE_X + ELEMENT_CENTER_X;
+            const currentElementCenterY = ORIGINAL_TRANSLATE_Y + ELEMENT_CENTER_Y;
+            
+            // Translation needed to snap element center to pseudocube center
+            const snapTranslateX = PSEUDOCUBE_CENTER_X - currentElementCenterX;
+            const snapTranslateY = PSEUDOCUBE_CENTER_Y - currentElementCenterY;
+            
+            // Initial orbital values
+            let orbitX = 0;  // Rotation around X axis
+            let orbitY = 0;  // Rotation around Y axis
+            let orbitZ = 0;  // Rotation around Z axis
+            let speed = 1.0;
+            let isOrbiting = false;
+            let animationId = null;
+            let showAxes = true;
+            
+            // Update orbital display with proper pseudocube centering
+            function updateOrbitalDisplay() {
+                // Apply transformations in correct order for pseudocube space:
+                // 1. Snap element's center to pseudocube center
+                // 2. Apply 3D rotations (orbit around pseudocube center)
+                // 3. No need to translate back - element stays centered!
+                
+                // Calculate the total translation needed
+                const totalTranslateX = ORIGINAL_TRANSLATE_X + snapTranslateX;
+                const totalTranslateY = ORIGINAL_TRANSLATE_Y + snapTranslateY;
+                
+                // Apply the transformation
+                const transform = `
+                    translate(${totalTranslateX}px, ${totalTranslateY}px)
+                    rotateX(${orbitX}deg)
+                    rotateY(${orbitY}deg)
+                    rotateZ(${orbitZ}deg)
+                `;
+                
+                smashElement.style.transform = transform;
+                smashElement.style.transformOrigin = `${ELEMENT_CENTER_X}px ${ELEMENT_CENTER_Y}px`;
+                smashElement.style.transformStyle = 'preserve-3d';
+                
+                // Update slider values
+                rotateXValue.textContent = `${orbitX.toFixed(1)}°`;
+                rotateYValue.textContent = `${orbitY.toFixed(1)}°`;
+                rotateZValue.textContent = `${orbitZ.toFixed(1)}°`;
+                
+                // Update current rotation display
+                currentX.textContent = `${orbitX > 0 ? '+' : ''}${Math.round(orbitX)}°`;
+                currentY.textContent = `${orbitY > 0 ? '+' : ''}${Math.round(orbitY)}°`;
+                currentZ.textContent = `${orbitZ > 0 ? '+' : ''}${Math.round(orbitZ)}°`;
+                
+                // Also rotate the axes to match the orbital view
+                if (showAxes) {
+                    pseudocubeAxes.style.transform = `translate(-50%, -50%) rotateX(${orbitX}deg) rotateY(${orbitY}deg) rotateZ(${orbitZ}deg)`;
+                }
+            }
+            
+            // Initialize display
+            updateOrbitalDisplay();
+            
+            // Slider event listeners
+            rotateXSlider.addEventListener('input', function() {
+                orbitX = parseInt(this.value);
+                updateOrbitalDisplay();
+            });
+            
+            rotateYSlider.addEventListener('input', function() {
+                orbitY = parseInt(this.value);
+                updateOrbitalDisplay();
+            });
+            
+            rotateZSlider.addEventListener('input', function() {
+                orbitZ = parseInt(this.value);
+                updateOrbitalDisplay();
+            });
+            
+            speedSlider.addEventListener('input', function() {
+                speed = parseFloat(this.value);
+                speedValue.textContent = `${speed.toFixed(1)}x`;
+            });
+            
+            // Animation function for orbital smash
+            function orbitalSmash() {
+                if (!isOrbiting) return;
+                
+                // Orbital motion - different speeds for each axis for interesting patterns
+                orbitX = (orbitX + 1.2 * speed) % 360;
+                orbitY = (orbitY + 0.9 * speed) % 360;
+                orbitZ = (orbitZ + 0.6 * speed) % 360;
+                
+                // Update sliders and display (adjusting for -180 to 180 range)
+                const adjustedX = orbitX > 180 ? orbitX - 360 : orbitX;
+                const adjustedY = orbitY > 180 ? orbitY - 360 : orbitY;
+                const adjustedZ = orbitZ > 180 ? orbitZ - 360 : orbitZ;
+                
+                rotateXSlider.value = adjustedX;
+                rotateYSlider.value = adjustedY;
+                rotateZSlider.value = adjustedZ;
+                
+                updateOrbitalDisplay();
+                
+                // Continue animation
+                animationId = requestAnimationFrame(orbitalSmash);
+            }
+            
+            // Button event listeners
+            startButton.addEventListener('click', function() {
+                if (isOrbiting) return;
+                isOrbiting = true;
+                orbitalSmash();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                startButton.textContent = "Orbiting...";
+            });
+            
+            stopButton.addEventListener('click', function() {
+                isOrbiting = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                startButton.textContent = "Start Orbital Smash";
+            });
+            
+            resetButton.addEventListener('click', function() {
+                // Stop orbiting if active
+                isOrbiting = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                
+                // Reset orbital values
+                orbitX = 0;
+                orbitY = 0;
+                orbitZ = 0;
+                speed = 1.0;
+                
+                // Update sliders
+                rotateXSlider.value = orbitX;
+                rotateYSlider.value = orbitY;
+                rotateZSlider.value = orbitZ;
+                speedSlider.value = speed;
+                
+                // Update displays
+                speedValue.textContent = `${speed.toFixed(1)}x`;
+                updateOrbitalDisplay();
+                
+                // Enable start button
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                startButton.textContent = "Start Orbital Smash";
+            });
+            
+            toggleAxesButton.addEventListener('click', function() {
+                showAxes = !showAxes;
+                if (showAxes) {
+                    pseudocubeAxes.classList.add('active');
+                    toggleAxesButton.textContent = 'Hide 3D Axes';
+                } else {
+                    pseudocubeAxes.classList.remove('active');
+                    toggleAxesButton.textContent = 'Show 3D Axes';
+                }
+            });
+            
+            // Initialize button states
+            stopButton.disabled = true;
+            
+            // Log pseudocube space information
+            console.log('=== PSEUDOCUBE SPACE SETUP ===');
+            console.log('Pseudocube Center:', PSEUDOCUBE_CENTER_X, PSEUDOCUBE_CENTER_Y);
+            console.log('Element Natural Center:', ELEMENT_CENTER_X, ELEMENT_CENTER_Y);
+            console.log('Current Element Center:', currentElementCenterX, currentElementCenterY);
+            console.log('Snap Translation:', snapTranslateX, snapTranslateY);
+            console.log('Total Translation:', ORIGINAL_TRANSLATE_X + snapTranslateX, ORIGINAL_TRANSLATE_Y + snapTranslateY);
+            console.log('=============================');
+        });
+    </script>
+</body>
+</html>
