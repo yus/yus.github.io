@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quantum Wind – SAXON SXQ Diamond CPU (Live)</title>
+    <title>Quantum Wind – SAXON SXQ Diamond CPU (3D)</title>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js">
     </script>
     <style>
         * {
@@ -22,10 +27,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1400px;
             width: 100%;
         }
 
@@ -126,96 +132,55 @@
             height: 200px;
         }
 
-        /* Bloch sphere */
-        .bloch-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .bloch-sphere {
+        /* 3D Bloch Sphere container */
+        .bloch-3d-container {
             position: relative;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #1a2a4a, #0a0e1a);
-            border: 2px solid #4a7aaa;
-            box-shadow: 0 0 40px rgba(60, 130, 255, 0.15);
-            flex-shrink: 0;
-            transition: box-shadow 0.3s;
+            width: 100%;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #0d1a2e, #060a14);
+            cursor: grab;
         }
-        .bloch-sphere.turbulent {
-            box-shadow: 0 0 60px rgba(255, 94, 122, 0.25);
+        .bloch-3d-container:active {
+            cursor: grabbing;
+        }
+        .bloch-3d-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        .bloch-arrow {
+        .bloch-overlay {
             position: absolute;
-            top: 50%;
+            bottom: 12px;
             left: 50%;
-            width: 70px;
-            height: 4px;
-            background: linear-gradient(90deg, #39ff8a, #ffd866);
-            transform-origin: 0% 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(57, 255, 138, 0.3);
-            transition: width 0.1s;
-        }
-        .bloch-arrow::after {
-            content: '';
-            position: absolute;
-            right: -10px;
-            top: -8px;
-            width: 0;
-            height: 0;
-            border-left: 14px solid #ffd866;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-        }
-        .bloch-arrow.fading {
-            opacity: 0.3;
-        }
-
-        .bloch-label {
-            position: absolute;
+            transform: translateX(-50%);
             font-size: 0.7rem;
-            color: #8ab0e0;
-            font-weight: 300;
-        }
-        .bloch-label.n {
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .bloch-label.s {
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .bloch-label.e {
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .bloch-label.w {
-            left: 6px;
-            top: 50%;
-            transform: translateY(-50%);
+            color: #4a7a9a;
+            background: rgba(10, 14, 26, 0.7);
+            padding: 0.2rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #1a2a3a;
+            pointer-events: none;
+            white-space: nowrap;
         }
 
         .bloch-legend {
-            font-size: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
             color: #b0c8e8;
-            line-height: 1.6;
+            flex-wrap: wrap;
         }
         .bloch-legend .dot {
             display: inline-block;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            margin-right: 6px;
+            margin-right: 4px;
         }
         .dot.green {
             background: #39ff8a;
@@ -226,9 +191,12 @@
         .dot.red {
             background: #ff5e7a;
         }
+        .dot.blue {
+            background: #5a9aff;
+        }
 
         .phase-display {
-            margin-top: 0.4rem;
+            margin-top: 0.3rem;
             font-size: 0.8rem;
             color: #8aa0c0;
             text-align: center;
@@ -324,7 +292,7 @@
             box-shadow: 0 0 20px rgba(57, 255, 138, 0.1);
         }
 
-        /* Error chart overlay glow */
+        /* Error glow */
         .error-glow {
             position: absolute;
             top: 50%;
@@ -340,6 +308,17 @@
         }
         .error-glow.active {
             opacity: 1;
+        }
+
+        .noise-badge {
+            display: inline-block;
+            background: #2a1a2a;
+            border: 1px solid #5a3a4a;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.75rem;
+            color: #ff8a9a;
+            transition: all 0.3s;
         }
 
         /* Footnote */
@@ -390,21 +369,9 @@
             .header h1 {
                 font-size: 1.8rem;
             }
-            .bloch-sphere {
-                width: 120px;
-                height: 120px;
+            .bloch-3d-container {
+                height: 220px;
             }
-            .bloch-arrow {
-                width: 50px;
-            }
-        }
-
-        /* Tooltip for animation status */
-        .anim-status {
-            font-size: 0.7rem;
-            color: #4a6a8a;
-            text-align: right;
-            margin-top: 0.2rem;
         }
     </style>
 </head>
@@ -416,10 +383,10 @@
         <div class="header">
             <div>
                 <h1>🌀 QUANTUM WIND</h1>
-                <div class="sub">SAXON SXQ · Diamond NV‑Center · <span>Phase‑Flow</span> Model</div>
+                <div class="sub">SAXON SXQ · Diamond NV‑Center · <span>3D Phase‑Flow</span> Model</div>
             </div>
             <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-                <span class="live-badge">● LIVE</span>
+                <span class="live-badge">● LIVE 3D</span>
                 <span style="font-size:0.8rem;color:#4a6a8a;">Coherence · Error Correction · Topology</span>
             </div>
         </div>
@@ -439,37 +406,25 @@
                     <span class="stat">Gates <span class="val" id="gateVal">10³+</span></span>
                 </div>
                 <div style="margin-top:0.6rem;font-size:0.75rem;color:#5a7a9a;">
-                    <span class="noise-badge" id="turbulenceBadge" style="display:inline-block;background:#2a1a2a;border:1px solid #5a3a4a;border-radius:30px;padding:0.2rem 1rem;font-size:0.75rem;color:#ff8a9a;">⬤ turbulence</span>
+                    <span class="noise-badge" id="turbulenceBadge">⬤ turbulence</span>
                     <span id="correctionStatusText" style="margin-left:0.5rem;">&nbsp;corrected via parity feedback</span>
                 </div>
             </div>
 
-            <!-- CARD 2: Bloch sphere -->
+            <!-- CARD 2: 3D Bloch Sphere -->
             <div class="card" id="blochCard">
-                <h3>🌀 <span class="accent">Quantum Wind</span> · Bloch Flow</h3>
-                <div class="bloch-container">
-                    <div class="bloch-sphere" id="blochSphere">
-                        <div class="bloch-arrow" id="blochArrow" style="transform: translate(-50%,-50%) rotate(45deg);"></div>
-                        <span class="bloch-label n">|0⟩</span>
-                        <span class="bloch-label s">|1⟩</span>
-                        <span class="bloch-label e">|+⟩</span>
-                        <span class="bloch-label w">|−⟩</span>
-                        <div style="position:absolute;bottom:10px;right:10px;font-size:0.5rem;color:#4a7a5a;">NV⁻</div>
-                    </div>
-                    <div class="bloch-legend">
-                        <div><span class="dot green"></span> spin vector (wind dir.)</div>
-                        <div><span class="dot gold"></span> microwave drive (gust)</div>
-                        <div><span class="dot red"></span> dephasing (turbulence)</div>
-                        <div class="phase-display" style="margin-top:6px;">
-                            phase angle <span id="phaseDisplay">φ = 45°</span>
-                        </div>
-                        <div class="phase-display" style="font-size:0.65rem;color:#5a7a9a;">
-                            coherence <span id="coherencePercent">100%</span>
-                        </div>
-                    </div>
+                <h3>🌀 <span class="accent">Quantum Wind</span> · 3D Bloch Flow</h3>
+                <div class="bloch-3d-container" id="blochContainer">
+                    <div class="bloch-overlay">drag to rotate · scroll to zoom</div>
                 </div>
-                <div style="margin-top:0.6rem;font-size:0.8rem;color:#8ab0d0;border-top:1px solid #1a2a3a;padding-top:0.6rem;text-align:center;">
-                    <em>“The wind moves <strong style="color:#ffd866;">phase relations</strong> — the geometry of possibility.”</em>
+                <div class="bloch-legend">
+                    <span><span class="dot green"></span> spin vector</span>
+                    <span><span class="dot gold"></span> microwave drive</span>
+                    <span><span class="dot red"></span> dephasing</span>
+                    <span><span class="dot blue"></span> Bloch sphere</span>
+                </div>
+                <div class="phase-display">
+                    phase <span id="phaseDisplay">φ = 0°</span> &nbsp;·&nbsp; coherence <span id="coherencePercent">100%</span>
                 </div>
             </div>
 
@@ -545,7 +500,7 @@
 
             <div class="citation">
                 © SAXON Quantum · SXQ series · Diamond NV architecture · v1.0 · “Quantum Wind” model · 2026
-                <span style="display:block;font-size:0.6rem;color:#3a5a6a;margin-top:0.2rem;">animated dashboard — all elements phase‑coupled</span>
+                <span style="display:block;font-size:0.6rem;color:#3a5a6a;margin-top:0.2rem;">3D animated dashboard — all elements phase‑coupled</span>
             </div>
 
         </div>
@@ -560,13 +515,11 @@
             const ctx1 = document.getElementById('coherenceChart').getContext('2d');
             const ctx2 = document.getElementById('errorChart').getContext('2d');
 
-            // Data buffers for animation
             const maxDataPoints = 60;
             const timeLabels = Array.from({ length: maxDataPoints }, (_, i) => (i * 20) + 'µs');
             const rawData = new Array(maxDataPoints).fill(1);
             const correctedData = new Array(maxDataPoints).fill(1);
 
-            // Coherence Chart
             const coherenceChart = new Chart(ctx1, {
                 type: 'line',
                 data: {
@@ -617,7 +570,6 @@
                 }
             });
 
-            // Error Budget Chart
             const errorChart = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
@@ -648,9 +600,195 @@
                 }
             });
 
+            // --- THREE.JS 3D BLOCH SPHERE ---
+            const container = document.getElementById('blochContainer');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10);
+            camera.position.set(3, 2, 4);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x0a0e1a, 0);
+            container.appendChild(renderer.domElement);
+
+            // Orbit controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.autoRotate = false;
+            controls.rotateSpeed = 0.8;
+            controls.target.set(0, 0, 0);
+
+            // --- LIGHTS ---
+            const ambientLight = new THREE.AmbientLight(0x2a4a6a, 0.5);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x8ab4ff, 1);
+            dirLight.position.set(2, 3, 4);
+            scene.add(dirLight);
+
+            const backLight = new THREE.DirectionalLight(0x39ff8a, 0.3);
+            backLight.position.set(-2, -1, -3);
+            scene.add(backLight);
+
+            // --- BLOCH SPHERE ---
+            const sphereGroup = new THREE.Group();
+            scene.add(sphereGroup);
+
+            // Main sphere (transparent)
+            const sphereGeo = new THREE.SphereGeometry(1.0, 48, 48);
+            const sphereMat = new THREE.MeshPhysicalMaterial({
+                color: 0x1a3a6a,
+                transparent: true,
+                opacity: 0.15,
+                wireframe: false,
+                roughness: 0.2,
+                metalness: 0.1,
+                side: THREE.DoubleSide,
+            });
+            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            sphereGroup.add(sphere);
+
+            // Wireframe overlay
+            const wireframeMat = new THREE.MeshBasicMaterial({
+                color: 0x3a6a9a,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2,
+            });
+            const wireframe = new THREE.Mesh(sphereGeo.clone(), wireframeMat);
+            sphereGroup.add(wireframe);
+
+            // Grid circles (latitude/longitude)
+            const ringMat = new THREE.LineBasicMaterial({ color: 0x3a6a9a, transparent: true, opacity: 0.3 });
+
+            // Equator
+            const ringGeo = new THREE.RingGeometry(0.99, 1.0, 64);
+            const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x3a6a9a, transparent: true,
+                    opacity: 0.2, side: THREE.DoubleSide }));
+            ring.rotation.x = Math.PI / 2;
+            sphereGroup.add(ring);
+
+            // Meridians (vertical rings)
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI;
+                const points = [];
+                for (let j = 0; j <= 32; j++) {
+                    const theta = (j / 32) * Math.PI * 2;
+                    const x = 1.0 * Math.cos(theta);
+                    const y = 1.0 * Math.sin(theta) * Math.cos(angle);
+                    const z = 1.0 * Math.sin(theta) * Math.sin(angle);
+                    points.push(new THREE.Vector3(x, y, z));
+                }
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geo, ringMat);
+                sphereGroup.add(line);
+            }
+
+            // Axes
+            const axisLength = 1.5;
+            const axisMat = (color) => new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5 });
+
+            const makeAxis = (dir, color) => {
+                const pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(dir[0] * axisLength, dir[1] * axisLength, dir[2] *
+                    axisLength)];
+                const geo = new THREE.BufferGeometry().setFromPoints(pts);
+                const line = new THREE.Line(geo, axisMat(color));
+                sphereGroup.add(line);
+            };
+            makeAxis([1, 0, 0], 0xff5e7a);
+            makeAxis([0, 1, 0], 0x39ff8a);
+            makeAxis([0, 0, 1], 0x5a9aff);
+
+            // Axis labels as sprites (simplified - use small spheres as markers)
+            const labelMat = (color) => new THREE.MeshBasicMaterial({ color });
+            const labelPositions = [
+                { pos: [1.6, 0, 0], color: 0xff5e7a },
+                { pos: [-1.6, 0, 0], color: 0xff5e7a },
+                { pos: [0, 1.6, 0], color: 0x39ff8a },
+                { pos: [0, -1.6, 0], color: 0x39ff8a },
+                { pos: [0, 0, 1.6], color: 0x5a9aff },
+                { pos: [0, 0, -1.6], color: 0x5a9aff },
+            ];
+            labelPositions.forEach(({ pos, color }) => {
+                const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), new THREE
+                .MeshBasicMaterial({ color }));
+                dot.position.set(pos[0], pos[1], pos[2]);
+                sphereGroup.add(dot);
+            });
+
+            // --- QUANTUM WIND ARROW ---
+            const arrowGroup = new THREE.Group();
+            sphereGroup.add(arrowGroup);
+
+            // Arrow shaft (cone + cylinder)
+            const shaftMat = new THREE.MeshPhysicalMaterial({
+                color: 0x39ff8a,
+                emissive: 0x39ff8a,
+                emissiveIntensity: 0.3,
+                roughness: 0.3,
+                metalness: 0.1,
+            });
+            const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 8), shaftMat);
+            shaft.position.set(0, 0.5, 0);
+            arrowGroup.add(shaft);
+
+            const headMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffd866,
+                emissive: 0xffd866,
+                emissiveIntensity: 0.2,
+                roughness: 0.2,
+                metalness: 0.1,
+            });
+            const head = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.2, 8), headMat);
+            head.position.set(0, 1.1, 0);
+            arrowGroup.add(head);
+
+            // Glow ring around arrow base
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0x39ff8a,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.DoubleSide,
+            });
+            const glowRing = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.6, 32), glowMat);
+            glowRing.rotation.x = -Math.PI / 2;
+            glowRing.position.set(0, 0, 0);
+            arrowGroup.add(glowRing);
+
+            // --- TRAJECTORY PATH (dotted orbit) ---
+            const orbitPoints = [];
+            const orbitSteps = 60;
+            for (let i = 0; i <= orbitSteps; i++) {
+                const theta = (i / orbitSteps) * Math.PI * 2;
+                const r = 0.9;
+                orbitPoints.push(new THREE.Vector3(r * Math.cos(theta), 0, r * Math.sin(theta)));
+            }
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+            const orbitMat = new THREE.LineDashedMaterial({
+                color: 0x4a7aaa,
+                dashSize: 0.05,
+                gapSize: 0.05,
+                transparent: true,
+                opacity: 0.2,
+            });
+            const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+            orbitLine.computeLineDistances();
+            sphereGroup.add(orbitLine);
+
+            // --- STATE VECTORS (for visualization) ---
+            // Small dots on sphere surface to show state distribution
+            const stateDots = [];
+            const dotMat = new THREE.MeshBasicMaterial({ color: 0xffd866, transparent: true, opacity: 0.3 });
+
             // --- DOM REFS ---
-            const blochArrow = document.getElementById('blochArrow');
-            const blochSphere = document.getElementById('blochSphere');
             const phaseDisplay = document.getElementById('phaseDisplay');
             const coherencePercent = document.getElementById('coherencePercent');
             const rawVal = document.getElementById('rawVal');
@@ -663,101 +801,118 @@
             const errorDominant = document.getElementById('errorDominant');
             const stepItems = document.querySelectorAll('.step-item');
 
-            // Error labels
-            const errLabels = {
-                magnetic: document.getElementById('errMagnetic'),
-                phonon: document.getElementById('errPhonon'),
-                carbon: document.getElementById('errCarbon'),
-                nitrogen: document.getElementById('errNitrogen'),
-            };
-
             // --- ANIMATION STATE ---
             let frame = 0;
-            const coherenceDecayRate = 0.008; // per frame
-            const cycleLength = 300; // frames per full phase cycle
+            const coherenceDecayRate = 0.008;
+
+            // --- RESIZE HANDLER ---
+            function resizeRenderer() {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                if (w > 0 && h > 0) {
+                    renderer.setSize(w, h);
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+                }
+            }
+            window.addEventListener('resize', resizeRenderer);
+            // Also observe container size changes
+            const ro = new ResizeObserver(() => resizeRenderer());
+            ro.observe(container);
 
             // --- ANIMATION LOOP ---
             function animate() {
                 frame++;
 
-                // 1. PHASE ANGLE (0–360°)
+                // 1. PHASE & COHERENCE
                 const phaseDeg = (frame * 0.6) % 360;
                 const phaseRad = phaseDeg * Math.PI / 180;
-
-                // 2. COHERENCE (exponential decay, reset periodically for demo)
                 let rawCoherence = Math.exp(-(frame % 400) * coherenceDecayRate);
-                // Clamp and cycle for visual effect
                 if (frame % 400 === 0) rawCoherence = 1.0;
-
-                // Corrected coherence stays high (with small ripples)
                 const correctedCoherence = 0.92 + 0.08 * Math.sin(phaseRad * 0.5);
 
-                // 3. UPDATE BLOCH SPHERE
-                // Arrow rotation
-                blochArrow.style.transform = `translate(-50%, -50%) rotate(${phaseDeg}deg)`;
-                // Arrow length = coherence
-                const arrowLength = 50 + 30 * rawCoherence;
-                blochArrow.style.width = arrowLength + 'px';
-                // Fade if low coherence
-                blochArrow.classList.toggle('fading', rawCoherence < 0.3);
+                // 2. UPDATE 3D ARROW
+                // Arrow points along direction defined by theta (polar angle) and phi (azimuth)
+                // For visualization: arrow traces a path on the sphere surface
+                const theta = Math.PI / 2.2; // slightly tilted from equator
+                const phi = phaseRad;
 
-                // Sphere glow = turbulence (inverse of coherence)
-                blochSphere.classList.toggle('turbulent', rawCoherence < 0.5);
+                // Arrow direction vector (from center to surface)
+                const dir = new THREE.Vector3(
+                    Math.sin(theta) * Math.cos(phi),
+                    Math.cos(theta),
+                    Math.sin(theta) * Math.sin(phi)
+                ).normalize();
 
-                // Phase display
-                phaseDisplay.textContent = `φ = ${Math.round(phaseDeg)}°`;
+                // Scale arrow length by coherence
+                const arrowScale = 0.3 + 0.7 * rawCoherence;
 
-                // Coherence percent
-                coherencePercent.textContent = `${Math.round(rawCoherence * 100)}%`;
+                // Position arrow group at origin, then orient
+                arrowGroup.position.set(0, 0, 0);
+                arrowGroup.quaternion.identity();
 
-                // 4. UPDATE COHERENCE CHART (shift data)
+                // Orient: point Y-axis along direction
+                const up = new THREE.Vector3(0, 1, 0);
+                const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+                arrowGroup.quaternion.copy(quat);
+
+                // Scale arrow length
+                arrowGroup.scale.set(1, arrowScale, 1);
+
+                // Arrow color shifts with coherence
+                const color = new THREE.Color().setHSL(0.3 * rawCoherence + 0.1, 0.9, 0.5 + 0.3 * rawCoherence);
+                shaftMat.color.copy(color);
+                shaftMat.emissive.copy(color);
+                shaftMat.emissiveIntensity = 0.2 + 0.3 * rawCoherence;
+
+                // Head color
+                const headColor = new THREE.Color().setHSL(0.12, 0.9, 0.6 + 0.3 * rawCoherence);
+                headMat.color.copy(headColor);
+                headMat.emissive.copy(headColor);
+
+                // Glow ring opacity
+                glowMat.opacity = 0.05 + 0.2 * rawCoherence;
+
+                // 3. UPDATE CHARTS
                 rawData.push(rawCoherence);
                 rawData.shift();
                 correctedData.push(correctedCoherence);
                 correctedData.shift();
-
                 coherenceChart.update();
 
-                // 5. UPDATE ERROR BUDGET (dynamic turbulence source)
-                // Cycle dominant error source based on phase
+                // 4. ERROR BUDGET
                 const errorCycle = Math.floor(phaseDeg / 90) % 4;
                 const errorData = [38, 27, 22, 13];
                 const errorColors = ['#ff5e7a', '#ffb05a', '#5a9aff', '#b05aff'];
                 const errorNames = ['magnetic noise', 'phonons', '¹³C nuclear spins', 'residual N'];
-                const errorLabelsList = ['Magnetic noise', 'Phonons', '¹³C nuclear', 'Residual N'];
 
-                // Slightly modulate data to show dynamics
                 const modulated = errorData.map((v, i) => {
                     let boost = 0;
                     if (i === errorCycle) boost = 8 * (0.5 + 0.5 * Math.sin(phaseRad));
                     return Math.max(5, v + boost);
                 });
-
-                // Normalize
                 const total = modulated.reduce((a, b) => a + b, 0);
                 const normalized = modulated.map(v => Math.round((v / total) * 100));
 
                 errorChart.data.datasets[0].data = normalized;
                 errorChart.update();
 
-                // Glow on dominant
                 errorGlow.classList.toggle('active', rawCoherence < 0.6);
                 errorGlow.style.background =
                     `radial-gradient(circle, ${errorColors[errorCycle]}33, transparent 70%)`;
+                errorDominant.innerHTML =
+                    `dominant: <span style="color:${errorColors[errorCycle]};">${errorNames[errorCycle]}</span>`;
 
-                // Update dominant label
-                errorDominant.innerHTML = `dominant: <span style="color:${errorColors[errorCycle]};">${errorNames[errorCycle]}</span>`;
-
-                // 6. UPDATE CORRECTION STEPS (cycle)
+                // 5. CORRECTION STEPS
                 const activeStep = Math.floor(frame / 40) % 4;
                 stepItems.forEach((el, i) => {
                     el.classList.toggle('active', i === activeStep);
                 });
 
-                // Correction status pulse
-                correctionStatus.classList.toggle('active', rawCoherence > 0.7);
+                // 6. UPDATE DOM
+                phaseDisplay.textContent = `φ = ${Math.round(phaseDeg)}°`;
+                coherencePercent.textContent = `${Math.round(rawCoherence * 100)}%`;
 
-                // 7. UPDATE STATS / BADGES
                 const rawMicro = Math.round(100 / (rawCoherence + 0.01));
                 rawVal.textContent = `~${Math.min(rawMicro, 500)} µs`;
                 logicalVal.textContent = rawCoherence > 0.5 ? '> 1 s' : '~500 ms';
@@ -765,20 +920,24 @@
 
                 turbulenceBadge.style.borderColor = rawCoherence < 0.4 ? '#ff5e7a' : '#5a3a4a';
                 turbulenceBadge.style.color = rawCoherence < 0.4 ? '#ff5e7a' : '#ff8a9a';
-
                 correctionStatusText.textContent = rawCoherence > 0.7 ?
                     '✅ correction active · wind stable' :
                     '⚠️ correction engaged · stabilizing wind';
-
-                // 8. CARD GLOW (coherence card pulses with coherence)
+                correctionStatus.classList.toggle('active', rawCoherence > 0.7);
                 document.getElementById('coherenceCard').classList.toggle('glow', rawCoherence > 0.8);
 
-                // Continue
+                // 7. RENDER 3D
+                controls.update();
+                renderer.render(scene, camera);
+
                 requestAnimationFrame(animate);
             }
 
-            // Start
+            // Start animation
             animate();
+
+            // Initial resize
+            setTimeout(resizeRenderer, 100);
 
         });
     </script>
