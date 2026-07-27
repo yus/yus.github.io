@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quantum Wind – SAXON SXQ Diamond CPU</title>
-    <!-- Chart.js for graphs -->
+    <title>Quantum Wind – SAXON SXQ Diamond CPU (Live)</title>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
@@ -60,6 +60,26 @@
             -webkit-text-fill-color: #ffd866;
         }
 
+        .live-badge {
+            background: #1a3a2a;
+            border: 1px solid #39ff8a;
+            border-radius: 30px;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.7rem;
+            color: #39ff8a;
+            letter-spacing: 1px;
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
         /* Grid */
         .grid {
             display: grid;
@@ -74,10 +94,16 @@
             padding: 1.5rem 1.5rem 1.8rem;
             border: 1px solid #1f2f4a;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            transition: border 0.2s;
+            transition: border 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
         }
         .card:hover {
             border-color: #3a5a8a;
+        }
+        .card.glow {
+            border-color: #ffd866;
+            box-shadow: 0 0 30px rgba(255, 216, 102, 0.08);
         }
 
         .card h3 {
@@ -100,7 +126,7 @@
             height: 200px;
         }
 
-        /* Bloch sphere visualization (pure CSS) */
+        /* Bloch sphere */
         .bloch-container {
             display: flex;
             justify-content: center;
@@ -118,20 +144,24 @@
             border: 2px solid #4a7aaa;
             box-shadow: 0 0 40px rgba(60, 130, 255, 0.15);
             flex-shrink: 0;
+            transition: box-shadow 0.3s;
+        }
+        .bloch-sphere.turbulent {
+            box-shadow: 0 0 60px rgba(255, 94, 122, 0.25);
         }
 
-        /* Arrow = quantum wind vector */
         .bloch-arrow {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 80px;
+            width: 70px;
             height: 4px;
             background: linear-gradient(90deg, #39ff8a, #ffd866);
             transform-origin: 0% 50%;
             transform: translate(-50%, -50%) rotate(45deg);
             border-radius: 4px;
             box-shadow: 0 0 20px rgba(57, 255, 138, 0.3);
+            transition: width 0.1s;
         }
         .bloch-arrow::after {
             content: '';
@@ -143,6 +173,9 @@
             border-left: 14px solid #ffd866;
             border-top: 8px solid transparent;
             border-bottom: 8px solid transparent;
+        }
+        .bloch-arrow.fading {
+            opacity: 0.3;
         }
 
         .bloch-label {
@@ -194,17 +227,19 @@
             background: #ff5e7a;
         }
 
-        /* Turbulence / noise panel */
-        .noise-badge {
-            display: inline-block;
-            background: #2a1a2a;
-            border: 1px solid #5a3a4a;
-            border-radius: 30px;
-            padding: 0.2rem 1rem;
-            font-size: 0.75rem;
-            color: #ff8a9a;
+        .phase-display {
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            color: #8aa0c0;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+        }
+        .phase-display span {
+            color: #ffd866;
+            font-weight: 600;
         }
 
+        /* Stats */
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -223,7 +258,91 @@
             color: #ffd866;
             font-weight: 600;
         }
+        .stat-row .stat .val.green {
+            color: #39ff8a;
+        }
 
+        /* Error correction steps */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 30px;
+            transition: all 0.4s;
+            border: 1px solid transparent;
+        }
+        .step-item .num {
+            background: #1a2a4a;
+            padding: 2px 12px;
+            border-radius: 30px;
+            border: 1px solid #2a4a6a;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6a8fc0;
+            transition: all 0.4s;
+        }
+        .step-item.active {
+            border-color: #ffd866;
+            background: #1a2030;
+        }
+        .step-item.active .num {
+            background: #ffd866;
+            color: #0a0e1a;
+            border-color: #ffd866;
+        }
+        .step-item .desc {
+            color: #b0c8e8;
+        }
+        .step-item .desc .hl {
+            color: #ffd866;
+        }
+        .step-item .desc .hl2 {
+            color: #39ff8a;
+        }
+
+        .correction-status {
+            margin-top: 0.8rem;
+            background: #0d1424;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            text-align: center;
+            border: 1px dashed #2a5a4a;
+            font-size: 0.75rem;
+            color: #6aaa8a;
+            transition: all 0.4s;
+        }
+        .correction-status.active {
+            border-color: #39ff8a;
+            color: #39ff8a;
+            box-shadow: 0 0 20px rgba(57, 255, 138, 0.1);
+        }
+
+        /* Error chart overlay glow */
+        .error-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 94, 122, 0.1), transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .error-glow.active {
+            opacity: 1;
+        }
+
+        /* Footnote */
         .footnote {
             margin-top: 2rem;
             padding-top: 1.5rem;
@@ -276,8 +395,16 @@
                 height: 120px;
             }
             .bloch-arrow {
-                width: 60px;
+                width: 50px;
             }
+        }
+
+        /* Tooltip for animation status */
+        .anim-status {
+            font-size: 0.7rem;
+            color: #4a6a8a;
+            text-align: right;
+            margin-top: 0.2rem;
         }
     </style>
 </head>
@@ -291,36 +418,38 @@
                 <h1>🌀 QUANTUM WIND</h1>
                 <div class="sub">SAXON SXQ · Diamond NV‑Center · <span>Phase‑Flow</span> Model</div>
             </div>
-            <div style="font-size:0.8rem;color:#4a6a8a;">
-                Coherence · Error Correction · Topology
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <span class="live-badge">● LIVE</span>
+                <span style="font-size:0.8rem;color:#4a6a8a;">Coherence · Error Correction · Topology</span>
             </div>
         </div>
 
-        <!-- GRID: GRAPHS + VISUALS -->
+        <!-- GRID -->
         <div class="grid">
 
-            <!-- CARD 1: Coherence decay (T2*) -->
-            <div class="card">
+            <!-- CARD 1: Coherence decay -->
+            <div class="card" id="coherenceCard">
                 <h3>⏳ <span class="accent">Raw</span> vs <span class="accent">Corrected</span> Coherence</h3>
                 <div class="chart-container">
                     <canvas id="coherenceChart"></canvas>
                 </div>
                 <div class="stat-row">
-                    <span class="stat">Raw T₂* <span class="val">~100 µs</span></span>
-                    <span class="stat">Logical T₂ <span class="val">&gt; 1 s</span></span>
-                    <span class="stat">Gates <span class="val">10³+</span></span>
+                    <span class="stat">Raw T₂* <span class="val" id="rawVal">~100 µs</span></span>
+                    <span class="stat">Logical T₂ <span class="val green" id="logicalVal">&gt; 1 s</span></span>
+                    <span class="stat">Gates <span class="val" id="gateVal">10³+</span></span>
                 </div>
                 <div style="margin-top:0.6rem;font-size:0.75rem;color:#5a7a9a;">
-                    <span class="noise-badge">⬤ turbulence</span> &nbsp; corrected via parity feedback
+                    <span class="noise-badge" id="turbulenceBadge" style="display:inline-block;background:#2a1a2a;border:1px solid #5a3a4a;border-radius:30px;padding:0.2rem 1rem;font-size:0.75rem;color:#ff8a9a;">⬤ turbulence</span>
+                    <span id="correctionStatusText" style="margin-left:0.5rem;">&nbsp;corrected via parity feedback</span>
                 </div>
             </div>
 
-            <!-- CARD 2: Bloch sphere + Wind metaphor -->
-            <div class="card">
+            <!-- CARD 2: Bloch sphere -->
+            <div class="card" id="blochCard">
                 <h3>🌀 <span class="accent">Quantum Wind</span> · Bloch Flow</h3>
                 <div class="bloch-container">
-                    <div class="bloch-sphere">
-                        <div class="bloch-arrow" style="transform: translate(-50%,-50%) rotate(45deg);"></div>
+                    <div class="bloch-sphere" id="blochSphere">
+                        <div class="bloch-arrow" id="blochArrow" style="transform: translate(-50%,-50%) rotate(45deg);"></div>
                         <span class="bloch-label n">|0⟩</span>
                         <span class="bloch-label s">|1⟩</span>
                         <span class="bloch-label e">|+⟩</span>
@@ -331,59 +460,66 @@
                         <div><span class="dot green"></span> spin vector (wind dir.)</div>
                         <div><span class="dot gold"></span> microwave drive (gust)</div>
                         <div><span class="dot red"></span> dephasing (turbulence)</div>
-                        <div style="margin-top:6px;font-size:0.7rem;color:#6a8aaa;">
-                            phase angle <span style="color:#ffd866;">φ</span> = 45°
+                        <div class="phase-display" style="margin-top:6px;">
+                            phase angle <span id="phaseDisplay">φ = 45°</span>
+                        </div>
+                        <div class="phase-display" style="font-size:0.65rem;color:#5a7a9a;">
+                            coherence <span id="coherencePercent">100%</span>
                         </div>
                     </div>
                 </div>
-                <div style="margin-top:0.6rem;font-size:0.8rem;color:#8ab0d0;border-top:1px solid #1a2a3a;padding-top:0.6rem;">
+                <div style="margin-top:0.6rem;font-size:0.8rem;color:#8ab0d0;border-top:1px solid #1a2a3a;padding-top:0.6rem;text-align:center;">
                     <em>“The wind moves <strong style="color:#ffd866;">phase relations</strong> — the geometry of possibility.”</em>
                 </div>
             </div>
 
-            <!-- CARD 3: Error budget / turbulence sources -->
-            <div class="card">
+            <!-- CARD 3: Error budget -->
+            <div class="card" id="errorCard">
                 <h3>⚡ <span class="accent">Turbulence</span> Sources (Errors)</h3>
-                <div class="chart-container" style="height:160px;">
+                <div class="chart-container" style="height:160px;position:relative;">
                     <canvas id="errorChart"></canvas>
+                    <div class="error-glow" id="errorGlow"></div>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.2rem;font-size:0.7rem;color:#8aa0c0;">
-                    <span>■ <span style="color:#ff5e7a;">Magnetic noise</span></span>
-                    <span>■ <span style="color:#ffb05a;">Phonons (lattice)</span></span>
-                    <span>■ <span style="color:#5a9aff;">¹³C nuclear spins</span></span>
-                    <span>■ <span style="color:#b05aff;">Residual N</span></span>
+                    <span id="errMagnetic">■ <span style="color:#ff5e7a;">Magnetic noise</span></span>
+                    <span id="errPhonon">■ <span style="color:#ffb05a;">Phonons (lattice)</span></span>
+                    <span id="errCarbon">■ <span style="color:#5a9aff;">¹³C nuclear spins</span></span>
+                    <span id="errNitrogen">■ <span style="color:#b05aff;">Residual N</span></span>
+                </div>
+                <div style="margin-top:0.3rem;font-size:0.65rem;color:#4a6a8a;text-align:center;" id="errorDominant">
+                    dominant: <span style="color:#ff5e7a;">magnetic noise</span>
                 </div>
             </div>
 
-            <!-- CARD 4: Error correction – feedback loop -->
-            <div class="card">
+            <!-- CARD 4: Error correction -->
+            <div class="card" id="correctionCard">
                 <h3>🛠 <span class="accent">Correction</span> · Diamond Vortex Code</h3>
-                <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.9rem;">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">①</span>
-                        <span><span style="color:#39ff8a;">3× NV</span> logical qubit pool</span>
+                <div class="step-list">
+                    <div class="step-item" data-step="0">
+                        <span class="num">①</span>
+                        <span class="desc"><span class="hl2">3× NV</span> logical qubit pool</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">②</span>
-                        <span>Ancilla measures <span style="color:#ffd866;">parity</span> (no collapse)</span>
+                    <div class="step-item" data-step="1">
+                        <span class="num">②</span>
+                        <span class="desc">Ancilla measures <span class="hl">parity</span> (no collapse)</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">③</span>
-                        <span>Feedback <span style="color:#ffd866;">π‑pulse</span> re‑aligns wind</span>
+                    <div class="step-item" data-step="2">
+                        <span class="num">③</span>
+                        <span class="desc">Feedback <span class="hl">π‑pulse</span> re‑aligns wind</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">④</span>
-                        <span><span style="color:#39ff8a;">T₂ &gt; 1 s</span> · fault‑tolerant gates</span>
+                    <div class="step-item" data-step="3">
+                        <span class="num">④</span>
+                        <span class="desc"><span class="hl2">T₂ &gt; 1 s</span> · fault‑tolerant gates</span>
                     </div>
                 </div>
-                <div style="margin-top:0.8rem;background:#0d1424;border-radius:40px;padding:0.3rem 1rem;text-align:center;border:1px dashed #2a5a4a;font-size:0.75rem;color:#6aaa8a;">
+                <div class="correction-status" id="correctionStatus">
                     ⚡ mid‑circuit optical readout · unique to diamond
                 </div>
             </div>
 
         </div>
 
-        <!-- FOOTNOTE: ASCII + CITATION -->
+        <!-- FOOTNOTE -->
         <div class="footnote">
 
             <div class="ascii-box">
@@ -409,29 +545,35 @@
 
             <div class="citation">
                 © SAXON Quantum · SXQ series · Diamond NV architecture · v1.0 · “Quantum Wind” model · 2026
+                <span style="display:block;font-size:0.6rem;color:#3a5a6a;margin-top:0.2rem;">animated dashboard — all elements phase‑coupled</span>
             </div>
 
         </div>
 
     </div>
 
-    <!-- CHARTS INIT -->
+    <!-- SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // ---- COHERENCE CHART ----
+            // --- CHART INSTANCES ---
             const ctx1 = document.getElementById('coherenceChart').getContext('2d');
-            const time = Array.from({ length: 50 }, (_, i) => (i * 20)); // 0–980 µs
-            const raw = time.map(t => Math.exp(-t / 100) * 1.0);
-            const corrected = time.map(t => Math.exp(-t / 1200) * 1.0);
+            const ctx2 = document.getElementById('errorChart').getContext('2d');
 
-            new Chart(ctx1, {
+            // Data buffers for animation
+            const maxDataPoints = 60;
+            const timeLabels = Array.from({ length: maxDataPoints }, (_, i) => (i * 20) + 'µs');
+            const rawData = new Array(maxDataPoints).fill(1);
+            const correctedData = new Array(maxDataPoints).fill(1);
+
+            // Coherence Chart
+            const coherenceChart = new Chart(ctx1, {
                 type: 'line',
                 data: {
-                    labels: time.map(t => t + 'µs'),
+                    labels: timeLabels,
                     datasets: [{
                         label: 'Raw (T₂* ≈ 100 µs)',
-                        data: raw,
+                        data: rawData,
                         borderColor: '#ff5e7a',
                         backgroundColor: 'rgba(255,94,122,0.08)',
                         borderWidth: 2.5,
@@ -440,7 +582,7 @@
                         fill: true,
                     }, {
                         label: 'Corrected (Logical T₂ > 1 s)',
-                        data: corrected,
+                        data: correctedData,
                         borderColor: '#39ff8a',
                         backgroundColor: 'rgba(57,255,138,0.08)',
                         borderWidth: 2.5,
@@ -452,6 +594,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
                     plugins: {
                         legend: {
                             labels: { color: '#b0c8e8', font: { size: 10, weight: '300' } }
@@ -474,9 +617,8 @@
                 }
             });
 
-            // ---- ERROR BUDGET CHART (doughnut) ----
-            const ctx2 = document.getElementById('errorChart').getContext('2d');
-            new Chart(ctx2, {
+            // Error Budget Chart
+            const errorChart = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
                     labels: ['Magnetic noise', 'Phonons', '¹³C nuclear', 'Residual N'],
@@ -490,6 +632,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
                     plugins: {
                         legend: {
                             position: 'bottom',
@@ -504,6 +647,138 @@
                     cutout: '65%',
                 }
             });
+
+            // --- DOM REFS ---
+            const blochArrow = document.getElementById('blochArrow');
+            const blochSphere = document.getElementById('blochSphere');
+            const phaseDisplay = document.getElementById('phaseDisplay');
+            const coherencePercent = document.getElementById('coherencePercent');
+            const rawVal = document.getElementById('rawVal');
+            const logicalVal = document.getElementById('logicalVal');
+            const gateVal = document.getElementById('gateVal');
+            const turbulenceBadge = document.getElementById('turbulenceBadge');
+            const correctionStatusText = document.getElementById('correctionStatusText');
+            const correctionStatus = document.getElementById('correctionStatus');
+            const errorGlow = document.getElementById('errorGlow');
+            const errorDominant = document.getElementById('errorDominant');
+            const stepItems = document.querySelectorAll('.step-item');
+
+            // Error labels
+            const errLabels = {
+                magnetic: document.getElementById('errMagnetic'),
+                phonon: document.getElementById('errPhonon'),
+                carbon: document.getElementById('errCarbon'),
+                nitrogen: document.getElementById('errNitrogen'),
+            };
+
+            // --- ANIMATION STATE ---
+            let frame = 0;
+            const coherenceDecayRate = 0.008; // per frame
+            const cycleLength = 300; // frames per full phase cycle
+
+            // --- ANIMATION LOOP ---
+            function animate() {
+                frame++;
+
+                // 1. PHASE ANGLE (0–360°)
+                const phaseDeg = (frame * 0.6) % 360;
+                const phaseRad = phaseDeg * Math.PI / 180;
+
+                // 2. COHERENCE (exponential decay, reset periodically for demo)
+                let rawCoherence = Math.exp(-(frame % 400) * coherenceDecayRate);
+                // Clamp and cycle for visual effect
+                if (frame % 400 === 0) rawCoherence = 1.0;
+
+                // Corrected coherence stays high (with small ripples)
+                const correctedCoherence = 0.92 + 0.08 * Math.sin(phaseRad * 0.5);
+
+                // 3. UPDATE BLOCH SPHERE
+                // Arrow rotation
+                blochArrow.style.transform = `translate(-50%, -50%) rotate(${phaseDeg}deg)`;
+                // Arrow length = coherence
+                const arrowLength = 50 + 30 * rawCoherence;
+                blochArrow.style.width = arrowLength + 'px';
+                // Fade if low coherence
+                blochArrow.classList.toggle('fading', rawCoherence < 0.3);
+
+                // Sphere glow = turbulence (inverse of coherence)
+                blochSphere.classList.toggle('turbulent', rawCoherence < 0.5);
+
+                // Phase display
+                phaseDisplay.textContent = `φ = ${Math.round(phaseDeg)}°`;
+
+                // Coherence percent
+                coherencePercent.textContent = `${Math.round(rawCoherence * 100)}%`;
+
+                // 4. UPDATE COHERENCE CHART (shift data)
+                rawData.push(rawCoherence);
+                rawData.shift();
+                correctedData.push(correctedCoherence);
+                correctedData.shift();
+
+                coherenceChart.update();
+
+                // 5. UPDATE ERROR BUDGET (dynamic turbulence source)
+                // Cycle dominant error source based on phase
+                const errorCycle = Math.floor(phaseDeg / 90) % 4;
+                const errorData = [38, 27, 22, 13];
+                const errorColors = ['#ff5e7a', '#ffb05a', '#5a9aff', '#b05aff'];
+                const errorNames = ['magnetic noise', 'phonons', '¹³C nuclear spins', 'residual N'];
+                const errorLabelsList = ['Magnetic noise', 'Phonons', '¹³C nuclear', 'Residual N'];
+
+                // Slightly modulate data to show dynamics
+                const modulated = errorData.map((v, i) => {
+                    let boost = 0;
+                    if (i === errorCycle) boost = 8 * (0.5 + 0.5 * Math.sin(phaseRad));
+                    return Math.max(5, v + boost);
+                });
+
+                // Normalize
+                const total = modulated.reduce((a, b) => a + b, 0);
+                const normalized = modulated.map(v => Math.round((v / total) * 100));
+
+                errorChart.data.datasets[0].data = normalized;
+                errorChart.update();
+
+                // Glow on dominant
+                errorGlow.classList.toggle('active', rawCoherence < 0.6);
+                errorGlow.style.background =
+                    `radial-gradient(circle, ${errorColors[errorCycle]}33, transparent 70%)`;
+
+                // Update dominant label
+                errorDominant.innerHTML = `dominant: <span style="color:${errorColors[errorCycle]};">${errorNames[errorCycle]}</span>`;
+
+                // 6. UPDATE CORRECTION STEPS (cycle)
+                const activeStep = Math.floor(frame / 40) % 4;
+                stepItems.forEach((el, i) => {
+                    el.classList.toggle('active', i === activeStep);
+                });
+
+                // Correction status pulse
+                correctionStatus.classList.toggle('active', rawCoherence > 0.7);
+
+                // 7. UPDATE STATS / BADGES
+                const rawMicro = Math.round(100 / (rawCoherence + 0.01));
+                rawVal.textContent = `~${Math.min(rawMicro, 500)} µs`;
+                logicalVal.textContent = rawCoherence > 0.5 ? '> 1 s' : '~500 ms';
+                gateVal.textContent = rawCoherence > 0.7 ? '10³+' : '10²';
+
+                turbulenceBadge.style.borderColor = rawCoherence < 0.4 ? '#ff5e7a' : '#5a3a4a';
+                turbulenceBadge.style.color = rawCoherence < 0.4 ? '#ff5e7a' : '#ff8a9a';
+
+                correctionStatusText.textContent = rawCoherence > 0.7 ?
+                    '✅ correction active · wind stable' :
+                    '⚠️ correction engaged · stabilizing wind';
+
+                // 8. CARD GLOW (coherence card pulses with coherence)
+                document.getElementById('coherenceCard').classList.toggle('glow', rawCoherence > 0.8);
+
+                // Continue
+                requestAnimationFrame(animate);
+            }
+
+            // Start
+            animate();
 
         });
     </script>
