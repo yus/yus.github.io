@@ -198,7 +198,7 @@
         .phase-display {
             margin-top: 0.3rem;
             font-size: 0.8rem;
-            color: #8aa0c0;
+            color: #8aa0c8;
             text-align: center;
             font-family: 'Fira Code', monospace;
         }
@@ -207,27 +207,56 @@
             font-weight: 600;
         }
 
-        /* Stats */
-        .stat-row {
+        /* Stats - VERTICAL STACK */
+        .stat-stack {
             display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 0.4rem;
             margin-top: 0.6rem;
-            font-size: 0.9rem;
+            width: 100%;
         }
-        .stat-row .stat {
+        .stat-stack .stat {
             background: #0d1424;
             padding: 0.3rem 1rem;
             border-radius: 40px;
             border: 1px solid #1f2f4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            width: 100%;
         }
-        .stat-row .stat .val {
+        .stat-stack .stat .label {
+            color: #8aa0c0;
+        }
+        .stat-stack .stat .val {
             color: #ffd866;
             font-weight: 600;
         }
-        .stat-row .stat .val.green {
+        .stat-stack .stat .val.green {
             color: #39ff8a;
+        }
+
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            color: #5a7a9a;
+        }
+
+        .noise-badge {
+            display: inline-block;
+            background: #2a1a2a;
+            border: 1px solid #5a3a4a;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.75rem;
+            color: #ff8a9a;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
 
         /* Error correction steps */
@@ -255,6 +284,7 @@
             font-weight: 600;
             color: #6a8fc0;
             transition: all 0.4s;
+            flex-shrink: 0;
         }
         .step-item.active {
             border-color: #ffd866;
@@ -310,17 +340,6 @@
             opacity: 1;
         }
 
-        .noise-badge {
-            display: inline-block;
-            background: #2a1a2a;
-            border: 1px solid #5a3a4a;
-            border-radius: 30px;
-            padding: 0.2rem 1rem;
-            font-size: 0.75rem;
-            color: #ff8a9a;
-            transition: all 0.3s;
-        }
-
         /* Footnote */
         .footnote {
             margin-top: 2rem;
@@ -372,6 +391,40 @@
             .bloch-3d-container {
                 height: 220px;
             }
+            .stat-stack .stat {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .stat-stack .stat {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.6rem;
+                flex-wrap: wrap;
+                gap: 0.2rem;
+            }
+            .status-row {
+                font-size: 0.65rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .bloch-legend {
+                gap: 0.8rem;
+                font-size: 0.65rem;
+            }
+            .phase-display {
+                font-size: 0.7rem;
+            }
+            .step-item .desc {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -400,14 +453,26 @@
                 <div class="chart-container">
                     <canvas id="coherenceChart"></canvas>
                 </div>
-                <div class="stat-row">
-                    <span class="stat">Raw T₂* <span class="val" id="rawVal">~100 µs</span></span>
-                    <span class="stat">Logical T₂ <span class="val green" id="logicalVal">&gt; 1 s</span></span>
-                    <span class="stat">Gates <span class="val" id="gateVal">10³+</span></span>
+
+                <!-- VERTICAL STATS STACK -->
+                <div class="stat-stack">
+                    <div class="stat">
+                        <span class="label">Raw T₂*</span>
+                        <span class="val" id="rawVal">~100 µs</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Logical T₂</span>
+                        <span class="val green" id="logicalVal">&gt; 1 s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Gate operations</span>
+                        <span class="val" id="gateVal">10³+</span>
+                    </div>
                 </div>
-                <div style="margin-top:0.6rem;font-size:0.75rem;color:#5a7a9a;">
+
+                <div class="status-row">
                     <span class="noise-badge" id="turbulenceBadge">⬤ turbulence</span>
-                    <span id="correctionStatusText" style="margin-left:0.5rem;">&nbsp;corrected via parity feedback</span>
+                    <span id="correctionStatusText">corrected via parity feedback</span>
                 </div>
             </div>
 
@@ -605,7 +670,6 @@
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            // Scene setup
             const scene = new THREE.Scene();
 
             const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10);
@@ -618,7 +682,6 @@
             renderer.setClearColor(0x0a0e1a, 0);
             container.appendChild(renderer.domElement);
 
-            // Orbit controls
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.08;
@@ -642,7 +705,6 @@
             const sphereGroup = new THREE.Group();
             scene.add(sphereGroup);
 
-            // Main sphere (transparent)
             const sphereGeo = new THREE.SphereGeometry(1.0, 48, 48);
             const sphereMat = new THREE.MeshPhysicalMaterial({
                 color: 0x1a3a6a,
@@ -656,7 +718,6 @@
             const sphere = new THREE.Mesh(sphereGeo, sphereMat);
             sphereGroup.add(sphere);
 
-            // Wireframe overlay
             const wireframeMat = new THREE.MeshBasicMaterial({
                 color: 0x3a6a9a,
                 wireframe: true,
@@ -666,17 +727,14 @@
             const wireframe = new THREE.Mesh(sphereGeo.clone(), wireframeMat);
             sphereGroup.add(wireframe);
 
-            // Grid circles (latitude/longitude)
             const ringMat = new THREE.LineBasicMaterial({ color: 0x3a6a9a, transparent: true, opacity: 0.3 });
 
-            // Equator
             const ringGeo = new THREE.RingGeometry(0.99, 1.0, 64);
             const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x3a6a9a, transparent: true,
                     opacity: 0.2, side: THREE.DoubleSide }));
             ring.rotation.x = Math.PI / 2;
             sphereGroup.add(ring);
 
-            // Meridians (vertical rings)
             for (let i = 0; i < 4; i++) {
                 const angle = (i / 4) * Math.PI;
                 const points = [];
@@ -692,7 +750,6 @@
                 sphereGroup.add(line);
             }
 
-            // Axes
             const axisLength = 1.5;
             const axisMat = (color) => new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5 });
 
@@ -707,8 +764,6 @@
             makeAxis([0, 1, 0], 0x39ff8a);
             makeAxis([0, 0, 1], 0x5a9aff);
 
-            // Axis labels as sprites (simplified - use small spheres as markers)
-            const labelMat = (color) => new THREE.MeshBasicMaterial({ color });
             const labelPositions = [
                 { pos: [1.6, 0, 0], color: 0xff5e7a },
                 { pos: [-1.6, 0, 0], color: 0xff5e7a },
@@ -728,7 +783,6 @@
             const arrowGroup = new THREE.Group();
             sphereGroup.add(arrowGroup);
 
-            // Arrow shaft (cone + cylinder)
             const shaftMat = new THREE.MeshPhysicalMaterial({
                 color: 0x39ff8a,
                 emissive: 0x39ff8a,
@@ -751,7 +805,6 @@
             head.position.set(0, 1.1, 0);
             arrowGroup.add(head);
 
-            // Glow ring around arrow base
             const glowMat = new THREE.MeshBasicMaterial({
                 color: 0x39ff8a,
                 transparent: true,
@@ -763,11 +816,10 @@
             glowRing.position.set(0, 0, 0);
             arrowGroup.add(glowRing);
 
-            // --- TRAJECTORY PATH (dotted orbit) ---
+            // --- TRAJECTORY PATH ---
             const orbitPoints = [];
-            const orbitSteps = 60;
-            for (let i = 0; i <= orbitSteps; i++) {
-                const theta = (i / orbitSteps) * Math.PI * 2;
+            for (let i = 0; i <= 60; i++) {
+                const theta = (i / 60) * Math.PI * 2;
                 const r = 0.9;
                 orbitPoints.push(new THREE.Vector3(r * Math.cos(theta), 0, r * Math.sin(theta)));
             }
@@ -782,11 +834,6 @@
             const orbitLine = new THREE.Line(orbitGeo, orbitMat);
             orbitLine.computeLineDistances();
             sphereGroup.add(orbitLine);
-
-            // --- STATE VECTORS (for visualization) ---
-            // Small dots on sphere surface to show state distribution
-            const stateDots = [];
-            const dotMat = new THREE.MeshBasicMaterial({ color: 0xffd866, transparent: true, opacity: 0.3 });
 
             // --- DOM REFS ---
             const phaseDisplay = document.getElementById('phaseDisplay');
@@ -805,7 +852,7 @@
             let frame = 0;
             const coherenceDecayRate = 0.008;
 
-            // --- RESIZE HANDLER ---
+            // --- RESIZE ---
             function resizeRenderer() {
                 const w = container.clientWidth;
                 const h = container.clientHeight;
@@ -816,7 +863,6 @@
                 }
             }
             window.addEventListener('resize', resizeRenderer);
-            // Also observe container size changes
             const ro = new ResizeObserver(() => resizeRenderer());
             ro.observe(container);
 
@@ -824,63 +870,47 @@
             function animate() {
                 frame++;
 
-                // 1. PHASE & COHERENCE
                 const phaseDeg = (frame * 0.6) % 360;
                 const phaseRad = phaseDeg * Math.PI / 180;
                 let rawCoherence = Math.exp(-(frame % 400) * coherenceDecayRate);
                 if (frame % 400 === 0) rawCoherence = 1.0;
                 const correctedCoherence = 0.92 + 0.08 * Math.sin(phaseRad * 0.5);
 
-                // 2. UPDATE 3D ARROW
-                // Arrow points along direction defined by theta (polar angle) and phi (azimuth)
-                // For visualization: arrow traces a path on the sphere surface
-                const theta = Math.PI / 2.2; // slightly tilted from equator
+                // Arrow direction
+                const theta = Math.PI / 2.2;
                 const phi = phaseRad;
-
-                // Arrow direction vector (from center to surface)
                 const dir = new THREE.Vector3(
                     Math.sin(theta) * Math.cos(phi),
                     Math.cos(theta),
                     Math.sin(theta) * Math.sin(phi)
                 ).normalize();
 
-                // Scale arrow length by coherence
                 const arrowScale = 0.3 + 0.7 * rawCoherence;
-
-                // Position arrow group at origin, then orient
                 arrowGroup.position.set(0, 0, 0);
                 arrowGroup.quaternion.identity();
-
-                // Orient: point Y-axis along direction
                 const up = new THREE.Vector3(0, 1, 0);
                 const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
                 arrowGroup.quaternion.copy(quat);
-
-                // Scale arrow length
                 arrowGroup.scale.set(1, arrowScale, 1);
 
-                // Arrow color shifts with coherence
                 const color = new THREE.Color().setHSL(0.3 * rawCoherence + 0.1, 0.9, 0.5 + 0.3 * rawCoherence);
                 shaftMat.color.copy(color);
                 shaftMat.emissive.copy(color);
                 shaftMat.emissiveIntensity = 0.2 + 0.3 * rawCoherence;
 
-                // Head color
                 const headColor = new THREE.Color().setHSL(0.12, 0.9, 0.6 + 0.3 * rawCoherence);
                 headMat.color.copy(headColor);
                 headMat.emissive.copy(headColor);
-
-                // Glow ring opacity
                 glowMat.opacity = 0.05 + 0.2 * rawCoherence;
 
-                // 3. UPDATE CHARTS
+                // Charts
                 rawData.push(rawCoherence);
                 rawData.shift();
                 correctedData.push(correctedCoherence);
                 correctedData.shift();
                 coherenceChart.update();
 
-                // 4. ERROR BUDGET
+                // Error budget
                 const errorCycle = Math.floor(phaseDeg / 90) % 4;
                 const errorData = [38, 27, 22, 13];
                 const errorColors = ['#ff5e7a', '#ffb05a', '#5a9aff', '#b05aff'];
@@ -903,13 +933,13 @@
                 errorDominant.innerHTML =
                     `dominant: <span style="color:${errorColors[errorCycle]};">${errorNames[errorCycle]}</span>`;
 
-                // 5. CORRECTION STEPS
+                // Correction steps
                 const activeStep = Math.floor(frame / 40) % 4;
                 stepItems.forEach((el, i) => {
                     el.classList.toggle('active', i === activeStep);
                 });
 
-                // 6. UPDATE DOM
+                // DOM updates
                 phaseDisplay.textContent = `φ = ${Math.round(phaseDeg)}°`;
                 coherencePercent.textContent = `${Math.round(rawCoherence * 100)}%`;
 
@@ -926,17 +956,12 @@
                 correctionStatus.classList.toggle('active', rawCoherence > 0.7);
                 document.getElementById('coherenceCard').classList.toggle('glow', rawCoherence > 0.8);
 
-                // 7. RENDER 3D
                 controls.update();
                 renderer.render(scene, camera);
-
                 requestAnimationFrame(animate);
             }
 
-            // Start animation
             animate();
-
-            // Initial resize
             setTimeout(resizeRenderer, 100);
 
         });
