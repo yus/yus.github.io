@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum Wind – SAXON SXQ Diamond CPU</title>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0e1a;
+            color: #e0e8f0;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2a3a5a;
+            padding-bottom: 1.2rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #8ab4ff, #39ff8a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .sub {
+            font-size: 0.95rem;
+            color: #8aa0c8;
+            letter-spacing: 1px;
+        }
+        .header .sub span {
+            color: #ffd866;
+            -webkit-text-fill-color: #ffd866;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #11182b;
+            border-radius: 20px;
+            padding: 1.5rem 1.5rem 1.8rem;
+            border: 1px solid #1f2f4a;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            transition: border 0.2s;
+        }
+        .card:hover {
+            border-color: #3a5a8a;
+        }
+
+        .card h3 {
+            font-weight: 400;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #6a8fc0;
+            margin-bottom: 1rem;
+            border-left: 3px solid #ffd866;
+            padding-left: 12px;
+        }
+
+        .card h3 .accent {
+            color: #ffd866;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+
+        /* Bloch sphere visualization (pure CSS) */
+        .bloch-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .bloch-sphere {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a2a4a, #0a0e1a);
+            border: 2px solid #4a7aaa;
+            box-shadow: 0 0 40px rgba(60, 130, 255, 0.15);
+            flex-shrink: 0;
+        }
+
+        /* Arrow = quantum wind vector */
+        .bloch-arrow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #39ff8a, #ffd866);
+            transform-origin: 0% 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(57, 255, 138, 0.3);
+        }
+        .bloch-arrow::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: -8px;
+            width: 0;
+            height: 0;
+            border-left: 14px solid #ffd866;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        .bloch-label {
+            position: absolute;
+            font-size: 0.7rem;
+            color: #8ab0e0;
+            font-weight: 300;
+        }
+        .bloch-label.n {
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .bloch-label.s {
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .bloch-label.e {
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .bloch-label.w {
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .bloch-legend {
+            font-size: 0.8rem;
+            color: #b0c8e8;
+            line-height: 1.6;
+        }
+        .bloch-legend .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .dot.green {
+            background: #39ff8a;
+        }
+        .dot.gold {
+            background: #ffd866;
+        }
+        .dot.red {
+            background: #ff5e7a;
+        }
+
+        /* Turbulence / noise panel */
+        .noise-badge {
+            display: inline-block;
+            background: #2a1a2a;
+            border: 1px solid #5a3a4a;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.75rem;
+            color: #ff8a9a;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            font-size: 0.9rem;
+        }
+        .stat-row .stat {
+            background: #0d1424;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            border: 1px solid #1f2f4a;
+        }
+        .stat-row .stat .val {
+            color: #ffd866;
+            font-weight: 600;
+        }
+
+        .footnote {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1a2a3a;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .ascii-box {
+            background: #0a0e1a;
+            border: 1px solid #2a4a6a;
+            border-radius: 14px;
+            padding: 1.5rem 1.2rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            color: #8ab0d0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .ascii-box .hl {
+            color: #ffd866;
+        }
+        .ascii-box .hl2 {
+            color: #39ff8a;
+        }
+        .ascii-box .hl3 {
+            color: #ff5e7a;
+        }
+
+        .citation {
+            color: #6a8aaa;
+            font-size: 0.8rem;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .bloch-sphere {
+                width: 120px;
+                height: 120px;
+            }
+            .bloch-arrow {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1>🌀 QUANTUM WIND</h1>
+                <div class="sub">SAXON SXQ · Diamond NV‑Center · <span>Phase‑Flow</span> Model</div>
+            </div>
+            <div style="font-size:0.8rem;color:#4a6a8a;">
+                Coherence · Error Correction · Topology
+            </div>
+        </div>
+
+        <!-- GRID: GRAPHS + VISUALS -->
+        <div class="grid">
+
+            <!-- CARD 1: Coherence decay (T2*) -->
+            <div class="card">
+                <h3>⏳ <span class="accent">Raw</span> vs <span class="accent">Corrected</span> Coherence</h3>
+                <div class="chart-container">
+                    <canvas id="coherenceChart"></canvas>
+                </div>
+                <div class="stat-row">
+                    <span class="stat">Raw T₂* <span class="val">~100 µs</span></span>
+                    <span class="stat">Logical T₂ <span class="val">&gt; 1 s</span></span>
+                    <span class="stat">Gates <span class="val">10³+</span></span>
+                </div>
+                <div style="margin-top:0.6rem;font-size:0.75rem;color:#5a7a9a;">
+                    <span class="noise-badge">⬤ turbulence</span> &nbsp; corrected via parity feedback
+                </div>
+            </div>
+
+            <!-- CARD 2: Bloch sphere + Wind metaphor -->
+            <div class="card">
+                <h3>🌀 <span class="accent">Quantum Wind</span> · Bloch Flow</h3>
+                <div class="bloch-container">
+                    <div class="bloch-sphere">
+                        <div class="bloch-arrow" style="transform: translate(-50%,-50%) rotate(45deg);"></div>
+                        <span class="bloch-label n">|0⟩</span>
+                        <span class="bloch-label s">|1⟩</span>
+                        <span class="bloch-label e">|+⟩</span>
+                        <span class="bloch-label w">|−⟩</span>
+                        <div style="position:absolute;bottom:10px;right:10px;font-size:0.5rem;color:#4a7a5a;">NV⁻</div>
+                    </div>
+                    <div class="bloch-legend">
+                        <div><span class="dot green"></span> spin vector (wind dir.)</div>
+                        <div><span class="dot gold"></span> microwave drive (gust)</div>
+                        <div><span class="dot red"></span> dephasing (turbulence)</div>
+                        <div style="margin-top:6px;font-size:0.7rem;color:#6a8aaa;">
+                            phase angle <span style="color:#ffd866;">φ</span> = 45°
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:0.6rem;font-size:0.8rem;color:#8ab0d0;border-top:1px solid #1a2a3a;padding-top:0.6rem;">
+                    <em>“The wind moves <strong style="color:#ffd866;">phase relations</strong> — the geometry of possibility.”</em>
+                </div>
+            </div>
+
+            <!-- CARD 3: Error budget / turbulence sources -->
+            <div class="card">
+                <h3>⚡ <span class="accent">Turbulence</span> Sources (Errors)</h3>
+                <div class="chart-container" style="height:160px;">
+                    <canvas id="errorChart"></canvas>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.2rem;font-size:0.7rem;color:#8aa0c0;">
+                    <span>■ <span style="color:#ff5e7a;">Magnetic noise</span></span>
+                    <span>■ <span style="color:#ffb05a;">Phonons (lattice)</span></span>
+                    <span>■ <span style="color:#5a9aff;">¹³C nuclear spins</span></span>
+                    <span>■ <span style="color:#b05aff;">Residual N</span></span>
+                </div>
+            </div>
+
+            <!-- CARD 4: Error correction – feedback loop -->
+            <div class="card">
+                <h3>🛠 <span class="accent">Correction</span> · Diamond Vortex Code</h3>
+                <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.9rem;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">①</span>
+                        <span><span style="color:#39ff8a;">3× NV</span> logical qubit pool</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">②</span>
+                        <span>Ancilla measures <span style="color:#ffd866;">parity</span> (no collapse)</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">③</span>
+                        <span>Feedback <span style="color:#ffd866;">π‑pulse</span> re‑aligns wind</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="background:#1a2a4a;padding:4px 12px;border-radius:30px;border:1px solid #2a4a6a;">④</span>
+                        <span><span style="color:#39ff8a;">T₂ &gt; 1 s</span> · fault‑tolerant gates</span>
+                    </div>
+                </div>
+                <div style="margin-top:0.8rem;background:#0d1424;border-radius:40px;padding:0.3rem 1rem;text-align:center;border:1px dashed #2a5a4a;font-size:0.75rem;color:#6aaa8a;">
+                    ⚡ mid‑circuit optical readout · unique to diamond
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTNOTE: ASCII + CITATION -->
+        <div class="footnote">
+
+            <div class="ascii-box">
+                <span class="hl">╔══════════════════════════════════════════════════════════════════╗</span>
+                <span class="hl">║  🌀  QUANTUM WIND  —  SAXON SXQ  —  NV‑center diamond CPU       ║</span>
+                <span class="hl">╠══════════════════════════════════════════════════════════════════╣</span>
+                ║                                                                              ║
+                ║   <span class="hl2">SOURCE</span>  ──  green laser (532 nm)  ──  polarize spin to |0⟩     ║
+                ║   <span class="hl2">DRIVE</span>   ──  microwave RF pulse   ──  rotate spin on Bloch     ║
+                ║   <span class="hl2">FLOW</span>    ──  phase accumulation  ──  <span class="hl">quantum wind</span> through Hilbert  ║
+                ║   <span class="hl3">TURBULENCE</span> ──  T₂* dephasing  ──  magnetic noise / phonons     ║
+                ║   <span class="hl2">CORRECTION</span> ──  parity ancilla  ──  π‑pulse feedback loop      ║
+                ║                                                                              ║
+                ║   <span class="hl">“The quantum wind moves PHASE RELATIONS —</span>                         ║
+                ║    <span class="hl"> not mass, not energy, but the geometry of possibility.”</span>        ║
+                ║                                                                              ║
+                ║   ──  Coherence:  raw 100 µs  →  logical &gt; 1 s                             ║
+                ║   ──  Qubits:     NV‑center electron spin (S=1)                             ║
+                ║   ──  Coupling:   dipole‑dipole + photon‑mediated entanglement              ║
+                ║   ──  Code:       surface code / parity monitoring (mid‑circuit)            ║
+                <span class="hl">╚══════════════════════════════════════════════════════════════════╝</span>
+            </div>
+
+            <div class="citation">
+                © SAXON Quantum · SXQ series · Diamond NV architecture · v1.0 · “Quantum Wind” model · 2026
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CHARTS INIT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ---- COHERENCE CHART ----
+            const ctx1 = document.getElementById('coherenceChart').getContext('2d');
+            const time = Array.from({ length: 50 }, (_, i) => (i * 20)); // 0–980 µs
+            const raw = time.map(t => Math.exp(-t / 100) * 1.0);
+            const corrected = time.map(t => Math.exp(-t / 1200) * 1.0);
+
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: time.map(t => t + 'µs'),
+                    datasets: [{
+                        label: 'Raw (T₂* ≈ 100 µs)',
+                        data: raw,
+                        borderColor: '#ff5e7a',
+                        backgroundColor: 'rgba(255,94,122,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        fill: true,
+                    }, {
+                        label: 'Corrected (Logical T₂ > 1 s)',
+                        data: corrected,
+                        borderColor: '#39ff8a',
+                        backgroundColor: 'rgba(57,255,138,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        tension: 0.3,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#b0c8e8', font: { size: 10, weight: '300' } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#5a7a9a', maxTicksLimit: 8, font: { size: 8 } },
+                            grid: { color: '#1a2a3a' },
+                            title: { display: true, text: 'time (µs)', color: '#5a7a9a', font: { size: 9 } }
+                        },
+                        y: {
+                            ticks: { color: '#5a7a9a', font: { size: 8 } },
+                            grid: { color: '#1a2a3a' },
+                            title: { display: true, text: 'coherence (norm.)', color: '#5a7a9a', font: { size: 9 } },
+                            min: 0,
+                            max: 1.05,
+                        }
+                    }
+                }
+            });
+
+            // ---- ERROR BUDGET CHART (doughnut) ----
+            const ctx2 = document.getElementById('errorChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Magnetic noise', 'Phonons', '¹³C nuclear', 'Residual N'],
+                    datasets: [{
+                        data: [38, 27, 22, 13],
+                        backgroundColor: ['#ff5e7a', '#ffb05a', '#5a9aff', '#b05aff'],
+                        borderColor: '#0a0e1a',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#8aa0c0',
+                                font: { size: 8, weight: '300' },
+                                boxWidth: 10,
+                                padding: 6,
+                            }
+                        }
+                    },
+                    cutout: '65%',
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
