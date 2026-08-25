@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geothesis - Snap Triangle</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #111;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        label {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        input[type="range"] {
+            width: 150px;
+            accent-color: #00ff88;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #00ff88;
+            min-height: 20px;
+        }
+        .legend {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #aaa;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌀 Geothesis</h1>
+        <canvas id="canvas" width="600" height="600"></canvas>
+        <div class="status" id="status">Initializing...</div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>ω₁ (T₁ vertices)</label>
+                <input type="range" id="omega1" min="0.1" max="3.0" step="0.1" value="1.0">
+                <span id="omega1_val">1.0</span>
+            </div>
+            <div class="control-group">
+                <label>ω₂ (T₂ tangents)</label>
+                <input type="range" id="omega2" min="0.1" max="3.0" step="0.1" value="1.5">
+                <span id="omega2_val">1.5</span>
+            </div>
+            <div class="control-group">
+                <label>Time Speed</label>
+                <input type="range" id="speed" min="0.001" max="0.05" step="0.001" value="0.01">
+                <span id="speed_val">0.01</span>
+            </div>
+            <div class="control-group">
+                <label>Show T₃</label>
+                <input type="checkbox" id="showT3" checked>
+            </div>
+            <div class="control-group">
+                <button id="pauseBtn">⏸️ Pause</button>
+            </div>
+            <div class="control-group">
+                <button id="resetBtn">🔄 Reset</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#00ff88"></span> T₁ (inscribed)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ff4444"></span> T₂ (circumscribed)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ffaa00"></span> Tangency points</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#aa44ff"></span> Connecting lines</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#00ccff"></span> T₃ (alive)</div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+        const CENTER_X = W / 2;
+        const CENTER_Y = H / 2;
+        const RADIUS = 200;
+
+        let time = 0;
+        let paused = false;
+
+        // Controls
+        const omega1Input = document.getElementById('omega1');
+        const omega2Input = document.getElementById('omega2');
+        const speedInput = document.getElementById('speed');
+        const showT3Checkbox = document.getElementById('showT3');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        omega1Input.addEventListener('input', () => {
+            document.getElementById('omega1_val').textContent = omega1Input.value;
+        });
+        omega2Input.addEventListener('input', () => {
+            document.getElementById('omega2_val').textContent = omega2Input.value;
+        });
+        speedInput.addEventListener('input', () => {
+            document.getElementById('speed_val').textContent = speedInput.value;
+        });
+        pauseBtn.addEventListener('click', () => {
+            paused = !paused;
+            pauseBtn.textContent = paused ? '▶️ Play' : '⏸️ Pause';
+        });
+        resetBtn.addEventListener('click', () => {
+            time = 0;
+        });
+
+        function drawCircle(x, y, r, color, lineWidth = 2, dash = []) {
+            ctx.beginPath();
+            ctx.setLineDash(dash);
+            ctx.arc(x, y, r, 0, 2 * Math.PI);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawLine(x1, y1, x2, y2, color, lineWidth = 1, dash = []) {
+            ctx.beginPath();
+            ctx.setLineDash(dash);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawPoint(x, y, color, radius = 4) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawTriangle(vertices, color, lineWidth = 2, dash = [], fill = null) {
+            if (fill) {
+                ctx.beginPath();
+                ctx.moveTo(vertices[0].x, vertices[0].y);
+                ctx.lineTo(vertices[1].x, vertices[1].y);
+                ctx.lineTo(vertices[2].x, vertices[2].y);
+                ctx.closePath();
+                ctx.fillStyle = fill;
+                ctx.fill();
+            }
+            for (let i = 0; i < 3; i++) {
+                const next = (i + 1) % 3;
+                drawLine(vertices[i].x, vertices[i].y, vertices[next].x, vertices[next].y, color, lineWidth, dash);
+            }
+        }
+
+        function getIntersection(line1, line2) {
+            const [p1, p2] = line1;
+            const [p3, p4] = line2;
+            
+            const x1 = p1.x, y1 = p1.y;
+            const x2 = p2.x, y2 = p2.y;
+            const x3 = p3.x, y3 = p3.y;
+            const x4 = p4.x, y4 = p4.y;
+            
+            const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            
+            if (Math.abs(denom) < 0.0001) {
+                return null; // Parallel or coincident
+            }
+            
+            const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+            
+            const intersectX = x1 + t * (x2 - x1);
+            const intersectY = y1 + t * (y2 - y1);
+            
+            return { x: intersectX, y: intersectY };
+        }
+
+        function checkTriangleCrossesCircle(vertices) {
+            const center = { x: CENTER_X, y: CENTER_Y };
+            const radius = RADIUS;
+            
+            for (let i = 0; i < 3; i++) {
+                const p1 = vertices[i];
+                const p2 = vertices[(i + 1) % 3];
+                
+                // Check if segment p1-p2 intersects circle
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const fx = p1.x - center.x;
+                const fy = p1.y - center.y;
+                
+                const a = dx * dx + dy * dy;
+                const b = 2 * (fx * dx + fy * dy);
+                const c = fx * fx + fy * fy - radius * radius;
+                
+                const discriminant = b * b - 4 * a * c;
+                
+                if (discriminant >= 0) {
+                    const sqrtDisc = Math.sqrt(discriminant);
+                    const t1 = (-b - sqrtDisc) / (2 * a);
+                    const t2 = (-b + sqrtDisc) / (2 * a);
+                    
+                    if ((t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function animate() {
+            if (!paused) {
+                time += parseFloat(speedInput.value);
+            }
+            
+            const omega1 = parseFloat(omega1Input.value);
+            const omega2 = parseFloat(omega2Input.value);
+            
+            // Clear canvas
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, W, H);
+            
+            // Draw circle
+            drawCircle(CENTER_X, CENTER_Y, RADIUS, '#0066cc', 3);
+            
+            // Calculate T₁ vertices (inscribed)
+            const t1Angles = [0, 2*Math.PI/3, 4*Math.PI/3].map(a => a + omega1 * time);
+            const t1Vertices = t1Angles.map(angle => ({
+                x: CENTER_X + RADIUS * Math.cos(angle),
+                y: CENTER_Y + RADIUS * Math.sin(angle),
+                angle: angle
+            }));
+            
+            // Calculate T₂ tangency points
+            const t2TangentAngles = [0, 2*Math.PI/3, 4*Math.PI/3].map(a => a + omega2 * time);
+            const tangencyPoints = t2TangentAngles.map(angle => ({
+                x: CENTER_X + RADIUS * Math.cos(angle),
+                y: CENTER_Y + RADIUS * Math.sin(angle),
+                angle: angle
+            }));
+            
+            // Calculate T₂ vertices (intersection of tangents)
+            const t2Vertices = [];
+            for (let i = 0; i < 3; i++) {
+                const angle1 = t2TangentAngles[i];
+                const angle2 = t2TangentAngles[(i + 1) % 3];
+                
+                // Tangent line at angle a: cos(a) * x + sin(a) * y = 1 (in unit circle coords)
+                // Convert to canvas coords
+                const a1 = Math.cos(angle1), b1 = Math.sin(angle1);
+                const a2 = Math.cos(angle2), b2 = Math.sin(angle2);
+                
+                // Solve: a1 * x + b1 * y = RADIUS, a2 * x + b2 * y = RADIUS
+                // In canvas coords (relative to center)
+                const det = a1 * b2 - a2 * b1;
+                
+                if (Math.abs(det) > 0.0001) {
+                    const x_rel = (RADIUS * b2 - RADIUS * b1) / det;
+                    const y_rel = (a1 * RADIUS - a2 * RADIUS) / det;
+                    
+                    t2Vertices.push({
+                        x: CENTER_X + x_rel,
+                        y: CENTER_Y + y_rel
+                    });
+                } else {
+                    // Parallel tangents (shouldn't happen for valid triangle)
+                    t2Vertices.push({
+                        x: CENTER_X + RADIUS * 3 * Math.cos(angle1),
+                        y: CENTER_Y + RADIUS * 3 * Math.sin(angle1)
+                    });
+                }
+            }
+            
+            // Draw T₁
+            drawTriangle(t1Vertices, '#00ff88', 2);
+            t1Vertices.forEach(v => drawPoint(v.x, v.y, '#00ff88', 5));
+            
+            // Draw T₂
+            drawTriangle(t2Vertices, '#ff4444', 2, [5, 5]);
+            t2Vertices.forEach(v => drawPoint(v.x, v.y, '#ff4444', 5));
+            
+            // Draw tangency points
+            tangencyPoints.forEach(p => drawPoint(p.x, p.y, '#ffaa00', 4));
+            
+            // Draw connecting lines (infinite lines)
+            const connectingLines = [];
+            for (let i = 0; i < 3; i++) {
+                const start = t1Vertices[i];
+                const end = t2Vertices[i];
+                
+                // Extend line infinitely
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                
+                if (length > 0.01) {
+                    const ux = dx / length;
+                    const uy = dy / length;
+                    
+                    const extendStart = { x: start.x - ux * 1000, y: start.y - uy * 1000 };
+                    const extendEnd = { x: end.x + ux * 1000, y: end.y + uy * 1000 };
+                    
+                    drawLine(extendStart.x, extendStart.y, extendEnd.x, extendEnd.y, '#aa44ff', 1, [3, 3]);
+                    
+                    connectingLines.push([extendStart, extendEnd]);
+                }
+            }
+            
+            // Find T₃ (intersections of connecting lines)
+            let t3Exists = false;
+            let t3Vertices = [];
+            let t3CrossesCircle = false;
+            
+            if (showT3Checkbox.checked && connectingLines.length === 3) {
+                const intersection1 = getIntersection(connectingLines[0], connectingLines[1]);
+                const intersection2 = getIntersection(connectingLines[1], connectingLines[2]);
+                const intersection3 = getIntersection(connectingLines[2], connectingLines[0]);
+                
+                if (intersection1 && intersection2 && intersection3) {
+                    t3Vertices = [intersection1, intersection2, intersection3];
+                    
+                    // Check if triangle is valid (not degenerate)
+                    const area = Math.abs((intersection1.x * (intersection2.y - intersection3.y) + 
+                                          intersection2.x * (intersection3.y - intersection1.y) + 
+                                          intersection3.x * (intersection1.y - intersection2.y)) / 2);
+                    
+                    if (area > 1) { // Minimum area threshold
+                        t3Exists = true;
+                        t3CrossesCircle = checkTriangleCrossesCircle(t3Vertices);
+                        
+                        // Draw T₃
+                        const t3Color = t3CrossesCircle ? '#00ccff' : '#ff00ff';
+                        const t3Dash = t3CrossesCircle ? [] : [10, 5];
+                        drawTriangle(t3Vertices, t3Color, 2.5, t3Dash, t3CrossesCircle ? 'rgba(0, 204, 255, 0.1)' : 'rgba(255, 0, 255, 0.1)');
+                        t3Vertices.forEach(v => drawPoint(v.x, v.y, t3Color, 4));
+                    }
+                }
+            }
+            
+            // Update status
+            const statusEl = document.getElementById('status');
+            if (t3Exists) {
+                if (t3CrossesCircle) {
+                    statusEl.textContent = `✅ T₃ ALIVE — CROSSES circle | ω₁=${omega1.toFixed(1)}, ω₂=${omega2.toFixed(1)}`;
+                    statusEl.style.color = '#00ccff';
+                } else {
+                    statusEl.textContent = `✅ T₃ ALIVE — no cross circle | ω₁=${omega1.toFixed(1)}, ω₂=${omega2.toFixed(1)}`;
+                    statusEl.style.color = '#ff00ff';
+                }
+            } else {
+                statusEl.textContent = `❌ T₃ not alive (lines don't form triangle) | t=${time.toFixed(2)}`;
+                statusEl.style.color = '#ff4444';
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
