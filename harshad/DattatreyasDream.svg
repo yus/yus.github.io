@@ -1,0 +1,127 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" style="background:#0b0e14">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1f2e"/>
+      <stop offset="100%" stop-color="#0b0e14"/>
+    </linearGradient>
+    <!-- Кисть для волн -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="1200" height="800" fill="url(#bg)"/>
+
+  <!-- Заголовок: "1972 — Соната для Капрекара" -->
+  <text x="600" y="60" font-family="'Georgia', serif" font-size="32" fill="#e0dcc8" text-anchor="middle" letter-spacing="6">
+    1972 — Соната для Капрекара
+  </text>
+  <text x="600" y="90" font-family="monospace" font-size="14" fill="#7a7f8f" text-anchor="middle">
+    symbolic SVG · 7 шагов к тишине
+  </text>
+
+  <!-- Шкала времени (7 шагов) -->
+  <g stroke="#2a3040" stroke-width="1">
+    <line x1="80" y1="720" x2="1120" y2="720"/>
+    <!-- Отметки шагов -->
+    <text x="80" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">0</text>
+    <text x="228" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">1</text>
+    <text x="377" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">2</text>
+    <text x="526" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">3</text>
+    <text x="675" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">4</text>
+    <text x="824" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">5</text>
+    <text x="973" y="750" fill="#7a7f8f" font-size="12" font-family="monospace">6</text>
+    <text x="1120" y="750" fill="#e0dcc8" font-size="12" font-family="monospace">7</text>
+  </g>
+
+  <!-- =================== НОТНЫЙ СТАН (4 голоса) =================== -->
+
+  <!-- Голос 1: Сопрано (Самые высокие цифры) -->
+  <g stroke="#f0a5b0" fill="none" stroke-width="2" filter="url(#glow)">
+    <!-- Траектория: 1→8→5→5→1→8→6 -->
+    <polyline points="80,200 228,120 377,280 526,280 675,200 824,120 973,160" stroke-opacity="0.8"/>
+    <!-- Ноты-круги -->
+    <circle cx="80" cy="200" r="8" fill="#f0a5b0"/>
+    <circle cx="228" cy="120" r="8" fill="#f0a5b0"/>
+    <circle cx="377" cy="280" r="8" fill="#f0a5b0"/>
+    <circle cx="526" cy="280" r="8" fill="#f0a5b0"/>
+    <circle cx="675" cy="200" r="8" fill="#f0a5b0"/>
+    <circle cx="824" cy="120" r="8" fill="#f0a5b0"/>
+    <circle cx="973" cy="160" r="8" fill="#f0a5b0"/>
+    <!-- Финальная тишина: 6174 -->
+    <circle cx="1120" cy="200" r="4" fill="#f0a5b0" opacity="0.3"/>
+  </g>
+
+  <!-- Голос 2: Альт (средние высокие) -->
+  <g stroke="#6fc1b0" fill="none" stroke-width="2">
+    <polyline points="80,320 228,400 377,240 526,240 675,400 824,440 973,380"/>
+    <circle cx="80" cy="320" r="7" fill="#6fc1b0"/>
+    <circle cx="228" cy="400" r="7" fill="#6fc1b0"/>
+    <circle cx="377" cy="240" r="7" fill="#6fc1b0"/>
+    <circle cx="526" cy="240" r="7" fill="#6fc1b0"/>
+    <circle cx="675" cy="400" r="7" fill="#6fc1b0"/>
+    <circle cx="824" cy="440" r="7" fill="#6fc1b0"/>
+    <circle cx="973" cy="380" r="7" fill="#6fc1b0"/>
+    <circle cx="1120" cy="400" r="3" fill="#6fc1b0" opacity="0.3"/>
+  </g>
+
+  <!-- Голос 3: Тенор (средние низкие) -->
+  <g stroke="#d4b87a" fill="none" stroke-width="2">
+    <polyline points="80,460 228,400 377,440 526,520 675,440 824,480 973,460"/>
+    <circle cx="80" cy="460" r="7" fill="#d4b87a"/>
+    <circle cx="228" cy="400" r="7" fill="#d4b87a"/>
+    <circle cx="377" cy="440" r="7" fill="#d4b87a"/>
+    <circle cx="526" cy="520" r="7" fill="#d4b87a"/>
+    <circle cx="675" cy="440" r="7" fill="#d4b87a"/>
+    <circle cx="824" cy="480" r="7" fill="#d4b87a"/>
+    <circle cx="973" cy="460" r="7" fill="#d4b87a"/>
+    <circle cx="1120" cy="480" r="3" fill="#d4b87a" opacity="0.3"/>
+  </g>
+
+  <!-- Голос 4: Бас (самые низкие цифры) -->
+  <g stroke="#8f8fbc" fill="none" stroke-width="2">
+    <polyline points="80,600 228,520 377,560 526,600 675,560 824,560 973,540"/>
+    <circle cx="80" cy="600" r="8" fill="#8f8fbc"/>
+    <circle cx="228" cy="520" r="8" fill="#8f8fbc"/>
+    <circle cx="377" cy="560" r="8" fill="#8f8fbc"/>
+    <circle cx="526" cy="600" r="8" fill="#8f8fbc"/>
+    <circle cx="675" cy="560" r="8" fill="#8f8fbc"/>
+    <circle cx="824" cy="560" r="8" fill="#8f8fbc"/>
+    <circle cx="973" cy="540" r="8" fill="#8f8fbc"/>
+    <circle cx="1120" cy="560" r="4" fill="#8f8fbc" opacity="0.3"/>
+  </g>
+
+  <!-- Подписи чисел под шкалой -->
+  <g font-family="monospace" font-size="24" fill="#e0dcc8" text-anchor="middle">
+    <text x="80" y="690">1972</text>
+    <text x="228" y="690">8442</text>
+    <text x="377" y="690">5994</text>
+    <text x="526" y="690">5355</text>
+    <text x="675" y="690">1998</text>
+    <text x="824" y="690">8082</text>
+    <text x="973" y="690">8532</text>
+    <text x="1120" y="690" fill="#7a7f8f">6174</text>
+  </g>
+
+  <!-- Визуализация "затухания" (общая амплитуда падает) -->
+  <path d="M80,720 L80,200 Q228,180 228,520 Q377,480 377,560 Q526,600 526,280 Q675,400 675,560 Q824,520 824,560 Q973,540 973,380 Q1120,400 1120,720" 
+        fill="none" stroke="#4a5268" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+
+  <!-- Название аккордов (семантика) -->
+  <g font-family="'Georgia', serif" font-size="12" fill="#7a7f8f" font-style="italic" text-anchor="middle">
+    <text x="80" y="80">Тема</text>
+    <text x="228" y="80">Развитие</text>
+    <text x="377" y="80">Конфликт</text>
+    <text x="526" y="80">Скерцо</text>
+    <text x="675" y="80">Кульминация</text>
+    <text x="824" y="80">Разрешение</text>
+    <text x="973" y="80">Приближение</text>
+    <text x="1120" y="80">Тишина</text>
+  </g>
+
+  <!-- Автограф -->
+  <text x="600" y="790" font-family="monospace" font-size="10" fill="#3a4050" text-anchor="middle">
+    symbolic v1.0 · слушай числами · сгенерировано в диалоге
+  </text>
+</svg>
