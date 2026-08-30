@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сон Даттарая · Партитура</title>
+    <title>Сон Даттарая · Студия числовой музыки</title>
     <style>
-        /* --- Стили для тёмной студийной атмосферы --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background: #0b0e14; 
@@ -22,7 +21,6 @@
             grid-template-columns: 2fr 1fr;
             gap: 24px;
         }
-        /* Левая колонка: Холст SVG + Нотный стан */
         .canvas-area { 
             background: #131821; 
             border-radius: 24px; 
@@ -45,12 +43,11 @@
         }
         #staffCanvas {
             width: 100%;
-            height: 140px;
+            height: 160px;
             display: block;
             background: #131821;
             border-radius: 8px;
         }
-        /* Правая колонка: Карточка и настройки */
         .info-panel {
             background: #131821;
             border-radius: 24px;
@@ -69,7 +66,9 @@
             justify-content: center;
             color: #4a5268;
             font-size: 14px;
+            overflow: hidden;
         }
+        .preview-mini img, .preview-mini svg { max-width: 100%; max-height: 100%; }
         .description-box {
             background: #1a1f2e;
             padding: 16px;
@@ -84,7 +83,7 @@
             gap: 12px;
             flex-wrap: wrap;
         }
-        .controls button {
+        .controls button, .controls select, .controls input {
             background: #2a3040;
             border: none;
             color: #e0dcc8;
@@ -96,15 +95,31 @@
             flex: 1;
         }
         .controls button:hover { background: #4a5268; }
-        .instrument-select {
+        .controls select { background: #1a1f2e; border: 1px solid #2a3040; }
+        .tempo-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             background: #1a1f2e;
-            border: 1px solid #2a3040;
-            color: #e0dcc8;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 40px;
-            font-family: inherit;
-            cursor: pointer;
         }
+        .tempo-controls input[type="range"] {
+            flex: 2;
+            background: transparent;
+            accent-color: #e0dcc8;
+        }
+        .toggle {
+            background: #2a3040;
+            border: none;
+            color: #e0dcc8;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+        .toggle.active { background: #4a5268; box-shadow: 0 0 20px rgba(97, 175, 239, 0.2); }
         .status-text { font-size: 13px; color: #7a7f8f; text-align: center; }
         .drop-zone {
             border: 2px dashed #2a3040;
@@ -117,8 +132,17 @@
         }
         .drop-zone:hover { border-color: #e0dcc8; background: #1a1f2e; }
         #fileInput { display: none; }
-
-        /* --- Глобальные медиа-настройки для адаптации --- */
+        .sequence-display {
+            font-family: monospace;
+            font-size: 12px;
+            color: #7a7f8f;
+            text-align: center;
+            padding: 8px;
+            background: #0b0e14;
+            border-radius: 8px;
+            border: 1px solid #1a1f2e;
+            word-break: break-all;
+        }
         @media (max-width: 900px) {
             .studio { grid-template-columns: 1fr; }
         }
@@ -130,7 +154,8 @@
     <div class="canvas-area">
         <canvas id="svgCanvas" width="800" height="450"></canvas>
         <div class="staff-container">
-            <canvas id="staffCanvas" width="800" height="140"></canvas>
+            <canvas id="staffCanvas" width="800" height="160"></canvas>
+            <div class="sequence-display" id="sequenceDisplay">⏳ Ожидание партитуры</div>
         </div>
     </div>
 
@@ -144,17 +169,24 @@
         <h2>📄 Карточка произведения</h2>
         <div class="preview-mini" id="miniPreview">⏳ Ожидание файла</div>
         <div class="description-box" id="descBox">
-            <span style="color:#4a5268;">Описание появится здесь, если SVG содержит тег &lt;desc&gt;...</span>
+            <span style="color:#4a5268;">Описание появится из тега &lt;desc&gt; в SVG...</span>
         </div>
 
         <h2>🎚️ Настройки трека</h2>
         <div class="controls">
             <button id="playBtn">▶ Играть</button>
             <button id="resetBtn">⟲ Сброс</button>
-            <select id="instrumentSelect" class="instrument-select">
+            <button id="arpeggioToggle" class="toggle active">🎹 Арпеджио</button>
+            <select id="instrumentSelect">
                 <option value="sitar">🎸 Ситар</option>
                 <option value="piano" selected>🎹 Фортепиано</option>
             </select>
+        </div>
+        <div class="tempo-controls">
+            <span>🐢</span>
+            <input type="range" id="bpmSlider" min="30" max="180" value="80">
+            <span>🐇</span>
+            <span id="bpmDisplay">80 BPM</span>
         </div>
         <div class="status-text" id="status">⏸ Готов к загрузке партитуры</div>
     </div>
@@ -176,31 +208,40 @@
     const descBox = document.getElementById('descBox');
     const miniPreview = document.getElementById('miniPreview');
     const instrumentSelect = document.getElementById('instrumentSelect');
+    const bpmSlider = document.getElementById('bpmSlider');
+    const bpmDisplay = document.getElementById('bpmDisplay');
+    const arpeggioToggle = document.getElementById('arpeggioToggle');
+    const sequenceDisplay = document.getElementById('sequenceDisplay');
 
     let shapes = [];
     let isPlaying = false;
     let animationId = null;
     let startTime = 0;
     let progress = 0;
-    const DURATION = 30; // секунд
+    let currentCycle = [1972, 8442, 5994, 5355, 1998, 8082, 8532, 6174];
     let audioCtx = null;
     let masterGain = null;
     let currentInstrument = 'piano';
+    let bpm = 80;
+    let arpeggioMode = true;
+    let fileName = '';
 
-    // Наши аккорды для 7 шагов (по 4 ноты, где 0 = пауза)
-    const chordMap = [
-        { name: '1972', notes: [1, 9, 7, 2] },
-        { name: '8442', notes: [8, 4, 4, 2] },
-        { name: '5994', notes: [5, 9, 9, 4] },
-        { name: '5355', notes: [5, 3, 5, 5] },
-        { name: '1998', notes: [1, 9, 9, 8] },
-        { name: '8082', notes: [8, 0, 8, 2] },
-        { name: '8532', notes: [8, 5, 3, 2] },
-        { name: '6174', notes: [6, 1, 7, 4] }
+    // "Великая 30-ка" — числа, идущие к 6174 за 7 шагов (пример)
+    const GREAT_30 = [
+        1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979,
+        1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987,
+        1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995,
+        1996, 1997, 1998, 1999, 2000, 2001
     ];
 
+    // Хардкод для "Сна Даттарая"
+    const DREAM_CYCLE = [1972, 8442, 5994, 5355, 1998, 8082, 8532, 6174];
+
+    // Частоты для нот (на основе 1-9)
+    const freqMap = { 0: 0, 1: 110, 2: 123.47, 3: 138.59, 4: 146.83, 5: 164.81, 6: 185.0, 7: 196.0, 8: 220.0, 9: 246.94 };
+
     // ================================================================
-    // 2. АУДИО: СИТАР И ФОРТЕПИАНО (упрощённые модели)
+    // 2. АУДИО-СИНТЕЗ
     // ================================================================
     function initAudio() {
         if (!audioCtx) {
@@ -214,98 +255,153 @@
     }
 
     function playNote(freq, duration, vol = 0.2, instrument = 'piano') {
-        if (!audioCtx) return;
+        if (!audioCtx || freq === 0) return;
         const now = audioCtx.currentTime;
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(vol, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        gainNode.connect(masterGain);
 
         if (instrument === 'sitar') {
-            // Ситар: несколько обертонов с характерным "гнусавым" фильтром
             const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
             const filter = audioCtx.createBiquadFilter();
             filter.type = 'bandpass';
             filter.frequency.value = freq * 2.2;
             filter.Q.value = 1.5;
             osc.type = 'sawtooth';
             osc.frequency.value = freq;
-            gain.gain.setValueAtTime(vol * 0.8, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1.2);
             osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(masterGain);
-            osc.start(now);
-            osc.stop(now + duration * 1.2);
-            // Добавим ещё один обертон для "струнности"
-            const osc2 = audioCtx.createOscillator();
-            const gain2 = audioCtx.createGain();
-            osc2.type = 'triangle';
-            osc2.frequency.value = freq * 3.0;
-            gain2.gain.setValueAtTime(vol * 0.2, now);
-            gain2.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.6);
-            osc2.connect(gain2);
-            gain2.connect(masterGain);
-            osc2.start(now);
-            osc2.stop(now + duration * 0.6);
-        } else {
-            // Фортепиано: простой синтез с быстрой атакой
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(vol, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-            osc.connect(gain);
-            gain.connect(masterGain);
+            filter.connect(gainNode);
             osc.start(now);
             osc.stop(now + duration);
-            // Добавим лёгкий "колокольчик" (высокий обертон)
+            // Обертон
             const osc2 = audioCtx.createOscillator();
             const gain2 = audioCtx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.value = freq * 2.0;
-            gain2.gain.setValueAtTime(vol * 0.08, now);
-            gain2.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.3);
+            gain2.gain.setValueAtTime(vol * 0.15, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.4);
+            osc2.type = 'triangle';
+            osc2.frequency.value = freq * 3.0;
             osc2.connect(gain2);
             gain2.connect(masterGain);
             osc2.start(now);
-            osc2.stop(now + duration * 0.3);
+            osc2.stop(now + duration * 0.4);
+        } else {
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            osc.connect(gainNode);
+            osc.start(now);
+            osc.stop(now + duration);
+            // Лёгкий обертон
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            gain2.gain.setValueAtTime(vol * 0.08, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.25);
+            osc2.type = 'sine';
+            osc2.frequency.value = freq * 2.0;
+            osc2.connect(gain2);
+            gain2.connect(masterGain);
+            osc2.start(now);
+            osc2.stop(now + duration * 0.25);
         }
     }
 
+    function playClick(freq, vol) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 0.02);
+    }
+
     // ================================================================
-    // 3. ПАРСЕР SVG (с чтением <desc> для карточки)
+    // 3. АЛГОРИТМ КАПРЕКАРА
     // ================================================================
-    function parseSVG(svgText) {
+    function kaprekarStep(num) {
+        const str = String(num).padStart(4, '0');
+        const digits = str.split('').map(Number);
+        const asc = digits.slice().sort((a,b) => a-b);
+        const desc = digits.slice().sort((a,b) => b-a);
+        const ascNum = parseInt(asc.join(''));
+        const descNum = parseInt(desc.join(''));
+        return descNum - ascNum;
+    }
+
+    function generateCycleFrom(start) {
+        const cycle = [start];
+        let current = start;
+        while (current !== 6174 && cycle.length < 10) {
+            current = kaprekarStep(current);
+            cycle.push(current);
+        }
+        return cycle;
+    }
+
+    // ================================================================
+    // 4. ПАРСЕР SVG
+    // ================================================================
+    function extractNumbersFromSVG(svgText, name) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(svgText, 'image/svg+xml');
-        const svg = doc.documentElement;
+        const textNodes = doc.querySelectorAll('text');
+        const numbers = [];
         
-        // Ищем описание
-        const descEl = svg.querySelector('desc');
-        if (descEl) {
-            descBox.innerHTML = `<span style="color:#b0b8c8;">${descEl.textContent}</span>`;
-        } else {
-            descBox.innerHTML = `<span style="color:#4a5268;">ℹ️ Нет тега &lt;desc&gt;. Добавьте описание в SVG.</span>`;
+        textNodes.forEach(node => {
+            const text = node.textContent.trim();
+            if (/^\d{4}$/.test(text)) {
+                numbers.push(parseInt(text));
+            }
+        });
+
+        // Если это "Сон Даттарая" — возвращаем хардкод
+        if (name.toLowerCase().includes('dattatreyasdream')) {
+            return DREAM_CYCLE;
         }
 
-        // Парсим фигуры (упрощённо, как в предыдущей версии)
-        const elements = svg.querySelectorAll('rect, circle, ellipse, line, polyline, polygon, path');
+        // Ищем первое число, отличное от 1972
+        const firstNon1972 = numbers.find(n => n !== 1972);
+        if (firstNon1972) {
+            return generateCycleFrom(firstNon1972);
+        }
+
+        // Если нашли только 1972 или ничего — берём из "Великой 30-ки"
+        if (numbers.length > 0 && numbers[0] === 1972) {
+            const randomFromGreat = GREAT_30[Math.floor(Math.random() * GREAT_30.length)];
+            return generateCycleFrom(randomFromGreat);
+        }
+
+        // Фолбэк
+        return generateCycleFrom(1972);
+    }
+
+    function parseSVGShapes(svgText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svgText, 'image/svg+xml');
+        const elements = doc.querySelectorAll('rect, circle, ellipse, line, polyline, polygon, path');
         const items = [];
         elements.forEach(el => {
             const tag = el.tagName.toLowerCase();
             const fill = el.getAttribute('fill') || '#ffffff';
             const color = fill !== 'none' ? fill : '#ffffff';
-            const x = parseFloat(el.getAttribute('x')) || 0;
-            const y = parseFloat(el.getAttribute('y')) || 0;
-            const w = parseFloat(el.getAttribute('width')) || 20;
-            const h = parseFloat(el.getAttribute('height')) || 20;
-            const r = parseFloat(el.getAttribute('r')) || 10;
-            const cx = parseFloat(el.getAttribute('cx')) || 0;
-            const cy = parseFloat(el.getAttribute('cy')) || 0;
             if (tag === 'circle') {
+                const cx = parseFloat(el.getAttribute('cx')) || 0;
+                const cy = parseFloat(el.getAttribute('cy')) || 0;
+                const r = parseFloat(el.getAttribute('r')) || 10;
                 items.push({ type: 'circle', cx, cy, r, color });
             } else if (tag === 'rect') {
+                const x = parseFloat(el.getAttribute('x')) || 0;
+                const y = parseFloat(el.getAttribute('y')) || 0;
+                const w = parseFloat(el.getAttribute('width')) || 20;
+                const h = parseFloat(el.getAttribute('height')) || 20;
                 items.push({ type: 'rect', x, y, w, h, color });
-            } // ... остальные типы для краткости опущены, но в боевой версии будут все
+            }
         });
         if (items.length === 0) {
             // Демо-фигуры
@@ -317,10 +413,9 @@
     }
 
     // ================================================================
-    // 4. ОТРИСОВКА: SVG + НОТНЫЙ СТАН
+    // 5. ОТРИСОВКА
     // ================================================================
     function drawShapes(progressVal) {
-        // --- Очистка холста SVG ---
         svgCtx.clearRect(0, 0, svgCanvas.width, svgCanvas.height);
         if (!shapes.length) {
             svgCtx.fillStyle = '#4a5268';
@@ -330,7 +425,6 @@
             return;
         }
 
-        // Рисуем фигуры с пульсацией
         const now = Date.now() / 1000;
         const total = shapes.length;
         const activeCount = Math.floor(progressVal * total);
@@ -365,12 +459,16 @@
         svgCtx.stroke();
         svgCtx.setLineDash([]);
 
-        // --- Отрисовка нотного стана ---
+        // Отрисовка нотного стана
+        drawStaff(progressVal);
+    }
+
+    function drawStaff(progressVal) {
         staffCtx.clearRect(0, 0, staffCanvas.width, staffCanvas.height);
         staffCtx.fillStyle = '#131821';
         staffCtx.fillRect(0, 0, staffCanvas.width, staffCanvas.height);
-        
-        // Линии стана (5 линий)
+
+        // Линии стана
         staffCtx.strokeStyle = '#4a5268';
         staffCtx.lineWidth = 1;
         const staffY = 20;
@@ -382,50 +480,58 @@
             staffCtx.stroke();
         }
 
-        // Скрипичный ключ (упрощённо)
+        // Скрипичный ключ
         staffCtx.fillStyle = '#7a7f8f';
         staffCtx.font = '40px Georgia';
         staffCtx.fillText('𝄞', 8, staffY + 40);
 
-        // Ноты: 7 аккордов
-        const noteNames = ['До', 'Ре', 'Ми', 'Фа', 'Соль', 'Ля', 'Си'];
-        const step = (staffCanvas.width - 120) / 8;
-        chordMap.forEach((chord, chordIdx) => {
-            const x = 60 + chordIdx * step;
-            const isActive = chordIdx <= (progressVal * 7);
+        const cycle = currentCycle;
+        const step = (staffCanvas.width - 120) / cycle.length;
+
+        // Обновляем отображение последовательности
+        sequenceDisplay.textContent = `🎵 ${cycle.join(' → ')}`;
+
+        cycle.forEach((num, idx) => {
+            const x = 60 + idx * step;
+            const isActive = idx <= (progressVal * cycle.length);
+            const digits = String(num).split('').map(Number);
+
             staffCtx.globalAlpha = isActive ? 0.9 : 0.2;
 
-            chord.notes.forEach((n, noteIdx) => {
-                if (n === 0) return; // пауза
-                const noteY = staffY + 50 - (n / 9) * 38; // высота от 9 (верх) до 1 (низ)
+            // Рисуем ноты для каждой цифры
+            digits.forEach((n, noteIdx) => {
+                if (n === 0) return;
+                const noteY = staffY + 50 - (n / 9) * 38;
                 const offset = noteIdx * 6 - 10;
-                // Круг ноты
                 staffCtx.beginPath();
-                staffCtx.arc(x + offset, noteY, 6, 0, Math.PI * 2);
+                staffCtx.arc(x + offset, noteY, 5, 0, Math.PI * 2);
                 staffCtx.fillStyle = isActive ? '#e0dcc8' : '#4a5268';
                 staffCtx.fill();
                 staffCtx.strokeStyle = '#e0dcc8';
-                staffCtx.lineWidth = 1;
+                staffCtx.lineWidth = 0.5;
                 staffCtx.stroke();
-                // Подпись ноты (для красоты)
-                if (isActive) {
-                    staffCtx.fillStyle = '#7a7f8f';
-                    staffCtx.font = '9px monospace';
-                    staffCtx.textAlign = 'center';
-                    staffCtx.fillText(noteNames[n-1] || n, x + offset, noteY - 12);
-                }
             });
 
-            // Подпись числа под станом
+            // Подпись числа
             staffCtx.fillStyle = isActive ? '#e0dcc8' : '#2a3040';
             staffCtx.font = '12px monospace';
             staffCtx.textAlign = 'center';
-            staffCtx.fillText(chord.name, x, staffY + 80);
+            staffCtx.fillText(num, x, staffY + 80);
+
+            // Тактовые черты
+            if (idx > 0) {
+                staffCtx.beginPath();
+                staffCtx.moveTo(x - step/2, staffY - 5);
+                staffCtx.lineTo(x - step/2, staffY + 65);
+                staffCtx.strokeStyle = '#3a4050';
+                staffCtx.lineWidth = 1;
+                staffCtx.stroke();
+            }
         });
 
-        // Линия текущего такта
+        // Линия текущей позиции
         if (progressVal > 0) {
-            const activeX = 60 + (progressVal * 7) * step;
+            const activeX = 60 + (progressVal * cycle.length) * step;
             staffCtx.strokeStyle = '#f0a5b0';
             staffCtx.lineWidth = 2;
             staffCtx.setLineDash([4, 4]);
@@ -437,11 +543,11 @@
         }
 
         staffCtx.globalAlpha = 1;
-        status.textContent = `⏳ Шаг ${Math.min(Math.floor(progressVal * 7) + 1, 8)} из 8 · ${Math.round(progressVal * 100)}%`;
+        status.textContent = `⏳ Такт ${Math.min(Math.floor(progressVal * cycle.length) + 1, cycle.length)} из ${cycle.length} · ${Math.round(progressVal * 100)}%`;
     }
 
     // ================================================================
-    // 5. УПРАВЛЕНИЕ ВОСПРОИЗВЕДЕНИЕМ
+    // 6. ВОСПРОИЗВЕДЕНИЕ
     // ================================================================
     function play() {
         if (!shapes.length) {
@@ -463,28 +569,50 @@
         if (!startTime) startTime = performance.now();
         currentInstrument = instrumentSelect.value;
 
+        const cycle = currentCycle;
+        const totalBeats = cycle.length * 4; // 4 четверти на такт
+        const beatDuration = 60 / bpm;
+
+        let currentBeat = 0;
+
         function loop() {
             if (!isPlaying) return;
             const now = performance.now();
             const dt = (now - startTime) / 1000;
-            progress = Math.min(dt / DURATION, 1);
+            const totalDuration = totalBeats * beatDuration;
+            progress = Math.min(dt / totalDuration, 1);
             drawShapes(progress);
 
-            // Генерация звука на основе текущего аккорда (каждый шаг)
-            const chordIndex = Math.floor(progress * 7);
-            if (chordIndex < 7) {
-                const chord = chordMap[chordIndex];
-                chord.notes.forEach((n, i) => {
-                    if (n === 0) return;
-                    const freq = 110 + n * 30; // привязка к частоте
-                    const vol = 0.08 + (1 - progress) * 0.12;
-                    // Играем ноту, если она только что стала активной (для простоты — с небольшой задержкой)
-                    if (Math.abs(progress - (chordIndex / 7)) < 0.01) {
-                        setTimeout(() => {
-                            playNote(freq, 0.3, vol, currentInstrument);
-                        }, i * 60);
+            const currentChordIndex = Math.min(Math.floor(progress * cycle.length), cycle.length - 1);
+            const chord = cycle[currentChordIndex];
+            const digits = String(chord).split('').map(Number);
+
+            // Воспроизведение аккорда или арпеджио
+            const beatInChord = (dt % (beatDuration * 4)) / beatDuration;
+            if (arpeggioMode) {
+                digits.forEach((n, i) => {
+                    const noteStart = (i / digits.length) * beatDuration * 4;
+                    if (Math.abs(beatInChord - (i / digits.length)) < 0.01) {
+                        const freq = freqMap[n] || 110;
+                        playNote(freq, beatDuration * 0.8, 0.15, currentInstrument);
                     }
                 });
+            } else {
+                if (beatInChord < 0.05) {
+                    digits.forEach((n) => {
+                        const freq = freqMap[n] || 110;
+                        playNote(freq, beatDuration * 3.5, 0.12, currentInstrument);
+                    });
+                }
+            }
+
+            // Метроном
+            if (Math.abs(beatInChord) < 0.01) {
+                playClick(800, 0.05);
+            } else if (Math.abs(beatInChord - 0.25) < 0.01 || 
+                       Math.abs(beatInChord - 0.5) < 0.01 || 
+                       Math.abs(beatInChord - 0.75) < 0.01) {
+                playClick(600, 0.03);
             }
 
             if (progress < 1) {
@@ -494,7 +622,7 @@
                 playBtn.textContent = '▶ Играть заново';
                 status.textContent = '◼ Завершено (тишина)';
                 drawShapes(1);
-                // Финальный аккорд тишины
+                // Финальный аккорд
                 setTimeout(() => {
                     playNote(110, 2.5, 0.08, currentInstrument);
                     playNote(220, 2.5, 0.06, currentInstrument);
@@ -513,21 +641,40 @@
         playBtn.textContent = '▶ Играть';
         status.textContent = '⟲ Сброшено';
         drawShapes(0);
-        playNote(800, 0.05, 0.02, currentInstrument);
+        playClick(1000, 0.05);
     }
 
     // ================================================================
-    // 6. ЗАГРУЗКА ФАЙЛА
+    // 7. ЗАГРУЗКА ФАЙЛА
     // ================================================================
     function loadSVG(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
             const text = e.target.result;
-            shapes = parseSVG(text);
+            fileName = file.name;
+
+            // Извлекаем числа и генерируем цикл
+            currentCycle = extractNumbersFromSVG(text, fileName);
+
+            // Парсим фигуры
+            shapes = parseSVGShapes(text);
+
             // Мини-превью
-            miniPreview.innerHTML = `✅ <span style="color:#6fc1b0;">${file.name}</span> (${shapes.length} фигур)`;
+            miniPreview.innerHTML = `✅ <span style="color:#6fc1b0;">${file.name}</span> (${shapes.length} фигур, ${currentCycle.length} тактов)`;
+
+            // Описание
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'image/svg+xml');
+            const descEl = doc.querySelector('desc');
+            if (descEl) {
+                descBox.innerHTML = `<span style="color:#b0b8c8;">${descEl.textContent}</span>`;
+            } else {
+                descBox.innerHTML = `<span style="color:#4a5268;">ℹ️ Нет тега &lt;desc&gt;. Добавьте описание в SVG.</span>`;
+            }
+
             drawShapes(0);
-            status.textContent = `✅ Загружено: ${file.name}`;
+            status.textContent = `✅ Загружено: ${file.name} (цикл: ${currentCycle.join('→')})`;
+
             // Короткий привет
             for (let i = 0; i < Math.min(shapes.length, 3); i++) {
                 setTimeout(() => { playNote(200 + i * 80, 0.1, 0.03, 'piano'); }, i * 80);
@@ -537,7 +684,7 @@
     }
 
     // ================================================================
-    // 7. СОБЫТИЯ
+    // 8. СОБЫТИЯ
     // ================================================================
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#e0dcc8'; });
@@ -546,8 +693,11 @@
         e.preventDefault();
         dropZone.style.borderColor = '#2a3040';
         const file = e.dataTransfer.files[0];
-        if (file && file.name.endsWith('.svg')) loadSVG(file);
-        else status.textContent = '❌ Нужен файл .svg';
+        if (file && (file.name.endsWith('.svg') || file.name.endsWith('.xml'))) {
+            loadSVG(file);
+        } else {
+            status.textContent = '❌ Нужен файл .svg или .xml';
+        }
     });
     fileInput.addEventListener('change', (e) => {
         if (fileInput.files[0]) loadSVG(fileInput.files[0]);
@@ -555,14 +705,28 @@
 
     playBtn.addEventListener('click', play);
     resetBtn.addEventListener('click', resetPlayer);
+
+    arpeggioToggle.addEventListener('click', () => {
+        arpeggioMode = !arpeggioMode;
+        arpeggioToggle.classList.toggle('active');
+        arpeggioToggle.textContent = arpeggioMode ? '🎹 Арпеджио' : '🎵 Аккорд';
+        status.textContent = arpeggioMode ? '🔄 Арпеджио включено' : '🔴 Арпеджио выключено (аккорды)';
+    });
+
+    bpmSlider.addEventListener('input', (e) => {
+        bpm = parseInt(e.target.value);
+        bpmDisplay.textContent = `${bpm} BPM`;
+    });
+
     instrumentSelect.addEventListener('change', () => {
         currentInstrument = instrumentSelect.value;
         status.textContent = `🎸 Инструмент: ${currentInstrument === 'sitar' ? 'Ситар' : 'Фортепиано'}`;
     });
 
-    // Стартовая отрисовка
+    // Старт
     drawShapes(0);
     status.textContent = '⏳ Ожидание SVG-партитуры';
+    sequenceDisplay.textContent = '⏳ Загрузите файл, чтобы увидеть последовательность';
 </script>
 </body>
 </html>
