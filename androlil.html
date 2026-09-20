@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin:0; background:#111; font-family: monospace; }
+  #grid {
+    width: 600px; height: 800px;
+    display: grid;
+    grid-template-columns: repeat(13, 44px);
+    grid-template-rows: repeat(18, 44px);
+  }
+  .knob {
+    width: 44px; height: 44px;
+    font-size: 15px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    background: #222; color: #ddd;
+    border: 1px solid #333;
+    cursor: pointer; user-select: none; padding: 0;
+  }
+  .knob:active { background: #555; }
+  #display {
+    background: #000; color: #0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: bold;
+    border: 1px solid #333;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div id="grid"></div>
+<script>
+  const COLS = 13, ROWS = 18;
+  const TOTAL = COLS * ROWS;      // 234
+  const KNOBS = TOTAL - 1;        // 233
+
+  const label = i => String.fromCharCode(65 + Math.floor(i/26)) +
+                     String.fromCharCode(65 + (i % 26));
+  // 0->AA, 1->AB, ... 25->AZ, 26->BA, ... 232->IW
+
+  const grid = document.getElementById('grid');
+
+  const display = document.createElement('div');
+  display.id = 'display';
+  display.textContent = '--';
+
+  for (let i = 0; i < KNOBS; i++) {
+    const b = document.createElement('button');
+    b.className = 'knob';
+    b.textContent = label(i);
+    b.onclick = () => display.textContent = b.textContent;
+    grid.appendChild(b);
+  }
+  grid.appendChild(display);
+</script>
+</body>
+</html>
