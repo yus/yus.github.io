@@ -2,6 +2,7 @@
 <html>
 <head>
 <style>
+  * { box-sizing: border-box; }
   body { margin:0; background:#111; font-family: monospace; }
   #grid {
     width: 600px; height: 800px;
@@ -19,11 +20,9 @@
   }
   .knob:active { background: #555; }
   #display {
-    background: #000; color: #0f0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px; font-weight: bold;
-    border: 1px solid #333;
-    letter-spacing: 2px;
+    width: 44px; height: 44px;
+    background: #000;
+    display: block;
   }
 </style>
 </head>
@@ -34,24 +33,41 @@
   const TOTAL = COLS * ROWS;      // 234
   const KNOBS = TOTAL - 1;        // 233
 
-  const label = i => String.fromCharCode(65 + Math.floor(i/26)) +
-                     String.fromCharCode(65 + (i % 26));
-  // 0->AA, 1->AB, ... 25->AZ, 26->BA, ... 232->IW
+  const label = i =>
+    String.fromCharCode(65 + Math.floor(i / 26)) +
+    String.fromCharCode(65 + (i % 26));
 
   const grid = document.getElementById('grid');
 
-  const display = document.createElement('div');
-  display.id = 'display';
-  display.textContent = '--';
-
+  // 233 knobs
   for (let i = 0; i < KNOBS; i++) {
     const b = document.createElement('button');
     b.className = 'knob';
     b.textContent = label(i);
-    b.onclick = () => display.textContent = b.textContent;
+    b.onclick = () => draw(b.textContent);
     grid.appendChild(b);
   }
-  grid.appendChild(display);
+
+  // LAST cell = canvas
+  const canvas = document.createElement('canvas');
+  canvas.id = 'display';
+  canvas.width = 44;
+  canvas.height = 44;
+  grid.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+
+  function draw(text) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 44, 44);
+    ctx.fillStyle = '#0f0';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 22, 22);
+  }
+
+  draw('--');
 </script>
 </body>
 </html>
