@@ -1,0 +1,299 @@
+/* ══════════════════════════════════════════════════════════════
+   parcels — base + mobile
+   the basis is a file. the overrides are yours. the layout is fluid.
+   ══════════════════════════════════════════════════════════════ */
+
+:root{
+  --bg:#0e0e10; --fg:#e8e8ea; --dim:#8a8a92; --line:#23232a; --card:#16161a;
+  --sn:#ff4d6d; --wn:#ff9e6d; --wp:#6dd3ff; --sp:#4dffb8; --neutral:#55555e;
+  --basis:#4a9eff; --override:#ffd166;
+
+  /* fluid tokens — these scale with viewport */
+  --pad: clamp(0.9rem, 4vw, 2rem);
+  --gap: clamp(0.5rem, 2vw, 0.8rem);
+  --fs:  clamp(0.82rem, 2.6vw, 0.9rem);
+  --fs-title: clamp(1.1rem, 5vw, 1.3rem);
+}
+
+*{ box-sizing:border-box; }
+
+html, body{ height:100%; }
+
+body{
+  margin:0;
+  padding: var(--pad);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  line-height:1.5;
+  max-width: 1100px;
+  margin-inline: auto;
+  font-size: var(--fs);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── headings ─────────────────────────────────────────────── */
+
+h1{ font-size: var(--fs-title); margin:0 0 .25rem; letter-spacing:-.02em; }
+h2{ font-size:.8rem; font-weight:600; margin:1.5rem 0 .5rem; color:var(--dim);
+    text-transform:uppercase; letter-spacing:.07em; }
+
+.sub{ color:var(--dim); font-size:.82rem; margin-bottom:1rem; }
+.nav{ font-size:.78rem; margin-bottom:1.5rem; }
+.nav a{ color:var(--wp); text-decoration:none; }
+.nav a:hover{ text-decoration:underline; }
+
+/* ── input ────────────────────────────────────────────────── */
+
+textarea{
+  width:100%;
+  min-height: 110px;
+  background: var(--card);
+  color: var(--fg);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:.9rem;
+  font: inherit;
+  font-size: var(--fs);
+  resize: vertical;
+  outline:none;
+}
+textarea:focus{ border-color: var(--wp); }
+
+/* ── buttons ──────────────────────────────────────────────── */
+
+.row{
+  display:flex;
+  gap: var(--gap);
+  margin:.8rem 0 1.2rem;
+  flex-wrap: wrap;
+}
+button{
+  background: var(--card);
+  color: var(--fg);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:.5rem 1rem;
+  font: inherit;
+  font-size:.82rem;
+  cursor:pointer;
+  min-height: 44px;              /* touch target */
+  min-width: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+button:hover{ border-color: var(--wp); }
+button.primary{ border-color: var(--wp); color: var(--wp); }
+button:active{ transform: translateY(1px); }
+
+/* ── status ───────────────────────────────────────────────── */
+
+.status{ font-size:.75rem; color:var(--dim); margin-bottom:1rem;
+         word-break: break-word; }
+.status b{ color: var(--fg); }
+.status .err{ color: var(--sn); }
+
+/* ── clouds ───────────────────────────────────────────────── */
+
+.clouds{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+  margin-bottom:1.5rem;
+}
+.cloud{
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:.9rem;
+  min-height: 110px;
+  border-top:3px solid var(--neutral);
+  overflow: hidden;
+}
+.cloud.sn{ border-top-color: var(--sn); }
+.cloud.wn{ border-top-color: var(--wn); }
+.cloud.wp{ border-top-color: var(--wp); }
+.cloud.sp{ border-top-color: var(--sp); }
+
+.cloud h3{
+  font-size:.7rem;
+  text-transform: uppercase;
+  letter-spacing:.08em;
+  margin:0 0 .6rem;
+  color: var(--dim);
+}
+.cloud .count{ color: var(--fg); font-weight:600; }
+
+/* ── parcels ──────────────────────────────────────────────── */
+
+.parcel{
+  display: inline-block;
+  padding:.15rem .5rem;
+  margin:.15rem .2rem .15rem 0;
+  border-radius:4px;
+  background:#1e1e24;
+  font-size:.78rem;
+  border:1px solid var(--line);
+  word-break: break-word;
+  max-width: 100%;
+}
+.parcel .score{ color: var(--dim); font-size:.7rem; margin-left:.3rem; }
+.parcel.sn{ border-color: var(--sn); color: var(--sn); }
+.parcel.wn{ border-color: var(--wn); color: var(--wn); }
+.parcel.wp{ border-color: var(--wp); color: var(--wp); }
+.parcel.sp{ border-color: var(--sp); color: var(--sp); }
+.parcel.ovr::after{ content:"•"; color: var(--override); margin-left:.25rem; }
+
+/* ── manifold ─────────────────────────────────────────────── */
+
+.manifold{
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  font-size:.82rem;
+}
+.manifold h3{
+  margin:0 0 .4rem;
+  font-size:.7rem;
+  text-transform: uppercase;
+  letter-spacing:.08em;
+  color: var(--dim);
+}
+
+.bar{
+  display:flex;
+  height:20px;
+  border-radius:4px;
+  overflow:hidden;
+  margin:.6rem 0;
+  background:#1a1a1f;
+}
+.bar span{ display:block; height:100%; }
+.bar .sn{ background: var(--sn); }
+.bar .wn{ background: var(--wn); }
+.bar .wp{ background: var(--wp); }
+.bar .sp{ background: var(--sp); }
+
+.stats{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+  margin-top:.8rem;
+  font-size:.75rem;
+  color: var(--dim);
+}
+.stats div span{ color: var(--fg); font-weight:600; }
+
+.finding{
+  margin-top:.8rem;
+  padding:.6rem .8rem;
+  border-left:3px solid var(--wp);
+  background:#121216;
+  border-radius:3px;
+  font-size:.8rem;
+  color: var(--dim);
+}
+.finding strong{ color: var(--fg); }
+.finding.mutter{ border-left-color: var(--sn); }
+.finding.mutter strong{ color: var(--sn); }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE LAYER
+   the same page, bent for the hand.
+   ══════════════════════════════════════════════════════════════ */
+
+/* tablets and small laptops */
+@media (max-width: 900px){
+  .clouds{ grid-template-columns: repeat(2, 1fr); }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* phones — the main event */
+@media (max-width: 600px){
+  body{
+    padding: 1rem .8rem 2rem;
+    max-width: 100%;
+    font-size: .88rem;
+  }
+
+  h1{ font-size: 1.15rem; }
+  .sub{ font-size:.76rem; }
+
+  textarea{
+    min-height: 130px;
+    font-size: 1rem;             /* prevents iOS zoom-on-focus */
+    padding:.7rem;
+  }
+
+  .row{
+    gap:.5rem;
+    margin:.7rem 0 1rem;
+  }
+  button{
+    flex: 1 1 auto;               /* full-width touch targets */
+    padding:.65rem .8rem;
+    font-size:.85rem;
+  }
+
+  /* clouds stack one per row, each fully visible */
+  .clouds{
+    grid-template-columns: 1fr;
+    gap:.6rem;
+  }
+  .cloud{
+    min-height: auto;
+    padding:.7rem .8rem;
+  }
+  .cloud h3{
+    font-size:.66rem;
+    margin-bottom:.4rem;
+  }
+
+  /* parcels shrink slightly, stay on one line each if possible */
+  .parcel{
+    font-size:.74rem;
+    padding:.12rem .45rem;
+  }
+
+  /* manifold stays visible, stats drop to 2x2 */
+  .manifold{
+    padding:.8rem .9rem;
+    font-size:.78rem;
+  }
+  .stats{
+    grid-template-columns: repeat(2, 1fr);
+    font-size:.72rem;
+  }
+
+  .bar{ height: 16px; }
+
+  .finding{
+    font-size:.76rem;
+    padding:.55rem .7rem;
+  }
+}
+
+/* very narrow phones */
+@media (max-width: 380px){
+  body{ padding:.8rem .6rem 2rem; }
+  button{ font-size:.8rem; padding:.6rem .6rem; }
+  .parcel{ font-size:.7rem; }
+  .stats{ font-size:.68rem; }
+}
+
+/* landscape phones — clouds can go back to 2-col */
+@media (max-width: 900px) and (orientation: landscape){
+  .clouds{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; animation: none !important; }
+  button:active{ transform: none; }
+}
+
+/* dark-mode stays dark; light-mode users get a fallback if they force */
+@media (prefers-color-scheme: light){
+  /* intentionally inert — the page is a dark instrument */
+}
