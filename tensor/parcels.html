@@ -2,81 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Parcels — Basis Thesaurus</title>
-<style>
-  :root{
-    --bg:#0e0e10; --fg:#e8e8ea; --dim:#8a8a92; --line:#23232a; --card:#16161a;
-    --sn:#ff4d6d; --wn:#ff9e6d; --wp:#6dd3ff; --sp:#4dffb8; --neutral:#55555e;
-    --basis:#4a9eff; --override:#ffd166;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;padding:2rem;background:var(--bg);color:var(--fg);
-       font-family:ui-monospace,"SF Mono",Menlo,monospace;line-height:1.5;
-       max-width:1100px;margin:0 auto}
-  h1{font-size:1.3rem;margin:0 0 .25rem;letter-spacing:-.02em}
-  h2{font-size:.8rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--dim);
-     text-transform:uppercase;letter-spacing:.07em}
-  .sub{color:var(--dim);font-size:.82rem;margin-bottom:1rem}
-  .nav{font-size:.78rem;margin-bottom:1.5rem}
-  .nav a{color:var(--wp);text-decoration:none}
-  .nav a:hover{text-decoration:underline}
-
-  textarea{width:100%;min-height:110px;background:var(--card);color:var(--fg);
-           border:1px solid var(--line);border-radius:6px;padding:.9rem;
-           font:inherit;font-size:.9rem;resize:vertical;outline:none}
-  textarea:focus{border-color:var(--wp)}
-
-  .row{display:flex;gap:.6rem;margin:.8rem 0 1.2rem;flex-wrap:wrap}
-  button{background:var(--card);color:var(--fg);border:1px solid var(--line);
-         border-radius:6px;padding:.5rem 1rem;font:inherit;font-size:.82rem;cursor:pointer}
-  button:hover{border-color:var(--wp)}
-  button.primary{border-color:var(--wp);color:var(--wp)}
-
-  .status{font-size:.75rem;color:var(--dim);margin-bottom:1rem}
-  .status b{color:var(--fg)}
-  .status .err{color:var(--sn)}
-
-  .clouds{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.5rem}
-  .cloud{background:var(--card);border:1px solid var(--line);border-radius:8px;
-         padding:.9rem;min-height:110px;border-top:3px solid var(--neutral)}
-  .cloud.sn{border-top-color:var(--sn)}
-  .cloud.wn{border-top-color:var(--wn)}
-  .cloud.wp{border-top-color:var(--wp)}
-  .cloud.sp{border-top-color:var(--sp)}
-  .cloud h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
-            margin:0 0 .6rem;color:var(--dim)}
-  .cloud .count{color:var(--fg);font-weight:600}
-
-  .parcel{display:inline-block;padding:.15rem .5rem;margin:.15rem .2rem .15rem 0;
-          border-radius:4px;background:#1e1e24;font-size:.78rem;
-          border:1px solid var(--line)}
-  .parcel .score{color:var(--dim);font-size:.7rem;margin-left:.3rem}
-  .parcel.sn{border-color:var(--sn);color:var(--sn)}
-  .parcel.wn{border-color:var(--wn);color:var(--wn)}
-  .parcel.wp{border-color:var(--wp);color:var(--wp)}
-  .parcel.sp{border-color:var(--sp);color:var(--sp)}
-  .parcel.ovr::after{content:"•";color:var(--override);margin-left:.25rem}
-
-  .manifold{background:var(--card);border:1px solid var(--line);border-radius:8px;
-            padding:1rem 1.2rem;font-size:.82rem}
-  .bar{display:flex;height:20px;border-radius:4px;overflow:hidden;
-       margin:.6rem 0;background:#1a1a1f}
-  .bar span{display:block;height:100%}
-  .bar .sn{background:var(--sn)}
-  .bar .wn{background:var(--wn)}
-  .bar .wp{background:var(--wp)}
-  .bar .sp{background:var(--sp)}
-
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;
-         margin-top:.8rem;font-size:.75rem;color:var(--dim)}
-  .stats div span{color:var(--fg);font-weight:600}
-
-  .finding{margin-top:.8rem;padding:.6rem .8rem;border-left:3px solid var(--wp);
-           background:#121216;border-radius:3px;font-size:.8rem;color:var(--dim)}
-  .finding strong{color:var(--fg)}
-  .finding.mutter{border-left-color:var(--sn)}
-  .finding.mutter strong{color:var(--sn)}
-</style>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
