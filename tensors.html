@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Method Types — Serial vs Syncopated</title>
+<style>
+  :root {
+    --bg: #0e0e10;
+    --fg: #e8e8ea;
+    --dim: #8a8a92;
+    --serial: #4a9eff;
+    --syncopated: #ff6b9d;
+    --permuted: #ffd166;
+    --staggered: #06d6a0;
+    --paratonic: #b388ff;
+    --line: #23232a;
+    --card: #16161a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 2rem;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .sub {
+    color: var(--dim);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--dim);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--card);
+    font-weight: 600;
+    color: var(--dim);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: #121216; }
+
+  .name {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .name.serial { color: var(--serial); }
+  .name.syncopated { color: var(--syncopated); }
+  .name.permuted { color: var(--permuted); }
+  .name.staggered { color: var(--staggered); }
+  .name.paratonic { color: var(--paratonic); }
+
+  .order {
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+  }
+
+  .order .up { color: var(--serial); }
+  .order .down { color: var(--dim); }
+  .order .jump { color: var(--syncopated); }
+  .order .rest { color: var(--dim); opacity: 0.5; }
+
+  .sum {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .same {
+    color: var(--dim);
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  .note {
+    margin-top: 1.5rem;
+    padding: 1rem 1.2rem;
+    background: var(--card);
+    border-left: 3px solid var(--syncopated);
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: var(--dim);
+  }
+
+  .note strong { color: var(--fg); }
+
+  .trajectory {
+    font-family: ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #0a0a0c;
+    border-radius: 4px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Method Types — Same Sum, Different Path</h1>
+  <div class="sub">A method is not the product. The sum is invariant; the order carries the difference.</div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--serial)"></i> serial / monotonic</span>
+    <span><i class="dot" style="background:var(--syncopated)"></i> syncopated</span>
+    <span><i class="dot" style="background:var(--permuted)"></i> permuted</span>
+    <span><i class="dot" style="background:var(--staggered)"></i> staggered</span>
+    <span><i class="dot" style="background:var(--paratonic)"></i> paratonic (coined)</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Order (n=5)</th>
+        <th>Sum</th>
+        <th>Motion</th>
+        <th>Where it lives</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="name serial">serial</td>
+        <td class="order"><span class="up">5 4 3 2 1</span></td>
+        <td class="sum">120 <span class="same">same</span></td>
+        <td>monotonic, forced</td>
+        <td>the default path — the one we expect</td>
+      </tr>
+      <tr>
+        <td class="name syncopated">syncopated</td>
+        <td class="order"><span class="jump">2</span> <span class="up">5</span> <span class="rest">·</span> <span class="jump">1</span> <span class="up">3</span> <span class="jump">4</span></td>
+        <td class="sum">120 <span class="same">same</span></td>
+        <td>off-beat, displaced, resolves</td>
+        <td>music — notes off the expected beat</td>
+      </tr>
+      <tr>
+        <td class="name permuted">permuted</td>
+        <td class="order"><span class="up">3</span> <span class="jump">1</span> <span class="up">4</span> <span class="jump">2</span> <span class="up">5</span></td>
+        <td class="sum">120 <span class="same">same</span></td>
+        <td>rearranged, no rhythm</td>
+        <td>math — same factors, arbitrary order</td>
+      </tr>
+      <tr>
+        <td class="name staggered">staggered</td>
+        <td class="order"><span class="up">5</span> <span class="rest">··</span> <span class="up">4</span> <span class="rest">·</span> <span class="up">3</span> <span class="rest">···</span> <span class="up">2</span> <span class="up">1</span></td>
+        <td class="sum">120 <span class="same">same</span></td>
+        <td>delayed, off-step</td>
+        <td>scheduling — displaced timing, same result</td>
+      </tr>
+      <tr>
+        <td class="name paratonic">paratonic</td>
+        <td class="order"><span class="jump">?</span> <span class="up">5</span> <span class="jump">?</span> <span class="up">1</span> <span class="jump">?</span></td>
+        <td class="sum">120 <span class="same">same</span></td>
+        <td>beside the expected line</td>
+        <td>coined — for methods that run parallel, not against</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="trajectory">trajectory through the tensor:
+
+  serial      ────────────────►  (straight, monotonic)
+
+  syncopated  ──┐  ┌──┐   ┌──►   (jumps, but arrives)
+
+  permuted    ─┐ ┌─┘ ┌─┐ ┌──►    (rearranged, no beat)
+
+  staggered   ──┐    ┌───┐  ─►   (delayed, same end)</div>
+
+  <div class="note">
+    <strong>The head thought:</strong> the sum is not a feature of the method. It's a feature of the <em>factors</em>. The method is the path — monotonic or not. Two methods can share a product and share nothing else. The mirror reads the method, not the sum.
+  </div>
+
+</body>
+</html>
