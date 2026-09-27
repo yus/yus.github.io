@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Parcels — Basis Thesaurus</title>
+<style>
+  :root{
+    --bg:#0e0e10; --fg:#e8e8ea; --dim:#8a8a92; --line:#23232a; --card:#16161a;
+    --sn:#ff4d6d; --wn:#ff9e6d; --wp:#6dd3ff; --sp:#4dffb8; --neutral:#55555e;
+    --basis:#4a9eff; --override:#ffd166;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:2rem;background:var(--bg);color:var(--fg);
+       font-family:ui-monospace,"SF Mono",Menlo,monospace;line-height:1.5;
+       max-width:1100px;margin:0 auto}
+  h1{font-size:1.3rem;margin:0 0 .25rem;letter-spacing:-.02em}
+  h2{font-size:.8rem;font-weight:600;margin:1.5rem 0 .5rem;color:var(--dim);
+     text-transform:uppercase;letter-spacing:.07em}
+  .sub{color:var(--dim);font-size:.82rem;margin-bottom:1rem}
+  .nav{font-size:.78rem;margin-bottom:1.5rem}
+  .nav a{color:var(--wp);text-decoration:none}
+  .nav a:hover{text-decoration:underline}
+
+  textarea{width:100%;min-height:110px;background:var(--card);color:var(--fg);
+           border:1px solid var(--line);border-radius:6px;padding:.9rem;
+           font:inherit;font-size:.9rem;resize:vertical;outline:none}
+  textarea:focus{border-color:var(--wp)}
+
+  .row{display:flex;gap:.6rem;margin:.8rem 0 1.2rem;flex-wrap:wrap}
+  button{background:var(--card);color:var(--fg);border:1px solid var(--line);
+         border-radius:6px;padding:.5rem 1rem;font:inherit;font-size:.82rem;cursor:pointer}
+  button:hover{border-color:var(--wp)}
+  button.primary{border-color:var(--wp);color:var(--wp)}
+
+  .status{font-size:.75rem;color:var(--dim);margin-bottom:1rem}
+  .status b{color:var(--fg)}
+  .status .err{color:var(--sn)}
+
+  .clouds{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.5rem}
+  .cloud{background:var(--card);border:1px solid var(--line);border-radius:8px;
+         padding:.9rem;min-height:110px;border-top:3px solid var(--neutral)}
+  .cloud.sn{border-top-color:var(--sn)}
+  .cloud.wn{border-top-color:var(--wn)}
+  .cloud.wp{border-top-color:var(--wp)}
+  .cloud.sp{border-top-color:var(--sp)}
+  .cloud h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+            margin:0 0 .6rem;color:var(--dim)}
+  .cloud .count{color:var(--fg);font-weight:600}
+
+  .parcel{display:inline-block;padding:.15rem .5rem;margin:.15rem .2rem .15rem 0;
+          border-radius:4px;background:#1e1e24;font-size:.78rem;
+          border:1px solid var(--line)}
+  .parcel .score{color:var(--dim);font-size:.7rem;margin-left:.3rem}
+  .parcel.sn{border-color:var(--sn);color:var(--sn)}
+  .parcel.wn{border-color:var(--wn);color:var(--wn)}
+  .parcel.wp{border-color:var(--wp);color:var(--wp)}
+  .parcel.sp{border-color:var(--sp);color:var(--sp)}
+  .parcel.ovr::after{content:"•";color:var(--override);margin-left:.25rem}
+
+  .manifold{background:var(--card);border:1px solid var(--line);border-radius:8px;
+            padding:1rem 1.2rem;font-size:.82rem}
+  .bar{display:flex;height:20px;border-radius:4px;overflow:hidden;
+       margin:.6rem 0;background:#1a1a1f}
+  .bar span{display:block;height:100%}
+  .bar .sn{background:var(--sn)}
+  .bar .wn{background:var(--wn)}
+  .bar .wp{background:var(--wp)}
+  .bar .sp{background:var(--sp)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;
+         margin-top:.8rem;font-size:.75rem;color:var(--dim)}
+  .stats div span{color:var(--fg);font-weight:600}
+
+  .finding{margin-top:.8rem;padding:.6rem .8rem;border-left:3px solid var(--wp);
+           background:#121216;border-radius:3px;font-size:.8rem;color:var(--dim)}
+  .finding strong{color:var(--fg)}
+  .finding.mutter{border-left-color:var(--sn)}
+  .finding.mutter strong{color:var(--sn)}
+</style>
+</head>
+<body>
+
+<h1>Parcels — Basis Thesaurus</h1>
+<div class="sub">input → parcels → clouds → manifold. polarity basis: AFINN-111. overrides: yours.</div>
+<div class="nav">← <a href="./tensors.html">tensors.html</a> (method types)</div>
+
+<textarea id="input">You must never output incorrect data. Prefer concise answers, avoid ambiguity, and always verify facts. Be excellent but never slow.</textarea>
+
+<div class="row">
+  <button class="primary" id="go">precipitate</button>
+  <button id="clear">clear</button>
+</div>
+
+<div class="status" id="status">loading basis…</div>
+
+<div class="clouds">
+  <div class="cloud sn"><h3>strong negative <span class="count" id="c-sn">0</span></h3><div id="p-sn"></div></div>
+  <div class="cloud wn"><h3>weak negative <span class="count" id="c-wn">0</span></h3><div id="p-wn"></div></div>
+  <div class="cloud wp"><h3>weak positive <span class="count" id="c-wp">0</span></h3><div id="p-wp"></div></div>
+  <div class="cloud sp"><h3>strong positive <span class="count" id="c-sp">0</span></h3><div id="p-sp"></div></div>
+</div>
+
+<div class="manifold">
+  <h3 style="margin:0 0 .4rem;font-size:.7rem;text-transform:uppercase;
+             letter-spacing:.08em;color:var(--dim)">manifold — polarity shape</h3>
+  <div class="bar" id="bar"></div>
+  <div class="stats">
+    <div>parcels: <span id="s-total">0</span></div>
+    <div>balance: <span id="s-balance">—</span></div>
+    <div>dominant: <span id="s-dominant">—</span></div>
+    <div>tension: <span id="s-tension">—</span></div>
+  </div>
+  <div class="finding" id="finding">waiting…</div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   BASIS THESAURUS — AFINN-111
+   loaded from your own URL: ./afinn-111.txt
+   swap the basis by changing BASIS_URL. nothing above changes.
+   ══════════════════════════════════════════════════════════════ */
+const BASIS_URL = "./afinn-111.txt";
+let BASIS = {};
+
+/* ══════════════════════════════════════════════════════════════
+   OVERRIDE LAYER — yours
+   these win over the basis. earned from friction, not theory.
+   ══════════════════════════════════════════════════════════════ */
+const OVERRIDES = {
+  // add your own: "word": score
+  // examples for the prompt domain:
+  "hallucinate": -4,
+  "coherent": 3,
+  "prompt": 1,
+  "token": 0,
+  // "crash": -5,   // if you want AFINN's -3 sharpened
+};
+
+/* merged lexicon: overrides win */
+let LEX = {};
+
+/* ──────────────── bands ──────────────── */
+function band(score){
+  if (score <= -3) return "sn";
+  if (score <= -1) return "wn";
+  if (score >=  3) return "sp";
+  if (score >=  1) return "wp";
+  return null;
+}
+
+/* ──────────────── tokenize + parcelize ──────────────── */
+function tokenize(text){
+  return text.toLowerCase().match(/[a-z']+/g) || [];
+}
+
+function parcelize(text){
+  const tokens = tokenize(text);
+  const parcels = [];
+  const seen = new Set();
+  for (const t of tokens){
+    if (seen.has(t)) continue;
+    const base = t.replace(/(ing|ed|s)$/,"");
+    let score = LEX[t];
+    let fromOverride = false;
+    if (OVERRIDES[t] !== undefined){ score = OVERRIDES[t]; fromOverride = true; }
+    else if (score === undefined && OVERRIDES[base] !== undefined){ score = OVERRIDES[base]; fromOverride = true; }
+    else if (score === undefined) score = LEX[base];
+    if (score === undefined) continue;
+    seen.add(t);
+    parcels.push({ word: t, score, fromOverride });
+  }
+  return parcels;
+}
+
+/* ──────────────── render ──────────────── */
+const $ = id => document.getElementById(id);
+
+function render(){
+  const text = $("input").value || "";
+  const parcels = parcelize(text);
+
+  const buckets = { sn:[], wn:[], wp:[], sp:[] };
+  for (const p of parcels){
+    const b = band(p.score);
+    if (b) buckets[b].push(p);
+  }
+
+  for (const b of ["sn","wn","wp","sp"]){
+    $("p-"+b).innerHTML = buckets[b].map(p =>
+      `<span class="parcel ${b}${p.fromOverride?" ovr":""}">${p.word}<span class="score">${p.score>0?"+":""}${p.score}</span></span>`
+    ).join("") || `<span style="color:var(--dim);font-size:.75rem">—</span>`;
+    $("c-"+b).textContent = buckets[b].length;
+  }
+
+  const total = parcels.length || 1;
+  const widths = {
+    sn:(buckets.sn.length/total*100).toFixed(1),
+    wn:(buckets.wn.length/total*100).toFixed(1),
+    wp:(buckets.wp.length/total*100).toFixed(1),
+    sp:(buckets.sp.length/total*100).toFixed(1)
+  };
+  $("bar").innerHTML =
+    `<span class="sn" style="width:${widths.sn}%"></span>` +
+    `<span class="wn" style="width:${widths.wn}%"></span>` +
+    `<span class="wp" style="width:${widths.wp}%"></span>` +
+    `<span class="sp" style="width:${widths.sp}%"></span>`;
+
+  const neg = buckets.sn.length + buckets.wn.length;
+  const pos = buckets.wp.length + buckets.sp.length;
+  const balance = pos - neg;
+  $("s-total").textContent = parcels.length;
+  $("s-balance").textContent = (balance > 0 ? "+" : "") + balance;
+
+  const sizes = { sn:buckets.sn.length, wn:buckets.wn.length,
+                  wp:buckets.wp.length, sp:buckets.sp.length };
+  const dom = Object.entries(sizes).sort((a,b)=>b[1]-a[1])[0];
+  $("s-dominant").textContent = dom[1] ? dom[0] : "—";
+
+  const tension = Math.min(neg, pos);
+  $("s-tension").textContent = tension;
+
+  const f = $("finding");
+  f.classList.remove("mutter");
+  if (parcels.length === 0){
+    f.innerHTML = "no parcels — try words like <strong>must</strong>, <strong>never</strong>, <strong>prefer</strong>, <strong>avoid</strong>";
+  } else if (tension >= 3 && Math.abs(balance) <= 2){
+    f.classList.add("mutter");
+    f.innerHTML = "<strong>mutter detected:</strong> strong negatives and strong positives both present, balance near zero. the prompt reads as one thing and is another — the conflict is hidden by the shape.";
+  } else if (neg > pos && sizes.sn > 0){
+    f.innerHTML = "<strong>negative-dominant:</strong> the prompt is framed by prohibition. check whether the <em>intent</em> survives the constraints.";
+  } else if (pos > neg && sizes.sp > 0){
+    f.innerHTML = "<strong>positive-dominant:</strong> the prompt is framed by requirement. check whether the <em>constraints</em> are missing.";
+  } else if (dom[1] === 0){
+    f.innerHTML = "no polar parcels — the prompt carries no weight in this lexicon yet.";
+  } else {
+    f.innerHTML = "<strong>balanced:</strong> polarity is spread. look for thin clouds rather than collisions.";
+  }
+}
+
+/* ──────────────── basis loading ──────────────── */
+function parseAFINN(txt){
+  const out = {};
+  for (const line of txt.split("\n")){
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const parts = trimmed.split(/\s+/);
+    if (parts.length < 2) continue;
+    const w = parts[0].toLowerCase();
+    const s = parseInt(parts[parts.length-1], 10);
+    if (!isNaN(s)) out[w] = s;
+  }
+  return out;
+}
+
+async function loadBasis(){
+  const status = $("status");
+  try {
+    const r = await fetch(BASIS_URL, { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const txt = await r.text();
+    BASIS = parseAFINN(txt);
+    LEX = { ...BASIS, ...OVERRIDES };
+    const n = Object.keys(BASIS).length;
+    const o = Object.keys(OVERRIDES).length;
+    status.innerHTML = `basis: <b>${n}</b> words from <b>${BASIS_URL}</b> · overrides: <b>${o}</b> · total: <b>${Object.keys(LEX).length}</b>`;
+    render();
+  } catch (e){
+    status.innerHTML = `<span class="err">basis load failed (${e.message})</span> — falling back to inline starter set.`;
+    BASIS = {
+      "never":-5,"wrong":-4,"incorrect":-4,"fail":-4,"broken":-4,
+      "avoid":-2,"ambiguous":-2,"unclear":-2,"missing":-1,
+      "prefer":1,"clear":2,"good":2,"helpful":2,"better":2,
+      "must":3,"always":4,"critical":4,"verify":3,"correct":3,"excellent":5
+    };
+    LEX = { ...BASIS, ...OVERRIDES };
+    render();
+  }
+}
+
+/* ──────────────── wiring ──────────────── */
+$("go").addEventListener("click", render);
+$("clear").addEventListener("click", () => { $("input").value = ""; render(); });
+$("input").addEventListener("input", render);
+
+/* boot */
+loadBasis();
+</script>
+
+</body>
+</html>
